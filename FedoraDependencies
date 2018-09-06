@@ -1,0 +1,57 @@
+sudo -s
+#sudo yum update    /No
+sudo yum install gfortran
+dnf install glx-utils
+sudo yum install freeglut-devel
+dnf install mathgl-devel
+dnf install mathgl
+dnf install libmgl
+dnf install mathgl-fltk
+#sudo apt-get install libmgl-dev
+dnf install blas
+dnf install blas-devel
+dnf install lapack
+dnf install lapack-devel
+#sudo apt install liblapacke-dev
+dnf install gtk3-devel
+dnf install make
+dnf install clang
+rpm --import https://repos.codelite.org/CodeLite.asc
+rpm -Uvh https://repos.codelite.org/rpms-13.0/fedora/codelite-13.0-1.fc30.x86_64.rpm
+
+//It is nessesary that we need to instal it after all other libs, because it automatically
+//compile the related parts in linux and mac, but in windows we should configure it eg. opengl
+//To install wxWidgets
+//extract wxWidgets-3.1.2.tar.bz2
+cd wxWidgets-3.1.2
+//without sudo
+mkdir gtk-build
+cd gtk-build/
+../configure --enable-unicode --with-opengl --with-libpng
+make
+sudo make install
+
+ ------------------------------------------------------
+ 
+ The installation of wxWidgets is finished.  On certain
+ platforms (e.g. Linux) you'll now have to run ldconfig
+ if you installed a shared library and also modify the
+ LD_LIBRARY_PATH (or equivalent) environment variable.
+ 
+ wxWidgets comes with no guarantees and doesn't claim
+ to be suitable for any purpose.
+ 
+ Read the wxWindows Licence on licencing conditions.
+ 
+ ------------------------------------------------------
+
+Setting->Environment Variables
+CodeLiteDir=/usr/share/codelite
+WXDIRInclude=/usr/local/include/wx-3.1
+lapackeDir=/usr/include/lapacke
+RapidXML_DIR=/home/mohammadnakhaee/Documents/pecsjunc/rapidxml-1.13
+export PATH=$(WXDIRInclude):$PATH
+
+
+
+

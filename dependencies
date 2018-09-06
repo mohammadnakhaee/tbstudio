@@ -1,0 +1,73 @@
+sudo apt-key adv --fetch-keys http://repos.codelite.org/CodeLite.asc
+sudo apt-add-repository 'deb https://repos.codelite.org/ubuntu/ disco universe'
+debian stretch deb https://repos.codelite.org/debian3/ stretch devel
+sudo apt-get codelite
+
+
+
+sudo apt-get update
+sudo apt-get install libgtk-3-dev build-essential checkinstall
+
+
+sudo apt-get install gfortran
+
+
+
+
+
+
+
+
+
+To install OpenGL libraries:
+sudo apt-get install mesa-utils
+
+To install freeGlut:
+sudo apt-get install freeglut3-dev
+
+Installing mathgl package on Ubuntu
+sudo apt-get update
+sudo apt-get install mathgl
+sudo apt-get install libmgl-dev
+
+
+
+
+install lapack
+sudo apt install liblapack3
+sudo apt install liblapack-dev
+sudo apt install libopenblas-base
+sudo apt install libopenblas-dev
+sudo apt install liblapack-dev
+sudo apt install liblapacke-dev
+
+
+//It is nessesary that we need to instal it after all other libs, because it automatically
+//compile the related parts in linux and mac, but in windows we should configure it eg. opengl
+install wxWidgets
+extract wxWidgets-3.1.2.tar.bz2
+cd wxWidgets-3.1.2
+without sudo
+mkdir gtk-build
+cd gtk-build/
+#../configure --disable-shared --enable-unicode
+#../configure --enable-unicode
+../configure --enable-unicode --with-opengl --with-libpng
+make
+sudo make install
+
+ ------------------------------------------------------
+ 
+ The installation of wxWidgets is finished.  On certain
+ platforms (e.g. Linux) you'll now have to run ldconfig
+ if you installed a shared library and also modify the
+ LD_LIBRARY_PATH (or equivalent) environment variable.
+ 
+ wxWidgets comes with no guarantees and doesn't claim
+ to be suitable for any purpose.
+ 
+ Read the wxWindows Licence on licencing conditions.
+ 
+ ------------------------------------------------------
+
+

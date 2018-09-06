@@ -1,0 +1,189 @@
+[{
+  "file": "/home/mohammadnakhaee/Documents/pecsjunc/GUI/MyFigureClass.cpp",
+  "directory": "/home/mohammadnakhaee/Documents/pecsjunc/GUI",
+  "command": "clang  -c /home/mohammadnakhaee/Documents/pecsjunc/GUI/MyFigureClass.cpp -o /home/mohammadnakhaee/Documents/pecsjunc/GUI/MyFigureClass.cpp.o  -I/usr/include/c++/9 -I/usr/include/c++/9/x86_64-redhat-linux -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-redhat-linux/9/include -I/usr/local/include -I/usr/include -DNDEBUG -I. -I. -I$(RapidXML_DIR) -I$(WXDIRInclude) -I$(lapackeDir)  -O2  -Wall  -I/usr/local/lib/wx/include/gtk3-unicode-3.1 -I/usr/local/include/wx-3.1 -D_FILE_OFFSET_BITS=64 -DWXUSINGDLL -D__WXGTK__ -pthread -lwx_gtk3u_gl-3.1"
+ }, {
+  "file": "/home/mohammadnakhaee/Documents/pecsjunc/GUI/StructureClass.h",
+  "directory": "/home/mohammadnakhaee/Documents/pecsjunc/GUI",
+  "command": "clang  -c /home/mohammadnakhaee/Documents/pecsjunc/GUI/StructureClass.h -o /home/mohammadnakhaee/Documents/pecsjunc/GUI/StructureClass.h.o  -I/usr/include/c++/9 -I/usr/include/c++/9/x86_64-redhat-linux -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-redhat-linux/9/include -I/usr/local/include -I/usr/include -DNDEBUG -I. -I. -I$(RapidXML_DIR) -I$(WXDIRInclude) -I$(lapackeDir)  -O2  -Wall  -I/usr/local/lib/wx/include/gtk3-unicode-3.1 -I/usr/local/include/wx-3.1 -D_FILE_OFFSET_BITS=64 -DWXUSINGDLL -D__WXGTK__ -pthread -lwx_gtk3u_gl-3.1"
+ }, {
+  "file": "/home/mohammadnakhaee/Documents/pecsjunc/GUI/OrbitalsClass.cpp",
+  "directory": "/home/mohammadnakhaee/Documents/pecsjunc/GUI",
+  "command": "clang  -c /home/mohammadnakhaee/Documents/pecsjunc/GUI/OrbitalsClass.cpp -o /home/mohammadnakhaee/Documents/pecsjunc/GUI/OrbitalsClass.cpp.o  -I/usr/include/c++/9 -I/usr/include/c++/9/x86_64-redhat-linux -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-redhat-linux/9/include -I/usr/local/include -I/usr/include -DNDEBUG -I. -I. -I$(RapidXML_DIR) -I$(WXDIRInclude) -I$(lapackeDir)  -O2  -Wall  -I/usr/local/lib/wx/include/gtk3-unicode-3.1 -I/usr/local/include/wx-3.1 -D_FILE_OFFSET_BITS=64 -DWXUSINGDLL -D__WXGTK__ -pthread -lwx_gtk3u_gl-3.1"
+ }, {
+  "file": "/home/mohammadnakhaee/Documents/pecsjunc/GUI/MyOpenGL.cpp",
+  "directory": "/home/mohammadnakhaee/Documents/pecsjunc/GUI",
+  "command": "clang  -c /home/mohammadnakhaee/Documents/pecsjunc/GUI/MyOpenGL.cpp -o /home/mohammadnakhaee/Documents/pecsjunc/GUI/MyOpenGL.cpp.o  -I/usr/include/c++/9 -I/usr/include/c++/9/x86_64-redhat-linux -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-redhat-linux/9/include -I/usr/local/include -I/usr/include -DNDEBUG -I. -I. -I$(RapidXML_DIR) -I$(WXDIRInclude) -I$(lapackeDir)  -O2  -Wall  -I/usr/local/lib/wx/include/gtk3-unicode-3.1 -I/usr/local/include/wx-3.1 -D_FILE_OFFSET_BITS=64 -DWXUSINGDLL -D__WXGTK__ -pthread -lwx_gtk3u_gl-3.1"
+ }, {
+  "file": "/home/mohammadnakhaee/Documents/pecsjunc/GUI/welcome650325.h",
+  "directory": "/home/mohammadnakhaee/Documents/pecsjunc/GUI",
+  "command": "clang  -c /home/mohammadnakhaee/Documents/pecsjunc/GUI/welcome650325.h -o /home/mohammadnakhaee/Documents/pecsjunc/GUI/welcome650325.h.o  -I/usr/include/c++/9 -I/usr/include/c++/9/x86_64-redhat-linux -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-redhat-linux/9/include -I/usr/local/include -I/usr/include -DNDEBUG -I. -I. -I$(RapidXML_DIR) -I$(WXDIRInclude) -I$(lapackeDir)  -O2  -Wall  -I/usr/local/lib/wx/include/gtk3-unicode-3.1 -I/usr/local/include/wx-3.1 -D_FILE_OFFSET_BITS=64 -DWXUSINGDLL -D__WXGTK__ -pthread -lwx_gtk3u_gl-3.1"
+ }, {
+  "file": "/home/mohammadnakhaee/Documents/pecsjunc/GUI/Sec30.h",
+  "directory": "/home/mohammadnakhaee/Documents/pecsjunc/GUI",
+  "command": "clang  -c /home/mohammadnakhaee/Documents/pecsjunc/GUI/Sec30.h -o /home/mohammadnakhaee/Documents/pecsjunc/GUI/Sec30.h.o  -I/usr/include/c++/9 -I/usr/include/c++/9/x86_64-redhat-linux -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-redhat-linux/9/include -I/usr/local/include -I/usr/include -DNDEBUG -I. -I. -I$(RapidXML_DIR) -I$(WXDIRInclude) -I$(lapackeDir)  -O2  -Wall  -I/usr/local/lib/wx/include/gtk3-unicode-3.1 -I/usr/local/include/wx-3.1 -D_FILE_OFFSET_BITS=64 -DWXUSINGDLL -D__WXGTK__ -pthread -lwx_gtk3u_gl-3.1"
+ }, {
+  "file": "/home/mohammadnakhaee/Documents/pecsjunc/GUI/sec30TextCtrl.h",
+  "directory": "/home/mohammadnakhaee/Documents/pecsjunc/GUI",
+  "command": "clang  -c /home/mohammadnakhaee/Documents/pecsjunc/GUI/sec30TextCtrl.h -o /home/mohammadnakhaee/Documents/pecsjunc/GUI/sec30TextCtrl.h.o  -I/usr/include/c++/9 -I/usr/include/c++/9/x86_64-redhat-linux -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-redhat-linux/9/include -I/usr/local/include -I/usr/include -DNDEBUG -I. -I. -I$(RapidXML_DIR) -I$(WXDIRInclude) -I$(lapackeDir)  -O2  -Wall  -I/usr/local/lib/wx/include/gtk3-unicode-3.1 -I/usr/local/include/wx-3.1 -D_FILE_OFFSET_BITS=64 -DWXUSINGDLL -D__WXGTK__ -pthread -lwx_gtk3u_gl-3.1"
+ }, {
+  "file": "/home/mohammadnakhaee/Documents/pecsjunc/GUI/UnitcellClass.cpp",
+  "directory": "/home/mohammadnakhaee/Documents/pecsjunc/GUI",
+  "command": "clang  -c /home/mohammadnakhaee/Documents/pecsjunc/GUI/UnitcellClass.cpp -o /home/mohammadnakhaee/Documents/pecsjunc/GUI/UnitcellClass.cpp.o  -I/usr/include/c++/9 -I/usr/include/c++/9/x86_64-redhat-linux -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-redhat-linux/9/include -I/usr/local/include -I/usr/include -DNDEBUG -I. -I. -I$(RapidXML_DIR) -I$(WXDIRInclude) -I$(lapackeDir)  -O2  -Wall  -I/usr/local/lib/wx/include/gtk3-unicode-3.1 -I/usr/local/include/wx-3.1 -D_FILE_OFFSET_BITS=64 -DWXUSINGDLL -D__WXGTK__ -pthread -lwx_gtk3u_gl-3.1"
+ }, {
+  "file": "/home/mohammadnakhaee/Documents/pecsjunc/GUI/MyFigureClass.h",
+  "directory": "/home/mohammadnakhaee/Documents/pecsjunc/GUI",
+  "command": "clang  -c /home/mohammadnakhaee/Documents/pecsjunc/GUI/MyFigureClass.h -o /home/mohammadnakhaee/Documents/pecsjunc/GUI/MyFigureClass.h.o  -I/usr/include/c++/9 -I/usr/include/c++/9/x86_64-redhat-linux -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-redhat-linux/9/include -I/usr/local/include -I/usr/include -DNDEBUG -I. -I. -I$(RapidXML_DIR) -I$(WXDIRInclude) -I$(lapackeDir)  -O2  -Wall  -I/usr/local/lib/wx/include/gtk3-unicode-3.1 -I/usr/local/include/wx-3.1 -D_FILE_OFFSET_BITS=64 -DWXUSINGDLL -D__WXGTK__ -pthread -lwx_gtk3u_gl-3.1"
+ }, {
+  "file": "/home/mohammadnakhaee/Documents/pecsjunc/GUI/MainFrame.cpp",
+  "directory": "/home/mohammadnakhaee/Documents/pecsjunc/GUI",
+  "command": "clang  -c /home/mohammadnakhaee/Documents/pecsjunc/GUI/MainFrame.cpp -o /home/mohammadnakhaee/Documents/pecsjunc/GUI/MainFrame.cpp.o  -I/usr/include/c++/9 -I/usr/include/c++/9/x86_64-redhat-linux -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-redhat-linux/9/include -I/usr/local/include -I/usr/include -DNDEBUG -I. -I. -I$(RapidXML_DIR) -I$(WXDIRInclude) -I$(lapackeDir)  -O2  -Wall  -I/usr/local/lib/wx/include/gtk3-unicode-3.1 -I/usr/local/include/wx-3.1 -D_FILE_OFFSET_BITS=64 -DWXUSINGDLL -D__WXGTK__ -pthread -lwx_gtk3u_gl-3.1"
+ }, {
+  "file": "/home/mohammadnakhaee/Documents/pecsjunc/GUI/SKClass.cpp",
+  "directory": "/home/mohammadnakhaee/Documents/pecsjunc/GUI",
+  "command": "clang  -c /home/mohammadnakhaee/Documents/pecsjunc/GUI/SKClass.cpp -o /home/mohammadnakhaee/Documents/pecsjunc/GUI/SKClass.cpp.o  -I/usr/include/c++/9 -I/usr/include/c++/9/x86_64-redhat-linux -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-redhat-linux/9/include -I/usr/local/include -I/usr/include -DNDEBUG -I. -I. -I$(RapidXML_DIR) -I$(WXDIRInclude) -I$(lapackeDir)  -O2  -Wall  -I/usr/local/lib/wx/include/gtk3-unicode-3.1 -I/usr/local/include/wx-3.1 -D_FILE_OFFSET_BITS=64 -DWXUSINGDLL -D__WXGTK__ -pthread -lwx_gtk3u_gl-3.1"
+ }, {
+  "file": "/home/mohammadnakhaee/Documents/pecsjunc/GUI/MyMatrix.cpp",
+  "directory": "/home/mohammadnakhaee/Documents/pecsjunc/GUI",
+  "command": "clang  -c /home/mohammadnakhaee/Documents/pecsjunc/GUI/MyMatrix.cpp -o /home/mohammadnakhaee/Documents/pecsjunc/GUI/MyMatrix.cpp.o  -I/usr/include/c++/9 -I/usr/include/c++/9/x86_64-redhat-linux -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-redhat-linux/9/include -I/usr/local/include -I/usr/include -DNDEBUG -I. -I. -I$(RapidXML_DIR) -I$(WXDIRInclude) -I$(lapackeDir)  -O2  -Wall  -I/usr/local/lib/wx/include/gtk3-unicode-3.1 -I/usr/local/include/wx-3.1 -D_FILE_OFFSET_BITS=64 -DWXUSINGDLL -D__WXGTK__ -pthread -lwx_gtk3u_gl-3.1"
+ }, {
+  "file": "/home/mohammadnakhaee/Documents/pecsjunc/GUI/BondsClass.cpp",
+  "directory": "/home/mohammadnakhaee/Documents/pecsjunc/GUI",
+  "command": "clang  -c /home/mohammadnakhaee/Documents/pecsjunc/GUI/BondsClass.cpp -o /home/mohammadnakhaee/Documents/pecsjunc/GUI/BondsClass.cpp.o  -I/usr/include/c++/9 -I/usr/include/c++/9/x86_64-redhat-linux -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-redhat-linux/9/include -I/usr/local/include -I/usr/include -DNDEBUG -I. -I. -I$(RapidXML_DIR) -I$(WXDIRInclude) -I$(lapackeDir)  -O2  -Wall  -I/usr/local/lib/wx/include/gtk3-unicode-3.1 -I/usr/local/include/wx-3.1 -D_FILE_OFFSET_BITS=64 -DWXUSINGDLL -D__WXGTK__ -pthread -lwx_gtk3u_gl-3.1"
+ }, {
+  "file": "/home/mohammadnakhaee/Documents/pecsjunc/GUI/GridClass.h",
+  "directory": "/home/mohammadnakhaee/Documents/pecsjunc/GUI",
+  "command": "clang  -c /home/mohammadnakhaee/Documents/pecsjunc/GUI/GridClass.h -o /home/mohammadnakhaee/Documents/pecsjunc/GUI/GridClass.h.o  -I/usr/include/c++/9 -I/usr/include/c++/9/x86_64-redhat-linux -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-redhat-linux/9/include -I/usr/local/include -I/usr/include -DNDEBUG -I. -I. -I$(RapidXML_DIR) -I$(WXDIRInclude) -I$(lapackeDir)  -O2  -Wall  -I/usr/local/lib/wx/include/gtk3-unicode-3.1 -I/usr/local/include/wx-3.1 -D_FILE_OFFSET_BITS=64 -DWXUSINGDLL -D__WXGTK__ -pthread -lwx_gtk3u_gl-3.1"
+ }, {
+  "file": "/home/mohammadnakhaee/Documents/pecsjunc/GUI/sec30TextCtrl.cpp",
+  "directory": "/home/mohammadnakhaee/Documents/pecsjunc/GUI",
+  "command": "clang  -c /home/mohammadnakhaee/Documents/pecsjunc/GUI/sec30TextCtrl.cpp -o /home/mohammadnakhaee/Documents/pecsjunc/GUI/sec30TextCtrl.cpp.o  -I/usr/include/c++/9 -I/usr/include/c++/9/x86_64-redhat-linux -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-redhat-linux/9/include -I/usr/local/include -I/usr/include -DNDEBUG -I. -I. -I$(RapidXML_DIR) -I$(WXDIRInclude) -I$(lapackeDir)  -O2  -Wall  -I/usr/local/lib/wx/include/gtk3-unicode-3.1 -I/usr/local/include/wx-3.1 -D_FILE_OFFSET_BITS=64 -DWXUSINGDLL -D__WXGTK__ -pthread -lwx_gtk3u_gl-3.1"
+ }, {
+  "file": "/home/mohammadnakhaee/Documents/pecsjunc/GUI/checktree.cpp",
+  "directory": "/home/mohammadnakhaee/Documents/pecsjunc/GUI",
+  "command": "clang  -c /home/mohammadnakhaee/Documents/pecsjunc/GUI/checktree.cpp -o /home/mohammadnakhaee/Documents/pecsjunc/GUI/checktree.cpp.o  -I/usr/include/c++/9 -I/usr/include/c++/9/x86_64-redhat-linux -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-redhat-linux/9/include -I/usr/local/include -I/usr/include -DNDEBUG -I. -I. -I$(RapidXML_DIR) -I$(WXDIRInclude) -I$(lapackeDir)  -O2  -Wall  -I/usr/local/lib/wx/include/gtk3-unicode-3.1 -I/usr/local/include/wx-3.1 -D_FILE_OFFSET_BITS=64 -DWXUSINGDLL -D__WXGTK__ -pthread -lwx_gtk3u_gl-3.1"
+ }, {
+  "file": "/home/mohammadnakhaee/Documents/pecsjunc/GUI/UpdateClass.h",
+  "directory": "/home/mohammadnakhaee/Documents/pecsjunc/GUI",
+  "command": "clang  -c /home/mohammadnakhaee/Documents/pecsjunc/GUI/UpdateClass.h -o /home/mohammadnakhaee/Documents/pecsjunc/GUI/UpdateClass.h.o  -I/usr/include/c++/9 -I/usr/include/c++/9/x86_64-redhat-linux -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-redhat-linux/9/include -I/usr/local/include -I/usr/include -DNDEBUG -I. -I. -I$(RapidXML_DIR) -I$(WXDIRInclude) -I$(lapackeDir)  -O2  -Wall  -I/usr/local/lib/wx/include/gtk3-unicode-3.1 -I/usr/local/include/wx-3.1 -D_FILE_OFFSET_BITS=64 -DWXUSINGDLL -D__WXGTK__ -pthread -lwx_gtk3u_gl-3.1"
+ }, {
+  "file": "/home/mohammadnakhaee/Documents/pecsjunc/GUI/MainFrame.h",
+  "directory": "/home/mohammadnakhaee/Documents/pecsjunc/GUI",
+  "command": "clang  -c /home/mohammadnakhaee/Documents/pecsjunc/GUI/MainFrame.h -o /home/mohammadnakhaee/Documents/pecsjunc/GUI/MainFrame.h.o  -I/usr/include/c++/9 -I/usr/include/c++/9/x86_64-redhat-linux -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-redhat-linux/9/include -I/usr/local/include -I/usr/include -DNDEBUG -I. -I. -I$(RapidXML_DIR) -I$(WXDIRInclude) -I$(lapackeDir)  -O2  -Wall  -I/usr/local/lib/wx/include/gtk3-unicode-3.1 -I/usr/local/include/wx-3.1 -D_FILE_OFFSET_BITS=64 -DWXUSINGDLL -D__WXGTK__ -pthread -lwx_gtk3u_gl-3.1"
+ }, {
+  "file": "/home/mohammadnakhaee/Documents/pecsjunc/GUI/mygrid.cpp",
+  "directory": "/home/mohammadnakhaee/Documents/pecsjunc/GUI",
+  "command": "clang  -c /home/mohammadnakhaee/Documents/pecsjunc/GUI/mygrid.cpp -o /home/mohammadnakhaee/Documents/pecsjunc/GUI/mygrid.cpp.o  -I/usr/include/c++/9 -I/usr/include/c++/9/x86_64-redhat-linux -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-redhat-linux/9/include -I/usr/local/include -I/usr/include -DNDEBUG -I. -I. -I$(RapidXML_DIR) -I$(WXDIRInclude) -I$(lapackeDir)  -O2  -Wall  -I/usr/local/lib/wx/include/gtk3-unicode-3.1 -I/usr/local/include/wx-3.1 -D_FILE_OFFSET_BITS=64 -DWXUSINGDLL -D__WXGTK__ -pthread -lwx_gtk3u_gl-3.1"
+ }, {
+  "file": "/home/mohammadnakhaee/Documents/pecsjunc/GUI/Sec30.cpp",
+  "directory": "/home/mohammadnakhaee/Documents/pecsjunc/GUI",
+  "command": "clang  -c /home/mohammadnakhaee/Documents/pecsjunc/GUI/Sec30.cpp -o /home/mohammadnakhaee/Documents/pecsjunc/GUI/Sec30.cpp.o  -I/usr/include/c++/9 -I/usr/include/c++/9/x86_64-redhat-linux -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-redhat-linux/9/include -I/usr/local/include -I/usr/include -DNDEBUG -I. -I. -I$(RapidXML_DIR) -I$(WXDIRInclude) -I$(lapackeDir)  -O2  -Wall  -I/usr/local/lib/wx/include/gtk3-unicode-3.1 -I/usr/local/include/wx-3.1 -D_FILE_OFFSET_BITS=64 -DWXUSINGDLL -D__WXGTK__ -pthread -lwx_gtk3u_gl-3.1"
+ }, {
+  "file": "/home/mohammadnakhaee/Documents/pecsjunc/GUI/Regression.h",
+  "directory": "/home/mohammadnakhaee/Documents/pecsjunc/GUI",
+  "command": "clang  -c /home/mohammadnakhaee/Documents/pecsjunc/GUI/Regression.h -o /home/mohammadnakhaee/Documents/pecsjunc/GUI/Regression.h.o  -I/usr/include/c++/9 -I/usr/include/c++/9/x86_64-redhat-linux -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-redhat-linux/9/include -I/usr/local/include -I/usr/include -DNDEBUG -I. -I. -I$(RapidXML_DIR) -I$(WXDIRInclude) -I$(lapackeDir)  -O2  -Wall  -I/usr/local/lib/wx/include/gtk3-unicode-3.1 -I/usr/local/include/wx-3.1 -D_FILE_OFFSET_BITS=64 -DWXUSINGDLL -D__WXGTK__ -pthread -lwx_gtk3u_gl-3.1"
+ }, {
+  "file": "/home/mohammadnakhaee/Documents/pecsjunc/GUI/UnitcellClass.h",
+  "directory": "/home/mohammadnakhaee/Documents/pecsjunc/GUI",
+  "command": "clang  -c /home/mohammadnakhaee/Documents/pecsjunc/GUI/UnitcellClass.h -o /home/mohammadnakhaee/Documents/pecsjunc/GUI/UnitcellClass.h.o  -I/usr/include/c++/9 -I/usr/include/c++/9/x86_64-redhat-linux -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-redhat-linux/9/include -I/usr/local/include -I/usr/include -DNDEBUG -I. -I. -I$(RapidXML_DIR) -I$(WXDIRInclude) -I$(lapackeDir)  -O2  -Wall  -I/usr/local/lib/wx/include/gtk3-unicode-3.1 -I/usr/local/include/wx-3.1 -D_FILE_OFFSET_BITS=64 -DWXUSINGDLL -D__WXGTK__ -pthread -lwx_gtk3u_gl-3.1"
+ }, {
+  "file": "/home/mohammadnakhaee/Documents/pecsjunc/GUI/SetupClass.cpp",
+  "directory": "/home/mohammadnakhaee/Documents/pecsjunc/GUI",
+  "command": "clang  -c /home/mohammadnakhaee/Documents/pecsjunc/GUI/SetupClass.cpp -o /home/mohammadnakhaee/Documents/pecsjunc/GUI/SetupClass.cpp.o  -I/usr/include/c++/9 -I/usr/include/c++/9/x86_64-redhat-linux -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-redhat-linux/9/include -I/usr/local/include -I/usr/include -DNDEBUG -I. -I. -I$(RapidXML_DIR) -I$(WXDIRInclude) -I$(lapackeDir)  -O2  -Wall  -I/usr/local/lib/wx/include/gtk3-unicode-3.1 -I/usr/local/include/wx-3.1 -D_FILE_OFFSET_BITS=64 -DWXUSINGDLL -D__WXGTK__ -pthread -lwx_gtk3u_gl-3.1"
+ }, {
+  "file": "/home/mohammadnakhaee/Documents/pecsjunc/GUI/wxcrafter_bitmaps.cpp",
+  "directory": "/home/mohammadnakhaee/Documents/pecsjunc/GUI",
+  "command": "clang  -c /home/mohammadnakhaee/Documents/pecsjunc/GUI/wxcrafter_bitmaps.cpp -o /home/mohammadnakhaee/Documents/pecsjunc/GUI/wxcrafter_bitmaps.cpp.o  -I/usr/include/c++/9 -I/usr/include/c++/9/x86_64-redhat-linux -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-redhat-linux/9/include -I/usr/local/include -I/usr/include -DNDEBUG -I. -I. -I$(RapidXML_DIR) -I$(WXDIRInclude) -I$(lapackeDir)  -O2  -Wall  -I/usr/local/lib/wx/include/gtk3-unicode-3.1 -I/usr/local/include/wx-3.1 -D_FILE_OFFSET_BITS=64 -DWXUSINGDLL -D__WXGTK__ -pthread -lwx_gtk3u_gl-3.1"
+ }, {
+  "file": "/home/mohammadnakhaee/Documents/pecsjunc/GUI/Regression.cpp",
+  "directory": "/home/mohammadnakhaee/Documents/pecsjunc/GUI",
+  "command": "clang  -c /home/mohammadnakhaee/Documents/pecsjunc/GUI/Regression.cpp -o /home/mohammadnakhaee/Documents/pecsjunc/GUI/Regression.cpp.o  -I/usr/include/c++/9 -I/usr/include/c++/9/x86_64-redhat-linux -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-redhat-linux/9/include -I/usr/local/include -I/usr/include -DNDEBUG -I. -I. -I$(RapidXML_DIR) -I$(WXDIRInclude) -I$(lapackeDir)  -O2  -Wall  -I/usr/local/lib/wx/include/gtk3-unicode-3.1 -I/usr/local/include/wx-3.1 -D_FILE_OFFSET_BITS=64 -DWXUSINGDLL -D__WXGTK__ -pthread -lwx_gtk3u_gl-3.1"
+ }, {
+  "file": "/home/mohammadnakhaee/Documents/pecsjunc/GUI/UpdateClass.cpp",
+  "directory": "/home/mohammadnakhaee/Documents/pecsjunc/GUI",
+  "command": "clang  -c /home/mohammadnakhaee/Documents/pecsjunc/GUI/UpdateClass.cpp -o /home/mohammadnakhaee/Documents/pecsjunc/GUI/UpdateClass.cpp.o  -I/usr/include/c++/9 -I/usr/include/c++/9/x86_64-redhat-linux -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-redhat-linux/9/include -I/usr/local/include -I/usr/include -DNDEBUG -I. -I. -I$(RapidXML_DIR) -I$(WXDIRInclude) -I$(lapackeDir)  -O2  -Wall  -I/usr/local/lib/wx/include/gtk3-unicode-3.1 -I/usr/local/include/wx-3.1 -D_FILE_OFFSET_BITS=64 -DWXUSINGDLL -D__WXGTK__ -pthread -lwx_gtk3u_gl-3.1"
+ }, {
+  "file": "/home/mohammadnakhaee/Documents/pecsjunc/GUI/WelcomeClass.cpp",
+  "directory": "/home/mohammadnakhaee/Documents/pecsjunc/GUI",
+  "command": "clang  -c /home/mohammadnakhaee/Documents/pecsjunc/GUI/WelcomeClass.cpp -o /home/mohammadnakhaee/Documents/pecsjunc/GUI/WelcomeClass.cpp.o  -I/usr/include/c++/9 -I/usr/include/c++/9/x86_64-redhat-linux -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-redhat-linux/9/include -I/usr/local/include -I/usr/include -DNDEBUG -I. -I. -I$(RapidXML_DIR) -I$(WXDIRInclude) -I$(lapackeDir)  -O2  -Wall  -I/usr/local/lib/wx/include/gtk3-unicode-3.1 -I/usr/local/include/wx-3.1 -D_FILE_OFFSET_BITS=64 -DWXUSINGDLL -D__WXGTK__ -pthread -lwx_gtk3u_gl-3.1"
+ }, {
+  "file": "/home/mohammadnakhaee/Documents/pecsjunc/GUI/wxcrafter.cpp",
+  "directory": "/home/mohammadnakhaee/Documents/pecsjunc/GUI",
+  "command": "clang  -c /home/mohammadnakhaee/Documents/pecsjunc/GUI/wxcrafter.cpp -o /home/mohammadnakhaee/Documents/pecsjunc/GUI/wxcrafter.cpp.o  -I/usr/include/c++/9 -I/usr/include/c++/9/x86_64-redhat-linux -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-redhat-linux/9/include -I/usr/local/include -I/usr/include -DNDEBUG -I. -I. -I$(RapidXML_DIR) -I$(WXDIRInclude) -I$(lapackeDir)  -O2  -Wall  -I/usr/local/lib/wx/include/gtk3-unicode-3.1 -I/usr/local/include/wx-3.1 -D_FILE_OFFSET_BITS=64 -DWXUSINGDLL -D__WXGTK__ -pthread -lwx_gtk3u_gl-3.1"
+ }, {
+  "file": "/home/mohammadnakhaee/Documents/pecsjunc/GUI/ColorsClass.cpp",
+  "directory": "/home/mohammadnakhaee/Documents/pecsjunc/GUI",
+  "command": "clang  -c /home/mohammadnakhaee/Documents/pecsjunc/GUI/ColorsClass.cpp -o /home/mohammadnakhaee/Documents/pecsjunc/GUI/ColorsClass.cpp.o  -I/usr/include/c++/9 -I/usr/include/c++/9/x86_64-redhat-linux -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-redhat-linux/9/include -I/usr/local/include -I/usr/include -DNDEBUG -I. -I. -I$(RapidXML_DIR) -I$(WXDIRInclude) -I$(lapackeDir)  -O2  -Wall  -I/usr/local/lib/wx/include/gtk3-unicode-3.1 -I/usr/local/include/wx-3.1 -D_FILE_OFFSET_BITS=64 -DWXUSINGDLL -D__WXGTK__ -pthread -lwx_gtk3u_gl-3.1"
+ }, {
+  "file": "/home/mohammadnakhaee/Documents/pecsjunc/GUI/GridClass.cpp",
+  "directory": "/home/mohammadnakhaee/Documents/pecsjunc/GUI",
+  "command": "clang  -c /home/mohammadnakhaee/Documents/pecsjunc/GUI/GridClass.cpp -o /home/mohammadnakhaee/Documents/pecsjunc/GUI/GridClass.cpp.o  -I/usr/include/c++/9 -I/usr/include/c++/9/x86_64-redhat-linux -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-redhat-linux/9/include -I/usr/local/include -I/usr/include -DNDEBUG -I. -I. -I$(RapidXML_DIR) -I$(WXDIRInclude) -I$(lapackeDir)  -O2  -Wall  -I/usr/local/lib/wx/include/gtk3-unicode-3.1 -I/usr/local/include/wx-3.1 -D_FILE_OFFSET_BITS=64 -DWXUSINGDLL -D__WXGTK__ -pthread -lwx_gtk3u_gl-3.1"
+ }, {
+  "file": "/home/mohammadnakhaee/Documents/pecsjunc/GUI/main.cpp",
+  "directory": "/home/mohammadnakhaee/Documents/pecsjunc/GUI",
+  "command": "clang  -c /home/mohammadnakhaee/Documents/pecsjunc/GUI/main.cpp -o /home/mohammadnakhaee/Documents/pecsjunc/GUI/main.cpp.o  -I/usr/include/c++/9 -I/usr/include/c++/9/x86_64-redhat-linux -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-redhat-linux/9/include -I/usr/local/include -I/usr/include -DNDEBUG -I. -I. -I$(RapidXML_DIR) -I$(WXDIRInclude) -I$(lapackeDir)  -O2  -Wall  -I/usr/local/lib/wx/include/gtk3-unicode-3.1 -I/usr/local/include/wx-3.1 -D_FILE_OFFSET_BITS=64 -DWXUSINGDLL -D__WXGTK__ -pthread -lwx_gtk3u_gl-3.1"
+ }, {
+  "file": "/home/mohammadnakhaee/Documents/pecsjunc/GUI/StructureClass.cpp",
+  "directory": "/home/mohammadnakhaee/Documents/pecsjunc/GUI",
+  "command": "clang  -c /home/mohammadnakhaee/Documents/pecsjunc/GUI/StructureClass.cpp -o /home/mohammadnakhaee/Documents/pecsjunc/GUI/StructureClass.cpp.o  -I/usr/include/c++/9 -I/usr/include/c++/9/x86_64-redhat-linux -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-redhat-linux/9/include -I/usr/local/include -I/usr/include -DNDEBUG -I. -I. -I$(RapidXML_DIR) -I$(WXDIRInclude) -I$(lapackeDir)  -O2  -Wall  -I/usr/local/lib/wx/include/gtk3-unicode-3.1 -I/usr/local/include/wx-3.1 -D_FILE_OFFSET_BITS=64 -DWXUSINGDLL -D__WXGTK__ -pthread -lwx_gtk3u_gl-3.1"
+ }, {
+  "file": "/home/mohammadnakhaee/Documents/pecsjunc/GUI/GraphClass.cpp",
+  "directory": "/home/mohammadnakhaee/Documents/pecsjunc/GUI",
+  "command": "clang  -c /home/mohammadnakhaee/Documents/pecsjunc/GUI/GraphClass.cpp -o /home/mohammadnakhaee/Documents/pecsjunc/GUI/GraphClass.cpp.o  -I/usr/include/c++/9 -I/usr/include/c++/9/x86_64-redhat-linux -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-redhat-linux/9/include -I/usr/local/include -I/usr/include -DNDEBUG -I. -I. -I$(RapidXML_DIR) -I$(WXDIRInclude) -I$(lapackeDir)  -O2  -Wall  -I/usr/local/lib/wx/include/gtk3-unicode-3.1 -I/usr/local/include/wx-3.1 -D_FILE_OFFSET_BITS=64 -DWXUSINGDLL -D__WXGTK__ -pthread -lwx_gtk3u_gl-3.1"
+ }, {
+  "file": "/home/mohammadnakhaee/Documents/pecsjunc/GUI/Embeded.h",
+  "directory": "/home/mohammadnakhaee/Documents/pecsjunc/GUI",
+  "command": "clang  -c /home/mohammadnakhaee/Documents/pecsjunc/GUI/Embeded.h -o /home/mohammadnakhaee/Documents/pecsjunc/GUI/Embeded.h.o  -I/usr/include/c++/9 -I/usr/include/c++/9/x86_64-redhat-linux -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-redhat-linux/9/include -I/usr/local/include -I/usr/include -DNDEBUG -I. -I. -I$(RapidXML_DIR) -I$(WXDIRInclude) -I$(lapackeDir)  -O2  -Wall  -I/usr/local/lib/wx/include/gtk3-unicode-3.1 -I/usr/local/include/wx-3.1 -D_FILE_OFFSET_BITS=64 -DWXUSINGDLL -D__WXGTK__ -pthread -lwx_gtk3u_gl-3.1"
+ }, {
+  "file": "/home/mohammadnakhaee/Documents/pecsjunc/GUI/SKClass.h",
+  "directory": "/home/mohammadnakhaee/Documents/pecsjunc/GUI",
+  "command": "clang  -c /home/mohammadnakhaee/Documents/pecsjunc/GUI/SKClass.h -o /home/mohammadnakhaee/Documents/pecsjunc/GUI/SKClass.h.o  -I/usr/include/c++/9 -I/usr/include/c++/9/x86_64-redhat-linux -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-redhat-linux/9/include -I/usr/local/include -I/usr/include -DNDEBUG -I. -I. -I$(RapidXML_DIR) -I$(WXDIRInclude) -I$(lapackeDir)  -O2  -Wall  -I/usr/local/lib/wx/include/gtk3-unicode-3.1 -I/usr/local/include/wx-3.1 -D_FILE_OFFSET_BITS=64 -DWXUSINGDLL -D__WXGTK__ -pthread -lwx_gtk3u_gl-3.1"
+ }, {
+  "file": "/home/mohammadnakhaee/Documents/pecsjunc/GUI/mygrid.h",
+  "directory": "/home/mohammadnakhaee/Documents/pecsjunc/GUI",
+  "command": "clang  -c /home/mohammadnakhaee/Documents/pecsjunc/GUI/mygrid.h -o /home/mohammadnakhaee/Documents/pecsjunc/GUI/mygrid.h.o  -I/usr/include/c++/9 -I/usr/include/c++/9/x86_64-redhat-linux -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-redhat-linux/9/include -I/usr/local/include -I/usr/include -DNDEBUG -I. -I. -I$(RapidXML_DIR) -I$(WXDIRInclude) -I$(lapackeDir)  -O2  -Wall  -I/usr/local/lib/wx/include/gtk3-unicode-3.1 -I/usr/local/include/wx-3.1 -D_FILE_OFFSET_BITS=64 -DWXUSINGDLL -D__WXGTK__ -pthread -lwx_gtk3u_gl-3.1"
+ }, {
+  "file": "/home/mohammadnakhaee/Documents/pecsjunc/GUI/SetupClass.h",
+  "directory": "/home/mohammadnakhaee/Documents/pecsjunc/GUI",
+  "command": "clang  -c /home/mohammadnakhaee/Documents/pecsjunc/GUI/SetupClass.h -o /home/mohammadnakhaee/Documents/pecsjunc/GUI/SetupClass.h.o  -I/usr/include/c++/9 -I/usr/include/c++/9/x86_64-redhat-linux -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-redhat-linux/9/include -I/usr/local/include -I/usr/include -DNDEBUG -I. -I. -I$(RapidXML_DIR) -I$(WXDIRInclude) -I$(lapackeDir)  -O2  -Wall  -I/usr/local/lib/wx/include/gtk3-unicode-3.1 -I/usr/local/include/wx-3.1 -D_FILE_OFFSET_BITS=64 -DWXUSINGDLL -D__WXGTK__ -pthread -lwx_gtk3u_gl-3.1"
+ }, {
+  "file": "/home/mohammadnakhaee/Documents/pecsjunc/GUI/wxcrafter.h",
+  "directory": "/home/mohammadnakhaee/Documents/pecsjunc/GUI",
+  "command": "clang  -c /home/mohammadnakhaee/Documents/pecsjunc/GUI/wxcrafter.h -o /home/mohammadnakhaee/Documents/pecsjunc/GUI/wxcrafter.h.o  -I/usr/include/c++/9 -I/usr/include/c++/9/x86_64-redhat-linux -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-redhat-linux/9/include -I/usr/local/include -I/usr/include -DNDEBUG -I. -I. -I$(RapidXML_DIR) -I$(WXDIRInclude) -I$(lapackeDir)  -O2  -Wall  -I/usr/local/lib/wx/include/gtk3-unicode-3.1 -I/usr/local/include/wx-3.1 -D_FILE_OFFSET_BITS=64 -DWXUSINGDLL -D__WXGTK__ -pthread -lwx_gtk3u_gl-3.1"
+ }, {
+  "file": "/home/mohammadnakhaee/Documents/pecsjunc/GUI/GraphClass.h",
+  "directory": "/home/mohammadnakhaee/Documents/pecsjunc/GUI",
+  "command": "clang  -c /home/mohammadnakhaee/Documents/pecsjunc/GUI/GraphClass.h -o /home/mohammadnakhaee/Documents/pecsjunc/GUI/GraphClass.h.o  -I/usr/include/c++/9 -I/usr/include/c++/9/x86_64-redhat-linux -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-redhat-linux/9/include -I/usr/local/include -I/usr/include -DNDEBUG -I. -I. -I$(RapidXML_DIR) -I$(WXDIRInclude) -I$(lapackeDir)  -O2  -Wall  -I/usr/local/lib/wx/include/gtk3-unicode-3.1 -I/usr/local/include/wx-3.1 -D_FILE_OFFSET_BITS=64 -DWXUSINGDLL -D__WXGTK__ -pthread -lwx_gtk3u_gl-3.1"
+ }, {
+  "file": "/home/mohammadnakhaee/Documents/pecsjunc/GUI/BondsClass.h",
+  "directory": "/home/mohammadnakhaee/Documents/pecsjunc/GUI",
+  "command": "clang  -c /home/mohammadnakhaee/Documents/pecsjunc/GUI/BondsClass.h -o /home/mohammadnakhaee/Documents/pecsjunc/GUI/BondsClass.h.o  -I/usr/include/c++/9 -I/usr/include/c++/9/x86_64-redhat-linux -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-redhat-linux/9/include -I/usr/local/include -I/usr/include -DNDEBUG -I. -I. -I$(RapidXML_DIR) -I$(WXDIRInclude) -I$(lapackeDir)  -O2  -Wall  -I/usr/local/lib/wx/include/gtk3-unicode-3.1 -I/usr/local/include/wx-3.1 -D_FILE_OFFSET_BITS=64 -DWXUSINGDLL -D__WXGTK__ -pthread -lwx_gtk3u_gl-3.1"
+ }, {
+  "file": "/home/mohammadnakhaee/Documents/pecsjunc/GUI/ColorsClass.h",
+  "directory": "/home/mohammadnakhaee/Documents/pecsjunc/GUI",
+  "command": "clang  -c /home/mohammadnakhaee/Documents/pecsjunc/GUI/ColorsClass.h -o /home/mohammadnakhaee/Documents/pecsjunc/GUI/ColorsClass.h.o  -I/usr/include/c++/9 -I/usr/include/c++/9/x86_64-redhat-linux -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-redhat-linux/9/include -I/usr/local/include -I/usr/include -DNDEBUG -I. -I. -I$(RapidXML_DIR) -I$(WXDIRInclude) -I$(lapackeDir)  -O2  -Wall  -I/usr/local/lib/wx/include/gtk3-unicode-3.1 -I/usr/local/include/wx-3.1 -D_FILE_OFFSET_BITS=64 -DWXUSINGDLL -D__WXGTK__ -pthread -lwx_gtk3u_gl-3.1"
+ }, {
+  "file": "/home/mohammadnakhaee/Documents/pecsjunc/GUI/OrbitalsClass.h",
+  "directory": "/home/mohammadnakhaee/Documents/pecsjunc/GUI",
+  "command": "clang  -c /home/mohammadnakhaee/Documents/pecsjunc/GUI/OrbitalsClass.h -o /home/mohammadnakhaee/Documents/pecsjunc/GUI/OrbitalsClass.h.o  -I/usr/include/c++/9 -I/usr/include/c++/9/x86_64-redhat-linux -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-redhat-linux/9/include -I/usr/local/include -I/usr/include -DNDEBUG -I. -I. -I$(RapidXML_DIR) -I$(WXDIRInclude) -I$(lapackeDir)  -O2  -Wall  -I/usr/local/lib/wx/include/gtk3-unicode-3.1 -I/usr/local/include/wx-3.1 -D_FILE_OFFSET_BITS=64 -DWXUSINGDLL -D__WXGTK__ -pthread -lwx_gtk3u_gl-3.1"
+ }, {
+  "file": "/home/mohammadnakhaee/Documents/pecsjunc/GUI/WelcomeClass.h",
+  "directory": "/home/mohammadnakhaee/Documents/pecsjunc/GUI",
+  "command": "clang  -c /home/mohammadnakhaee/Documents/pecsjunc/GUI/WelcomeClass.h -o /home/mohammadnakhaee/Documents/pecsjunc/GUI/WelcomeClass.h.o  -I/usr/include/c++/9 -I/usr/include/c++/9/x86_64-redhat-linux -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-redhat-linux/9/include -I/usr/local/include -I/usr/include -DNDEBUG -I. -I. -I$(RapidXML_DIR) -I$(WXDIRInclude) -I$(lapackeDir)  -O2  -Wall  -I/usr/local/lib/wx/include/gtk3-unicode-3.1 -I/usr/local/include/wx-3.1 -D_FILE_OFFSET_BITS=64 -DWXUSINGDLL -D__WXGTK__ -pthread -lwx_gtk3u_gl-3.1"
+ }, {
+  "file": "/home/mohammadnakhaee/Documents/pecsjunc/GUI/checktree.h",
+  "directory": "/home/mohammadnakhaee/Documents/pecsjunc/GUI",
+  "command": "clang  -c /home/mohammadnakhaee/Documents/pecsjunc/GUI/checktree.h -o /home/mohammadnakhaee/Documents/pecsjunc/GUI/checktree.h.o  -I/usr/include/c++/9 -I/usr/include/c++/9/x86_64-redhat-linux -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-redhat-linux/9/include -I/usr/local/include -I/usr/include -DNDEBUG -I. -I. -I$(RapidXML_DIR) -I$(WXDIRInclude) -I$(lapackeDir)  -O2  -Wall  -I/usr/local/lib/wx/include/gtk3-unicode-3.1 -I/usr/local/include/wx-3.1 -D_FILE_OFFSET_BITS=64 -DWXUSINGDLL -D__WXGTK__ -pthread -lwx_gtk3u_gl-3.1"
+ }, {
+  "file": "/home/mohammadnakhaee/Documents/pecsjunc/GUI/MyMatrix.h",
+  "directory": "/home/mohammadnakhaee/Documents/pecsjunc/GUI",
+  "command": "clang  -c /home/mohammadnakhaee/Documents/pecsjunc/GUI/MyMatrix.h -o /home/mohammadnakhaee/Documents/pecsjunc/GUI/MyMatrix.h.o  -I/usr/include/c++/9 -I/usr/include/c++/9/x86_64-redhat-linux -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-redhat-linux/9/include -I/usr/local/include -I/usr/include -DNDEBUG -I. -I. -I$(RapidXML_DIR) -I$(WXDIRInclude) -I$(lapackeDir)  -O2  -Wall  -I/usr/local/lib/wx/include/gtk3-unicode-3.1 -I/usr/local/include/wx-3.1 -D_FILE_OFFSET_BITS=64 -DWXUSINGDLL -D__WXGTK__ -pthread -lwx_gtk3u_gl-3.1"
+ }, {
+  "file": "/home/mohammadnakhaee/Documents/pecsjunc/GUI/main.h",
+  "directory": "/home/mohammadnakhaee/Documents/pecsjunc/GUI",
+  "command": "clang  -c /home/mohammadnakhaee/Documents/pecsjunc/GUI/main.h -o /home/mohammadnakhaee/Documents/pecsjunc/GUI/main.h.o  -I/usr/include/c++/9 -I/usr/include/c++/9/x86_64-redhat-linux -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-redhat-linux/9/include -I/usr/local/include -I/usr/include -DNDEBUG -I. -I. -I$(RapidXML_DIR) -I$(WXDIRInclude) -I$(lapackeDir)  -O2  -Wall  -I/usr/local/lib/wx/include/gtk3-unicode-3.1 -I/usr/local/include/wx-3.1 -D_FILE_OFFSET_BITS=64 -DWXUSINGDLL -D__WXGTK__ -pthread -lwx_gtk3u_gl-3.1"
+ }, {
+  "file": "/home/mohammadnakhaee/Documents/pecsjunc/GUI/MyOpenGL.h",
+  "directory": "/home/mohammadnakhaee/Documents/pecsjunc/GUI",
+  "command": "clang  -c /home/mohammadnakhaee/Documents/pecsjunc/GUI/MyOpenGL.h -o /home/mohammadnakhaee/Documents/pecsjunc/GUI/MyOpenGL.h.o  -I/usr/include/c++/9 -I/usr/include/c++/9/x86_64-redhat-linux -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-redhat-linux/9/include -I/usr/local/include -I/usr/include -DNDEBUG -I. -I. -I$(RapidXML_DIR) -I$(WXDIRInclude) -I$(lapackeDir)  -O2  -Wall  -I/usr/local/lib/wx/include/gtk3-unicode-3.1 -I/usr/local/include/wx-3.1 -D_FILE_OFFSET_BITS=64 -DWXUSINGDLL -D__WXGTK__ -pthread -lwx_gtk3u_gl-3.1"
+ }]

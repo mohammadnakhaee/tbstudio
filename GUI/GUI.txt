@@ -1,0 +1,1 @@
+./Debug/win_resources.rc.o ./Debug/wxcrafter_bitmaps.cpp.o ./Debug/MyOpenGL.cpp.o ./Debug/wxcrafter.cpp.o ./Debug/GridClass.cpp.o ./Debug/GraphClass.cpp.o ./Debug/main.cpp.o ./Debug/MainFrame.cpp.o   
