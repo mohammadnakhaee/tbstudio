@@ -34,6 +34,15 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
     m_ribbonPage340 = new wxRibbonPage(m_ribbonBar338, wxID_ANY, _("File"), wxNullBitmap, 0);
     m_ribbonBar338->SetActivePage( m_ribbonPage340 );
     
+    m_ribbonPanel981 = new wxRibbonPanel(m_ribbonPage340, wxID_ANY, _("My Label"), wxNullBitmap, wxDefaultPosition, wxDLG_UNIT(m_ribbonPage340, wxSize(-1,-1)), wxRIBBON_PANEL_DEFAULT_STYLE);
+    
+    m_ribbonButtonBar983 = new wxRibbonButtonBar(m_ribbonPanel981, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_ribbonPanel981, wxSize(-1,-1)), 0);
+    
+    m_ribbonButtonBar983->AddButton(wxID_OPEN, _("Open"), wxXmlResource::Get()->LoadBitmap(wxT("placeholder")), _("Help String"), wxRIBBON_BUTTON_NORMAL);
+    
+    m_ribbonButtonBar983->AddButton(wxID_SAVE, _("Save"), wxXmlResource::Get()->LoadBitmap(wxT("placeholder")), _("Help String"), wxRIBBON_BUTTON_NORMAL);
+    m_ribbonButtonBar983->Realize();
+    
     m_ribbonPage462 = new wxRibbonPage(m_ribbonBar338, wxID_ANY, _("Edit"), wxNullBitmap, 0);
     m_ribbonBar338->SetActivePage( m_ribbonPage462 );
     
@@ -87,7 +96,7 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
     
     boxSizer211->Add(boxSizer544, 1, wxEXPAND, WXC_FROM_DIP(5));
     
-    LeftPanel0 = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(450,-1)), wxTAB_TRAVERSAL);
+    LeftPanel0 = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     LeftPanel0->SetBackgroundColour(wxColour(wxT("rgb(235,235,235)")));
     wxFont LeftPanel0Font = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
     LeftPanel0Font.SetWeight(wxFONTWEIGHT_BOLD);
@@ -101,26 +110,34 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
     m_panel598 = new wxPanel(LeftPanel0, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(LeftPanel0, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     m_panel598->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
     
-    boxSizer594->Add(m_panel598, 0, wxRIGHT|wxBOTTOM|wxEXPAND, WXC_FROM_DIP(5));
+    boxSizer594->Add(m_panel598, 0, wxRIGHT|wxEXPAND, WXC_FROM_DIP(5));
     
     wxBoxSizer* boxSizer600 = new wxBoxSizer(wxVERTICAL);
     m_panel598->SetSizer(boxSizer600);
     
-    m_staticText602 = new wxStaticText(m_panel598, wxID_ANY, _("Method's Properties"), wxDefaultPosition, wxDLG_UNIT(m_panel598, wxSize(-1,-1)), 0);
+    m_staticText602 = new wxStaticText(m_panel598, wxID_ANY, _("Tight-Binding Model Attributes"), wxDefaultPosition, wxDLG_UNIT(m_panel598, wxSize(-1,-1)), 0);
     m_staticText602->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHTTEXT));
     
     boxSizer600->Add(m_staticText602, 0, wxALL, WXC_FROM_DIP(5));
     
-    LeftPanel = new wxPanel(LeftPanel0, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(LeftPanel0, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    LeftPanel->SetBackgroundColour(wxColour(wxT("rgb(255,255,255)")));
+    LeftPanel = new wxNotebook(LeftPanel0, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(LeftPanel0, wxSize(-1,-1)), wxBK_DEFAULT);
+    LeftPanel->SetName(wxT("LeftPanel"));
     
-    boxSizer594->Add(LeftPanel, 1, wxRIGHT|wxEXPAND, WXC_FROM_DIP(5));
-    LeftPanel0->SetMinSize(wxSize(450,-1));
+    boxSizer594->Add(LeftPanel, 1, wxEXPAND, WXC_FROM_DIP(5));
     
     mainpanel = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxFULL_REPAINT_ON_RESIZE|wxTAB_TRAVERSAL);
     mainpanel->SetBackgroundColour(wxColour(wxT("rgb(255,255,255)")));
     
     boxSizer544->Add(mainpanel, 1, wxEXPAND, WXC_FROM_DIP(5));
+    
+    
+    #if wxVERSION_NUMBER >= 2900
+    if(!wxPersistenceManager::Get().Find(LeftPanel)){
+        wxPersistenceManager::Get().RegisterAndRestore(LeftPanel);
+    } else {
+        wxPersistenceManager::Get().Restore(LeftPanel);
+    }
+    #endif
     
     SetName(wxT("MainFrameBaseClass"));
     SetSize(wxDLG_UNIT(this, wxSize(800,500)));
@@ -142,6 +159,8 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
     // Connect events
     this->Connect(wxEVT_SIZE, wxSizeEventHandler(MainFrameBaseClass::MainFrameBaseClass_Resize), NULL, this);
     this->Connect(wxEVT_MOVE, wxMoveEventHandler(MainFrameBaseClass::MainFrameBaseClass_Move), NULL, this);
+    m_ribbonButtonBar983->Connect(wxID_OPEN, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrameBaseClass::BtnOpen_OnClick), NULL, this);
+    m_ribbonButtonBar983->Connect(wxID_SAVE, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrameBaseClass::BtnSave_OnClick), NULL, this);
     m_ribbonButtonBar610->Connect(wxID_APPLY, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrameBaseClass::BtnMain_OnClick), NULL, this);
     m_ribbonButtonBar610->Connect(wxID_ADD, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrameBaseClass::BtnTerminal_OnClick), NULL, this);
     m_ribbonButtonBar610->Connect(wxID_BACKWARD, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrameBaseClass::BtnGrid_OnClick), NULL, this);
@@ -156,6 +175,8 @@ MainFrameBaseClass::~MainFrameBaseClass()
 {
     this->Disconnect(wxEVT_SIZE, wxSizeEventHandler(MainFrameBaseClass::MainFrameBaseClass_Resize), NULL, this);
     this->Disconnect(wxEVT_MOVE, wxMoveEventHandler(MainFrameBaseClass::MainFrameBaseClass_Move), NULL, this);
+    m_ribbonButtonBar983->Disconnect(wxID_OPEN, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrameBaseClass::BtnOpen_OnClick), NULL, this);
+    m_ribbonButtonBar983->Disconnect(wxID_SAVE, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrameBaseClass::BtnSave_OnClick), NULL, this);
     m_ribbonButtonBar610->Disconnect(wxID_APPLY, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrameBaseClass::BtnMain_OnClick), NULL, this);
     m_ribbonButtonBar610->Disconnect(wxID_ADD, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrameBaseClass::BtnTerminal_OnClick), NULL, this);
     m_ribbonButtonBar610->Disconnect(wxID_BACKWARD, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrameBaseClass::BtnGrid_OnClick), NULL, this);
@@ -179,32 +200,13 @@ GraphBaseClass::GraphBaseClass(wxWindow* parent, wxWindowID id, const wxPoint& p
     wxBoxSizer* boxSizer215 = new wxBoxSizer(wxVERTICAL);
     this->SetSizer(boxSizer215);
     
-    TopPanel = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    TopPanel = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(300,-1)), wxTAB_TRAVERSAL);
+    TopPanel->SetBackgroundColour(wxColour(wxT("rgb(255,255,255)")));
     
     boxSizer215->Add(TopPanel, 0, wxEXPAND, WXC_FROM_DIP(5));
     
     wxBoxSizer* boxSizer241 = new wxBoxSizer(wxHORIZONTAL);
     TopPanel->SetSizer(boxSizer241);
-    
-    m_button243 = new wxButton(TopPanel, wxID_ANY, _("My Button"), wxDefaultPosition, wxDLG_UNIT(TopPanel, wxSize(-1,-1)), 0);
-    
-    boxSizer241->Add(m_button243, 0, 0, WXC_FROM_DIP(5));
-    
-    m_button245 = new wxButton(TopPanel, wxID_ANY, _("My Button"), wxDefaultPosition, wxDLG_UNIT(TopPanel, wxSize(-1,-1)), 0);
-    
-    boxSizer241->Add(m_button245, 0, 0, WXC_FROM_DIP(5));
-    
-    m_button247 = new wxButton(TopPanel, wxID_ANY, _("My Button"), wxDefaultPosition, wxDLG_UNIT(TopPanel, wxSize(-1,-1)), 0);
-    
-    boxSizer241->Add(m_button247, 0, 0, WXC_FROM_DIP(5));
-    
-    m_button249 = new wxButton(TopPanel, wxID_ANY, _("My Button"), wxDefaultPosition, wxDLG_UNIT(TopPanel, wxSize(-1,-1)), 0);
-    
-    boxSizer241->Add(m_button249, 0, 0, WXC_FROM_DIP(5));
-    
-    m_button251 = new wxButton(TopPanel, wxID_ANY, _("My Button"), wxDefaultPosition, wxDLG_UNIT(TopPanel, wxSize(-1,-1)), 0);
-    
-    boxSizer241->Add(m_button251, 0, 0, WXC_FROM_DIP(5));
     
     SetName(wxT("GraphBaseClass"));
     SetMinClientSize(wxSize(400,300));
@@ -237,4 +239,74 @@ GridBaseClass::GridBaseClass(wxWindow* parent, wxWindowID id, const wxPoint& pos
 
 GridBaseClass::~GridBaseClass()
 {
+}
+
+StructureBaseClass::StructureBaseClass(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style)
+    : wxPanel(parent, id, pos, size, style)
+{
+    if ( !bBitmapLoaded ) {
+        // We need to initialise the default bitmap handler
+        wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
+        wxC9ED9InitBitmapResources();
+        bBitmapLoaded = true;
+    }
+    this->SetBackgroundColour(wxColour(wxT("rgb(255,255,255)")));
+    
+    wxBoxSizer* boxSizer628 = new wxBoxSizer(wxVERTICAL);
+    this->SetSizer(boxSizer628);
+    
+    wxBoxSizer* boxSizer630384 = new wxBoxSizer(wxHORIZONTAL);
+    
+    boxSizer628->Add(boxSizer630384, 0, wxEXPAND, WXC_FROM_DIP(5));
+    
+    Btn_Load = new wxButton(this, wxID_ANY, _("Load"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    
+    boxSizer630384->Add(Btn_Load, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    Btn_Save = new wxButton(this, wxID_ANY, _("Save"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    
+    boxSizer630384->Add(Btn_Save, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    wxBoxSizer* boxSizer6303844 = new wxBoxSizer(wxHORIZONTAL);
+    
+    boxSizer628->Add(boxSizer6303844, 0, wxEXPAND, WXC_FROM_DIP(5));
+    
+    Btn_Import_XYZ = new wxButton(this, wxID_ANY, _("Import"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    
+    boxSizer6303844->Add(Btn_Import_XYZ, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    Btn_Export_XYZ = new wxButton(this, wxID_ANY, _("Export"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    
+    boxSizer6303844->Add(Btn_Export_XYZ, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    m_textCtrl995 = new wxTextCtrl(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    #if wxVERSION_NUMBER >= 3000
+    m_textCtrl995->SetHint(wxT(""));
+    #endif
+    
+    boxSizer628->Add(m_textCtrl995, 0, wxALL, WXC_FROM_DIP(5));
+    
+    SetBackgroundColour(wxColour(wxT("rgb(255,255,255)")));
+    SetName(wxT("StructureBaseClass"));
+    SetSize(wxDLG_UNIT(this, wxSize(-1,-1)));
+    if (GetSizer()) {
+         GetSizer()->Fit(this);
+    }
+    // Connect events
+    Btn_Load->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(StructureBaseClass::Btn_Load_OnClick), NULL, this);
+    Btn_Save->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(StructureBaseClass::Btn_Save_OnClick), NULL, this);
+    Btn_Import_XYZ->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(StructureBaseClass::Btn_Import_XYZ_OnClick), NULL, this);
+    Btn_Export_XYZ->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(StructureBaseClass::Btn_Export_XYZ_OnClick), NULL, this);
+    m_textCtrl995->Connect(wxEVT_CHAR, wxKeyEventHandler(StructureBaseClass::OnChar), NULL, this);
+    
+}
+
+StructureBaseClass::~StructureBaseClass()
+{
+    Btn_Load->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(StructureBaseClass::Btn_Load_OnClick), NULL, this);
+    Btn_Save->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(StructureBaseClass::Btn_Save_OnClick), NULL, this);
+    Btn_Import_XYZ->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(StructureBaseClass::Btn_Import_XYZ_OnClick), NULL, this);
+    Btn_Export_XYZ->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(StructureBaseClass::Btn_Export_XYZ_OnClick), NULL, this);
+    m_textCtrl995->Disconnect(wxEVT_CHAR, wxKeyEventHandler(StructureBaseClass::OnChar), NULL, this);
+    
 }

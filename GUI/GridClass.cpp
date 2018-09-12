@@ -4,7 +4,7 @@ GridClass::GridClass(wxWindow* parent)
     : GridBaseClass(parent)
 {
     
-wxGrid* grid = new wxGrid( this,
+myGrid* grid = new myGrid( this,
                     -1,
                     wxPoint( 0, 0 ),
                     wxSize( 2400, 2300 ) );

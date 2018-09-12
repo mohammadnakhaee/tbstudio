@@ -39,12 +39,10 @@ DECLARE_APP(MainApp)
     #include "../../sample.xpm"
 #endif
 
-#include <mgl2/mgl.h>
-#include <mgl2/glut.h>
-#include <GL/gl.h>
-#include <GL/glu.h>
-#include <GL/glext.h>
-#include <GL/glut.h>
+
+#include <wx/clipbrd.h> 
+#include <wx/menu.h>
+#include <wx/textfile.h>
 
 // ----------------------------------------------------------------------------
 // constants
@@ -335,10 +333,37 @@ MyGLContext::MyGLContext(wxGLCanvas *canvas, int DimVar)
     //Shared between 2D and 3D OpenGL
     glEnable(GL_TEXTURE_2D); //Essential
     glEnable(GL_NORMALIZE);  //Faster
-    glEnable(GL_LIGHT0); //is not checked
     glEnable(GL_BLEND); //is not checked
     glEnable(GL_CULL_FACE); //is not checked
     glEnable(GL_DEPTH_TEST); //is not checked
+    glEnable(GL_COLOR_MATERIAL); //To enable the colourful glusphere. Whithout this we are unable to change the color of surfaces
+    
+    //glEnable( GL_LINE_SMOOTH );
+    //glEnable( GL_POLYGON_SMOOTH );
+    //glHint( GL_LINE_SMOOTH_HINT, GL_NICEST );
+    //glHint( GL_POLYGON_SMOOTH_HINT, GL_NICEST );
+    
+    glEnable(GL_LIGHT0); //is not checked
+	glLightfv(GL_LIGHT0, GL_POSITION, (const GLfloat[]) {30,30,50.0f});
+	glLightfv(GL_LIGHT0, GL_SPECULAR,  (const GLfloat[]) {1,1,1,1});
+    
+    glEnable(GL_LIGHT1); //is not checked
+	glLightfv(GL_LIGHT1, GL_POSITION, (const GLfloat[]) {-70,-70,0.0f});
+	glLightfv(GL_LIGHT1, GL_SPECULAR,  (const GLfloat[]) {0.5,0.5,0.5,1});
+    
+    glEnable(GL_LIGHT2); //is not checked
+	glLightfv(GL_LIGHT2, GL_POSITION, (const GLfloat[]) {0,0,50.0f});
+	glLightfv(GL_LIGHT2, GL_AMBIENT,  (const GLfloat[]) {0.25,0.25,0.25,0.25});
+	//glLightfv(GL_LIGHT0, GL_DIFFUSE,  (const GLfloat[]) {1,1,1,1});
+	//glLightfv(GL_LIGHT0, GL_SPECULAR, (const GLfloat[]) {1,1,1,1});
+
+    
+    glMaterialfv(GL_FRONT, GL_EMISSION,  (const GLfloat[]) {0,0,0,1} );
+    glMaterialfv(GL_FRONT, GL_AMBIENT,  (const GLfloat[]) {1,1,1,1} );
+    glMaterialfv(GL_FRONT, GL_DIFFUSE,  (const GLfloat[]) {1,1,1,1} );
+    glMaterialfv(GL_FRONT, GL_SPECULAR,  (const GLfloat[]) {1,1,1,1} );
+    glMaterialf(GL_FRONT, GL_SHININESS, 25.0f);
+    
     
     //for ( unsigned i = 0; i < WXSIZEOF(m_textures); i++ )
     //{
@@ -448,6 +473,17 @@ void MyGLContext::Polygons3D()
 
 }
 
+// initiate buffers
+GLuint elementbuffer;
+GLuint normalbuffer;
+GLuint uvbuffer;
+GLuint vertexbuffer;
+
+// this variable will later be used to hold the number of indices
+int size = 0;
+
+
+
 void MyGLContext::background()
 {
     glColor3f(1.0f, 1.0f, 1.0f); // Red
@@ -532,24 +568,70 @@ void MyGLContext::Draw2D()
     CheckGLError();
 }
 
-void MyGLContext::Draw3D(float xangle, float yangle)
+void MyGLContext::Draw_Atom(float r, float x, float y, float z, GLubyte R, GLubyte G, GLubyte B, int Slices, int Stacks)
+{
+    glPushMatrix();
+    glColor3ub(R, G, B);
+    glTranslatef(x, y, z);
+    //glScaled(0.5, 0.5, 0.5);
+    gluSphere(quad,r , Slices , Stacks);
+    glPopMatrix();
+}
+
+void MyGLContext::Draw_Lattice(int nColDArray, int nDArray, double** DArray, int nColIArray, int nIArray, int** IArray)
+{
+    for (int i=0; i<nDArray; i++)
+    {
+        Draw_Atom(0.5f, (float)DArray[0][i], (float)DArray[1][i], (float)DArray[2][i], 255, 0, 0, 80, 60);
+    }
+    
+    //Draw_Atom(0.5f, -0.5f, -0.5f, 0.0f, 255, 0, 0, 80, 60);
+    //Draw_Atom(0.5f, -0.5f, 0.5f, 0.0f, 0, 255, 0, 80, 60);
+    //Draw_Atom(0.5f, 0.5f, 0.5f, 0.0f, 0, 0, 255, 80, 60);
+    //Draw_Atom(0.5f, 0.5f, -0.5f, 0.0f, 0, 125, 140, 80, 60);
+}
+
+void MyGLContext::Draw3D(int nColDArray, int nDArray, double** DArray, int nColIArray, int nIArray, int** IArray, float xMove, float yMove, float XCam, float YCam, float zoom, float zoomCam, float w, float h)
 {
     glEnable(GL_LIGHTING);
-    GLfloat ambient[] = { 0.65, 0.65, 0.65, 0.65 };
+    GLfloat ambient[] = { 0.065, 0.065, 0.065, 0.065 };
     glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-    glPushMatrix();
+    //glPushMatrix();
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glFrustum(-0.5f, 0.5f, -0.5f, 0.5f, 1.0f, 3.0f);
+    //gluLookAt(0, 0, -1,  0, 0, 0, 1, 0, 0);
+    //glFrustum(-1.0f, 1.0f, -0.5f, 0.5f, 1.0f, 10.0f);
+    glOrtho(-w, w, -h, h, 0.0f, 50.0f);
+    glTranslatef(XCam + xMove, YCam + yMove, 0.0f);
+    float ztot = zoomCam + zoom;
+    glScaled(ztot, ztot, ztot);//Zoom
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glTranslatef(0.0f, 0.0f, -2.0f);
-    glRotatef(xangle, 1.0f, 0.0f, 0.0f);
-    glRotatef(yangle, 0.0f, 1.0f, 0.0f);
-    Polygons3D();
+    //glRotatef(xangle, 1.0f, 0.0f, 0.0f);
+    //glRotatef(yangle, 0.0f, 1.0f, 0.0f);
+    //double theta = zangle*0.01745329252;
+    //glRotatef(0.0f, 0.0f, 0.0f, 1.0f);
+    //glRotatef(xangle, (float)sin(theta), -(float)cos(theta), 0.0f);
+    //glRotatef(zangle, 0.0f, 0.0f, 1.0f);
+    
+    
+    //Polygons3D(); //It works, but we do not need it no longer
+    //Glu Functions Begin
+    quad = gluNewQuadric();
+    glPolygonMode( GL_FRONT_AND_BACK, GL_FILL);    //GL_LINE or GL_FILL
+    glLineWidth(1.0);
+    //glShadeModel(GL_SMOOTH);
+    //glEnable(GL_LINE_SMOOTH);
+    //glEnable(GL_BLEND);
+    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    //glHint(GL_LINE_SMOOTH_HINT, GL_DONT_CARE);
+    Draw_Lattice(nColDArray, nDArray, DArray, nColIArray, nIArray, IArray);
+    gluDeleteQuadric(quad);
+    //Glu Functions End
     glFlush();  // Render now
-    glPopMatrix();
+    //glPopMatrix();
     CheckGLError();
 }
 
@@ -561,6 +643,15 @@ wxBEGIN_EVENT_TABLE(MyGLCanvas, wxGLCanvas)
     EVT_PAINT(MyGLCanvas::OnPaint)
     EVT_KEY_DOWN(MyGLCanvas::OnKeyDown)
     EVT_TIMER(SpinTimer, MyGLCanvas::OnSpinTimer)
+    EVT_MOUSEWHEEL(MyGLCanvas::OnMouseWheel)
+    EVT_LEFT_DOWN(MyGLCanvas::OnMouseLeftDown)
+    EVT_LEFT_UP(MyGLCanvas::OnMouseLeftUp)
+    EVT_MOTION(MyGLCanvas::OnMouseMove)
+    EVT_RIGHT_DOWN(MyGLCanvas::OnMouseRightDown)
+    EVT_RIGHT_UP(MyGLCanvas::OnMouseRightUp)
+    EVT_MIDDLE_DOWN(MyGLCanvas::OnMouseMiddleDown)
+    EVT_MIDDLE_UP(MyGLCanvas::OnMouseMiddleUp)
+    EVT_MENU(wxID_COPY,MyGLCanvas::OnSaveRasterImage)
 wxEND_EVENT_TABLE()
 
 MyGLCanvas::MyGLCanvas(wxWindow *parent, int DimVar, int *attribList)
@@ -571,8 +662,9 @@ MyGLCanvas::MyGLCanvas(wxWindow *parent, int DimVar, int *attribList)
     : wxGLCanvas(parent, wxID_ANY, attribList,
                  wxDefaultPosition, wxDefaultSize,
                  wxFULL_REPAINT_ON_RESIZE),
-      m_xangle(0.0),
-      m_yangle(0.0),
+      TheLastXAngle(0.0),
+      TheLastYAngle(0.0),
+      TheLastZAngle(0.0),
       m_spinTimer(this,SpinTimer),
       m_useStereo(false),
       m_stereoWarningAlreadyDisplayed(false)
@@ -622,9 +714,14 @@ void MyGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // Black and opaque
     
     
-    int w,h,x,y;
+    int w,h;
     w=ClientSize.x;
     h=ClientSize.y;
+    float max = (float)w;
+    if (h>w) max = (float)h;
+    float w3d=w/max;
+    float h3d=h/max;
+    
     //GetClientSize(&w,&h); // size of the picture
     mglGraph gr;
     sample(&gr,(double)w,(double)h);
@@ -641,8 +738,10 @@ void MyGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
         glLoadIdentity();
         glFrustum(-0.47f, 0.53f, -0.5f, 0.5f, 1.0f, 3.0f);
         
-        if (Dim>2)
-            context.Draw3D(m_xangle, m_yangle);
+        if (Dim==3)
+            context.Draw3D(NumberOfDoubleArrays, nDoubleArray, DoubleArray1,
+                            NumberOfIntArrays, nIntArray, IntArray,
+                            XMove, YMove, XCam, YCam, Zoom, ZoomCam, w3d,h3d);
         else
             context.Draw2D();
             
@@ -652,8 +751,10 @@ void MyGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
         glLoadIdentity();
         glFrustum(-0.53f, 0.47f, -0.5f, 0.5f, 1.0f, 3.0f);
         
-        if (Dim>2)
-            context.Draw3D(m_xangle, m_yangle);
+        if (Dim==3)
+            context.Draw3D(NumberOfDoubleArrays, nDoubleArray, DoubleArray1,
+                            NumberOfIntArrays, nIntArray, IntArray,
+                            XMove, YMove, XCam, YCam, Zoom, ZoomCam, w3d,h3d);
         else
             context.Draw2D();
             
@@ -661,8 +762,10 @@ void MyGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
     }
     else
     {
-        if (Dim>2)
-            context.Draw3D(m_xangle, m_yangle);
+        if (Dim==3)
+            context.Draw3D(NumberOfDoubleArrays, nDoubleArray, DoubleArray1,
+                            NumberOfIntArrays, nIntArray, IntArray,
+                            XMove, YMove, XCam, YCam, Zoom, ZoomCam, w3d,h3d);
         else
             context.Draw2D();
         if ( m_useStereo && !m_stereoWarningAlreadyDisplayed )
@@ -678,11 +781,12 @@ void MyGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
     //glFinish(); // necessary
 }
 
-void MyGLCanvas::Spin(float xSpin, float ySpin)
+void MyGLCanvas::Spin(float xSpin, float ySpin, float zSpin)
 {
-    m_xangle += xSpin;
-    m_yangle += ySpin;
-
+    TheLastXAngle += xSpin;
+    TheLastYAngle += ySpin;
+    TheLastZAngle += zSpin;
+    
     Refresh(false);
 }
 
@@ -699,26 +803,26 @@ void MyGLCanvas::OnKeyDown(wxKeyEvent& event)
     switch ( event.GetKeyCode() )
     {
         case WXK_RIGHT:
-            Spin( 0.0, -angle );
+            Spin( 0.0, -angle , 0.0);
             break;
 
         case WXK_LEFT:
-            Spin( 0.0, angle );
+            Spin( 0.0, angle  , 0.0);
             break;
 
         case WXK_DOWN:
-            Spin( -angle, 0.0 );
+            Spin( -angle, 0.0  , 0.0);
             break;
 
         case WXK_UP:
-            Spin( angle, 0.0 );
+            Spin( angle, 0.0  , 0.0);
             break;
 
         case WXK_SPACE:
             if ( m_spinTimer.IsRunning() )
                 m_spinTimer.Stop();
             else
-                m_spinTimer.Start( 100 );
+                m_spinTimer.Start( 20 );
             break;
 
         default:
@@ -727,11 +831,268 @@ void MyGLCanvas::OnKeyDown(wxKeyEvent& event)
     }
 }
 
+void MyGLCanvas::OnMouseWheel(wxMouseEvent& event)
+{
+    bool scrldwn = event.GetWheelRotation() < 0;
+    float delta = 0.005*0.01f*event.GetWheelDelta();
+    //scrldwn=scrldwn;
+    //int d = event.GetWheelDelta();
+    if (scrldwn)
+        ZoomCam = ZoomCam + delta;
+    else
+        ZoomCam = ZoomCam - delta;
+    if (ZoomCam <=0.0) ZoomCam=0.001;
+    
+    Refresh(false);
+}
+
 void MyGLCanvas::OnSpinTimer(wxTimerEvent& WXUNUSED(event))
 {
     if (Dim == 3)
-        Spin(0.0, 4.0);
+        Spin(1.0, 0.0 , 0.0);
     else
         Animate();
     
+}
+
+void MyGLCanvas::OnMouseLeftDown(wxMouseEvent& event)
+{
+    //To get mouse position relative to top-left corner of display, add this in a mouse event handler:
+    const wxPoint pt = wxGetMousePosition();
+    mouseX0 = pt.x;
+    mouseY0 = pt.y;
+    isMouseLeftDown = true;
+    isMouseRightDown = false;
+    isMouseMiddleDown = false;
+    //To get mouse position relative to top-left corner of current window or canvas, add this in a mouse event handler:
+    //const wxPoint pt = wxGetMousePosition();
+    //int mouseX = pt.x - this->GetScreenPosition().x;
+    //int mouseY = pt.y - this->GetScreenPosition().y;
+}
+
+void MyGLCanvas::OnMouseLeftUp(wxMouseEvent& event)
+{
+    isMouseLeftDown = false;
+    Reload();
+}
+
+void MyGLCanvas::OnMouseMove(wxMouseEvent& event)
+{
+    if (isMouseLeftDown)
+    {
+        const wxPoint pt = wxGetMousePosition();
+        mouseX = pt.x;
+        mouseY = pt.y;
+        float l=0;
+        float m=0;
+        float value=0;
+        GetDirection(mouseX0, mouseY0, mouseX, mouseY, l, m, value);
+        
+        if (isMoveMode)
+            DoMove(l,m);
+        else if (isRotationMode)
+            DoRotate(l,m,(float)(0.01*value));
+        else if (isZoomMode)
+            DoZoom(0.0005*(m-l));
+    }
+    else if (isMouseRightDown)
+    {
+        const wxPoint pt = wxGetMousePosition();
+        mouseX = pt.x;
+        mouseY = pt.y;
+        float l=0;
+        float m=0;
+        float value=0;
+        GetDirection(mouseX0, mouseY0, mouseX, mouseY, l, m, value);
+        DoZoom(0.0005*(m-l));
+    }
+    else if (isMouseMiddleDown)
+    {
+        const wxPoint pt = wxGetMousePosition();
+        mouseX = pt.x;
+        mouseY = pt.y;
+        float l=0;
+        float m=0;
+        float value=0;
+        GetDirection(mouseX0, mouseY0, mouseX, mouseY, l, m, value);
+        DoMove(l,m);
+    }
+}
+
+void MyGLCanvas::OnMouseRightDown(wxMouseEvent& event)
+{
+    const wxPoint pt = wxGetMousePosition();
+    mouseX0 = pt.x;
+    mouseY0 = pt.y;
+    isMouseRightDown = true;
+    isMouseLeftDown = false;
+    isMouseMiddleDown = false;
+}
+
+void MyGLCanvas::OnMouseRightUp(wxMouseEvent& event)
+{
+    const wxPoint pt = wxGetMousePosition();
+    mouseX = pt.x;
+    mouseY = pt.y;
+    isMouseRightDown = false;
+    if (mouseY==mouseY0 && mouseX==mouseX0)
+    {
+        wxMenu *pmenuPopUp = new wxMenu;
+        wxMenuItem* pItem;
+        pItem = new wxMenuItem(pmenuPopUp,wxID_COPY, wxT("Save Raster Image"));
+        pmenuPopUp->Append(pItem);
+        PopupMenu(pmenuPopUp,event.GetPosition());
+        delete pmenuPopUp;
+    }
+    else
+        Reload();
+}
+
+void MyGLCanvas::OnMouseMiddleDown(wxMouseEvent& event)
+{
+    const wxPoint pt = wxGetMousePosition();
+    mouseX0 = pt.x;
+    mouseY0 = pt.y;
+    isMouseMiddleDown = true;
+    isMouseRightDown = false;
+    isMouseLeftDown = false;
+}
+
+void MyGLCanvas::OnMouseMiddleUp(wxMouseEvent& event)
+{
+    isMouseMiddleDown = false;
+    Reload();
+}
+
+void MyGLCanvas::OnSaveRasterImage(wxCommandEvent &WXUNUSED(event))
+{
+    
+}
+
+void MyGLCanvas::DoMove(float l, float m)
+{
+    const wxSize ClientSize = GetClientSize();
+    int w,h;
+    w=ClientSize.x;
+    h=ClientSize.y;
+    float max = (float)w;
+    if (h>w) max = (float)h;
+    float w3d=w/max;
+    float h3d=h/max;
+    
+    if (l!=0) XMove = -2.0*l*w3d/w;
+    if (m!=0) YMove = -2.0*m*h3d/h;
+    Refresh(false);
+}
+
+void MyGLCanvas::DoRotate(float l, float m, float Theta)
+{
+    if (l==0 && m==0) return;
+    double r2 = l*l + m*m;
+    double r = sqrt(r2);
+    double sr = sin(Theta)/r;
+    double c = cos(Theta);
+    double cr2 = c/r2;
+    double sr2 = sr/r;
+    for (int i=0; i<nDoubleArray; i++)
+    {
+        double a = (m*DoubleArray0[0][i] - l*DoubleArray0[1][i])/r2;
+        double b = l*DoubleArray0[0][i] + m*DoubleArray0[1][i];
+        double bc = b*cr2;
+        double zs = DoubleArray0[2][i]*sr2;
+        DoubleArray1[0][i] = m*a + l*bc - l*r*zs;
+        DoubleArray1[1][i] = -l*a + m*bc - m*r*zs;
+        DoubleArray1[2][i] = DoubleArray0[2][i]*c + b*sr;
+    }
+    Refresh(false);
+}
+
+void MyGLCanvas::DoZoom(float l)
+{
+    if (l!=0) Zoom = -l;
+    Refresh(false);
+}
+
+void MyGLCanvas::GetDirection(int i0, int j0, int i, int j, float& x, float& y, float& Theta)
+{
+    x = -(float)(i - i0);
+    y = (float)(j - j0);
+    Theta = (float)sqrt(x*x + y*y);
+}
+
+void MyGLCanvas::CreateDoubleArray(int NumberOfArraysVar, int nArray)
+{
+    NumberOfDoubleArrays=NumberOfArraysVar;
+    nDoubleArray=nArray;
+	DoubleArray = new double*[NumberOfDoubleArrays];
+	for(int i = 0; i < NumberOfDoubleArrays; i++) DoubleArray[i] = new double[nDoubleArray];
+    CreateDoubleArray1();
+}
+
+void MyGLCanvas::DiscardDoubleArrays()
+{
+    for(int i = 0; i < NumberOfDoubleArrays; i++) delete [] DoubleArray[i];
+	delete [] DoubleArray;
+    DiscardDoubleArrays1();
+}
+
+void MyGLCanvas::CreateIntArray(int NumberOfArraysVar, int nArray)
+{
+    NumberOfIntArrays=NumberOfArraysVar;
+    nIntArray=nArray;
+	IntArray = new int*[NumberOfIntArrays];
+	for(int i = 0; i < NumberOfIntArrays; i++) IntArray[i] = new int[nIntArray];
+}
+
+void MyGLCanvas::DiscardIntArrays()
+{
+    for(int i = 0; i < NumberOfIntArrays; i++) delete [] IntArray[i];
+	delete [] IntArray;
+}
+
+
+void MyGLCanvas::CreateDoubleArray1()
+{
+	DoubleArray0 = new double*[NumberOfDoubleArrays];
+    DoubleArray1 = new double*[NumberOfDoubleArrays];
+	for(int i = 0; i < NumberOfDoubleArrays; i++)
+    {
+        DoubleArray0[i] = new double[nDoubleArray];
+        DoubleArray1[i] = new double[nDoubleArray];
+    }
+}
+
+void MyGLCanvas::DiscardDoubleArrays1()
+{
+    for(int i = 0; i < NumberOfDoubleArrays; i++) delete [] DoubleArray0[i];
+    for(int i = 0; i < NumberOfDoubleArrays; i++) delete [] DoubleArray1[i];
+	delete [] DoubleArray0;
+    delete [] DoubleArray1;
+}
+
+void MyGLCanvas::LoadToCanvas()
+{
+    for (int i=0; i<nDoubleArray; i++)
+    {
+        DoubleArray1[0][i] = DoubleArray[0][i];
+        DoubleArray1[1][i] = DoubleArray[1][i];
+        DoubleArray1[2][i] = DoubleArray[2][i];
+    }
+    Reload();
+}
+
+void MyGLCanvas::Reload()
+{
+    XCam += XMove;
+    YCam += YMove;
+    ZoomCam += Zoom;
+    XMove = 0;
+    YMove = 0;
+    Zoom = 0;
+    for (int i=0; i<nDoubleArray; i++)
+    {
+        DoubleArray0[0][i] = DoubleArray1[0][i];
+        DoubleArray0[1][i] = DoubleArray1[1][i];
+        DoubleArray0[2][i] = DoubleArray1[2][i];
+    }
 }

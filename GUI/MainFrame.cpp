@@ -8,9 +8,8 @@
 #include <GL/glu.h>
 #include <GL/glext.h>
 #include <GL/glut.h>
-#include "GraphClass.h"
 #include <WX/mdi.h>
-#include "GridClass.h"
+
 
 /*
 #ifdef __WXMAC__
@@ -38,7 +37,7 @@ void prepare2DViewport(int topleft_x, int topleft_y, int bottomrigth_x, int bott
 void render();
 void displayMe(void);
 GLuint texture = 0;
-wxGLContext*	m_context;
+wxGLContext* m_context;
 //wxClientDC* dc;
 //wxGLCanvas* m_glCanvas17;
 
@@ -46,6 +45,56 @@ wxGLContext*	m_context;
 MainFrame::MainFrame(wxWindow* parent)
     : MainFrameBaseClass(parent)
 {
+    //tbmodel = new TBModel();
+    //tbmodel->nAtoms = 4;
+    sec30=new Sec30();
+    
+    /*
+    CML::IOData* iod = static_cast<MainFrame*>(mainFrame)->iod;
+    int SelectedCalcBoxIndex = iod->SelectedCalcBoxIndex;
+    std::list<CML::CalcBox>::iterator cb=iod->CalcBoxs.begin();
+    for (int i=0; i < SelectedCalcBoxIndex; i++) cb++;
+    
+    CML::Atom NewAtom;
+    NewAtom.Kind=1;
+    NewAtom.x=0;
+    NewAtom.y=0;
+    NewAtom.z=0;
+    std::list<CML::Atom>::iterator atm=cb->UnitCell->Atoms.end();
+    cb->UnitCell->Atoms.insert(atm,NewAtom);
+    cb->UnitCell->nAtoms++;
+    wxString str = wxString::Format(wxT("%02d: %s {%5.4f,%5.4f,%5.4f}"), cb->UnitCell->nAtoms,NewAtom.GetAtomLable(NewAtom.Kind),NewAtom.x,NewAtom.y,NewAtom.z);
+    LBAtoms->Append(str);
+    */
+    
+    /*
+    std::list<double>::iterator x=tbmodel->XArray.end();
+    tbmodel->XArray.insert(x,-0.5);
+    tbmodel->XArray.insert(x,0.5);
+    tbmodel->XArray.insert(x,0.5);
+    tbmodel->XArray.insert(x,-0.5);
+    std::list<double>::iterator y=tbmodel->YArray.end();
+    tbmodel->YArray.insert(y,-0.5);
+    tbmodel->YArray.insert(y,-0.5);
+    tbmodel->YArray.insert(y,0.5);
+    tbmodel->YArray.insert(y,0.5);
+    std::list<double>::iterator z=tbmodel->ZArray.end();
+    tbmodel->ZArray.insert(z,0.0);
+    tbmodel->ZArray.insert(z,0.0);
+    tbmodel->ZArray.insert(z,0.0);
+    tbmodel->ZArray.insert(z,0.0);
+    std::list<int>::iterator k=tbmodel->KindArray.end();
+    tbmodel->KindArray.insert(k,-0.5);
+    tbmodel->KindArray.insert(k,0.5);
+    tbmodel->KindArray.insert(k,0.5);
+    tbmodel->KindArray.insert(k,-0.5);
+    */
+    
+    //Draw_Atom(0.5f, -0.5f, -0.5f, 0.0f, 255, 0, 0, 80, 60);
+    //Draw_Atom(0.5f, -0.5f, 0.5f, 0.0f, 0, 255, 0, 80, 60);
+    //Draw_Atom(0.5f, 0.5f, 0.5f, 0.0f, 0, 0, 255, 80, 60);
+    //Draw_Atom(0.5f, 0.5f, -0.5f, 0.0f, 0, 125, 140, 80, 60);
+    
     unsigned int AUI_Flags = wxAUI_MGR_ALLOW_FLOATING|wxAUI_MGR_ALLOW_ACTIVE_PANE|
     wxAUI_MGR_TRANSPARENT_DRAG|wxAUI_MGR_TRANSPARENT_HINT|wxAUI_MGR_VENETIAN_BLINDS_HINT|
     wxAUI_MGR_RECTANGLE_HINT|wxAUI_MGR_HINT_FADE|wxAUI_MGR_NO_VENETIAN_BLINDS_FADE|
@@ -55,22 +104,40 @@ MainFrame::MainFrame(wxWindow* parent)
     aui_mgr.SetManagedWindow(mainpanel);
     aui_mgr.GetArtProvider()->SetMetric(wxAUI_DOCKART_PANE_BORDER_SIZE, 1);
     
-    CenterPanel= new wxPanel(mainpanel);
-    //CenterPanel->SetBackgroundColour(* wxRED); //Does not work
-    aui_mgr.AddPane(CenterPanel, wxCENTER);
+    wxPanel* CenteralPanel= new wxPanel(mainpanel);
+    //CenterPanel->SetBackgroundColour(* wxRED); //Google it to know why it does not work.
+    aui_mgr.AddPane(CenteralPanel, wxCENTER);
     aui_mgr.Update();
     
+    wxTextCtrl* logfile = new wxTextCtrl(CenteralPanel, -1, _("ready ..."),
+                                        wxDefaultPosition, wxSize(200,150),
+                                        wxNO_BORDER | wxTE_MULTILINE);
+    wxBoxSizer* panelSizer1 = new wxBoxSizer(wxHORIZONTAL);
+    panelSizer1->Add(logfile, 1, wxEXPAND);
+    CenteralPanel->SetSizer(panelSizer1);
+    
+    Init_graph3d();
+    Init_graph2d();
+    Init_graph2d0();
+    LoadStructurePanel();
+    
+    // Create the TB Model Class which includes all information about the system
+    
+    
+    //
+    
+    /*
     unsigned int ntb_Flags = wxAUI_NB_TAB_SPLIT|wxAUI_NB_CLOSE_ON_ACTIVE_TAB|wxAUI_NB_TOP|
     wxAUI_NB_SCROLL_BUTTONS|wxAUI_NB_WINDOWLIST_BUTTON|wxAUI_NB_MIDDLE_CLICK_CLOSE|wxAUI_NB_TAB_MOVE|wxAUI_NB_TAB_FIXED_WIDTH;
-    
-    aui_ntb = new wxAuiNotebook(CenterPanel,wxID_ANY,wxPoint(0,0),wxSize(100,100),ntb_Flags);
-    
+    aui_ntb = new wxAuiNotebook(LeftPanel,wxID_ANY,wxPoint(0,0),wxSize(100,100),ntb_Flags);
     // Set up the sizer for the panel
-    wxBoxSizer* panelSizer = new wxBoxSizer(wxHORIZONTAL);
-    panelSizer->Add(aui_ntb, 1, wxEXPAND);
-    CenterPanel->SetSizer(panelSizer);
+    wxBoxSizer* panelSizer2 = new wxBoxSizer(wxHORIZONTAL);
+    panelSizer2->Add(aui_ntb, 1, wxEXPAND);
+    LeftPanel->SetSizer(panelSizer2);
+    */
     
-    ShowStartPage();
+    //ShowStartPage();
+    
     //wxAuiPaneInfo inf = wxAuiPaneInfo().Dockable(true).TopDockable(true).BottomDockable(true).LeftDockable(true).RightDockable(true).Caption(wxT("Notbook")).BestSize(600,800).Dock();
     //aui_mgr.AddPane(SidePanel,inf);
     //m_ribbonButtonBar528->Connect(wxID_ANY, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrameBaseClass::b2), NULL, this);
@@ -331,6 +398,9 @@ void GLPane::prepareFor3DDrawing()
 void MainFrame::MainFrameBaseClass_Resize(wxSizeEvent& event)
 {
     this->Layout();
+    structurePanel->Layout();
+    this->Layout();
+    structurePanel->Layout();
     aui_mgr.Update();
 }
 
@@ -440,14 +510,7 @@ void MainFrame::Btn2D_OnClick(wxRibbonButtonBarEvent& event)
     
 }
 
-void MainFrame::Btn3D_OnClick(wxRibbonButtonBarEvent& event)
-{
-    GraphClass* graph = new GraphClass(this,3);
-    //aui_ntb->AddPage(graph,"Graph");
-    //aui_ntb->Update();
-    aui_mgr.AddPane(graph, wxAuiPaneInfo().Gripper(false).Floatable(true).Caption("Graph").MaximizeButton(true).MinimizeButton(true).Float());
-    aui_mgr.Update();
-}
+
 void MainFrame::b1(wxRibbonButtonBarEvent& event)
 {
         
@@ -479,11 +542,12 @@ void MainFrame::bb2(wxKeyEvent& event)
 
 void MainFrame::B2D(wxRibbonButtonBarEvent& event)
 {
-    GraphClass* graph = new GraphClass(this,2);
-    //aui_ntb->AddPage(graph,"Graph");
-    //aui_ntb->Update();
-    aui_mgr.AddPane(graph, wxAuiPaneInfo().Gripper(false).Floatable(true).Caption("Graph").MaximizeButton(true).MinimizeButton(true).Float());
-    aui_mgr.Update();
+    
+}
+
+void MainFrame::Btn3D_OnClick(wxRibbonButtonBarEvent& event)
+{
+
 }
 
 void MainFrame::B3D(wxRibbonButtonBarEvent& event)
@@ -507,35 +571,98 @@ void MainFrame::mgl_test(wxRibbonButtonBarEvent& event)
 
 void MainFrame::BtnMain_OnClick(wxRibbonButtonBarEvent& event)
 {
-    ShowStartPage();
+    
 }
 
 void MainFrame::BtnTerminal_OnClick(wxRibbonButtonBarEvent& event)
 {
-    NewTerminal();
+    
 }
 
-void MainFrame::ShowStartPage()
+void MainFrame::Init_graph3d()
 {
-    wxTextCtrl* logfile = new wxTextCtrl(CenterPanel, -1, _("Here is some stuff"),
-                                        wxDefaultPosition, wxSize(200,150),
-                                        wxNO_BORDER | wxTE_MULTILINE);
-    aui_ntb->AddPage(logfile,"Start Page",true);
-    aui_ntb->Update();
+    //graph3d = new GraphClass(mainpanel,3);
+    //graph3d->CreateAtomicStructure(tbmodel);
+    //aui_mgr.AddPane(graph3d, wxAuiPaneInfo().Gripper(false).Floatable(true).Dockable(true).Caption("Structure").CloseButton(false).MaximizeButton(true).MinimizeButton(true).Dock().Left());
+    //aui_mgr.Update();
 }
 
-void MainFrame::NewTerminal()
+void MainFrame::UpdateGraph3d()
 {
-    wxTextCtrl* logfile = new wxTextCtrl(CenterPanel, -1, _(">>"),
-                                        wxDefaultPosition, wxSize(200,150),
-                                        wxNO_BORDER | wxTE_MULTILINE);
-    aui_ntb->AddPage(logfile,"Command prompt",true);
-    aui_ntb->Update();
+    //graph3d->DiscardAtomicStructure();
+    //graph3d->CreateAtomicStructure(tbmodel);
+}
+
+void MainFrame::Init_graph2d0()
+{
+    graph2d0 = new GraphClass(mainpanel,2);
+    aui_mgr.AddPane(graph2d0, wxAuiPaneInfo().Gripper(false).Floatable(true).Dockable(true).Caption("Initial Band Structure").CloseButton(false).MaximizeButton(true).MinimizeButton(true).Dock().Right());
+    aui_mgr.Update();
+}
+
+void MainFrame::Init_graph2d()
+{
+    graph2d = new GraphClass(mainpanel,2);
+    aui_mgr.AddPane(graph2d, wxAuiPaneInfo().Gripper(false).Floatable(true).Dockable(true).Caption("Band Structure").CloseButton(false).MaximizeButton(true).MinimizeButton(true).Dock().Right());
+    aui_mgr.Update();
+}
+
+void MainFrame::LoadStructurePanel()
+{
+    wxScrolledWindow* scrolledwindow = new wxScrolledWindow(LeftPanel,wxID_ANY,wxDefaultPosition, wxSize(-1,-1));
+    LeftPanel->AddPage(scrolledwindow,"Structure",true);
+    LeftPanel->Update();
+    
+    structurePanel = new StructureClass(scrolledwindow,sec30);
+    
+    wxBoxSizer* panelSizer1 = new wxBoxSizer(wxVERTICAL);
+    panelSizer1->Add(structurePanel, 1, wxEXPAND);
+    scrolledwindow->SetSizer(panelSizer1);
+    
+    scrolledwindow->FitInside();
+    scrolledwindow->SetScrollRate(-1,15);
+    structurePanel->graph3d = graph3d;
 }
 
 void MainFrame::BtnGrid_OnClick(wxRibbonButtonBarEvent& event)
 {
-    GridClass* grid = new GridClass(CenterPanel);
-    aui_ntb->AddPage(grid,"Data Grid",true);
-    aui_ntb->Update();
+    GridClass* grid = new GridClass(LeftPanel);
+    //LeftPanel->AddPage()
+    LeftPanel->AddPage(grid,"Data Grid",true);
+    LeftPanel->Update();
+    //wxSpinCtrlDbl s;
+}
+
+void MainFrame::BtnOpen_OnClick(wxRibbonButtonBarEvent& event)
+{
+    wxFileDialog* OpenDialog = new wxFileDialog(
+		this, _("Open project"), wxEmptyString, wxEmptyString, 
+		_("TBM File (*.tbm)|*.tbm")
+        ,wxFD_OPEN, wxDefaultPosition);
+    
+    if (OpenDialog->ShowModal() == wxID_OK) // if the user click "Open" instead of "Cancel"
+	{
+        wxString dgPath = OpenDialog->GetDirectory();
+        wxString dgFileName = OpenDialog->GetFilename();
+        sec30->LoadFromFile(dgPath, dgFileName);
+	}
+ 
+	OpenDialog->Destroy();
+}
+
+void MainFrame::BtnSave_OnClick(wxRibbonButtonBarEvent& event)
+{
+    wxFileDialog* OpenDialog = new wxFileDialog(
+		this, _("Save project"), wxEmptyString, wxEmptyString, 
+		_("TBM File (*.tbm)|*.tbm")
+        ,wxFD_SAVE, wxDefaultPosition);
+    
+    if (OpenDialog->ShowModal() == wxID_OK) // if the user click "Open" instead of "Cancel"
+	{
+        wxString dgPath = OpenDialog->GetDirectory();
+        wxString dgFileName = OpenDialog->GetFilename();
+        sec30->SaveToFile(dgPath, dgFileName);
+	}
+ 
+	OpenDialog->Destroy();
 }

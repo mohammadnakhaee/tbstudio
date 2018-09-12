@@ -2,16 +2,29 @@
 #define MAINFRAME_H
 #include "wxcrafter.h"
 #include <wx/aui/aui.h>
+#include "GraphClass.h"
+#include "GridClass.h"
+#include "StructureClass.h"
+#include <TBModel.h>
 
 class MainFrame : public MainFrameBaseClass
 {
 public:
     MainFrame(wxWindow* parent);
     virtual ~MainFrame();
-
+    
+    GraphClass* graph3d;
+    GraphClass* graph2d0;
+    GraphClass* graph2d;
+    StructureClass* structurePanel;
+    //TBModel* tbmodel;
+    Sec30* sec30;
+    
     void OnExit(wxCommandEvent& event);
     void OnAbout(wxCommandEvent& event);
 protected:
+    virtual void BtnOpen_OnClick(wxRibbonButtonBarEvent& event);
+    virtual void BtnSave_OnClick(wxRibbonButtonBarEvent& event);
     virtual void BtnGrid_OnClick(wxRibbonButtonBarEvent& event);
     virtual void BtnMain_OnClick(wxRibbonButtonBarEvent& event);
     virtual void BtnTerminal_OnClick(wxRibbonButtonBarEvent& event);
@@ -38,11 +51,13 @@ protected:
     virtual void MainFrameBaseClass_Resize(wxSizeEvent& event);
     virtual void m_glCanvas17_OnPaint(wxPaintEvent& event);
     virtual void BtnTest_OnClick(wxCommandEvent& event);
-    virtual void ShowStartPage();
-    virtual void NewTerminal();
-    
+    virtual void Init_graph3d();
+    virtual void Init_graph2d0();
+    virtual void Init_graph2d();
+    virtual void LoadStructurePanel();
+    virtual void UpdateGraph3d();
 private:
-    wxPanel* CenterPanel;
+    wxTextCtrl* logfile;
     wxAuiManager aui_mgr;
     wxAuiNotebook* aui_ntb;
 };

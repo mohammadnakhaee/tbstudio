@@ -21,7 +21,9 @@
 #include <wx/ribbon/buttonbar.h>
 #include <wx/panel.h>
 #include <wx/stattext.h>
+#include <wx/notebook.h>
 #include <wx/button.h>
+#include <wx/textctrl.h>
 #if wxVERSION_NUMBER >= 2900
 #include <wx/persist.h>
 #include <wx/persist/toplevel.h>
@@ -44,6 +46,8 @@ class MainFrameBaseClass : public wxFrame
 protected:
     wxRibbonBar* m_ribbonBar338;
     wxRibbonPage* m_ribbonPage340;
+    wxRibbonPanel* m_ribbonPanel981;
+    wxRibbonButtonBar* m_ribbonButtonBar983;
     wxRibbonPage* m_ribbonPage462;
     wxRibbonPage* m_ribbonPage606;
     wxRibbonPanel* m_ribbonPanel608;
@@ -57,12 +61,14 @@ protected:
     wxPanel* LeftPanel0;
     wxPanel* m_panel598;
     wxStaticText* m_staticText602;
-    wxPanel* LeftPanel;
+    wxNotebook* LeftPanel;
     wxPanel* mainpanel;
 
 protected:
     virtual void MainFrameBaseClass_Resize(wxSizeEvent& event) { event.Skip(); }
     virtual void MainFrameBaseClass_Move(wxMoveEvent& event) { event.Skip(); }
+    virtual void BtnOpen_OnClick(wxRibbonButtonBarEvent& event) { event.Skip(); }
+    virtual void BtnSave_OnClick(wxRibbonButtonBarEvent& event) { event.Skip(); }
     virtual void BtnMain_OnClick(wxRibbonButtonBarEvent& event) { event.Skip(); }
     virtual void BtnTerminal_OnClick(wxRibbonButtonBarEvent& event) { event.Skip(); }
     virtual void BtnGrid_OnClick(wxRibbonButtonBarEvent& event) { event.Skip(); }
@@ -75,7 +81,7 @@ public:
     wxRibbonBar* GetRibbonBar338() { return m_ribbonBar338; }
     wxStaticText* GetStaticText602() { return m_staticText602; }
     wxPanel* GetPanel598() { return m_panel598; }
-    wxPanel* GetLeftPanel() { return LeftPanel; }
+    wxNotebook* GetLeftPanel() { return LeftPanel; }
     wxPanel* GetLeftPanel0() { return LeftPanel0; }
     wxPanel* GetMainpanel() { return mainpanel; }
     MainFrameBaseClass(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("My Frame"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(800,500), long style = wxCAPTION|wxRESIZE_BORDER|wxMAXIMIZE_BOX|wxMINIMIZE_BOX|wxSYSTEM_MENU|wxCLOSE_BOX|wxFULL_REPAINT_ON_RESIZE);
@@ -87,20 +93,10 @@ class GraphBaseClass : public wxPanel
 {
 protected:
     wxPanel* TopPanel;
-    wxButton* m_button243;
-    wxButton* m_button245;
-    wxButton* m_button247;
-    wxButton* m_button249;
-    wxButton* m_button251;
 
 protected:
 
 public:
-    wxButton* GetButton243() { return m_button243; }
-    wxButton* GetButton245() { return m_button245; }
-    wxButton* GetButton247() { return m_button247; }
-    wxButton* GetButton249() { return m_button249; }
-    wxButton* GetButton251() { return m_button251; }
     wxPanel* GetTopPanel() { return TopPanel; }
     GraphBaseClass(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(400,300), long style = wxTAB_TRAVERSAL);
     virtual ~GraphBaseClass();
@@ -116,6 +112,33 @@ protected:
 public:
     GridBaseClass(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(400,300), long style = wxTAB_TRAVERSAL);
     virtual ~GridBaseClass();
+};
+
+
+class StructureBaseClass : public wxPanel
+{
+protected:
+    wxButton* Btn_Load;
+    wxButton* Btn_Save;
+    wxButton* Btn_Import_XYZ;
+    wxButton* Btn_Export_XYZ;
+    wxTextCtrl* m_textCtrl995;
+
+protected:
+    virtual void Btn_Load_OnClick(wxCommandEvent& event) { event.Skip(); }
+    virtual void Btn_Save_OnClick(wxCommandEvent& event) { event.Skip(); }
+    virtual void Btn_Import_XYZ_OnClick(wxCommandEvent& event) { event.Skip(); }
+    virtual void Btn_Export_XYZ_OnClick(wxCommandEvent& event) { event.Skip(); }
+    virtual void OnChar(wxKeyEvent& event) { event.Skip(); }
+
+public:
+    wxButton* GetBtn_Load() { return Btn_Load; }
+    wxButton* GetBtn_Save() { return Btn_Save; }
+    wxButton* GetBtn_Import_XYZ() { return Btn_Import_XYZ; }
+    wxButton* GetBtn_Export_XYZ() { return Btn_Export_XYZ; }
+    wxTextCtrl* GetTextCtrl995() { return m_textCtrl995; }
+    StructureBaseClass(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxTAB_TRAVERSAL|wxBORDER_STATIC);
+    virtual ~StructureBaseClass();
 };
 
 #endif

@@ -8,6 +8,12 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="src">
+    <File Name="Sec30.cpp"/>
+    <File Name="sec30TextCtrl.cpp"/>
+    <File Name="MyMatrix.cpp"/>
+    <File Name="mygrid.cpp"/>
+    <File Name="TBModel.cpp"/>
+    <File Name="StructureClass.cpp"/>
     <File Name="GridClass.cpp"/>
     <File Name="MyOpenGL.cpp"/>
     <File Name="GraphClass.cpp"/>
@@ -17,6 +23,12 @@
     <File Name="wxcrafter_bitmaps.cpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="include">
+    <File Name="Sec30.h"/>
+    <File Name="sec30TextCtrl.h"/>
+    <File Name="MyMatrix.h"/>
+    <File Name="mygrid.h"/>
+    <File Name="TBModel.h"/>
+    <File Name="StructureClass.h"/>
     <File Name="GridClass.h"/>
     <File Name="main.h"/>
     <File Name="MyOpenGL.h"/>
