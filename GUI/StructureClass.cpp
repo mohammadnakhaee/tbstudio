@@ -7,7 +7,7 @@ StructureClass::StructureClass(wxWindow* parent, Sec30* sec30var)
     sec30=sec30var;
     CreateAtomsGrid();
     
-    
+    /*
     ctr_a0->ChangeValue(wxString::Format(wxT("%lf"), (double)tbmodel->a[0]));
     ctr_a1->ChangeValue(wxString::Format(wxT("%lf"), (double)tbmodel->a[1]));
     ctr_a2->ChangeValue(wxString::Format(wxT("%lf"), (double)tbmodel->a[2]));
@@ -20,7 +20,7 @@ StructureClass::StructureClass(wxWindow* parent, Sec30* sec30var)
     ctr_a_strain->ChangeValue(wxString::Format(wxT("%lf"), (double)tbmodel->a_strain));
     ctr_b_strain->ChangeValue(wxString::Format(wxT("%lf"), (double)tbmodel->b_strain));
     ctr_c_strain->ChangeValue(wxString::Format(wxT("%lf"), (double)tbmodel->c_strain));
-    
+    */
     
     sec30->AddGroupBox(this,_("Crystallographic Information File"),wxColour(wxT("rgb(153,180,209)")));
     

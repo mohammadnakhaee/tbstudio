@@ -45,6 +45,11 @@ protected:
     virtual void ctr_c2_OnUpdated(wxCommandEvent& event);
     virtual void ctr_c_strain_OnUpdated(wxCommandEvent& event);
     virtual void Btn_Export_XYZ_OnClick(wxCommandEvent& event);
+    virtual void Btn_Import_XYZ_OnClick(wxCommandEvent& event);
+    virtual void Btn_Load_OnClick(wxCommandEvent& event);
+    virtual void Btn_Save_OnClick(wxCommandEvent& event);
+    virtual void OnCellChanged(wxGridEvent& event);
+    virtual void OnGridPaste(wxCommandEvent& event);
 
 };
 #endif // STRUCTURECLASS_H
