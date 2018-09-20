@@ -1,177 +1,87 @@
 #include "StructureClass.h"
 
-StructureClass::StructureClass(wxWindow* parent, Sec30* sec30var)
-    : StructureBaseClass(parent)
+StructureClass::StructureClass(wxWindow* parent, Sec30* sec30var, wxWindowID id, const wxPoint& pos, const wxSize& size, long style)
+    : wxPanel(parent, id, pos, size, style)
 {
+    //try{}
+    //catch(std::exception& ex)
+    //{wxMessageBox(ex.what());}
+    
+    this->SetBackgroundColour(wxColour(wxT("rgb(255,255,255)")));
+    
+    wxBoxSizer* boxSizer628 = new wxBoxSizer(wxVERTICAL);
+    this->SetSizer(boxSizer628);
+    
+    SetBackgroundColour(wxColour(wxT("rgb(255,255,255)")));
+    SetName(wxT("StructureBaseClass"));
+    SetSize(wxDLG_UNIT(this, wxSize(-1,-1)));
+    if (GetSizer()) {
+         GetSizer()->Fit(this);
+    }
+    
     //tbmodel=tbmodelvar;
     sec30=sec30var;
-    CreateAtomsGrid();
+    //CreateAtomsGrid();
     
-    /*
-    ctr_a0->ChangeValue(wxString::Format(wxT("%lf"), (double)tbmodel->a[0]));
-    ctr_a1->ChangeValue(wxString::Format(wxT("%lf"), (double)tbmodel->a[1]));
-    ctr_a2->ChangeValue(wxString::Format(wxT("%lf"), (double)tbmodel->a[2]));
-    ctr_b0->ChangeValue(wxString::Format(wxT("%lf"), (double)tbmodel->b[0]));
-    ctr_b1->ChangeValue(wxString::Format(wxT("%lf"), (double)tbmodel->b[1]));
-    ctr_b2->ChangeValue(wxString::Format(wxT("%lf"), (double)tbmodel->b[2]));
-    ctr_c0->ChangeValue(wxString::Format(wxT("%lf"), (double)tbmodel->c[0]));
-    ctr_c1->ChangeValue(wxString::Format(wxT("%lf"), (double)tbmodel->c[1]));
-    ctr_c2->ChangeValue(wxString::Format(wxT("%lf"), (double)tbmodel->c[2]));
-    ctr_a_strain->ChangeValue(wxString::Format(wxT("%lf"), (double)tbmodel->a_strain));
-    ctr_b_strain->ChangeValue(wxString::Format(wxT("%lf"), (double)tbmodel->b_strain));
-    ctr_c_strain->ChangeValue(wxString::Format(wxT("%lf"), (double)tbmodel->c_strain));
-    */
-    
+    /**********************************************************************************************************************************************/
     sec30->AddGroupBox(this,_("Crystallographic Information File"),wxColour(wxT("rgb(153,180,209)")));
-    
+    wxString Labels1[2] = { _("Load"), _("Save")};
+    wxObjectEventFunction Funcs1[2] = { wxCommandEventHandler(StructureClass::Btn_Load_OnClick), wxCommandEventHandler(StructureClass::Btn_Save_OnClick)};
+    sec30->AddButton(this, 2, Labels1, Funcs1);
+    /**********************************************************************************************************************************************/
     sec30->AddGroupBox(this,_("Unit Vectors"),wxColour(wxT("rgb(153,180,209)")));
-    sec30->AddDoubleVec(this, 3, _("a"), _("a"), 25, 100);
-    sec30->AddDoubleVec(this, 3, _("b"), _("b"), 25, 100);
-    sec30->AddDoubleVec(this, 3, _("c"), _("c"), 25, 100);
-    sec30->SetVar(this,_("a[0]"),1.0);
-    sec30->SetVar(this,_("a[1]"),0.0);
-    sec30->SetVar(this,_("a[2]"),0.0);
-    sec30->SetVar(this,_("b[0]"),0.0);
-    sec30->SetVar(this,_("b[1]"),1.0);
-    sec30->SetVar(this,_("b[2]"),0.0);
-    sec30->SetVar(this,_("c[0]"),0.0);
-    sec30->SetVar(this,_("c[1]"),0.0);
-    sec30->SetVar(this,_("c[2]"),1.0);
-    
+    sec30->AddVarVector(this, 3, _("a"), _("double"), _("a"), 25, 100);
+    sec30->AddVarVector(this, 3, _("b"), _("double"), _("b"), 25, 100);
+    sec30->AddVarVector(this, 3, _("c"), _("double"), _("c"), 25, 100);
+    sec30->SetVar(_("a[0]"), 1.0, false);
+    sec30->SetVar(_("a[1]"),0.0, false);
+    sec30->SetVar(_("a[2]"),0.0, false);
+    sec30->SetVar(_("b[0]"),0.0, false);
+    sec30->SetVar(_("b[1]"),1.0, false);
+    sec30->SetVar(_("b[2]"),0.0, false);
+    sec30->SetVar(_("c[0]"),0.0, false);
+    sec30->SetVar(_("c[1]"),0.0, false);
+    sec30->SetVar(_("c[2]"),1.0, false);
+    /**********************************************************************************************************************************************/
     sec30->AddGroupBox(this,_("Strain Coefficients"),wxColour(wxT("rgb(153,180,209)")));
-    sec30->AddDoubleVec(this, 1, _("astrain"), _("a"), 25, 100);
-    sec30->AddDoubleVec(this, 1, _("bstrain"), _("b"), 25, 100);
-    sec30->AddDoubleVec(this, 1, _("cstrain"), _("c"), 25, 100);
-    sec30->SetVar(this,_("astrain[0]"),1.0);
-    sec30->SetVar(this,_("bstrain[0]"),1.0);
-    sec30->SetVar(this,_("cstrain[0]"),1.0);
-    
+    sec30->AddVarVector(this, 1, _("astrain"), _("double"), _("a"), 25, 100);
+    sec30->AddVarVector(this, 1, _("bstrain"), _("double"), _("b"), 25, 100);
+    sec30->AddVarVector(this, 1, _("cstrain"), _("double"), _("c"), 25, 100);
+    sec30->SetVar(_("astrain[0]"),1.0, false);
+    sec30->SetVar(_("bstrain[0]"),1.0, false);
+    sec30->SetVar(_("cstrain[0]"),1.0, false);
+    /**********************************************************************************************************************************************/
     sec30->AddGroupBox(this,_("Atom species and Fractional Coordinates"),wxColour(wxT("rgb(153,180,209)")));
     wxString ColNames[4] = { _("Kind"), _("a"), _("b"), _("c")};
     wxString ColTypes[4] = { _("int"), _("double"), _("double"), _("double")};
     int ColSizes[4] = { 50, 75, 75, 75};
     int ColPrecision[4] = { 0, 8, 8, 8};
-    sec30->AddDouble2dArray(this, 999, 4, _("atomgrids"), ColNames, ColTypes, ColSizes, ColPrecision, 340, 300);
-    
+    sec30->AddGrid(this, 99, 4, _("KABC_Coords"), ColNames, ColTypes, ColSizes, ColPrecision, 340, 300);
+    /**********************************************************************************************************************************************/
     sec30->AddGroupBox(this,_("Import and Export XYZ Coordinates in Angstrom"),wxColour(wxT("rgb(153,180,209)")));
-
+    wxString Labels2[2] = { _("Import"), _("Export")};
+    wxObjectEventFunction Funcs2[2] = { wxCommandEventHandler(StructureClass::Btn_Import_XYZ_OnClick), wxCommandEventHandler(StructureClass::Btn_Export_XYZ_OnClick)};
+    sec30->AddButton(this, 2, Labels2, Funcs2);
+    /**********************************************************************************************************************************************/
+    sec30->AddVarVector(this, 1, _("nAtoms"), _("int"));
+    sec30->SetVar(_("nAtoms[0]"),0, false);
+    wxString ColTypes2[3] = {_("double"), _("double"), _("double")};
+    int ColPrecision2[3] = {8, 8, 8};
+    sec30->AddGrid(this, 99, 3, _("XYZ_Coords"), ColTypes2, ColPrecision2);
+    /**********************************************************************************************************************************************/
 }
 
 StructureClass::~StructureClass()
 {
 }
 
-void StructureClass::CreateAtomsGrid(void)
-{
-    /*AtomsGrid = new myGrid( gridpanel,wxID_ANY,wxDefaultPosition,gridpanel->GetSize());
-    AtomsGrid->EnableEditing(true);
-    wxBoxSizer* mainSizer = new wxBoxSizer(wxVERTICAL);
-    mainSizer->Add(gridpanel, 1, wxEXPAND);
-    AtomsGrid->SetSizer(mainSizer);
-
-    AtomsGrid->CreateGrid( 999, 4);
-    AtomsGrid->SetColLabelValue(0,wxString("Kind"));
-    AtomsGrid->SetColLabelValue(1,wxString("a"));
-    AtomsGrid->SetColLabelValue(2,wxString("b"));
-    AtomsGrid->SetColLabelValue(3,wxString("c"));
-    AtomsGrid->SetColSize( 0, 65 );// in pixels
-    AtomsGrid->SetColSize( 1, 65 );
-    AtomsGrid->SetColSize( 2, 65 );
-    AtomsGrid->SetColSize( 3, 65 );
-    
-    AtomsGrid->SetColMinimalAcceptableWidth(1);
-    //*wxGREEN
-    wxColour c;
-    c.Set(191,205,219,0);
-    AtomsGrid->SetLabelBackgroundColour(c);
-    AtomsGrid->SetColLabelSize(20);
-    AtomsGrid->SetRowLabelSize(35);
-    
-    AtomsGrid->Connect(wxEVT_GRID_CELL_CHANGED, wxGridEventHandler(StructureClass::OnCellChanged), NULL, this);
-    AtomsGrid->Connect(MyGridPasteEvent, wxCommandEventHandler(StructureClass::OnGridPaste), NULL, this);
-     */
-}
-
-int StructureClass::ValidateAtoms(void)
-{
-    /*tbmodel->XArray.clear();
-    tbmodel->YArray.clear();
-    tbmodel->ZArray.clear();
-    tbmodel->KindArray.clear();
-    int AtomCnt=0;
-    double A,B,C;
-    double x,y,z;
-    long int kind;
-    int nRow = AtomsGrid->GetNumberRows();
-    int i=-1;
-    bool isValid=true;
-    std::list<double>::iterator ia = tbmodel->AArray.end();
-    std::list<double>::iterator ib = tbmodel->BArray.end();
-    std::list<double>::iterator ic = tbmodel->CArray.end();
-    std::list<double>::iterator ix = tbmodel->XArray.end();
-    std::list<double>::iterator iy = tbmodel->YArray.end();
-    std::list<double>::iterator iz = tbmodel->ZArray.end();
-    std::list<int>::iterator ik = tbmodel->KindArray.end();
-            
-    while (i<nRow && isValid)
-    {
-        i++;
-        bool isLineValid = AtomsGrid->GetCellValue(i,0).ToLong(&kind);
-        isLineValid = isLineValid && AtomsGrid->GetCellValue(i,1).ToDouble(&A);
-        isLineValid = isLineValid && AtomsGrid->GetCellValue(i,2).ToDouble(&B);
-        isLineValid = isLineValid && AtomsGrid->GetCellValue(i,3).ToDouble(&C);
-        if (isLineValid)
-        {
-            AtomCnt++;
-            tbmodel->AArray.insert(ix,A);
-            tbmodel->BArray.insert(iy,B);
-            tbmodel->CArray.insert(iz,C);
-            x = A * tbmodel->a[0] + B * tbmodel->b[0] + C * tbmodel->c[0];
-            y = A * tbmodel->a[1] + B * tbmodel->b[1] + C * tbmodel->c[1];
-            z = A * tbmodel->a[2] + B * tbmodel->b[2] + C * tbmodel->c[2];
-            tbmodel->XArray.insert(ix,x);
-            tbmodel->YArray.insert(iy,y);
-            tbmodel->ZArray.insert(iz,z);
-            tbmodel->KindArray.insert(ik,kind);
-        }
-        else
-            isValid=false;
-    }
-    
-    return AtomCnt;
-     */
-     
-    //To learn
-    //AtomsGrid->SetCellTextColour(3, 3, *wxGREEN);
-    //AtomsGrid->SetCellBackgroundColour(3, 3, *wxLIGHT_GREY);
-}
-
-
-void StructureClass::OnCellChanged(wxGridEvent& event)
-{
-    ValidateForm();
-}
-
-void StructureClass::OnGridPaste(wxCommandEvent& event)
-{
-    ValidateForm();
-}
-
-void StructureClass::ValidateForm()
-{
-    //int nAtoms = ValidateAtoms();
-    //tbmodel->nAtoms = nAtoms;
-    //graph3d->DiscardAtomicStructure();
-    //graph3d->CreateAtomicStructure(tbmodel);
-    //graph3d->Refresh(false);
-}
 
 void StructureClass::Btn_Load_OnClick(wxCommandEvent& event)
 {
     wxFileDialog* OpenDialog = new wxFileDialog(
 		this, _("Import Structure"), wxEmptyString, wxEmptyString, 
-		_("CIF File (*.cif)|*.cif")
-        ,wxFD_OPEN, wxDefaultPosition);
+		_("CIF File (*.cif)|*.cif"),
+        wxFD_OPEN, wxDefaultPosition);
     
     if (OpenDialog->ShowModal() == wxID_OK) // if the user click "Open" instead of "Cancel"
 	{
@@ -252,9 +162,9 @@ void StructureClass::ExportToCIF(wxString filepath, wxString filename)
   double CellV,Cell_Volume;
   FILE *fp;
   
-  //tv[1][1] = tbmodel->a[0]; tv[1][2] = tbmodel->a[1]; tv[1][3] = tbmodel->a[2];
-  //tv[2][1] = tbmodel->b[0]; tv[2][2] = tbmodel->b[1]; tv[2][3] = tbmodel->b[2];
-  //tv[3][1] = tbmodel->c[0]; tv[3][2] = tbmodel->c[1]; tv[3][3] = tbmodel->c[2];
+  sec30->GetVar(_("a[0]"),tv[1][1]); sec30->GetVar(_("a[1]"),tv[1][2]); sec30->GetVar(_("a[2]"),tv[1][3]);
+  sec30->GetVar(_("b[0]"),tv[2][1]); sec30->GetVar(_("b[1]"),tv[2][2]); sec30->GetVar(_("b[2]"),tv[2][3]);
+  sec30->GetVar(_("c[0]"),tv[3][1]); sec30->GetVar(_("c[1]"),tv[3][2]); sec30->GetVar(_("c[2]"),tv[3][3]);
   
   /********************************************
               making of a CIF file
@@ -346,15 +256,16 @@ void StructureClass::ExportToCIF(wxString filepath, wxString filename)
     //std::list<double>::iterator iy = tbmodel->YArray.begin();
     //std::list<double>::iterator iz = tbmodel->ZArray.begin();
     //std::list<int>::iterator ik = tbmodel->KindArray.begin();
-  /*  
-    for (Gc_AN=1; Gc_AN<=tbmodel->nAtoms; Gc_AN++){
+    int nAtoms=0;
+    sec30->GetVar(_("nAtoms[0]"),nAtoms);
+    for (Gc_AN=1; Gc_AN<=nAtoms; Gc_AN++){
 
       //The zero is taken as the origin of the unit cell
-
-      Cxyz[1] = *ix++;
-      Cxyz[2] = *iy++;
-      Cxyz[3] = *iz++;
-      int kind=*ik++;
+      int kind=0;
+      sec30->GetVar(_("KABC_Coords"),Gc_AN-1,0,kind);
+      sec30->GetVar(_("KABC_Coords"),Gc_AN-1,1,Cxyz[1]);
+      sec30->GetVar(_("KABC_Coords"),Gc_AN-1,2,Cxyz[2]);
+      sec30->GetVar(_("KABC_Coords"),Gc_AN-1,3,Cxyz[3]);
       
       Cell_Gxyz[1] = Dot_Product(Cxyz,rtv[1])*0.5/PI;
       Cell_Gxyz[2] = Dot_Product(Cxyz,rtv[2])*0.5/PI;
@@ -376,7 +287,7 @@ void StructureClass::ExportToCIF(wxString filepath, wxString filename)
       
       fprintf(fp,"A%-6d%-3s%10.5f%10.5f%10.5f%10.5f  Uiso   1.00\n", Gc_AN, (const char*)GetAtomLable(kind).mb_str(), Cell_Gxyz[1], Cell_Gxyz[2], Cell_Gxyz[3], 0.0);
     }
-*/
+
     fclose(fp);
   }
 }
@@ -426,9 +337,9 @@ void StructureClass::ExportToXYZ(wxString filepath, wxString filename)
 wxString StructureClass::GetAtomLable(int kind)
 {
     wxString Lable;
+    Lable=wxT("H");
     switch (kind)
     {
-    case 1: Lable=wxT("H"); break;
     case 2: Lable=wxT("He"); break;
     case 3: Lable=wxT("Li"); break;
     case 4: Lable=wxT("Be"); break;
@@ -550,66 +461,3 @@ wxString StructureClass::GetAtomLable(int kind)
     return Lable;
 }
 
-void StructureClass::ValidateTextCtrl(wxTextCtrl c, double &value)
-{
-
-}
-
-void StructureClass::ctr_a0_OnUpdated(wxCommandEvent& event)
-{
-    /*double x;
-    if (ctr_a0->GetValue().ToDouble(&x))
-        tbmodel->a[0] = s;
-    else
-        ctr_a0->SetValue(tbmodel->a[0].ToStr());*/
-}
-
-void StructureClass::ctr_a1_OnUpdated(wxCommandEvent& event)
-{
-}
-
-void StructureClass::ctr_a2_OnUpdated(wxCommandEvent& event)
-{
-}
-
-void StructureClass::ctr_a_strain_OnUpdated(wxCommandEvent& event)
-{
-}
-
-void StructureClass::ctr_b0_OnUpdated(wxCommandEvent& event)
-{
-}
-
-void StructureClass::ctr_b1_OnUpdated(wxCommandEvent& event)
-{
-}
-
-void StructureClass::ctr_b2_OnUpdated(wxCommandEvent& event)
-{
-}
-
-void StructureClass::ctr_b_strain_OnUpdated(wxCommandEvent& event)
-{
-}
-
-void StructureClass::ctr_c0_OnUpdated(wxCommandEvent& event)
-{
-}
-
-void StructureClass::ctr_c1_OnUpdated(wxCommandEvent& event)
-{
-}
-
-void StructureClass::ctr_c2_OnUpdated(wxCommandEvent& event)
-{
-}
-
-void StructureClass::ctr_c_strain_OnUpdated(wxCommandEvent& event)
-{
-}
-void StructureClass::ctr_a0_OnEnter(wxCommandEvent& event)
-{
-}
-void StructureClass::OnChar(wxKeyEvent& event)
-{
-}

@@ -30,23 +30,30 @@ GraphClass::~GraphClass()
     DiscardAtomicStructure();
 }
 
-void GraphClass::CreateAtomicStructure(TBModel* tbmodelvar)
+void GraphClass::CreateAtomicStructure(Sec30* sec30Var)
 {
-    tbmodel = tbmodelvar;
-    glc->CreateDoubleArray(3,tbmodel->nAtoms);
-    glc->CreateIntArray(1,tbmodel->nAtoms);
+    sec30 = sec30Var;
+    int nAtoms = 0;
+    sec30->GetVar(_("nAtoms[0]"),nAtoms);
     
-    std::list<double>::iterator x=tbmodel->XArray.begin();
-    std::list<double>::iterator y=tbmodel->YArray.begin();
-    std::list<double>::iterator z=tbmodel->ZArray.begin();
-    std::list<int>::iterator k=tbmodel->KindArray.begin();
+    glc->CreateDoubleArray(3,nAtoms);
+    glc->CreateIntArray(1,nAtoms);
     
-    for (int i=0; i<tbmodel->nAtoms; i++)
+    //std::list<double>::iterator x=tbmodel->XArray.begin();
+    //std::list<double>::iterator y=tbmodel->YArray.begin();
+    //std::list<double>::iterator z=tbmodel->ZArray.begin();
+    //std::list<int>::iterator k=tbmodel->KindArray.begin();
+    
+    for (int i=0; i<nAtoms; i++)
     {
-        glc->DoubleArray[0][i] = *x;    x++;
-        glc->DoubleArray[1][i] = *y;    y++;
-        glc->DoubleArray[2][i] = *z;    z++;
-        glc->IntArray[0][i] = *k;   k++;
+        sec30->GetVar(_("KABC_Coords"), i, 0, glc->IntArray[0][i]);
+        sec30->GetVar(_("XYZ_Coords"), i, 0, glc->DoubleArray[0][i]);
+        sec30->GetVar(_("XYZ_Coords"), i, 1, glc->DoubleArray[1][i]);
+        sec30->GetVar(_("XYZ_Coords"), i, 2, glc->DoubleArray[2][i]);
+        //glc->DoubleArray[0][i] = *x;    x++;
+        //glc->DoubleArray[1][i] = *y;    y++;
+        //glc->DoubleArray[2][i] = *z;    z++;
+        //glc->IntArray[0][i] = *k;   k++;
     }
     glc->LoadToCanvas();
 }

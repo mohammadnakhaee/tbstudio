@@ -5,7 +5,6 @@
 #include "GraphClass.h"
 #include "GridClass.h"
 #include "StructureClass.h"
-#include <TBModel.h>
 
 class MainFrame : public MainFrameBaseClass
 {
@@ -56,9 +55,14 @@ protected:
     virtual void Init_graph2d();
     virtual void LoadStructurePanel();
     virtual void UpdateGraph3d();
+    virtual void ValidateStructure();
+    virtual int ValidateAtoms();
+    
 private:
     wxTextCtrl* logfile;
     wxAuiManager aui_mgr;
     wxAuiNotebook* aui_ntb;
+    
+    virtual void sec30_OnUpdated(wxCommandEvent& event);
 };
 #endif // MAINFRAME_H

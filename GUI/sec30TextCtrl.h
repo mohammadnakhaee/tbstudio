@@ -6,7 +6,8 @@
 #include <wx/sizer.h>
 #include <wx/stattext.h>
 #include <wx/event.h>
-
+#include <mygrid.h>
+/******************************************************************************/
 #ifdef WXC_FROM_DIP
 #undef WXC_FROM_DIP
 #endif
@@ -15,26 +16,55 @@
 #else
 #define WXC_FROM_DIP(x) x
 #endif
-
+/******************************************************************************/
+// this is typically in a header: it just declares MY_EVENT event type
+/******************************************************************************/
+//wxDECLARE_EVENT(Sec30EVT_sec30TextCtrl_Updated, wxCommandEvent);
 /******************************************************************************/
 
-// this is typically in a header: it just declares MY_EVENT event type
-wxDECLARE_EVENT(sec30TextCtrl_Updated, wxCommandEvent);
-
-class  sec30TextCtrl : public wxTextCtrl
+class  sec30TextCtrl : public myGrid
 {
 public:
-	sec30TextCtrl(wxWindow *parent, wxWindowID id, const wxString &value=wxEmptyString, const wxPoint &pos=wxDefaultPosition, const wxSize &size=wxDefaultSize, long style=0, const wxValidator &validator=wxDefaultValidator, const wxString &name=wxTextCtrlNameStr)
-    :wxTextCtrl(parent, id, value, pos, size, style, validator, name) {};
-
+	sec30TextCtrl(wxWindow *parent, wxWindowID id, wxString Type, const wxPoint &pos=wxDefaultPosition, const wxSize &size=wxDefaultSize)
+    :myGrid(parent, id, pos, size,0){
+        //SetMinSize(size);
+        //EnableGridLines(false);
+        EnableEditing(true);
+        CreateGrid( 1, 1);
+        SetColSize(0, size.x-1);// in pixels
+        SetColLabelSize(1);
+        SetRowLabelSize(1);
+        //EnableCellEditControl(false);
+        //SetCellAlignment(wxALIGN_CENTRE,0,0);
+        DisableColResize(0);
+        DisableRowResize(0);
+        EnableScrolling(false,false);
+        //SetWindowStyle(GetWindowStyle() & ~ wxVSCROLL & ~ wxHSCROLL );
+        ShowScrollbars(wxSHOW_SB_NEVER,wxSHOW_SB_NEVER);
+        if (Type=="wxString")
+        {}
+        else if (Type=="int")
+            SetColFormatNumber(0);
+        else if (Type=="double")
+            SetColFormatFloat(0);
+        else if (Type=="bool")
+            SetColFormatBool(0);
+        
+        SetCellAlignment (0,0, wxALIGN_LEFT,wxALIGN_BOTTOM);
+        //SetDefaultCellAlignment(wxALIGN_LEFT,wxALIGN_CENTRE);
+        
+        
+    };
+    
     ~sec30TextCtrl();
-    virtual void SendDataThroughEvent();
-    virtual void myUpdated(wxCommandEvent &WXUNUSED(event));
-    virtual void myENTER(wxCommandEvent &WXUNUSED(event));
+
 
    
 private:
-       DECLARE_EVENT_TABLE()
+    //virtual void SendUpdateEvent();
+    // virtual void OnCellChanged(wxGridEvent &event); You should not use This Function Name. It seems it is connected by default without DECLARE_EVENT_TABLE()
+    //virtual void myOnKeyDown(wxKeyEvent &event);
+       //DECLARE_EVENT_TABLE()
 };
 /******************************************************************************/
 #endif

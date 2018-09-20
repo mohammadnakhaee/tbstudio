@@ -255,58 +255,14 @@ StructureBaseClass::StructureBaseClass(wxWindow* parent, wxWindowID id, const wx
     wxBoxSizer* boxSizer628 = new wxBoxSizer(wxVERTICAL);
     this->SetSizer(boxSizer628);
     
-    wxBoxSizer* boxSizer630384 = new wxBoxSizer(wxHORIZONTAL);
-    
-    boxSizer628->Add(boxSizer630384, 0, wxEXPAND, WXC_FROM_DIP(5));
-    
-    Btn_Load = new wxButton(this, wxID_ANY, _("Load"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
-    
-    boxSizer630384->Add(Btn_Load, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
-    
-    Btn_Save = new wxButton(this, wxID_ANY, _("Save"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
-    
-    boxSizer630384->Add(Btn_Save, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
-    
-    wxBoxSizer* boxSizer6303844 = new wxBoxSizer(wxHORIZONTAL);
-    
-    boxSizer628->Add(boxSizer6303844, 0, wxEXPAND, WXC_FROM_DIP(5));
-    
-    Btn_Import_XYZ = new wxButton(this, wxID_ANY, _("Import"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
-    
-    boxSizer6303844->Add(Btn_Import_XYZ, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
-    
-    Btn_Export_XYZ = new wxButton(this, wxID_ANY, _("Export"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
-    
-    boxSizer6303844->Add(Btn_Export_XYZ, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
-    
-    m_textCtrl995 = new wxTextCtrl(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
-    #if wxVERSION_NUMBER >= 3000
-    m_textCtrl995->SetHint(wxT(""));
-    #endif
-    
-    boxSizer628->Add(m_textCtrl995, 0, wxALL, WXC_FROM_DIP(5));
-    
     SetBackgroundColour(wxColour(wxT("rgb(255,255,255)")));
     SetName(wxT("StructureBaseClass"));
     SetSize(wxDLG_UNIT(this, wxSize(-1,-1)));
     if (GetSizer()) {
          GetSizer()->Fit(this);
     }
-    // Connect events
-    Btn_Load->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(StructureBaseClass::Btn_Load_OnClick), NULL, this);
-    Btn_Save->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(StructureBaseClass::Btn_Save_OnClick), NULL, this);
-    Btn_Import_XYZ->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(StructureBaseClass::Btn_Import_XYZ_OnClick), NULL, this);
-    Btn_Export_XYZ->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(StructureBaseClass::Btn_Export_XYZ_OnClick), NULL, this);
-    m_textCtrl995->Connect(wxEVT_CHAR, wxKeyEventHandler(StructureBaseClass::OnChar), NULL, this);
-    
 }
 
 StructureBaseClass::~StructureBaseClass()
 {
-    Btn_Load->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(StructureBaseClass::Btn_Load_OnClick), NULL, this);
-    Btn_Save->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(StructureBaseClass::Btn_Save_OnClick), NULL, this);
-    Btn_Import_XYZ->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(StructureBaseClass::Btn_Import_XYZ_OnClick), NULL, this);
-    Btn_Export_XYZ->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(StructureBaseClass::Btn_Export_XYZ_OnClick), NULL, this);
-    m_textCtrl995->Disconnect(wxEVT_CHAR, wxKeyEventHandler(StructureBaseClass::OnChar), NULL, this);
-    
 }

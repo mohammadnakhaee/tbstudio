@@ -22,8 +22,6 @@
 #include <wx/panel.h>
 #include <wx/stattext.h>
 #include <wx/notebook.h>
-#include <wx/button.h>
-#include <wx/textctrl.h>
 #if wxVERSION_NUMBER >= 2900
 #include <wx/persist.h>
 #include <wx/persist/toplevel.h>
@@ -118,25 +116,10 @@ public:
 class StructureBaseClass : public wxPanel
 {
 protected:
-    wxButton* Btn_Load;
-    wxButton* Btn_Save;
-    wxButton* Btn_Import_XYZ;
-    wxButton* Btn_Export_XYZ;
-    wxTextCtrl* m_textCtrl995;
 
 protected:
-    virtual void Btn_Load_OnClick(wxCommandEvent& event) { event.Skip(); }
-    virtual void Btn_Save_OnClick(wxCommandEvent& event) { event.Skip(); }
-    virtual void Btn_Import_XYZ_OnClick(wxCommandEvent& event) { event.Skip(); }
-    virtual void Btn_Export_XYZ_OnClick(wxCommandEvent& event) { event.Skip(); }
-    virtual void OnChar(wxKeyEvent& event) { event.Skip(); }
 
 public:
-    wxButton* GetBtn_Load() { return Btn_Load; }
-    wxButton* GetBtn_Save() { return Btn_Save; }
-    wxButton* GetBtn_Import_XYZ() { return Btn_Import_XYZ; }
-    wxButton* GetBtn_Export_XYZ() { return Btn_Export_XYZ; }
-    wxTextCtrl* GetTextCtrl995() { return m_textCtrl995; }
     StructureBaseClass(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxTAB_TRAVERSAL|wxBORDER_STATIC);
     virtual ~StructureBaseClass();
 };

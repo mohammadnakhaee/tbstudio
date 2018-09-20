@@ -1,33 +1,40 @@
 #include "sec30TextCtrl.h"
-
-// this is a definition so can't be in a header
-wxDEFINE_EVENT(sec30TextCtrl_Updated, wxCommandEvent);
-
 /******************************************************************************/
-BEGIN_EVENT_TABLE(sec30TextCtrl,wxTextCtrl)
-    //wxEVT_COMMAND_TEXT_UPDATED(sec30TextCtrl::myUpdated)
-    //wxEVT_COMMAND_TEXT_ENTER(sec30TextCtrl::myENTER)
-END_EVENT_TABLE()
+// this is a definition so can't be in a header
+/******************************************************************************/
+//wxDEFINE_EVENT(Sec30EVT_sec30TextCtrl_Updated, wxCommandEvent);
+/******************************************************************************/
+//BEGIN_EVENT_TABLE(sec30TextCtrl,myGrid)
+    //EVT_GRID_CELL_CHANGED(sec30TextCtrl::OnCellChanged)
+    //EVT_KEY_DOWN(sec30TextCtrl::myOnKeyDown)
+//END_EVENT_TABLE()
 /******************************************************************************/
 
 sec30TextCtrl::~sec30TextCtrl()
 {
 }
 
-void sec30TextCtrl::SendDataThroughEvent()
+/*
+void sec30TextCtrl::SendUpdateEvent()
 {
-    wxCommandEvent* myevent = new wxCommandEvent(sec30TextCtrl_Updated);
-    //myevent->m_clientData = 1;
-    wxQueueEvent(this,myevent);
+    wxCommandEvent* event = new wxCommandEvent(Sec30EVT_sec30TextCtrl_Updated);
+    event->SetEventObject(this);
+    event->SetString("nothing");
+    wxQueueEvent(this,event);
 }
 
-void sec30TextCtrl::myUpdated(wxCommandEvent &WXUNUSED(event))
+void sec30TextCtrl::OnCellChanged(wxGridEvent &event)
 {
-    SendDataThroughEvent();
+    SendUpdateEvent();
 }
 
-void sec30TextCtrl::myENTER(wxCommandEvent &WXUNUSED(event))
+void sec30TextCtrl::myOnKeyDown(wxKeyEvent &event)
 {
-    SendDataThroughEvent();
+    switch (event.GetKeyCode())
+    {
+        case WXK_TAB:
+        case WXK_RETURN:
+            SendUpdateEvent();
+    }
 }
-
+*/

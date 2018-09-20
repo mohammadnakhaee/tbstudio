@@ -1,7 +1,17 @@
 #include "Sec30.h"
 
-Sec30::Sec30()
+// this is a definition so can't be in a header
+wxDEFINE_EVENT(Sec30EVT_OnUpdated, wxCommandEvent);
+
+/******************************************************************************/
+BEGIN_EVENT_TABLE(Sec30,wxWindow)
+
+END_EVENT_TABLE()
+/******************************************************************************/
+
+Sec30::Sec30(wxWindow* parent)
 {
+    SetParent(parent);
 }
 
 Sec30::~Sec30()
@@ -19,156 +29,270 @@ void Sec30::AddGroupBox(wxWindow *parent, wxString Caption, wxColour BGColor)
     vsizer->Add(st, 0, wxLEFT, WXC_FROM_DIP(5));
 }
 
-void Sec30::AddDoubleVec(wxWindow *parent, int VecCnt, wxString VariableName, wxString VecLabel, int LabelSize, int CtrlSize)
+void Sec30::AddButton(wxWindow *parent, int ButtonCnt, wxString* Labels, wxObjectEventFunction* Funcs)
+{
+    wxBoxSizer* MySizer = new wxBoxSizer(wxHORIZONTAL);
+    parent->GetSizer()->Add(MySizer, 0, wxEXPAND, WXC_FROM_DIP(5));
+    for (int i=0; i < ButtonCnt; i++)
+    {
+        wxButton* btn = new wxButton(parent, wxID_ANY, Labels[i], wxDefaultPosition, wxDLG_UNIT(parent, wxSize(-1,-1)), 0);
+        MySizer->Add(btn, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+        btn->Connect(wxEVT_COMMAND_BUTTON_CLICKED, Funcs[i], NULL, parent);
+    }
+}
+
+void Sec30::AddButton(wxWindow *parent, int ButtonCnt, wxString* ButtonNames, wxString* Labels, wxObjectEventFunction* Funcs)
+{
+    wxBoxSizer* MySizer = new wxBoxSizer(wxHORIZONTAL);
+    parent->GetSizer()->Add(MySizer, 0, wxEXPAND, WXC_FROM_DIP(5));
+    for (int i=0; i < ButtonCnt; i++)
+    {
+        wxButton* btn = new wxButton(parent, wxID_ANY, Labels[i], wxDefaultPosition, wxDLG_UNIT(parent, wxSize(-1,-1)), 0);
+        MySizer->Add(btn, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+        btn->SetName(ButtonNames[i]);
+        btn->Connect(wxEVT_COMMAND_BUTTON_CLICKED, Funcs[i], NULL, parent);
+    }
+}
+
+void Sec30::AddVarVector(wxWindow *parent, int VecCnt, wxString VariableName, wxString VariableType, wxString VecLabel, int LabelSize, int CtrlSize)
 {
     wxBoxSizer* MySizer = new wxBoxSizer(wxHORIZONTAL);
     parent->GetSizer()->Add(MySizer, 0, wxLEFT|wxRIGHT|wxTOP|wxEXPAND, WXC_FROM_DIP(5));
     
-    wxStaticText* st = new wxStaticText(parent, wxID_ANY, VecLabel + wxT(":"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    wxStaticText* st = new wxStaticText(parent, wxID_ANY, VecLabel + wxT(":"), wxDefaultPosition, wxDLG_UNIT(parent, wxSize(-1,-1)), 0);
     MySizer->Add(st, 0, wxLEFT|wxRIGHT|wxTOP, WXC_FROM_DIP(5));
     st->SetMinSize(wxSize(LabelSize,-1));
     
-    std::list<wxString>::iterator ivar = double_vars.end();
-    std::list<double>::iterator ival = double_vals.end();
+    std::list<wxString>::iterator ivar = vars.end();
     
     for (int i=0; i < VecCnt; i++)
     {
-        wxTextCtrl* tc=new wxTextCtrl(parent, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(CtrlSize,-1)), 0);
+        sec30TextCtrl* tc=new sec30TextCtrl(parent, wxID_ANY, VariableType, wxDefaultPosition, wxSize(CtrlSize,-1));
         MySizer->Add(tc, 0, wxRIGHT, WXC_FROM_DIP(5));
         tc->SetMinSize(wxSize(CtrlSize,-1));
         
         wxString var = wxString::Format(wxT("%s[%d]"), VariableName, i);
-        double_vars.insert(ivar,var);
-        double_vals.insert(ival,0.0);
-        
-        //Bind the TextBox and its Variable
-        tc->Connect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(Sec30::TextCtrl_OnUpdated), NULL, this);
-        tc->Connect(wxEVT_CHAR, wxKeyEventHandler(Sec30::TextCtrl_OnChar), NULL, this);
+        vars.insert(ivar,var);
         tc->SetName(var);
-        tc->SetHint(wxT("double"));
+        //tc->SetColLabelValue(0,VariableType);
+        tc->SetCellValue(0,0,_("0"));
+        tc->Connect(Sec30EVT_Grid_Updated, wxCommandEventHandler(Sec30::sec30TextCtrl_OnUpdated), NULL, this);
     }
     
     MySizer->Layout();
     parent->Layout();
 }
 
-void Sec30::AddDouble2dArray(wxWindow *parent, int nRow, int nCol, wxString VariableName, wxString* ColNames, wxString* ColTypes, int* ColSizes, int* ColPrecision, int xCtrlSize, int yCtrlSize)
+void Sec30::AddVarVector(wxWindow *parent, int VecCnt, wxString VariableName, wxString VariableType)
+{
+    std::list<wxString>::iterator ivar = vars.end();
+    
+    for (int i=0; i < VecCnt; i++)
+    {
+        sec30TextCtrl* tc=new sec30TextCtrl(parent, wxID_ANY, VariableType, wxDefaultPosition, wxSize(0,0));
+        tc->SetParent(parent);
+        tc->Show(false);
+        
+        wxString var = wxString::Format(wxT("%s[%d]"), VariableName, i);
+        vars.insert(ivar,var);
+        tc->SetName(var);
+        tc->SetCellValue(0,0,_("0"));
+        //tc->Connect(Sec30EVT_Grid_Updated, wxCommandEventHandler(Sec30::sec30TextCtrl_OnUpdated), NULL, this);
+    }
+    parent->Layout();
+}
+
+void Sec30::AddGrid(wxWindow *parent, int nRow, int nCol, wxString VariableName, wxString* ColNames, wxString* ColTypes, int* ColSizes, int* ColPrecision, int xCtrlSize, int yCtrlSize)
 {
     wxBoxSizer* MySizer = new wxBoxSizer(wxHORIZONTAL);
     parent->GetSizer()->Add(MySizer, 0, wxLEFT|wxRIGHT|wxTOP|wxEXPAND, WXC_FROM_DIP(5));
     
-    //wxStaticText* st = new wxStaticText(parent, wxID_ANY, VecLabel + wxT(":"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
-    //MySizer->Add(st, 0, wxLEFT|wxRIGHT|wxTOP, WXC_FROM_DIP(5));
-    //st->SetMinSize(wxSize(LabelSize,-1));
+    std::list<wxString>::iterator igrid = grids.end();
     
-    std::list<wxString>::iterator ivar = double2dArray_vars.end();
-    std::list<   std::vector<std::vector<wxString>>   > ::iterator ival = double2dArray_vals.end();
-    
-    myGrid* gc=new myGrid(parent, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(xCtrlSize,yCtrlSize)));
+    myGrid* gc=new myGrid(parent, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(parent, wxSize(xCtrlSize,yCtrlSize)),wxFULL_REPAINT_ON_RESIZE|wxHSCROLL|wxVSCROLL);
     MySizer->Add(gc, 0, wxRIGHT, WXC_FROM_DIP(5));
     gc->EnableEditing(true);
     gc->SetMinSize(wxSize(xCtrlSize,yCtrlSize));
+    
     gc->SetName(VariableName);
+    
+    //gc->SetDefaultCellAlignment(wxALIGN_LEFT,wxALIGN_CENTRE); //Does not work
     
     gc->CreateGrid( nRow, nCol);
     for (int i=0; i< nCol; i++)
     {
         gc->SetColLabelValue(i,ColNames[i]);
         gc->SetColSize(i, ColSizes[i] );// in pixels
+        gc->DisableColResize(i);
         if (ColTypes[i]=="int")
             gc->SetColFormatNumber(i);
         else if (ColTypes[i]=="double")
-            gc->SetColFormatFloat(i,ColSizes[i],ColPrecision[i]);
+            gc->SetColFormatFloat(i,-1,ColPrecision[i]);
+            
+        for (int j=0; j< nRow; j++)
+            gc->SetCellAlignment(j, i, wxALIGN_LEFT,wxALIGN_CENTRE);
     }
     
-    double2dArray_vars.insert(ivar,VariableName);
-    std::vector<std::vector<wxString>> empty;
-    double2dArray_vals.insert(ival,empty);
+    for (int i=0; i< nRow; i++) gc->DisableRowResize(i);
+    grids.insert(igrid,VariableName);
     
-    wxColour c; //*wxGREEN
+    wxColour c; //Also it is possible to determine the color in this way: wxColour c=*wxGREEN;
     c.Set(191,205,219,0);
     gc->SetLabelBackgroundColour(c);
     gc->SetColLabelSize(20);
     gc->SetRowLabelSize(35);
     gc->SetColMinimalAcceptableWidth(1);
-
-    //gc->SetColLabelSize(1);
-    //gc->SetRowLabelSize(1);
-    //gc->EnableCellEditControl(false);
     
-    //Bind the TextBox and its Variable
+    gc->Connect(Sec30EVT_Grid_Updated, wxCommandEventHandler(Sec30::sec30TextCtrl_OnUpdated), NULL, this);
+    
     //gc->Connect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(Sec30::TextCtrl_OnUpdated), NULL, this);
     //gc->Connect(wxEVT_GRID_CELL_CHANGED, wxGridEventHandler(StructureClass::OnCellChanged), NULL, this);
     //gc->Connect(MyGridPasteEvent, wxCommandEventHandler(StructureClass::OnGridPaste), NULL, this);
-    
-    
-    
-    
-    
+
     MySizer->Layout();
     parent->Layout();
 }
 
-void Sec30::TextCtrl_OnUpdated(wxCommandEvent& event)
+void Sec30::AddGrid(wxWindow *parent, int nRow, int nCol, wxString VariableName, wxString* ColTypes, int* ColPrecision)
+{
+    std::list<wxString>::iterator igrid = grids.end();
+    
+    myGrid* gc=new myGrid(parent, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(parent, wxSize(0,0)),0);
+    gc->Show(false);
+    gc->SetName(VariableName);
+    gc->CreateGrid( nRow, nCol);
+    for (int i=0; i< nCol; i++)
+    {
+        if (ColTypes[i]=="int")
+            gc->SetColFormatNumber(i);
+        else if (ColTypes[i]=="double")
+            gc->SetColFormatFloat(i,-1,ColPrecision[i]);
+    }
+    grids.insert(igrid,VariableName);
+    //gc->Connect(Sec30EVT_Grid_Updated, wxCommandEventHandler(Sec30::sec30TextCtrl_OnUpdated), NULL, this);
+    parent->Layout();
+}
+
+void Sec30::GetDim(wxString VariableName, int& nRow, int& nCol)
+{
+    myGrid* gridobj = (sec30TextCtrl*)FindWindowByName(VariableName,GetParent());
+    nRow = gridobj->GetNumberRows();
+    nCol = gridobj->GetNumberCols();
+}
+
+void Sec30::sec30TextCtrl_OnUpdated(wxCommandEvent& event)
 {
     wxTextCtrl* tc= (wxTextCtrl*)event.GetEventObject();
-    wxString type = tc->GetHint();
+    //wxString type = tc->GetHint();
     wxString name = tc->GetName();
-    wxString value = tc->GetValue();
-    SetData(type, name, value);
-    //if (isValid(label,value)) 
+    //wxString value = tc->GetValue();
+    
+    SendUpdateEvent(name);
 }
 
-void Sec30::SetVar(wxWindow *parent, wxString VariableName, double Value)
+void Sec30::SendUpdateEvent(wxString info)
+{
+    wxCommandEvent* event = new wxCommandEvent(Sec30EVT_OnUpdated);
+    //event->SetEventObject(this);
+    event->SetString(info);
+    wxQueueEvent(this,event);
+}
+
+void Sec30::SetVar(wxString VariableName, double Value, bool FireEvent)
 {
     wxString val = wxString::Format(wxT("%1f"), Value);
-    ((wxTextCtrl*)FindWindowByName(VariableName,parent))->SetValue(val);
+    ((sec30TextCtrl*)FindWindowByName(VariableName,GetParent()))->SetCellValue(0,0,val);
+    if (FireEvent) SendUpdateEvent(VariableName);
 }
 
-void Sec30::SetVar(wxWindow *parent, wxString VariableName, int Value)
+void Sec30::SetVar(wxString VariableName, int Value, bool FireEvent)
 {
     wxString val = wxString::Format(wxT("%d"), Value);
-    ((wxTextCtrl*)FindWindowByName(VariableName,parent))->SetValue(val);
+    ((sec30TextCtrl*)FindWindowByName(VariableName,GetParent()))->SetCellValue(0,0,val);
+    if (FireEvent) SendUpdateEvent(VariableName);
 }
 
-void Sec30::SetVar(wxWindow *parent, wxString VariableName, wxString Value)
+bool Sec30::GetVar(wxString VariableName, bool& Value)
 {
-    ((wxTextCtrl*)FindWindowByName(VariableName,parent))->SetValue(Value);
-}
-
-bool Sec30::SetData(wxString Type, wxString VariableName, wxString Value)
-{
-    bool isvalid = false;
-    std::list<wxString>::iterator ivar = double_vars.begin();
-    if (Type == wxT("double"))
+    int IntValue = 0;
+    bool output = GetVar(VariableName, IntValue);
+    if (output)
     {
-        double val;
-        isvalid = Value.ToDouble(&val);
-        std::list<double>::iterator ival = double_vals.begin();
-        for (int i=0; i<double_vars.size(); i++)
-        {
-            if (VariableName == *ivar++)
-            {
-                *ival = val;
-                return isvalid;
-            }
-            ival++;
-        }
-        
-        throw "Invalid variable name.";
+        Value = true;
+        if (IntValue == 0) Value = false;
     }
-    else if (Type == wxT("int"))
-    {
-        long i;
-        //isvalid = value.ToLong(&i);
-    }
-    
-    
+    return output;
 }
 
-void Sec30::GetData(wxString VariableName, double &Value)
+bool Sec30::GetVar(wxString VariableName, wxString& Value)
 {
-    
+    Value = ((sec30TextCtrl*)FindWindowByName(VariableName,GetParent()))->GetCellValue(0,0);
+    return true;
+}
+
+void Sec30::SetVar(wxString VariableName, int iRow, int iCol, double Value, bool FireEvent)
+{
+    wxString val = wxString::Format(wxT("%1f"), Value);
+    ((sec30TextCtrl*)FindWindowByName(VariableName,GetParent()))->SetCellValue(iRow, iCol, val);
+    if (FireEvent) SendUpdateEvent(VariableName);
+}
+
+void Sec30::SetVar(wxString VariableName, int iRow, int iCol, int Value, bool FireEvent)
+{
+    wxString val = wxString::Format(wxT("%d"), Value);
+    ((sec30TextCtrl*)FindWindowByName(VariableName,GetParent()))->SetCellValue(iRow, iCol, val);
+    if (FireEvent) SendUpdateEvent(VariableName);
+}
+
+void Sec30::SetVar(wxString VariableName, int iRow, int iCol, bool Value, bool FireEvent)
+{
+    int b = 0;
+    if (Value) b=1;
+    wxString val = wxString::Format(wxT("%d"), b);
+    ((sec30TextCtrl*)FindWindowByName(VariableName,GetParent()))->SetCellValue(iRow, iCol, val);
+    if (FireEvent) SendUpdateEvent(VariableName);
+}
+
+void Sec30::SetVar(wxString VariableName, int iRow, int iCol, wxString Value, bool FireEvent)
+{
+    ((sec30TextCtrl*)FindWindowByName(VariableName,GetParent()))->SetCellValue(iRow, iCol, Value);
+    if (FireEvent) SendUpdateEvent(VariableName);
+}
+
+bool Sec30::GetVar(wxString VariableName, int iRow, int iCol, double& Value)
+{
+    double d = 0.0;
+    wxString val = ((sec30TextCtrl*)FindWindowByName(VariableName,GetParent()))->GetCellValue(iRow, iCol);
+    bool output = val.ToDouble(&d);
+    if (output) Value = d;
+    return output;
+}
+
+bool Sec30::GetVar(wxString VariableName, int iRow, int iCol, int& Value)
+{
+    long l = 0;
+    wxString val = ((sec30TextCtrl*)FindWindowByName(VariableName,GetParent()))->GetCellValue(iRow, iCol);
+    bool output = val.ToLong(&l);
+    if (output) Value = (int)l;
+    return output;
+}
+
+bool Sec30::GetVar(wxString VariableName, int iRow, int iCol, bool& Value)
+{
+    int IntValue = 0;
+    bool output = GetVar(VariableName, iRow, iCol, IntValue);
+    if (output)
+    {
+        Value = true;
+        if (IntValue == 0) Value = false;
+    }
+    return output;
+}
+
+bool Sec30::GetVar(wxString VariableName, int iRow, int iCol, wxString& Value)
+{
+    Value = ((sec30TextCtrl*)FindWindowByName(VariableName,GetParent()))->GetCellValue(iRow, iCol);
+    return true;
 }
 
 void Sec30::SaveToFile(wxString filepath, wxString filename)
@@ -180,93 +304,47 @@ void Sec30::SaveToFile(wxString filepath, wxString filename)
     {
         int n = 0;
         std::list<wxString>::iterator is;
-        std::list<double>::iterator id;
-        std::list<int>::iterator ii;
-        std::list<bool>::iterator ib;
-        std::list<float>::iterator ifl;
-        std::list<char>::iterator ic;
+        wxString VariableName;
+        wxString val;
         
         ///////////////////////////////////////////////////////////////
-        n = double_vars.size();
+        n = vars.size();
         out.write((char *) &n, sizeof n);
         
-        for(is=double_vars.begin(); is!= double_vars.end(); is++)
+        for(is=vars.begin(); is!= vars.end(); is++)
         {
-            size_t len = (*is).size();
+            VariableName = *is;
+            size_t len = VariableName.size();
             out.write((char *)&len, sizeof len);
-            out.write((*is).c_str(), len);
+            out.write(VariableName.c_str(), len);
+            
+            GetVar(VariableName, val);
+            len = val.size();
+            out.write((char *)&len, sizeof len);
+            out.write(val.c_str(), len);
         }
-        
-        for(id=double_vals.begin(); id!= double_vals.end(); id++)
-            out.write((char *)&*id, sizeof *id);
         ///////////////////////////////////////////////////////////////
-        n = int_vars.size();
+        n = grids.size();
         out.write((char *) &n, sizeof n);
         
-        for(is=int_vars.begin(); is!= int_vars.end(); is++)
+        for(is=grids.begin(); is!= grids.end(); is++)
         {
-            size_t len = (*is).size();
+            VariableName = *is;
+            size_t len = VariableName.size();
             out.write((char *)&len, sizeof len);
-            out.write((*is).c_str(), len);
-        }
-        
-        for(ii=int_vals.begin(); ii!= int_vals.end(); ii++)
-            out.write((char *)&*ii, sizeof *ii);
-        ///////////////////////////////////////////////////////////////
-        n = bool_vars.size();
-        out.write((char *) &n, sizeof n);
-        
-        for(is=bool_vars.begin(); is!= bool_vars.end(); is++)
-        {
-            size_t len = (*is).size();
-            out.write((char *)&len, sizeof len);
-            out.write((*is).c_str(), len);
-        }
-        
-        for(ib=bool_vals.begin(); ib!= bool_vals.end(); ib++)
-            out.write((char *)&*ib, sizeof *ib);
-        ///////////////////////////////////////////////////////////////
-        n = float_vars.size();
-        out.write((char *) &n, sizeof n);
-        
-        for(is=float_vars.begin(); is!= float_vars.end(); is++)
-        {
-            size_t len = (*is).size();
-            out.write((char *)&len, sizeof len);
-            out.write((*is).c_str(), len);
-        }
-        
-        for(ifl=float_vals.begin(); ifl!= float_vals.end(); ifl++)
-            out.write((char *)&*ifl, sizeof *ifl);
-        ///////////////////////////////////////////////////////////////
-        n = char_vars.size();
-        out.write((char *) &n, sizeof n);
-        
-        for(is=char_vars.begin(); is!= char_vars.end(); is++)
-        {
-            size_t len = (*is).size();
-            out.write((char *)&len, sizeof len);
-            out.write((*is).c_str(), len);
-        }
-        
-        for(ic=char_vals.begin(); ic!= char_vals.end(); ic++)
-            out.write((char *)&*ic, sizeof *ic);
-        ///////////////////////////////////////////////////////////////
-        n = wxString_vars.size();
-        out.write((char *) &n, sizeof n);
-        
-        for(is=wxString_vars.begin(); is!= wxString_vars.end(); is++)
-        {
-            size_t len = (*is).size();
-            out.write((char *)&len, sizeof len);
-            out.write((*is).c_str(), len);
-        }
-        
-        for(is=wxString_vals.begin(); is!= wxString_vals.end(); is++)
-        {
-            size_t len = (*is).size();
-            out.write((char *)&len, sizeof len);
-            out.write((*is).c_str(), len);
+            out.write(VariableName.c_str(), len);
+            
+            int nRow=0;
+            int nCol=0;
+            GetDim(VariableName, nRow, nCol);
+            for (int irow=0; irow<nRow;irow++)
+                for (int icol=0; icol<nCol; icol++)
+                {
+                    GetVar(VariableName, irow, icol, val);
+                    len = val.size();
+                    out.write((char *)&len, sizeof len);
+                    out.write(val.c_str(), len);
+                }
         }
         ///////////////////////////////////////////////////////////////
         
@@ -283,129 +361,69 @@ void Sec30::LoadFromFile(wxString filepath, wxString filename)
     if (infile.is_open())
     {
         int n = 0;
-        size_t ns = 0;
-        double d=0.0;
-        int i=0;
-        bool b=false;
-        float f=0.0f;
-        char c='c';
-        
-        std::list<wxString>::iterator is;
-        std::list<double>::iterator id;
-        std::list<int>::iterator ii;
-        std::list<bool>::iterator ib;
-        std::list<float>::iterator ifl;
-        std::list<char>::iterator ic;
-        
         ///////////////////////////////////////////////////////////////
         infile.read(reinterpret_cast<char *>(&n), sizeof n);
         
-        is = double_vars.end();
         for(int it=0; it != n; it++)
         {
-            infile.read(reinterpret_cast<char *>(&ns), sizeof ns);
-            char* buf = new char[ns];
-            infile.read(buf, ns);
-            double_vars.insert(is,wxString(buf));
-        }
-        
-        id = double_vals.end();
-        for(int it=0; it != n; it++)
-        {
-            infile.read(reinterpret_cast<char *>(&d), sizeof d);
-            double_vals.insert(id,d);
-        }
-        ///////////////////////////////////////////////////////////////
-        infile.read(reinterpret_cast<char *>(&n), sizeof n);
-        
-        is = int_vars.end();
-        for(int it=0; it != n; it++)
-        {
-            infile.read(reinterpret_cast<char *>(&ns), sizeof ns);
-            char* buf = new char[ns];
-            infile.read(buf, ns);
-            int_vars.insert(is,wxString(buf));
-        }
-        
-        ii = int_vals.end();
-        for(int it=0; it != n; it++)
-        {
-            infile.read(reinterpret_cast<char *>(&i), sizeof i);
-            int_vals.insert(ii,i);
+            size_t ns1=0;
+            infile.read(reinterpret_cast<char *>(&ns1), sizeof ns1);
+            char* VariableNameBuf = new char[ns1];
+            for (int i = 0; i < ns1; i++)
+            {
+                char ch;
+                infile.read(&ch, sizeof ch);
+                VariableNameBuf[i] = ch;
+            }
+            wxString VariableName = wxString(VariableNameBuf,ns1);
+            
+            size_t ns2=0;
+            infile.read(reinterpret_cast<char *>(&ns2), sizeof ns2);
+            char* ValBuf = new char[ns2];
+            for (int i = 0; i < ns2; i++)
+            {
+                char ch;
+                infile.read(&ch, sizeof ch);
+                ValBuf[i] = ch;
+            }
+            wxString Val=wxString(ValBuf,ns2);
+            
+            SetVar(VariableName, Val, false);
         }
         ///////////////////////////////////////////////////////////////
         infile.read(reinterpret_cast<char *>(&n), sizeof n);
-        
-        is = bool_vars.end();
+
         for(int it=0; it != n; it++)
         {
-            infile.read(reinterpret_cast<char *>(&ns), sizeof ns);
-            char* buf = new char[ns];
-            infile.read(buf, ns);
-            bool_vars.insert(is,wxString(buf));
-        }
-        
-        ib = bool_vals.end();
-        for(int it=0; it != n; it++)
-        {
-            infile.read(reinterpret_cast<char *>(&b), sizeof b);
-            bool_vals.insert(ib,b);
-        }
-        ///////////////////////////////////////////////////////////////
-        infile.read(reinterpret_cast<char *>(&n), sizeof n);
-        
-        is = float_vars.end();
-        for(int it=0; it != n; it++)
-        {
-            infile.read(reinterpret_cast<char *>(&ns), sizeof ns);
-            char* buf = new char[ns];
-            infile.read(buf, ns);
-            float_vars.insert(is,wxString(buf));
-        }
-        
-        ifl = float_vals.end();
-        for(int it=0; it != n; it++)
-        {
-            infile.read(reinterpret_cast<char *>(&f), sizeof f);
-            float_vals.insert(ifl,f);
-        }
-        ///////////////////////////////////////////////////////////////
-        infile.read(reinterpret_cast<char *>(&n), sizeof n);
-        
-        is = char_vars.end();
-        for(int it=0; it != n; it++)
-        {
-            infile.read(reinterpret_cast<char *>(&ns), sizeof ns);
-            char* buf = new char[ns];
-            infile.read(buf, ns);
-            char_vars.insert(is,wxString(buf));
-        }
-        
-        ic = char_vals.end();
-        for(int it=0; it != n; it++)
-        {
-            infile.read(reinterpret_cast<char *>(&c), sizeof c);
-            char_vals.insert(ic,c);
-        }
-        ///////////////////////////////////////////////////////////////
-        infile.read(reinterpret_cast<char *>(&n), sizeof n);
-        
-        is = wxString_vars.end();
-        for(int it=0; it != n; it++)
-        {
-            infile.read(reinterpret_cast<char *>(&ns), sizeof ns);
-            char* buf = new char[ns];
-            infile.read(buf, ns);
-            wxString_vars.insert(is,wxString(buf));
-        }
-        
-        is = wxString_vals.end();
-        for(int it=0; it != n; it++)
-        {
-            infile.read(reinterpret_cast<char *>(&ns), sizeof ns);
-            char* buf = new char[ns];
-            infile.read(buf, ns);
-            wxString_vals.insert(is,wxString(buf));
+            size_t ns1=0;
+            infile.read(reinterpret_cast<char *>(&ns1), sizeof ns1);
+            char* VariableNameBuf = new char[ns1];
+            for (int i = 0; i < ns1; i++)
+            {
+                char ch;
+                infile.read(&ch, sizeof ch);
+                VariableNameBuf[i] = ch;
+            }
+            wxString VariableName = wxString(VariableNameBuf,ns1);
+
+            int nRow=0;
+            int nCol=0;
+            GetDim(VariableName, nRow, nCol);
+            for (int irow=0; irow<nRow;irow++)
+                for (int icol=0; icol<nCol; icol++)
+                {
+                    size_t ns2=0;
+                    infile.read(reinterpret_cast<char *>(&ns2), sizeof ns2);
+                    char* ValBuf = new char[ns2];
+                    for (int i = 0; i < ns2; i++)
+                    {
+                        char ch;
+                        infile.read(&ch, sizeof ch);
+                        ValBuf[i] = ch;
+                    }
+                    wxString Val=wxString(ValBuf,ns2);
+                    SetVar(VariableName, irow, icol, Val, false);
+                }
         }
         ///////////////////////////////////////////////////////////////
         
@@ -414,112 +432,6 @@ void Sec30::LoadFromFile(wxString filepath, wxString filename)
 
 }
 
-void Sec30::TextCtrl_OnChar(wxKeyEvent& event)
-{
-    wxTextCtrl* tc= (wxTextCtrl*)event.GetEventObject();
-    wxString oldvalue=tc->GetValue();
-    event.Skip(false);
-    
-    switch (event.GetKeyCode())
-    {
-        case '0':
-        case WXK_NUMPAD0:
-        case '1':
-        case '2':
-        case '3':
-        case '4':
-        case '5':
-        case '6':
-        case '7':
-        case '8':
-        case '9':
-        case WXK_NUMPAD1:
-        case WXK_NUMPAD2:
-        case WXK_NUMPAD3:
-        case WXK_NUMPAD4:
-        case WXK_NUMPAD5:
-        case WXK_NUMPAD6:
-        case WXK_NUMPAD7:
-        case WXK_NUMPAD8:
-        case WXK_NUMPAD9:
-        case WXK_DELETE:    
-        case WXK_RIGHT:
-        case WXK_LEFT:        
-        case WXK_BACK:
-        case WXK_TAB: 
-        case WXK_NUMPAD_END:
-        case WXK_NUMPAD_BEGIN:
-        case WXK_HOME:
-        case WXK_END:
-        case WXK_RETURN:
-        case WXK_NUMPAD_DECIMAL:
-        case '.':
-        case ',':
-        case WXK_NUMPAD_SUBTRACT:
-        case '-':
-            event.Skip();
-    }
-    
-    /*
-    switch (event.GetKeyCode())
-    {
-        case '0':
-        case WXK_NUMPAD0:  
-            //if (!((tc->GetDouble()==0)&&(oldvalue.Find('.')==-1)))
-                event.Skip();
-            break;
-        
-        case '1':
-        case '2':
-        case '3':
-        case '4':
-        case '5':
-        case '6':
-        case '7':
-        case '8':
-        case '9':
-        case WXK_NUMPAD1:
-        case WXK_NUMPAD2:
-        case WXK_NUMPAD3:
-        case WXK_NUMPAD4:
-        case WXK_NUMPAD5:
-        case WXK_NUMPAD6:
-        case WXK_NUMPAD7:
-        case WXK_NUMPAD8:
-        case WXK_NUMPAD9:
-            //if(GetDouble()==0) Clear();
-            
-        case WXK_DELETE:    
-        case WXK_RIGHT:
-        case WXK_LEFT:        
-        case WXK_BACK:
-        case WXK_TAB: 
-        case WXK_NUMPAD_END:
-        case WXK_NUMPAD_BEGIN:
-        case WXK_HOME:
-        case WXK_END:
-        case WXK_RETURN:
-            //event.Skip();  
-            break;
-        
-        case WXK_NUMPAD_DECIMAL:
-        case '.':
-        case ',':
-            //if (!(tc->GetHint() == _("int")))
-            //    if (oldvalue.Find('.')==-1) //keine doppelten Punkte zulassen
-            //        WriteText(".");  
-            break;
-        
-        case WXK_NUMPAD_SUBTRACT:
-        case '-':
-                event.Skip();
-            break;
-            
-        default:
-            break;
-    }
-     */
-}
 
 
 /*

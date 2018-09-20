@@ -9,6 +9,7 @@
 #include <GL/glext.h>
 #include <GL/glut.h>
 #include <WX/mdi.h>
+#include <wx/msgdlg.h>
 
 
 /*
@@ -47,7 +48,8 @@ MainFrame::MainFrame(wxWindow* parent)
 {
     //tbmodel = new TBModel();
     //tbmodel->nAtoms = 4;
-    sec30=new Sec30();
+    sec30=new Sec30(this);
+    sec30->Connect(Sec30EVT_OnUpdated, wxCommandEventHandler(sec30_OnUpdated), NULL, this);
     
     /*
     CML::IOData* iod = static_cast<MainFrame*>(mainFrame)->iod;
@@ -116,10 +118,13 @@ MainFrame::MainFrame(wxWindow* parent)
     panelSizer1->Add(logfile, 1, wxEXPAND);
     CenteralPanel->SetSizer(panelSizer1);
     
+    LoadStructurePanel();
+    
+    
     Init_graph3d();
     Init_graph2d();
     Init_graph2d0();
-    LoadStructurePanel();
+    
     
     // Create the TB Model Class which includes all information about the system
     
@@ -581,16 +586,16 @@ void MainFrame::BtnTerminal_OnClick(wxRibbonButtonBarEvent& event)
 
 void MainFrame::Init_graph3d()
 {
-    //graph3d = new GraphClass(mainpanel,3);
-    //graph3d->CreateAtomicStructure(tbmodel);
-    //aui_mgr.AddPane(graph3d, wxAuiPaneInfo().Gripper(false).Floatable(true).Dockable(true).Caption("Structure").CloseButton(false).MaximizeButton(true).MinimizeButton(true).Dock().Left());
-    //aui_mgr.Update();
+    graph3d = new GraphClass(mainpanel,3);
+    graph3d->CreateAtomicStructure(sec30);
+    aui_mgr.AddPane(graph3d, wxAuiPaneInfo().Gripper(false).Floatable(true).Dockable(true).Caption("Structure").CloseButton(false).MaximizeButton(true).MinimizeButton(true).Dock().Left());
+    aui_mgr.Update();
 }
 
 void MainFrame::UpdateGraph3d()
 {
-    //graph3d->DiscardAtomicStructure();
-    //graph3d->CreateAtomicStructure(tbmodel);
+    graph3d->DiscardAtomicStructure();
+    graph3d->CreateAtomicStructure(sec30);
 }
 
 void MainFrame::Init_graph2d0()
@@ -665,4 +670,66 @@ void MainFrame::BtnSave_OnClick(wxRibbonButtonBarEvent& event)
 	}
  
 	OpenDialog->Destroy();
+}
+
+void MainFrame::sec30_OnUpdated(wxCommandEvent& event)
+{
+    //wxString info = event.GetString();
+    //if (info == _("atomsgrid")) wxMessageBox(info, _("Sec30EVT"));
+    ValidateStructure();
+}
+
+void MainFrame::ValidateStructure()
+{
+    int nAtoms = ValidateAtoms();
+    sec30->SetVar(_("nAtoms[0]"),nAtoms,false);
+    graph3d->DiscardAtomicStructure();
+    graph3d->CreateAtomicStructure(sec30);
+    graph3d->Refresh(false);
+}
+
+int MainFrame::ValidateAtoms()
+{
+    int AtomCnt=0;
+    double A,B,C;
+    double a[3],b[3],c[3];
+    double x,y,z;
+    int kind;
+    int nRow = 0;
+    int nCol = 0;
+    sec30->GetDim(_("KABC_Coords"), nRow, nCol);
+    int i=-1;
+    bool isValid=true;
+    
+    sec30->GetVar(_("a[0]"), a[0]); sec30->GetVar(_("a[1]"), a[1]); sec30->GetVar(_("a[2]"), a[2]);
+    sec30->GetVar(_("b[0]"), b[0]); sec30->GetVar(_("b[1]"), b[1]); sec30->GetVar(_("b[2]"), b[2]);
+    sec30->GetVar(_("c[0]"), c[0]); sec30->GetVar(_("c[1]"), c[1]); sec30->GetVar(_("c[2]"), c[2]);
+
+    while (i<nRow && isValid)
+    {
+        i++;
+        bool isLineValid = sec30->GetVar(_("KABC_Coords"), i, 0, kind);
+        isLineValid = isLineValid && sec30->GetVar(_("KABC_Coords"), i, 1, A);
+        isLineValid = isLineValid && sec30->GetVar(_("KABC_Coords"), i, 2, B);
+        isLineValid = isLineValid && sec30->GetVar(_("KABC_Coords"), i, 3, C);
+        
+        if (isLineValid)
+        {
+            AtomCnt++;
+            x = A * a[0] + B * b[0] + C * c[0];
+            y = A * a[1] + B * b[1] + C * c[1];
+            z = A * a[2] + B * b[2] + C * c[2];
+            sec30->SetVar(_("XYZ_Coords"), i, 0, x, false);
+            sec30->SetVar(_("XYZ_Coords"), i, 1, y, false);
+            sec30->SetVar(_("XYZ_Coords"), i, 2, z, false);
+        }
+        else
+            isValid=false;
+    }
+    
+    return AtomCnt;
+     
+    //To learn
+    //AtomsGrid->SetCellTextColour(3, 3, *wxGREEN);
+    //AtomsGrid->SetCellBackgroundColour(3, 3, *wxLIGHT_GREY);
 }

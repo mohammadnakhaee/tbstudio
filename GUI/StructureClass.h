@@ -3,53 +3,31 @@
 #include "wxcrafter.h"
 #include <sstream>
 //#include <TBModel.h>
-#include "mygrid.h"
+//#include "mygrid.h"
 #include "GraphClass.h"
 #include <wx/filedlg.h>
 #include <MyMatrix.h>
 #include <string.h>
-#include <sec30TextCtrl.h>
+#include <exception>
+#include <wx/msgdlg.h>
 #include <Sec30.h>
 
-class StructureClass : public StructureBaseClass
+class StructureClass : public wxPanel
 {
 public:
-    //myGrid* AtomsGrid;
-    //TBModel* tbmodel;
     Sec30* sec30;
     GraphClass* graph3d;
-    
-    StructureClass(wxWindow* parent, Sec30* sec30var);
+
+    StructureClass(wxWindow* parent, Sec30* sec30var, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxTAB_TRAVERSAL|wxBORDER_STATIC);
     virtual ~StructureClass();
-    virtual void CreateAtomsGrid(void);
-    int ValidateAtoms(void);
-    void ValidateForm();
-    void ExportToCIF(wxString filepath, wxString filename);
-    void ExportToXYZ(wxString filepath, wxString filename);
-    wxString GetAtomLable(int kind);
-    void ValidateTextCtrl(wxTextCtrl c, double &value);
     
 protected:
-    virtual void OnChar(wxKeyEvent& event);
-    virtual void ctr_a0_OnEnter(wxCommandEvent& event);
-    virtual void ctr_a0_OnUpdated(wxCommandEvent& event);
-    virtual void ctr_a1_OnUpdated(wxCommandEvent& event);
-    virtual void ctr_a2_OnUpdated(wxCommandEvent& event);
-    virtual void ctr_a_strain_OnUpdated(wxCommandEvent& event);
-    virtual void ctr_b0_OnUpdated(wxCommandEvent& event);
-    virtual void ctr_b1_OnUpdated(wxCommandEvent& event);
-    virtual void ctr_b2_OnUpdated(wxCommandEvent& event);
-    virtual void ctr_b_strain_OnUpdated(wxCommandEvent& event);
-    virtual void ctr_c0_OnUpdated(wxCommandEvent& event);
-    virtual void ctr_c1_OnUpdated(wxCommandEvent& event);
-    virtual void ctr_c2_OnUpdated(wxCommandEvent& event);
-    virtual void ctr_c_strain_OnUpdated(wxCommandEvent& event);
     virtual void Btn_Export_XYZ_OnClick(wxCommandEvent& event);
     virtual void Btn_Import_XYZ_OnClick(wxCommandEvent& event);
     virtual void Btn_Load_OnClick(wxCommandEvent& event);
     virtual void Btn_Save_OnClick(wxCommandEvent& event);
-    virtual void OnCellChanged(wxGridEvent& event);
-    virtual void OnGridPaste(wxCommandEvent& event);
-
+    void ExportToCIF(wxString filepath, wxString filename);
+    void ExportToXYZ(wxString filepath, wxString filename);
+    wxString GetAtomLable(int kind);
 };
 #endif // STRUCTURECLASS_H
