@@ -61,7 +61,13 @@ public:
     bool GetVar(wxString VariableName, bool& Value);
     bool GetVar(wxString VariableName, wxString& Value);
     void SetVar(wxString VariableName, int iRow, int iCol, double Value, bool FireEvent);
-
+    void SetVar(wxString VariableName, int iRow, int iCol, int Value, bool FireEvent);
+    void SetVar(wxString VariableName, int iRow, int iCol, bool Value, bool FireEvent);
+    void SetVar(wxString VariableName, int iRow, int iCol, wxString Value, bool FireEvent);
+    bool GetVar(wxString VariableName, int iRow, int iCol, double& Value);
+    bool GetVar(wxString VariableName, int iRow, int iCol, int& Value);
+    bool GetVar(wxString VariableName, int iRow, int iCol, bool& Value);
+    bool GetVar(wxString VariableName, int iRow, int iCol, wxString& Value);
     
     
     void SaveToFile(wxString filepath, wxString filename);

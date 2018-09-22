@@ -212,6 +212,39 @@ void Sec30::SetVar(wxString VariableName, int Value, bool FireEvent)
     if (FireEvent) SendUpdateEvent(VariableName);
 }
 
+void Sec30::SetVar(wxString VariableName, bool Value, bool FireEvent)
+{
+    int b = 0;
+    if (Value) b=1;
+    wxString val = wxString::Format(wxT("%d"), b);
+    ((sec30TextCtrl*)FindWindowByName(VariableName,GetParent()))->SetCellValue(0,0,val);
+    if (FireEvent) SendUpdateEvent(VariableName);
+}
+
+void Sec30::SetVar(wxString VariableName, wxString Value, bool FireEvent)
+{
+    ((sec30TextCtrl*)FindWindowByName(VariableName,GetParent()))->SetCellValue(0,0,Value);
+    if (FireEvent) SendUpdateEvent(VariableName);
+}
+
+bool Sec30::GetVar(wxString VariableName, double& Value)
+{
+    double d = 0.0;
+    wxString val = ((sec30TextCtrl*)FindWindowByName(VariableName,GetParent()))->GetCellValue(0,0);
+    bool output = val.ToDouble(&d);
+    if (output) Value = d;
+    return output;
+}
+
+bool Sec30::GetVar(wxString VariableName, int& Value)
+{
+    long l = 0;
+    wxString val = ((sec30TextCtrl*)FindWindowByName(VariableName,GetParent()))->GetCellValue(0,0);
+    bool output = val.ToLong(&l);
+    if (output) Value = (int)l;
+    return output;
+}
+
 bool Sec30::GetVar(wxString VariableName, bool& Value)
 {
     int IntValue = 0;
