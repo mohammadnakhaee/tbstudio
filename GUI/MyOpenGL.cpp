@@ -1031,8 +1031,8 @@ void MyGLCanvas::CreateDoubleArray(int NumberOfArraysVar, int nArray)
 
 void MyGLCanvas::DiscardDoubleArrays()
 {
-    for(int i = 0; i < NumberOfDoubleArrays; i++) delete [] DoubleArray[i];
-	delete [] DoubleArray;
+    if (nDoubleArray > 0) for(int i = 0; i < NumberOfDoubleArrays; i++) delete [] DoubleArray[i];
+	if (NumberOfDoubleArrays>0) delete [] DoubleArray;
     DiscardDoubleArrays1();
 }
 
@@ -1046,8 +1046,10 @@ void MyGLCanvas::CreateIntArray(int NumberOfArraysVar, int nArray)
 
 void MyGLCanvas::DiscardIntArrays()
 {
-    for(int i = 0; i < NumberOfIntArrays; i++) delete [] IntArray[i];
-	delete [] IntArray;
+    if (nIntArray>0) for(int i = 0; i < NumberOfIntArrays; i++) delete [] IntArray[i];
+	if (NumberOfIntArrays>0) delete [] IntArray;
+    NumberOfIntArrays = 0;
+    nIntArray = 0;
 }
 
 
@@ -1064,10 +1066,18 @@ void MyGLCanvas::CreateDoubleArray1()
 
 void MyGLCanvas::DiscardDoubleArrays1()
 {
-    for(int i = 0; i < NumberOfDoubleArrays; i++) delete [] DoubleArray0[i];
-    for(int i = 0; i < NumberOfDoubleArrays; i++) delete [] DoubleArray1[i];
-	delete [] DoubleArray0;
-    delete [] DoubleArray1;
+    if (nDoubleArray > 0)
+    {
+        for(int i = 0; i < NumberOfDoubleArrays; i++)
+        {
+            delete [] DoubleArray0[i];
+            delete [] DoubleArray1[i];
+        }
+    }
+	if (NumberOfDoubleArrays>0) delete [] DoubleArray0;
+    if (NumberOfDoubleArrays>0) delete [] DoubleArray1;
+    NumberOfDoubleArrays=0;
+    nDoubleArray=0;
 }
 
 void MyGLCanvas::LoadToCanvas()

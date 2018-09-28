@@ -8,12 +8,15 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="src">
+    <File Name="OrbitalsClass.cpp"/>
+    <File Name="checktree.cpp"/>
+    <File Name="BondsClass.cpp"/>
+    <File Name="StructureClass.cpp"/>
+    <File Name="UnitcellClass.cpp"/>
     <File Name="Sec30.cpp"/>
     <File Name="sec30TextCtrl.cpp"/>
     <File Name="MyMatrix.cpp"/>
     <File Name="mygrid.cpp"/>
-    <File Name="TBModel.cpp"/>
-    <File Name="StructureClass.cpp"/>
     <File Name="GridClass.cpp"/>
     <File Name="MyOpenGL.cpp"/>
     <File Name="GraphClass.cpp"/>
@@ -23,12 +26,15 @@
     <File Name="wxcrafter_bitmaps.cpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="include">
+    <File Name="OrbitalsClass.h"/>
+    <File Name="checktree.h"/>
+    <File Name="BondsClass.h"/>
+    <File Name="StructureClass.h"/>
+    <File Name="UnitcellClass.h"/>
     <File Name="Sec30.h"/>
     <File Name="sec30TextCtrl.h"/>
     <File Name="MyMatrix.h"/>
     <File Name="mygrid.h"/>
-    <File Name="TBModel.h"/>
-    <File Name="StructureClass.h"/>
     <File Name="GridClass.h"/>
     <File Name="main.h"/>
     <File Name="MyOpenGL.h"/>
@@ -37,6 +43,14 @@
     <File Name="wxcrafter.h"/>
   </VirtualDirectory>
   <VirtualDirectory Name="resources">
+    <File Name="unchecked2.xpm"/>
+    <File Name="unchecked_mo.xpm"/>
+    <File Name="unchecked_ld.xpm"/>
+    <File Name="unchecked_d.xpm"/>
+    <File Name="checked2.xpm"/>
+    <File Name="checked_mo.xpm"/>
+    <File Name="checked_ld.xpm"/>
+    <File Name="checked_d.xpm"/>
     <File Name="wxcrafter.wxcp"/>
     <File Name="win_resources.rc"/>
   </VirtualDirectory>

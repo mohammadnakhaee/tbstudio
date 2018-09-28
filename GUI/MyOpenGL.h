@@ -20,6 +20,7 @@
 #include <GL/glext.h>
 #include <GL/glut.h>
 #include <math.h>
+#include <exception>
 
 // the rendering context used by all GL canvases
 class MyGLContext : public wxGLContext

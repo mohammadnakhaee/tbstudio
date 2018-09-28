@@ -16,6 +16,11 @@ public:
     void DiscardAtomicStructure();
     
 protected:
+    std::list<int> EssentialListi;
+    std::list<int> EssentialListj;
+    std::list<int> EssentialListk;
+    virtual bool isItNew(int i,int j,int k);
     virtual void graph_OnPaint(wxPaintEvent& event);
+    
 };
 #endif // GRAPHCLASS_H

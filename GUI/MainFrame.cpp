@@ -118,14 +118,19 @@ MainFrame::MainFrame(wxWindow* parent)
     panelSizer1->Add(logfile, 1, wxEXPAND);
     CenteralPanel->SetSizer(panelSizer1);
     
+    LoadUnitcellPanel();
     LoadStructurePanel();
+    LoadOrbitalsPanel();
+    LoadBondsPanel();
     
+    MainRibbon->SetActivePage((size_t)0);
+    LeftPanel->ChangeSelection(0);
     
     Init_graph3d();
     Init_graph2d();
     Init_graph2d0();
     
-    
+    EvaluateUnitcellPanel();
     // Create the TB Model Class which includes all information about the system
     
     
@@ -403,9 +408,7 @@ void GLPane::prepareFor3DDrawing()
 void MainFrame::MainFrameBaseClass_Resize(wxSizeEvent& event)
 {
     this->Layout();
-    structurePanel->Layout();
-    this->Layout();
-    structurePanel->Layout();
+    unitcellPanel->Layout();
     aui_mgr.Update();
 }
 
@@ -592,12 +595,6 @@ void MainFrame::Init_graph3d()
     aui_mgr.Update();
 }
 
-void MainFrame::UpdateGraph3d()
-{
-    graph3d->DiscardAtomicStructure();
-    graph3d->CreateAtomicStructure(sec30);
-}
-
 void MainFrame::Init_graph2d0()
 {
     graph2d0 = new GraphClass(mainpanel,2);
@@ -610,23 +607,6 @@ void MainFrame::Init_graph2d()
     graph2d = new GraphClass(mainpanel,2);
     aui_mgr.AddPane(graph2d, wxAuiPaneInfo().Gripper(false).Floatable(true).Dockable(true).Caption("Band Structure").CloseButton(false).MaximizeButton(true).MinimizeButton(true).Dock().Right());
     aui_mgr.Update();
-}
-
-void MainFrame::LoadStructurePanel()
-{
-    wxScrolledWindow* scrolledwindow = new wxScrolledWindow(LeftPanel,wxID_ANY,wxDefaultPosition, wxSize(-1,-1));
-    LeftPanel->AddPage(scrolledwindow,"Structure",true);
-    LeftPanel->Update();
-    
-    structurePanel = new StructureClass(scrolledwindow,sec30);
-    
-    wxBoxSizer* panelSizer1 = new wxBoxSizer(wxVERTICAL);
-    panelSizer1->Add(structurePanel, 1, wxEXPAND);
-    scrolledwindow->SetSizer(panelSizer1);
-    
-    scrolledwindow->FitInside();
-    scrolledwindow->SetScrollRate(-1,15);
-    structurePanel->graph3d = graph3d;
 }
 
 void MainFrame::BtnGrid_OnClick(wxRibbonButtonBarEvent& event)
@@ -672,43 +652,173 @@ void MainFrame::BtnSave_OnClick(wxRibbonButtonBarEvent& event)
 	OpenDialog->Destroy();
 }
 
-void MainFrame::sec30_OnUpdated(wxCommandEvent& event)
+void MainFrame::ClearGraph3D()
 {
-    //wxString info = event.GetString();
-    //if (info == _("atomsgrid")) wxMessageBox(info, _("Sec30EVT"));
-    ValidateStructure();
+    graph3d->DiscardAtomicStructure();
+    graph3d->Refresh(false);
 }
 
-void MainFrame::ValidateStructure()
+void MainFrame::ShowGraph3D()
 {
-    int nAtoms = ValidateAtoms();
-    sec30->SetVar(_("nAtoms[0]"),nAtoms,false);
+    graph3d->CreateAtomicStructure(sec30);
+    graph3d->Refresh(false);
+}
+
+void MainFrame::UpdateGraph3D()
+{
     graph3d->DiscardAtomicStructure();
     graph3d->CreateAtomicStructure(sec30);
     graph3d->Refresh(false);
 }
 
-int MainFrame::ValidateAtoms()
+/****************************************************************************************************************************************************************/
+/****************************************************************************************************************************************************************/
+void MainFrame::sec30_OnUpdated(wxCommandEvent& event)
 {
+    ClearGraph3D();
+    wxString info = event.GetString();
+    if (info == _("UnitcellClass"))
+        EvaluateUnitcellPanel();
+    else if (info == _("StructureClass"))
+        EvaluateStructurePanel();
+    else if (info == _("OrbitalsClass"))
+        EvaluateOrbitalsPanel();
+    else if (info == _("BondsClass"))
+        EvaluateBondsPanel();
+}
+/****************************************************************************************************************************************************************/
+/****************************************************************************************************************************************************************/
+void MainFrame::LoadUnitcellPanel()
+{
+    wxScrolledWindow* scrolledwindow = new wxScrolledWindow(LeftPanel,wxID_ANY,wxDefaultPosition, wxSize(-1,-1));
+    LeftPanel->AddPage(scrolledwindow,"Unit Cell",true);
+    LeftPanel->Update();
+    
+    unitcellPanel = new UnitcellClass(scrolledwindow,sec30);
+    
+    wxBoxSizer* panelSizer1 = new wxBoxSizer(wxVERTICAL);
+    panelSizer1->Add(unitcellPanel, 1, wxEXPAND);
+    scrolledwindow->SetSizer(panelSizer1);
+    
+    scrolledwindow->FitInside();
+    scrolledwindow->SetScrollRate(-1,15);
+    unitcellPanel->graph3d = graph3d;
+}
+
+void MainFrame::LoadStructurePanel()
+{
+    wxScrolledWindow* scrolledwindow = new wxScrolledWindow(LeftPanel,wxID_ANY,wxDefaultPosition, wxSize(-1,-1));
+    LeftPanel->AddPage(scrolledwindow,"Structure",true);
+    LeftPanel->Update();
+    
+    structurePanel = new StructureClass(scrolledwindow,sec30);
+    
+    wxBoxSizer* panelSizer1 = new wxBoxSizer(wxVERTICAL);
+    panelSizer1->Add(structurePanel, 1, wxEXPAND);
+    scrolledwindow->SetSizer(panelSizer1);
+    
+    scrolledwindow->FitInside();
+    scrolledwindow->SetScrollRate(-1,15);
+    structurePanel->graph3d = graph3d;
+}
+
+void MainFrame::LoadOrbitalsPanel()
+{
+    wxScrolledWindow* scrolledwindow = new wxScrolledWindow(LeftPanel,wxID_ANY,wxDefaultPosition, wxSize(-1,-1));
+    LeftPanel->AddPage(scrolledwindow,"Orbitals",true);
+    LeftPanel->Update();
+    
+    orbitalsPanel = new OrbitalsClass(scrolledwindow,sec30);
+    
+    wxBoxSizer* panelSizer1 = new wxBoxSizer(wxVERTICAL);
+    panelSizer1->Add(orbitalsPanel, 1, wxEXPAND);
+    scrolledwindow->SetSizer(panelSizer1);
+    
+    scrolledwindow->FitInside();
+    scrolledwindow->SetScrollRate(-1,15);
+    orbitalsPanel->graph3d = graph3d;
+}
+
+void MainFrame::LoadBondsPanel()
+{
+    wxScrolledWindow* scrolledwindow = new wxScrolledWindow(LeftPanel,wxID_ANY,wxDefaultPosition, wxSize(-1,-1));
+    LeftPanel->AddPage(scrolledwindow,"Bonds",true);
+    LeftPanel->Update();
+    
+    bondsPanel = new BondsClass(scrolledwindow,sec30);
+    
+    wxBoxSizer* panelSizer1 = new wxBoxSizer(wxVERTICAL);
+    panelSizer1->Add(bondsPanel, 1, wxEXPAND);
+    scrolledwindow->SetSizer(panelSizer1);
+    
+    scrolledwindow->FitInside();
+    scrolledwindow->SetScrollRate(-1,15);
+    bondsPanel->graph3d = graph3d;
+}
+/****************************************************************************************************************************************************************/
+/****************************************************************************************************************************************************************/
+void MainFrame::EvaluateUnitcellPanel()
+{
+    wxListBox* eunitcellsctr = sec30->GetListObject( _("EssentialUnitcellList"));
+    eunitcellsctr->Clear();
+    if (ValidateUnitCellPanel()) EvaluateStructurePanel();
+}
+
+void MainFrame::EvaluateStructurePanel()
+{
+    wxListBox* eunitcellsctr = sec30->GetListObject( _("EssentialUnitcellList"));
+    eunitcellsctr->Clear();
+    if (ValidateStructurePanel())
+    {
+        FillBondsPanel();
+        EvaluateBondsPanel();
+    }
+}
+
+void MainFrame::EvaluateOrbitalsPanel()
+{
+    if (ValidateOrbitalsPanel()) return;
+}
+
+void MainFrame::EvaluateBondsPanel()
+{
+    if (ValidateBondsPanel()) ShowGraph3D();
+}
+/****************************************************************************************************************************************************************/
+/****************************************************************************************************************************************************************/
+bool MainFrame::ValidateUnitCellPanel()
+{
+    bool isValid=true;
     int AtomCnt=0;
     double A,B,C;
     double a[3],b[3],c[3];
+    double astrain,bstrain,cstrain;
     double x,y,z;
     int kind;
     int nRow = 0;
     int nCol = 0;
     sec30->GetDim(_("KABC_Coords"), nRow, nCol);
-    int i=-1;
-    bool isValid=true;
     
-    sec30->GetVar(_("a[0]"), a[0]); sec30->GetVar(_("a[1]"), a[1]); sec30->GetVar(_("a[2]"), a[2]);
-    sec30->GetVar(_("b[0]"), b[0]); sec30->GetVar(_("b[1]"), b[1]); sec30->GetVar(_("b[2]"), b[2]);
-    sec30->GetVar(_("c[0]"), c[0]); sec30->GetVar(_("c[1]"), c[1]); sec30->GetVar(_("c[2]"), c[2]);
-
-    while (i<nRow && isValid)
+    isValid = isValid && sec30->GetVar(_("a[0]"), a[0]);
+    isValid = isValid && sec30->GetVar(_("a[1]"), a[1]);
+    isValid = isValid && sec30->GetVar(_("a[2]"), a[2]);
+    isValid = isValid && sec30->GetVar(_("b[0]"), b[0]);
+    isValid = isValid && sec30->GetVar(_("b[1]"), b[1]);
+    isValid = isValid && sec30->GetVar(_("b[2]"), b[2]);
+    isValid = isValid && sec30->GetVar(_("c[0]"), c[0]);
+    isValid = isValid && sec30->GetVar(_("c[1]"), c[1]);
+    isValid = isValid && sec30->GetVar(_("c[2]"), c[2]);
+    
+    isValid = isValid && sec30->GetVar(_("astrain[0]"), astrain);
+    isValid = isValid && sec30->GetVar(_("bstrain[0]"), bstrain);
+    isValid = isValid && sec30->GetVar(_("cstrain[0]"), cstrain);
+    
+    int i=-1;
+    bool isLineValid=true;
+    while (i<nRow && isLineValid)
     {
         i++;
-        bool isLineValid = sec30->GetVar(_("KABC_Coords"), i, 0, kind);
+        isLineValid = sec30->GetVar(_("KABC_Coords"), i, 0, kind);
         isLineValid = isLineValid && sec30->GetVar(_("KABC_Coords"), i, 1, A);
         isLineValid = isLineValid && sec30->GetVar(_("KABC_Coords"), i, 2, B);
         isLineValid = isLineValid && sec30->GetVar(_("KABC_Coords"), i, 3, C);
@@ -723,13 +833,129 @@ int MainFrame::ValidateAtoms()
             sec30->SetVar(_("XYZ_Coords"), i, 1, y, false);
             sec30->SetVar(_("XYZ_Coords"), i, 2, z, false);
         }
-        else
-            isValid=false;
     }
     
-    return AtomCnt;
+    sec30->SetVar(_("nAtoms[0]"),AtomCnt,false);
+    
+    return isValid;
      
     //To learn
     //AtomsGrid->SetCellTextColour(3, 3, *wxGREEN);
     //AtomsGrid->SetCellBackgroundColour(3, 3, *wxLIGHT_GREY);
+}
+
+bool MainFrame::ValidateStructurePanel()
+{
+    bool isValid=true;
+    bool CustomViewmode,TBViewmode,TBEssentialViewmode;
+    sec30->GetRadioVar(_("CustomViewmode[0]"),CustomViewmode);
+    sec30->GetRadioVar(_("TBViewmode[0]"),TBViewmode);
+    sec30->GetRadioVar(_("TBEssentialViewmode[0]"),TBEssentialViewmode);
+
+    int ma[2],mb[2],mc[2],TBl,TBm,TBn;
+    isValid = isValid && sec30->GetVar(_("ma[0]"), ma[0]);
+    isValid = isValid && sec30->GetVar(_("ma[1]"), ma[1]);
+    isValid = isValid && sec30->GetVar(_("mb[0]"), mb[0]);
+    isValid = isValid && sec30->GetVar(_("mb[1]"), mb[1]);
+    isValid = isValid && sec30->GetVar(_("mc[0]"), mc[0]);
+    isValid = isValid && sec30->GetVar(_("mc[1]"), mc[1]);
+    isValid = isValid && sec30->GetVar(_("TBl[0]"), TBl);
+    isValid = isValid && sec30->GetVar(_("TBm[0]"), TBm);
+    isValid = isValid && sec30->GetVar(_("TBn[0]"), TBn);
+    
+    int nShowingAtoms = 0;
+    int nunitcells = 0;
+    int nUnitcellAtoms = 0;
+    sec30->GetVar(_("nAtoms[0]"),nUnitcellAtoms);
+    
+    if (CustomViewmode)
+    {
+        nunitcells = (abs(ma[1]-ma[0]) + 1) * (abs(mb[1]-mb[0]) + 1) * (abs(mc[1]-mc[0]) + 1);
+        nShowingAtoms = nunitcells * nUnitcellAtoms;
+    }
+    else if (TBViewmode)
+    {
+        nunitcells = (2 * abs(TBl) + 1) * (2 * abs(TBm) + 1) * (2 * abs(TBn) + 1);
+        nShowingAtoms = nunitcells * nUnitcellAtoms;
+    }
+    else if (TBEssentialViewmode)
+    {
+        nunitcells = (int)(((2 * abs(TBl) + 1) * (2 * abs(TBm) + 1) * (2 * abs(TBn) + 1) - 1)/2) + 1;
+        nShowingAtoms = nunitcells * nUnitcellAtoms;
+    }
+    
+    sec30->SetVar(_("nShowingAtoms[0]"),nShowingAtoms,false);
+
+    return isValid;
+}
+
+bool MainFrame::ValidateOrbitalsPanel()
+{
+    bool isValid = true;
+    return isValid;
+}
+
+bool MainFrame::ValidateBondsPanel()
+{
+    bool isValid = true;
+    return isValid;
+}
+/****************************************************************************************************************************************************************/
+void MainFrame::OnchoisSelected(wxCommandEvent& event)
+{
+}
+
+bool MainFrame::isItNew(int i,int j,int k)
+{
+    std::list<int>::iterator ii;
+    std::list<int>::iterator ij;
+    std::list<int>::iterator ik;
+    bool isOK = true;
+    
+    ii=EssentialListi.begin();
+    ij=EssentialListj.begin();
+    ik=EssentialListk.begin();
+    for (int s=0; s!=EssentialListi.size(); s++)
+    {
+        if ((*ii == -i && *ij == -j && *ik == -k)) {isOK = false; break;}
+        ii++;ij++;ik++;
+    }
+    
+    if (isOK)
+    {
+        EssentialListi.insert(ii,i);
+        EssentialListi.insert(ij,j);
+        EssentialListi.insert(ik,k);
+    }
+    return isOK;
+}
+
+void MainFrame::FillBondsPanel()
+{
+    int TBl,TBm,TBn;
+    sec30->GetVar(_("TBl[0]"), TBl);
+    sec30->GetVar(_("TBm[0]"), TBm);
+    sec30->GetVar(_("TBn[0]"), TBn);
+    
+    wxListBox* eunitcellsctr = sec30->GetListObject( _("EssentialUnitcellList"));
+    EssentialListi.clear();
+    EssentialListj.clear();
+    EssentialListk.clear();
+    int lmin,lmax,mmin,mmax,nmin,nmax;
+    lmin = -TBl; lmax = TBl;
+    mmin = -TBm; mmax = TBm;
+    nmin = -TBn; nmax = TBn;
+    if (lmin>lmax) {int dummy = lmax; lmax = lmin; lmin = dummy;}
+    if (mmin>mmax) {int dummy = mmax; mmax = mmin; mmin = dummy;}
+    if (nmin>nmax) {int dummy = nmax; nmax = nmin; nmin = dummy;}
+    for (int i=lmax; i>=lmin; i--)
+        for (int j=mmax; j>=mmin; j--)
+            for (int k=nmax; k>=nmin; k--)
+            {
+                if (isItNew(i,j,k))
+                {
+                    wxString item = _("(") + wxString::Format(wxT("%d"), i) + _(",") + wxString::Format(wxT("%d"), j) + _(",") + wxString::Format(wxT("%d"), k) + _(")");
+                    eunitcellsctr->Append(item);
+                }
+            }
 }

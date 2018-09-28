@@ -42,7 +42,7 @@
 class MainFrameBaseClass : public wxFrame
 {
 protected:
-    wxRibbonBar* m_ribbonBar338;
+    wxRibbonBar* MainRibbon;
     wxRibbonPage* m_ribbonPage340;
     wxRibbonPanel* m_ribbonPanel981;
     wxRibbonButtonBar* m_ribbonButtonBar983;
@@ -76,7 +76,7 @@ protected:
     virtual void mgl_test(wxRibbonButtonBarEvent& event) { event.Skip(); }
 
 public:
-    wxRibbonBar* GetRibbonBar338() { return m_ribbonBar338; }
+    wxRibbonBar* GetMainRibbon() { return MainRibbon; }
     wxStaticText* GetStaticText602() { return m_staticText602; }
     wxPanel* GetPanel598() { return m_panel598; }
     wxNotebook* GetLeftPanel() { return LeftPanel; }
@@ -110,18 +110,6 @@ protected:
 public:
     GridBaseClass(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(400,300), long style = wxTAB_TRAVERSAL);
     virtual ~GridBaseClass();
-};
-
-
-class StructureBaseClass : public wxPanel
-{
-protected:
-
-protected:
-
-public:
-    StructureBaseClass(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxTAB_TRAVERSAL|wxBORDER_STATIC);
-    virtual ~StructureBaseClass();
 };
 
 #endif

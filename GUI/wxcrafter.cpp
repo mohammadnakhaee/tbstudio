@@ -26,13 +26,13 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
     wxBoxSizer* boxSizer211 = new wxBoxSizer(wxVERTICAL);
     this->SetSizer(boxSizer211);
     
-    m_ribbonBar338 = new wxRibbonBar(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxRIBBON_BAR_SHOW_PAGE_LABELS);
-    m_ribbonBar338->SetArtProvider(new wxRibbonDefaultArtProvider);
+    MainRibbon = new wxRibbonBar(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxRIBBON_BAR_SHOW_PAGE_LABELS);
+    MainRibbon->SetArtProvider(new wxRibbonDefaultArtProvider);
     
-    boxSizer211->Add(m_ribbonBar338, 0, wxEXPAND, WXC_FROM_DIP(5));
+    boxSizer211->Add(MainRibbon, 0, wxEXPAND, WXC_FROM_DIP(5));
     
-    m_ribbonPage340 = new wxRibbonPage(m_ribbonBar338, wxID_ANY, _("File"), wxNullBitmap, 0);
-    m_ribbonBar338->SetActivePage( m_ribbonPage340 );
+    m_ribbonPage340 = new wxRibbonPage(MainRibbon, wxID_ANY, _("File"), wxNullBitmap, 0);
+    MainRibbon->SetActivePage( m_ribbonPage340 );
     
     m_ribbonPanel981 = new wxRibbonPanel(m_ribbonPage340, wxID_ANY, _("My Label"), wxNullBitmap, wxDefaultPosition, wxDLG_UNIT(m_ribbonPage340, wxSize(-1,-1)), wxRIBBON_PANEL_DEFAULT_STYLE);
     
@@ -43,11 +43,11 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
     m_ribbonButtonBar983->AddButton(wxID_SAVE, _("Save"), wxXmlResource::Get()->LoadBitmap(wxT("placeholder")), _("Help String"), wxRIBBON_BUTTON_NORMAL);
     m_ribbonButtonBar983->Realize();
     
-    m_ribbonPage462 = new wxRibbonPage(m_ribbonBar338, wxID_ANY, _("Edit"), wxNullBitmap, 0);
-    m_ribbonBar338->SetActivePage( m_ribbonPage462 );
+    m_ribbonPage462 = new wxRibbonPage(MainRibbon, wxID_ANY, _("Edit"), wxNullBitmap, 0);
+    MainRibbon->SetActivePage( m_ribbonPage462 );
     
-    m_ribbonPage606 = new wxRibbonPage(m_ribbonBar338, wxID_ANY, _("View"), wxNullBitmap, 0);
-    m_ribbonBar338->SetActivePage( m_ribbonPage606 );
+    m_ribbonPage606 = new wxRibbonPage(MainRibbon, wxID_ANY, _("View"), wxNullBitmap, 0);
+    MainRibbon->SetActivePage( m_ribbonPage606 );
     
     m_ribbonPanel608 = new wxRibbonPanel(m_ribbonPage606, wxID_ANY, _("My Label"), wxNullBitmap, wxDefaultPosition, wxDLG_UNIT(m_ribbonPage606, wxSize(-1,-1)), wxRIBBON_PANEL_DEFAULT_STYLE);
     
@@ -60,8 +60,8 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
     m_ribbonButtonBar610->AddButton(wxID_BACKWARD, _("Data Grid"), wxXmlResource::Get()->LoadBitmap(wxT("placeholder")), _("Help String"), wxRIBBON_BUTTON_NORMAL);
     m_ribbonButtonBar610->Realize();
     
-    m_ribbonPage548 = new wxRibbonPage(m_ribbonBar338, wxID_ANY, _("Methods"), wxNullBitmap, 0);
-    m_ribbonBar338->SetActivePage( m_ribbonPage548 );
+    m_ribbonPage548 = new wxRibbonPage(MainRibbon, wxID_ANY, _("Methods"), wxNullBitmap, 0);
+    MainRibbon->SetActivePage( m_ribbonPage548 );
     
     m_ribbonPanel550 = new wxRibbonPanel(m_ribbonPage548, wxID_ANY, _("Voltametry"), wxNullBitmap, wxDefaultPosition, wxDLG_UNIT(m_ribbonPage548, wxSize(-1,-1)), wxRIBBON_PANEL_DEFAULT_STYLE);
     
@@ -74,8 +74,8 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
     m_ribbonButtonBar582->AddButton(wxID_ANY, _("Button"), wxXmlResource::Get()->LoadBitmap(wxT("placeholder")), _("Help String"), wxRIBBON_BUTTON_NORMAL);
     m_ribbonButtonBar582->Realize();
     
-    m_ribbonPage464 = new wxRibbonPage(m_ribbonBar338, wxID_ANY, _("Analyze Data"), wxNullBitmap, 0);
-    m_ribbonBar338->SetActivePage( m_ribbonPage464 );
+    m_ribbonPage464 = new wxRibbonPage(MainRibbon, wxID_ANY, _("Analyze Data"), wxNullBitmap, 0);
+    MainRibbon->SetActivePage( m_ribbonPage464 );
     
     m_ribbonPanel522 = new wxRibbonPanel(m_ribbonPage464, wxID_ANY, _("Panel1"), wxNullBitmap, wxDefaultPosition, wxDLG_UNIT(m_ribbonPage464, wxSize(-1,-1)), wxRIBBON_PANEL_DEFAULT_STYLE);
     
@@ -91,7 +91,7 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
     
     m_ribbonButtonBar528->AddButton(wxID_ANY, _("Button"), wxXmlResource::Get()->LoadBitmap(wxT("placeholder")), _("Help String"), wxRIBBON_BUTTON_HYBRID);
     m_ribbonButtonBar528->Realize();
-    m_ribbonBar338->Realize();
+    MainRibbon->Realize();
     wxBoxSizer* boxSizer544 = new wxBoxSizer(wxHORIZONTAL);
     
     boxSizer211->Add(boxSizer544, 1, wxEXPAND, WXC_FROM_DIP(5));
@@ -238,31 +238,5 @@ GridBaseClass::GridBaseClass(wxWindow* parent, wxWindowID id, const wxPoint& pos
 }
 
 GridBaseClass::~GridBaseClass()
-{
-}
-
-StructureBaseClass::StructureBaseClass(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style)
-    : wxPanel(parent, id, pos, size, style)
-{
-    if ( !bBitmapLoaded ) {
-        // We need to initialise the default bitmap handler
-        wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
-        wxC9ED9InitBitmapResources();
-        bBitmapLoaded = true;
-    }
-    this->SetBackgroundColour(wxColour(wxT("rgb(255,255,255)")));
-    
-    wxBoxSizer* boxSizer628 = new wxBoxSizer(wxVERTICAL);
-    this->SetSizer(boxSizer628);
-    
-    SetBackgroundColour(wxColour(wxT("rgb(255,255,255)")));
-    SetName(wxT("StructureBaseClass"));
-    SetSize(wxDLG_UNIT(this, wxSize(-1,-1)));
-    if (GetSizer()) {
-         GetSizer()->Fit(this);
-    }
-}
-
-StructureBaseClass::~StructureBaseClass()
 {
 }

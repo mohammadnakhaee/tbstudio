@@ -1,10 +1,18 @@
 #ifndef MAINFRAME_H
 #define MAINFRAME_H
+
+/**********************************************************************************/
 #include "wxcrafter.h"
 #include <wx/aui/aui.h>
+#include "math.h"
 #include "GraphClass.h"
 #include "GridClass.h"
+#include "UnitcellClass.h"
 #include "StructureClass.h"
+#include "OrbitalsClass.h"
+#include "BondsClass.h"
+
+/**********************************************************************************/
 
 class MainFrame : public MainFrameBaseClass
 {
@@ -15,13 +23,16 @@ public:
     GraphClass* graph3d;
     GraphClass* graph2d0;
     GraphClass* graph2d;
+    UnitcellClass* unitcellPanel;
     StructureClass* structurePanel;
-    //TBModel* tbmodel;
+    OrbitalsClass* orbitalsPanel;
+    BondsClass* bondsPanel;
     Sec30* sec30;
     
     void OnExit(wxCommandEvent& event);
     void OnAbout(wxCommandEvent& event);
 protected:
+    virtual void OnchoisSelected(wxCommandEvent& event);
     virtual void BtnOpen_OnClick(wxRibbonButtonBarEvent& event);
     virtual void BtnSave_OnClick(wxRibbonButtonBarEvent& event);
     virtual void BtnGrid_OnClick(wxRibbonButtonBarEvent& event);
@@ -53,16 +64,35 @@ protected:
     virtual void Init_graph3d();
     virtual void Init_graph2d0();
     virtual void Init_graph2d();
+    virtual void ClearGraph3D();
+    virtual void ShowGraph3D();
+    virtual void UpdateGraph3D();
+    /****************************************/
+    virtual void LoadUnitcellPanel();
+    virtual void EvaluateUnitcellPanel();
+    virtual bool ValidateUnitCellPanel();
+    /****************************************/
     virtual void LoadStructurePanel();
-    virtual void UpdateGraph3d();
-    virtual void ValidateStructure();
-    virtual int ValidateAtoms();
-    
+    virtual void EvaluateStructurePanel();
+    virtual bool ValidateStructurePanel();
+    /****************************************/
+    virtual void LoadOrbitalsPanel();
+    virtual void EvaluateOrbitalsPanel();
+    virtual bool ValidateOrbitalsPanel();
+    /****************************************/
+    virtual void LoadBondsPanel();
+    virtual void EvaluateBondsPanel();
+    virtual bool ValidateBondsPanel();
+    void FillBondsPanel();
+    /****************************************/
 private:
     wxTextCtrl* logfile;
     wxAuiManager aui_mgr;
     wxAuiNotebook* aui_ntb;
-    
+    std::list<int> EssentialListi;
+    std::list<int> EssentialListj;
+    std::list<int> EssentialListk;
+    bool isItNew(int i,int j,int k);
     virtual void sec30_OnUpdated(wxCommandEvent& event);
 };
 #endif // MAINFRAME_H

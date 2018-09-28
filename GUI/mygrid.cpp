@@ -232,9 +232,9 @@ void myGrid::myOnKeyDown(wxKeyEvent &event)
         MoveCursorRight(isShift);
     else if (wxGetKeyState(WXK_LEFT))
         MoveCursorLeft(isShift);
-    else if (key==WXK_TAB)
+    else if (key==WXK_TAB || key==WXK_NUMPAD_TAB)
         NavigateToNextInput(false);
-    else if (key==WXK_RETURN)
+    else if (key==WXK_RETURN || key==WXK_NUMPAD_ENTER)
     {
         if (IsCellEditControlEnabled())
             NavigateToNextInput(true);
@@ -245,6 +245,8 @@ void myGrid::myOnKeyDown(wxKeyEvent &event)
     {
         switch (key)
         {
+            case 45: StartTyping(_("-")); break;
+            case 46: StartTyping(_(".")); break;
             case 48: StartTyping(_("0")); break;
             case 49: StartTyping(_("1")); break;
             case 50: StartTyping(_("2")); break;
@@ -255,6 +257,10 @@ void myGrid::myOnKeyDown(wxKeyEvent &event)
             case 55: StartTyping(_("7")); break;
             case 56: StartTyping(_("8")); break;
             case 57: StartTyping(_("9")); break;
+            case 61: EnableCellEditControl(); break; // =
+            case WXK_F2: EnableCellEditControl(); break; // F2
+            case WXK_NUMPAD_SUBTRACT: StartTyping(_("-")); break;
+            case WXK_NUMPAD_DECIMAL: StartTyping(_(".")); break;
             case WXK_NUMPAD0: StartTyping(_("0")); break;
             case WXK_NUMPAD1: StartTyping(_("1")); break;
             case WXK_NUMPAD2: StartTyping(_("2")); break;
@@ -266,6 +272,9 @@ void myGrid::myOnKeyDown(wxKeyEvent &event)
             case WXK_NUMPAD8: StartTyping(_("8")); break;
             case WXK_NUMPAD9: StartTyping(_("9")); break;
             case WXK_SPACE: EnableCellEditControl(); break;
+            case WXK_NUMPAD_SPACE: EnableCellEditControl(); break;
+            case WXK_NUMPAD_EQUAL: EnableCellEditControl(); break;
+            case WXK_NUMPAD_F2: EnableCellEditControl(); break; // F2
         }
     }
 }

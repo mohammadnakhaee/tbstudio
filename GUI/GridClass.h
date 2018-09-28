@@ -3,12 +3,10 @@
 #include "wxcrafter.h"
 #include <wx/grid.h>
 #include "mygrid.h"
-#include "TBModel.h"
 
 class GridClass : public GridBaseClass
 {
 public:
-    TBModel* tbmodel;
     GridClass(wxWindow* parent);
     virtual ~GridClass();
 };

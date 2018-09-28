@@ -16,6 +16,13 @@
 #include <fstream>
 #include "mygrid.h"
 #include <sec30TextCtrl.h>
+#include <wx/radiobut.h>
+#include <wx/checkbox.h>
+#include "checktree.h"
+#include <wx/checklst.h>
+#include <wx/choice.h>
+#include <wx/bmpcbox.h>
+#include <wx/clrpicker.h>
 /******************************************************************************/
 
 /******************************************************************************/
@@ -41,8 +48,15 @@ public:
     ~Sec30();
 
     std::list<wxString> vars;
-    
     std::list<wxString> grids;
+    std::list<wxString> radios;
+    std::list<wxString> checks;
+    std::list<wxString> trees;
+    std::list<wxString> checklists;
+    std::list<wxString> lists;
+    std::list<wxString> choices;
+    std::list<wxString> combos;
+    std::list<wxString> colors;
     
     void AddGroupBox(wxWindow *parent, wxString Caption, wxColour BGColor);
     void AddButton(wxWindow *parent, int ButtonCnt, wxString* Labels, wxObjectEventFunction* Funcs);
@@ -51,6 +65,15 @@ public:
     void AddVarVector(wxWindow *parent, int VecCnt, wxString VariableName, wxString VariableType);
     void AddGrid(wxWindow *parent, int nRow, int nCol, wxString VariableName, wxString* ColNames, wxString* ColTypes, int* ColSizes, int* ColPrecision, int xCtrlSize, int yCtrlSize);
     void AddGrid(wxWindow *parent, int nRow, int nCol, wxString VariableName, wxString* ColTypes, int* ColPrecision);
+    void AddRadioButton(wxWindow *parent, wxString VariableName, wxString Label);
+    void AddCheckBox(wxWindow *parent, wxString VariableName, wxString Label);
+    wxCheckTree* AddTreeCtrl(wxWindow *parent, wxString VariableName, int xCtrlSize, int yCtrlSize);
+    wxChoice* AddChoiceCtrl(wxWindow *parent, wxString VariableName, wxString MyLabel, int LabelSize, int CtrlSize);
+    wxComboBox* AddComboCtrl(wxWindow *parent, wxString VariableName, wxString MyLabel, int LabelSize, int CtrlSize);
+    wxColourPickerCtrl* AddColorCtrl(wxWindow *parent, wxString VariableName, wxString MyLabel, wxColour color, int LabelSize, int CtrlSize);
+    wxScrolledWindow* AddScrolledPanel(wxWindow *parent, int xCtrlSize, int yCtrlSize, long style = wxSIMPLE_BORDER|wxHSCROLL|wxVSCROLL);
+    void AddCheckListBox(wxWindow *parent, wxString VariableName, int xCtrlSize, int yCtrlSize);
+    void AddListBox(wxWindow *parent, wxString VariableName, int xCtrlSize, int yCtrlSize);
     void GetDim(wxString VariableName, int& nRow, int& nCol);
     void SetVar(wxString VariableName, double Value, bool FireEvent);
     void SetVar(wxString VariableName, int Value, bool FireEvent);
@@ -60,21 +83,26 @@ public:
     bool GetVar(wxString VariableName, int& Value);
     bool GetVar(wxString VariableName, bool& Value);
     bool GetVar(wxString VariableName, wxString& Value);
-    void SetVar(wxString VariableName, int iRow, int iCol, double Value, bool FireEvent);
-    void SetVar(wxString VariableName, int iRow, int iCol, int Value, bool FireEvent);
-    void SetVar(wxString VariableName, int iRow, int iCol, bool Value, bool FireEvent);
-    void SetVar(wxString VariableName, int iRow, int iCol, wxString Value, bool FireEvent);
-    bool GetVar(wxString VariableName, int iRow, int iCol, double& Value);
-    bool GetVar(wxString VariableName, int iRow, int iCol, int& Value);
     bool GetVar(wxString VariableName, int iRow, int iCol, bool& Value);
     bool GetVar(wxString VariableName, int iRow, int iCol, wxString& Value);
-    
+    void SetRadioVar(wxString VariableName, bool Value, bool FireEvent);
+    void GetRadioVar(wxString VariableName, bool& Value);
+    void SetCheckVar(wxString VariableName, bool Value, bool FireEvent);
+    void GetCheckVar(wxString VariableName, bool& Value);
+    wxCheckTree* GetTreeObject(wxString VariableName);
+    wxCheckListBox* GetCheckListObject(wxString VariableName);
+    wxListBox* GetListObject(wxString VariableName);
+    wxChoice* GetChoiceObject(wxString VariableName);
+    wxComboBox* GetComboObject(wxString VariableName);
+    wxColourPickerCtrl* GetColorObject(wxString VariableName);
     
     void SaveToFile(wxString filepath, wxString filename);
     void LoadFromFile(wxString filepath, wxString filename);
 private:
     void SendUpdateEvent(wxString info);
     virtual void sec30TextCtrl_OnUpdated(wxCommandEvent &event);
+    virtual void MyRadioSelected(wxCommandEvent& event);
+    virtual void MyCheckBoxSelected(wxCommandEvent& event);
     DECLARE_EVENT_TABLE()
 };
 
