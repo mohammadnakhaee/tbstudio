@@ -146,9 +146,9 @@ void Sec30::AddGrid(wxWindow *parent, int nRow, int nCol, wxString VariableName,
     
     gc->Connect(Sec30EVT_Grid_Updated, wxCommandEventHandler(Sec30::sec30TextCtrl_OnUpdated), NULL, this);
     
-    gc->Connect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(Sec30::TextCtrl_OnUpdated), NULL, this);
-    gc->Connect(wxEVT_GRID_CELL_CHANGED, wxGridEventHandler(StructureClass::OnCellChanged), NULL, this);
-    gc->Connect(MyGridPasteEvent, wxCommandEventHandler(StructureClass::OnGridPaste), NULL, this);
+    //gc->Connect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(Sec30::TextCtrl_OnUpdated), NULL, this);
+    //gc->Connect(wxEVT_GRID_CELL_CHANGED, wxGridEventHandler(StructureClass::OnCellChanged), NULL, this);
+    //gc->Connect(MyGridPasteEvent, wxCommandEventHandler(StructureClass::OnGridPaste), NULL, this);
 
     MySizer->Layout();
     parent->Layout();
@@ -229,17 +229,18 @@ wxCheckTree* Sec30::AddTreeCtrl(wxWindow *parent, wxString VariableName, int xCt
     wxColour c; //Also it is possible to determine the color in this way: wxColour c=*wxGREEN;
     c.Set(191,205,219,0);
     
-    gc->Connect(Sec30EVT_Grid_Updated, wxCommandEventHandler(Sec30::sec30TextCtrl_OnUpdated), NULL, this);
-    gc->Connect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(Sec30::TextCtrl_OnUpdated), NULL, this);
-    gc->Connect(wxEVT_GRID_CELL_CHANGED, wxGridEventHandler(StructureClass::OnCellChanged), NULL, this);
-    gc->Connect(MyGridPasteEvent, wxCommandEventHandler(StructureClass::OnGridPaste), NULL, this);
+    //gc->Connect(Sec30EVT_Grid_Updated, wxCommandEventHandler(Sec30::sec30TextCtrl_OnUpdated), NULL, this);
+    
+    //gc->Connect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(Sec30::TextCtrl_OnUpdated), NULL, this);
+    //gc->Connect(wxEVT_GRID_CELL_CHANGED, wxGridEventHandler(StructureClass::OnCellChanged), NULL, this);
+    //gc->Connect(MyGridPasteEvent, wxCommandEventHandler(StructureClass::OnGridPaste), NULL, this);
     
     
-    wxTreeItemId id2=ctr->AppendItem(rootID,"2");
-    ctr->tree_add(id1,"x",true,true);
-    ctr->tree_add(id1,"y",true,true);
-    ctr->tree_add(id2,"x",true,false);
-    ctr->tree_add(id2,"y",true,true);
+    //wxTreeItemId id2=ctr->AppendItem(rootID,"2");
+    //ctr->tree_add(id1,"x",true,true);
+    //ctr->tree_add(id1,"y",true,true);
+    //ctr->tree_add(id2,"x",true,false);
+    //ctr->tree_add(id2,"y",true,true);
     
     ctr->ExpandAll();
     MySizer->Layout();
