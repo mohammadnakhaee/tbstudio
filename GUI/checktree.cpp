@@ -614,12 +614,12 @@ wxTreeItemId wxCheckTree::ContainsItemIn(wxTreeItemId root, const wxString& sSea
 	wxTreeItemId child;
     
     wxString sDataRoot = GetItemText(GetRootItem());
-    if( sDataRoot.Contains(sSearchFor)) return GetRootItem();
+    if(sDataRoot.Contains(sSearchFor)) return GetRootItem();
 
 	while( item.IsOk() )
 	{
 		wxString sData = GetItemText(item);
-		if( sData.Contains(sSearchFor))
+		if(sData.Contains(sSearchFor))
 		{
 			return item;
 		}

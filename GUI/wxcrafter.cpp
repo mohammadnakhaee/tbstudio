@@ -46,6 +46,13 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
     m_ribbonPage462 = new wxRibbonPage(MainRibbon, wxID_ANY, _("Edit"), wxNullBitmap, 0);
     MainRibbon->SetActivePage( m_ribbonPage462 );
     
+    m_ribbonPanel1043 = new wxRibbonPanel(m_ribbonPage462, wxID_ANY, _("My Label"), wxNullBitmap, wxDefaultPosition, wxDLG_UNIT(m_ribbonPage462, wxSize(-1,-1)), wxRIBBON_PANEL_DEFAULT_STYLE);
+    
+    m_ribbonButtonBar1045 = new wxRibbonButtonBar(m_ribbonPanel1043, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_ribbonPanel1043, wxSize(-1,-1)), 0);
+    
+    m_ribbonButtonBar1045->AddButton(wxID_REFRESH, _("Structure Style"), wxXmlResource::Get()->LoadBitmap(wxT("placeholder")), _("Help String"), wxRIBBON_BUTTON_NORMAL);
+    m_ribbonButtonBar1045->Realize();
+    
     m_ribbonPage606 = new wxRibbonPage(MainRibbon, wxID_ANY, _("View"), wxNullBitmap, 0);
     MainRibbon->SetActivePage( m_ribbonPage606 );
     
@@ -61,6 +68,7 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
     m_ribbonButtonBar610->Realize();
     
     m_ribbonPage548 = new wxRibbonPage(MainRibbon, wxID_ANY, _("Methods"), wxNullBitmap, 0);
+    m_ribbonPage548->Hide();
     MainRibbon->SetActivePage( m_ribbonPage548 );
     
     m_ribbonPanel550 = new wxRibbonPanel(m_ribbonPage548, wxID_ANY, _("Voltametry"), wxNullBitmap, wxDefaultPosition, wxDLG_UNIT(m_ribbonPage548, wxSize(-1,-1)), wxRIBBON_PANEL_DEFAULT_STYLE);
@@ -75,6 +83,7 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
     m_ribbonButtonBar582->Realize();
     
     m_ribbonPage464 = new wxRibbonPage(MainRibbon, wxID_ANY, _("Analyze Data"), wxNullBitmap, 0);
+    m_ribbonPage464->Hide();
     MainRibbon->SetActivePage( m_ribbonPage464 );
     
     m_ribbonPanel522 = new wxRibbonPanel(m_ribbonPage464, wxID_ANY, _("Panel1"), wxNullBitmap, wxDefaultPosition, wxDLG_UNIT(m_ribbonPage464, wxSize(-1,-1)), wxRIBBON_PANEL_DEFAULT_STYLE);
@@ -161,6 +170,7 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
     this->Connect(wxEVT_MOVE, wxMoveEventHandler(MainFrameBaseClass::MainFrameBaseClass_Move), NULL, this);
     m_ribbonButtonBar983->Connect(wxID_OPEN, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrameBaseClass::BtnOpen_OnClick), NULL, this);
     m_ribbonButtonBar983->Connect(wxID_SAVE, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrameBaseClass::BtnSave_OnClick), NULL, this);
+    m_ribbonButtonBar1045->Connect(wxID_REFRESH, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrameBaseClass::BtnStructureStyle_OnClick), NULL, this);
     m_ribbonButtonBar610->Connect(wxID_APPLY, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrameBaseClass::BtnMain_OnClick), NULL, this);
     m_ribbonButtonBar610->Connect(wxID_ADD, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrameBaseClass::BtnTerminal_OnClick), NULL, this);
     m_ribbonButtonBar610->Connect(wxID_BACKWARD, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrameBaseClass::BtnGrid_OnClick), NULL, this);
@@ -177,6 +187,7 @@ MainFrameBaseClass::~MainFrameBaseClass()
     this->Disconnect(wxEVT_MOVE, wxMoveEventHandler(MainFrameBaseClass::MainFrameBaseClass_Move), NULL, this);
     m_ribbonButtonBar983->Disconnect(wxID_OPEN, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrameBaseClass::BtnOpen_OnClick), NULL, this);
     m_ribbonButtonBar983->Disconnect(wxID_SAVE, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrameBaseClass::BtnSave_OnClick), NULL, this);
+    m_ribbonButtonBar1045->Disconnect(wxID_REFRESH, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrameBaseClass::BtnStructureStyle_OnClick), NULL, this);
     m_ribbonButtonBar610->Disconnect(wxID_APPLY, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrameBaseClass::BtnMain_OnClick), NULL, this);
     m_ribbonButtonBar610->Disconnect(wxID_ADD, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrameBaseClass::BtnTerminal_OnClick), NULL, this);
     m_ribbonButtonBar610->Disconnect(wxID_BACKWARD, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrameBaseClass::BtnGrid_OnClick), NULL, this);
@@ -239,4 +250,44 @@ GridBaseClass::GridBaseClass(wxWindow* parent, wxWindowID id, const wxPoint& pos
 
 GridBaseClass::~GridBaseClass()
 {
+}
+
+ColorsBaseClass::ColorsBaseClass(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style)
+    : wxDialog(parent, id, title, pos, size, style)
+{
+    if ( !bBitmapLoaded ) {
+        // We need to initialise the default bitmap handler
+        wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
+        wxC9ED9InitBitmapResources();
+        bBitmapLoaded = true;
+    }
+    this->SetBackgroundColour(wxColour(wxT("rgb(255,255,255)")));
+    
+    SetBackgroundColour(wxColour(wxT("rgb(255,255,255)")));
+    SetName(wxT("ColorsBaseClass"));
+    SetSize(wxDLG_UNIT(this, wxSize(-1,-1)));
+    if (GetSizer()) {
+         GetSizer()->Fit(this);
+    }
+    if(GetParent()) {
+        CentreOnParent(wxBOTH);
+    } else {
+        CentreOnScreen(wxBOTH);
+    }
+#if wxVERSION_NUMBER >= 2900
+    if(!wxPersistenceManager::Get().Find(this)) {
+        wxPersistenceManager::Get().RegisterAndRestore(this);
+    } else {
+        wxPersistenceManager::Get().Restore(this);
+    }
+#endif
+    // Connect events
+    this->Connect(wxEVT_CLOSE_WINDOW, wxCloseEventHandler(ColorsBaseClass::OnClose), NULL, this);
+    
+}
+
+ColorsBaseClass::~ColorsBaseClass()
+{
+    this->Disconnect(wxEVT_CLOSE_WINDOW, wxCloseEventHandler(ColorsBaseClass::OnClose), NULL, this);
+    
 }

@@ -23,11 +23,13 @@ BondsClass::BondsClass(wxWindow* parent, Sec30* sec30var, wxWindowID id, const w
     sec30->AddListBox(this, _("EssentialUnitcellList"), 340, 120);
     /**********************************************************************************************************************************************/
     sec30->AddGroupBox(this,_("Connect Two Atoms"),wxColour(wxT("rgb(153,180,209)")));
-    sec30->AddVarVector(this, 1, _("AtomIndex1"), _("int"), _("i : Atom Index in Cell (0,0,0)"), 180, 100);
-    sec30->AddVarVector(this, 1, _("AtomIndex2"), _("int"), _("j : Atom Index in Selected Cell"), 180, 100);
+    sec30->AddVarVector(this, 2, _("AtomIndex1"), _("int"), _("(i,n): Atom and Shell Index in Cell (0,0,0)"), 190, 50);
+    sec30->AddVarVector(this, 2, _("AtomIndex2"), _("int"), _("(j,m) : Atom and Shell Index in Selected Cell"), 190, 50);
     sec30->SetVar(_("AtomIndex1[0]"),1,false);
+    sec30->SetVar(_("AtomIndex1[1]"),1,false);
     sec30->SetVar(_("AtomIndex2[0]"),1,false);
-    wxComboBox* choicectr = sec30->AddComboCtrl(this, _("AtomLabel"), _("Bond Label"), 180, 100);
+    sec30->SetVar(_("AtomIndex2[1]"),1,false);
+    wxComboBox* choicectr = sec30->AddComboCtrl(this, _("AtomLabel"), _("Bond Label"), 190, 100);
     for (int i=1; i<=50; i++)
     {
         //wxImage img = wxImage(wxSize(10,10),true);
@@ -48,18 +50,6 @@ BondsClass::BondsClass(wxWindow* parent, Sec30* sec30var, wxWindowID id, const w
     wxTreeItemId rootID=treectr->AddRoot("TB Model");
     treectr->Connect(wxEVT_RIGHT_DOWN, wxMouseEventHandler(BondsClass::BondsTree_RightDown), NULL, this);
     /**********************************************************************************************************************************************/
-    sec30->AddGroupBox(this,_("Bond Styles"),wxColour(wxT("rgb(153,180,209)")));
-    wxScrolledWindow* colorlist = sec30->AddScrolledPanel(this, 340, 200);
-    for (int i=1; i<=50; i++)
-    {
-        wxColour c;
-        if (i==1)
-            c.Set(200,0,60,255);
-        else
-            c.Set(30,30,200,255);
-        sec30->AddColorCtrl(colorlist, _("Color") + wxString::Format(wxT("%d"),i), _("Bond ") + wxString::Format(wxT("%d"),i),c,100,100);
-    }
-    /**********************************************************************************************************************************************/
     sec30->AddGroupBox(this,_(""),wxColour(wxT("rgb(153,180,209)")));
     /**********************************************************************************************************************************************/
 }
@@ -73,11 +63,14 @@ BondsClass::~BondsClass()
 
 void BondsClass::Btn_Set_OnClick(wxCommandEvent& event)
 {
-    int i000;
-    int ilmn;
-    if (!sec30->GetVar(_("AtomIndex1[0]"),i000)) {wxMessageBox(_("The first index is empty. Please fill out this field and try again."),_("Error")); return;}
-    if (!sec30->GetVar(_("AtomIndex2[0]"),ilmn)) {wxMessageBox(_("The second index is empty. Please fill out this field and try again."),_("Error")); return;}
+    int i000,sh000;
+    int ilmn,shlmn;
+    if (!sec30->GetVar(_("AtomIndex1[0]"),i000)) {wxMessageBox(_("The first atom index is empty. Please fill out this field and try again."),_("Error")); return;}
+    if (!sec30->GetVar(_("AtomIndex1[1]"),sh000)) {wxMessageBox(_("The first shell index is empty. Please fill out this field and try again."),_("Error")); return;}
+    if (!sec30->GetVar(_("AtomIndex2[0]"),ilmn)) {wxMessageBox(_("The second atom index is empty. Please fill out this field and try again."),_("Error")); return;}
+    if (!sec30->GetVar(_("AtomIndex2[1]"),shlmn)) {wxMessageBox(_("The second shell index is empty. Please fill out this field and try again."),_("Error")); return;}
     if (i000 < 1 || ilmn < 1) {wxMessageBox(_("The atomic index must be greater than zero. i or j = 1,2,3, ... ."),_("Error")); return;}
+    if (sh000 < 1 || shlmn < 1) {wxMessageBox(_("The shell index must be greater than zero. n or m = 1,2,3, ... ."),_("Error")); return;}
     int maxIndex=0;
     sec30->GetVar(_("nAtoms[0]"),maxIndex);
     if (i000 > maxIndex || ilmn > maxIndex) {wxMessageBox(_("You have ") + wxString::Format(wxT("%d"), maxIndex) + _(" atom(s) in your unit cell.") ,_("Error")); return;}
@@ -111,22 +104,31 @@ void BondsClass::Btn_Set_OnClick(wxCommandEvent& event)
             int dummy = i000;
             i000 = ilmn;
             ilmn = dummy;
+            
+            dummy = sh000;
+            sh000 = shlmn;
+            shlmn = dummy;
         }
     }
     
-    wxString bondinfotest = _("[ i=") + wxString::Format(wxT("%d"), i000) + _(" , j=") + wxString::Format(wxT("%d"), ilmn);
+    wxString bondinfotest = _("[ (i,n)=") + wxString::Format(wxT("(%d,%d)"), i000, sh000) + _(" , (j,m)=") + wxString::Format(wxT("(%d,%d)"), ilmn, shlmn);
     wxTreeItemId testID = treectr->ContainsItemIn(lmnID,bondinfotest);
     if (testID)
-        wxMessageBox(_("There is a bond defined between ") + wxString::Format(wxT("%d"), i000) + _("th atom in cell(0,0,0) and ") + wxString::Format(wxT("%d"), ilmn) + _("th atom in cell") + listucell + _(" in your TB model."),_("Error"));
+        wxMessageBox(_("There is a bond defined between ") + wxString::Format(wxT("(%d,%d)"), i000, sh000) + _(" in cell(0,0,0) and ") + wxString::Format(wxT("(%d,%d)"), ilmn, shlmn) + _(" in cell") + listucell + _(" in your TB model."),_("Error"));
     else
     {
-        wxString bondinfo = _("[ i=") + wxString::Format(wxT("%d"), i000) + _(" , j=") + wxString::Format(wxT("%d"), ilmn) + _(" , ") + bondctr->GetString(btypind) + _(" ]");
+        wxString bondinfo = _("[ (i,n)=") + wxString::Format(wxT("(%d,%d)"), i000, sh000) + _(" , (j,m)=") + wxString::Format(wxT("(%d,%d)"), ilmn, shlmn) + _(" , ") + bondctr->GetString(btypind) + _(" ]");
         treectr->tree_add(lmnID,bondinfo,true,true);
     }
     treectr->Expand(rootID);
     treectr->Expand(lmnID);
     treectr->Update();
     treectr->Refresh(true);
+    
+    sec30->SendUpdateEvent(this->GetName());
+    //wxCommandEvent* event0 = new wxCommandEvent(Sec30EVT_OnUpdated);
+    //event0->SetString(this->GetName());
+    //wxQueueEvent(this->GetParent(),event0);
 }
 
 /*

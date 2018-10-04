@@ -12,6 +12,19 @@ UnitcellClass::UnitcellClass(wxWindow* parent, Sec30* sec30var, wxWindowID id, c
     SetSize(wxDLG_UNIT(this, wxSize(-1,-1)));
     GetSizer()->Fit(this);
     /**********************************************************************************************************************************************/
+    /*************Hidden Variables**************/
+    sec30->AddVarVector(this, 1, _("nAtoms"), _("int"));
+    sec30->SetVar(_("nAtoms[0]"),0, false);
+    sec30->AddVarVector(this, 1, _("nShowingAtoms"), _("int"));
+    sec30->SetVar(_("nShowingAtoms[0]"),0, false);
+    sec30->AddVarVector(this, 1, _("nShells"), _("int"));
+    sec30->SetVar(_("nShells[0]"),0, false);
+    sec30->AddVarVector(this, 1, _("nShowingBonds"), _("int"));
+    sec30->SetVar(_("nShowingBonds[0]"),0, false);
+    wxString ColTypes2[3] = {_("double"), _("double"), _("double")};
+    int ColPrecision2[3] = {8, 8, 8};
+    sec30->AddGrid(this, 99, 3, _("XYZ_Coords"), ColTypes2, ColPrecision2);
+    /**********************************************************************************************************************************************/
     sec30->AddGroupBox(this,_("Crystallographic Information File"),wxColour(wxT("rgb(153,180,209)")));
     wxString Labels1[2] = { _("Load"), _("Save")};
     wxObjectEventFunction Funcs1[2] = { wxCommandEventHandler(UnitcellClass::Btn_Load_OnClick), wxCommandEventHandler(UnitcellClass::Btn_Save_OnClick)};
@@ -47,12 +60,6 @@ UnitcellClass::UnitcellClass(wxWindow* parent, Sec30* sec30var, wxWindowID id, c
     sec30->AddGrid(this, 99, 4, _("KABC_Coords"), ColNames, ColTypes, ColSizes, ColPrecision, 340, 300);
     /**********************************************************************************************************************************************/
     sec30->AddGroupBox(this,_(""),wxColour(wxT("rgb(153,180,209)")));
-    /**********************************************************************************************************************************************/
-    sec30->AddVarVector(this, 1, _("nAtoms"), _("int"));
-    sec30->SetVar(_("nAtoms[0]"),0, false);
-    wxString ColTypes2[3] = {_("double"), _("double"), _("double")};
-    int ColPrecision2[3] = {8, 8, 8};
-    sec30->AddGrid(this, 99, 3, _("XYZ_Coords"), ColTypes2, ColPrecision2);
     /**********************************************************************************************************************************************/
 }
 
@@ -104,18 +111,32 @@ void UnitcellClass::Btn_Save_OnClick(wxCommandEvent& event)
 
 void UnitcellClass::ExportToCIF(wxString filepath, wxString filename)
 {
-  double PI=3.14159265359;
-  int i,Gc_AN,itmp;
-  double tmp[4],Cxyz[4],Cell_Gxyz[4],tv[4][4],rtv[4][4];
-  double lena,lenb,lenc,t1;
-  double alpha,beta,gamma;
-  double CellV,Cell_Volume;
-  FILE *fp;
-  
-  sec30->GetVar(_("a[0]"),tv[1][1]); sec30->GetVar(_("a[1]"),tv[1][2]); sec30->GetVar(_("a[2]"),tv[1][3]);
-  sec30->GetVar(_("b[0]"),tv[2][1]); sec30->GetVar(_("b[1]"),tv[2][2]); sec30->GetVar(_("b[2]"),tv[2][3]);
-  sec30->GetVar(_("c[0]"),tv[3][1]); sec30->GetVar(_("c[1]"),tv[3][2]); sec30->GetVar(_("c[2]"),tv[3][3]);
-  
+    double PI=3.14159265359;
+    int i,Gc_AN,itmp;
+    double tmp[4],Cxyz[4],Cell_Gxyz[4],tv[4][4],rtv[4][4];
+    double astrain, bstrain, cstrain;
+    double lena,lenb,lenc,t1;
+    double alpha,beta,gamma;
+    double CellV,Cell_Volume;
+    FILE *fp;
+      
+    bool isValid = true;
+    isValid = isValid && sec30->GetVar(_("a[0]"),tv[1][1]); isValid = isValid && sec30->GetVar(_("a[1]"),tv[1][2]); isValid = isValid && sec30->GetVar(_("a[2]"),tv[1][3]);
+    isValid = isValid && sec30->GetVar(_("b[0]"),tv[2][1]); isValid = isValid && sec30->GetVar(_("b[1]"),tv[2][2]); isValid = isValid && sec30->GetVar(_("b[2]"),tv[2][3]);
+    isValid = isValid && sec30->GetVar(_("c[0]"),tv[3][1]); isValid = isValid && sec30->GetVar(_("c[1]"),tv[3][2]); isValid = isValid && sec30->GetVar(_("c[2]"),tv[3][3]);
+    
+    isValid = isValid && sec30->GetVar(_("astrain[0]"), astrain);
+    isValid = isValid && sec30->GetVar(_("bstrain[0]"), bstrain);
+    isValid = isValid && sec30->GetVar(_("cstrain[0]"), cstrain);
+    
+    if (!isValid) wxMessageBox(_("Unable to create cif file. Please check the inputs."));
+    for (int i0=1; i0<=3; i0++)
+    {
+        tv[1][i0]=tv[1][i0]*astrain;
+        tv[2][i0]=tv[2][i0]*bstrain;
+        tv[3][i0]=tv[3][i0]*cstrain;
+    }
+    
   /********************************************
               making of a CIF file
   *********************************************/
@@ -235,137 +256,11 @@ void UnitcellClass::ExportToCIF(wxString filepath, wxString filename)
           }
     }
       
-      fprintf(fp,"A%-6d%-3s%10.5f%10.5f%10.5f%10.5f  Uiso   1.00\n", Gc_AN, (const char*)GetAtomLable(kind).mb_str(), Cell_Gxyz[1], Cell_Gxyz[2], Cell_Gxyz[3], 0.0);
+      fprintf(fp,"A%-6d%-3s%10.5f%10.5f%10.5f%10.5f  Uiso   1.00\n", Gc_AN, (const char*)sec30->GetAtomLable(kind).mb_str(), Cell_Gxyz[1], Cell_Gxyz[2], Cell_Gxyz[3], 0.0);
     }
 
     fclose(fp);
   }
 }
 
-wxString UnitcellClass::GetAtomLable(int kind)
-{
-    wxString Lable;
-    Lable=wxT("H");
-    switch (kind)
-    {
-    case 2: Lable=wxT("He"); break;
-    case 3: Lable=wxT("Li"); break;
-    case 4: Lable=wxT("Be"); break;
-    case 5: Lable=wxT("B"); break;
-    case 6: Lable=wxT("C"); break;
-    case 7: Lable=wxT("N"); break;
-    case 8: Lable=wxT("O"); break;
-    case 9: Lable=wxT("F"); break;
-    case 10: Lable=wxT("Ne"); break;
-    case 11: Lable=wxT("Na"); break;
-    case 12: Lable=wxT("Mg"); break;
-    case 13: Lable=wxT("Al"); break;
-    case 14: Lable=wxT("Si"); break;
-    case 15: Lable=wxT("P"); break;
-    case 16: Lable=wxT("S"); break;
-    case 17: Lable=wxT("Cl"); break;
-    case 18: Lable=wxT("Ar"); break;
-    case 19: Lable=wxT("K"); break;
-    case 20: Lable=wxT("Ca"); break;
-    case 21: Lable=wxT("Sc"); break;
-    case 22: Lable=wxT("Ti"); break;
-    case 23: Lable=wxT("V"); break;
-    case 24: Lable=wxT("Cr"); break;
-    case 25: Lable=wxT("Mn"); break;
-    case 26: Lable=wxT("Fe"); break;
-    case 27: Lable=wxT("Co"); break;
-    case 28: Lable=wxT("Ni"); break;
-    case 29: Lable=wxT("Cu"); break;
-    case 30: Lable=wxT("Zn"); break;
-    case 31: Lable=wxT("Ga"); break;
-    case 32: Lable=wxT("Ge"); break;
-    case 33: Lable=wxT("As"); break;
-    case 34: Lable=wxT("Se"); break;
-    case 35: Lable=wxT("Br"); break;
-    case 36: Lable=wxT("Kr"); break;
-    case 37: Lable=wxT("Rb"); break;
-    case 38: Lable=wxT("Sr"); break;
-    case 39: Lable=wxT("Y"); break;
-    case 40: Lable=wxT("Zr"); break;
-    case 41: Lable=wxT("Nb"); break;
-    case 42: Lable=wxT("Mo"); break;
-    case 43: Lable=wxT("Tc"); break;
-    case 44: Lable=wxT("Ru"); break;
-    case 45: Lable=wxT("Rh"); break;
-    case 46: Lable=wxT("Pd"); break;
-    case 47: Lable=wxT("Ag"); break;
-    case 48: Lable=wxT("Cd"); break;
-    case 49: Lable=wxT("In"); break;
-    case 50: Lable=wxT("Sn"); break;
-    case 51: Lable=wxT("Sb"); break;
-    case 52: Lable=wxT("Te"); break;
-    case 53: Lable=wxT("I"); break;
-    case 54: Lable=wxT("Xe"); break;
-    case 55: Lable=wxT("Cs"); break;
-    case 56: Lable=wxT("Ba"); break;
-    case 57: Lable=wxT("La"); break;
-    case 58: Lable=wxT("Ce"); break;
-    case 59: Lable=wxT("Pr"); break;
-    case 60: Lable=wxT("Nd"); break;
-    case 61: Lable=wxT("Pm"); break;
-    case 62: Lable=wxT("Sm"); break;
-    case 63: Lable=wxT("Eu"); break;
-    case 64: Lable=wxT("Gd"); break;
-    case 65: Lable=wxT("Tb"); break;
-    case 66: Lable=wxT("Dy"); break;
-    case 67: Lable=wxT("Ho"); break;
-    case 68: Lable=wxT("Er"); break;
-    case 69: Lable=wxT("Tm"); break;
-    case 70: Lable=wxT("Yb"); break;
-    case 71: Lable=wxT("Lu"); break;
-    case 72: Lable=wxT("Hf"); break;
-    case 73: Lable=wxT("Ta"); break;
-    case 74: Lable=wxT("W"); break;
-    case 75: Lable=wxT("Re"); break;
-    case 76: Lable=wxT("Os"); break;
-    case 77: Lable=wxT("Ir"); break;
-    case 78: Lable=wxT("Pt"); break;
-    case 79: Lable=wxT("Au"); break;
-    case 80: Lable=wxT("Hg"); break;
-    case 81: Lable=wxT("Tl"); break;
-    case 82: Lable=wxT("Pb"); break;
-    case 83: Lable=wxT("Bi"); break;
-    case 84: Lable=wxT("Po"); break;
-    case 85: Lable=wxT("At"); break;
-    case 86: Lable=wxT("Rn"); break;
-    case 87: Lable=wxT("Fr"); break;
-    case 88: Lable=wxT("Ra"); break;
-    case 89: Lable=wxT("Ac"); break;
-    case 90: Lable=wxT("Th"); break;
-    case 91: Lable=wxT("Pa"); break;
-    case 92: Lable=wxT("U"); break;
-    case 93: Lable=wxT("Np"); break;
-    case 94: Lable=wxT("Pu"); break;
-    case 95: Lable=wxT("Am"); break;
-    case 96: Lable=wxT("Cm"); break;
-    case 97: Lable=wxT("Bk"); break;
-    case 98: Lable=wxT("Cf"); break;
-    case 99: Lable=wxT("Es"); break;
-    case 100: Lable=wxT("Fm"); break;
-    case 101: Lable=wxT("Md"); break;
-    case 102: Lable=wxT("No"); break;
-    case 103: Lable=wxT("Lr"); break;
-    case 104: Lable=wxT("Rf"); break;
-    case 105: Lable=wxT("Db"); break;
-    case 106: Lable=wxT("Sg"); break;
-    case 107: Lable=wxT("Bh"); break;
-    case 108: Lable=wxT("Hs"); break;
-    case 109: Lable=wxT("Mt"); break;
-    case 110: Lable=wxT("Ds"); break;
-    case 111: Lable=wxT("Rg"); break;
-    case 112: Lable=wxT("Cn"); break;
-    case 113: Lable=wxT("Uut"); break;
-    case 114: Lable=wxT("Fl"); break;
-    case 115: Lable=wxT("Uup"); break;
-    case 116: Lable=wxT("Lv"); break;
-    case 117: Lable=wxT("Uus"); break;
-    case 118: Lable=wxT("Uuo"); break;
-    }
-    return Lable;
-}
 

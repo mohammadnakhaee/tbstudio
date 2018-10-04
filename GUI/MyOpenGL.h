@@ -31,10 +31,11 @@ public:
     void Polygons2D();
     void Polygons3D();
     void Draw_Atom(float r, float x, float y, float z, GLubyte R, GLubyte G, GLubyte B, int Slices, int Stacks);
-    void Draw_Lattice(int nColDArray, int nDArray, double** DArray, int nColIArray, int nIArray, int** IArray);
+    void Draw_Bond(float x0, float y0, float z0, float x1, float y1, float z1, float radius, GLubyte R, GLubyte G, GLubyte B, int Slices, int Stacks);
+    void Draw_Lattice(int nColDArray, int* nDArray, double** DArray, int nColIArray, int* nIArray, int** IArray);
     void background();
     void Draw2D();
-    void Draw3D(int nColDArray, int nDArray, double** DArray, int nColIArray, int nIArray, int** IArray, float xMove, float yMove, float XCam, float YCam, float zoom, float zoomCam, float w, float h);
+    void Draw3D(int nColDArray, int* nDArray, double** DArray, int nColIArray, int* nIArray, int** IArray, float xMove, float yMove, float XCam, float YCam, float zoom, float zoomCam, float w, float h);
 private:
     // textures for the cube faces
     GLuint m_textures[1];
@@ -54,17 +55,17 @@ public:
     float ZoomCam=0.0;
     
     int NumberOfDoubleArrays=0;
-    int nDoubleArray=0;
+    int* nDoubleArray;
     double** DoubleArray;
 
     int NumberOfIntArrays=0;
-    int nIntArray=0;
+    int* nIntArray;
     int** IntArray;
     
     MyGLCanvas(wxWindow *parent, int DimVar, int *attribList = NULL);
-    void CreateDoubleArray(int NumberOfArraysVar, int nArray);
+    void CreateDoubleArray(int NumberOfArraysVar, int* nArray);
     void DiscardDoubleArrays();
-    void CreateIntArray(int NumberOfArraysVar, int nArray);
+    void CreateIntArray(int NumberOfArraysVar, int* nArray);
     void DiscardIntArrays();
     void LoadToCanvas();
     void Reload();

@@ -61,7 +61,7 @@ public:
     void AddGroupBox(wxWindow *parent, wxString Caption, wxColour BGColor);
     void AddButton(wxWindow *parent, int ButtonCnt, wxString* Labels, wxObjectEventFunction* Funcs);
     void AddButton(wxWindow *parent, int ButtonCnt, wxString* ButtonNames, wxString* Labels, wxObjectEventFunction* Funcs);
-    void AddVarVector(wxWindow *parent, int VecCnt, wxString VariableName, wxString VariableType, wxString VecLabel, int LabelSize, int CtrlSize);
+    void AddVarVector(wxWindow *parent, int VecCnt, wxString VariableName, wxString VariableType, wxString VecLabel, int LabelSize, int CtrlSize, bool EnableEvent = true);
     void AddVarVector(wxWindow *parent, int VecCnt, wxString VariableName, wxString VariableType);
     void AddGrid(wxWindow *parent, int nRow, int nCol, wxString VariableName, wxString* ColNames, wxString* ColTypes, int* ColSizes, int* ColPrecision, int xCtrlSize, int yCtrlSize);
     void AddGrid(wxWindow *parent, int nRow, int nCol, wxString VariableName, wxString* ColTypes, int* ColPrecision);
@@ -91,11 +91,6 @@ public:
     bool GetVar(wxString VariableName, int iRow, int iCol, int& Value);
     bool GetVar(wxString VariableName, int iRow, int iCol, bool& Value);
     bool GetVar(wxString VariableName, int iRow, int iCol, wxString& Value);
-    void SetRadioVar(wxString VariableName, bool Value, bool FireEvent);
-    void GetRadioVar(wxString VariableName, bool& Value);
-    void SetCheckVar(wxString VariableName, bool Value, bool FireEvent);
-    void GetCheckVar(wxString VariableName, bool& Value);
-    wxCheckTree* GetTreeObject(wxString VariableName);
     wxCheckListBox* GetCheckListObject(wxString VariableName);
     wxListBox* GetListObject(wxString VariableName);
     wxChoice* GetChoiceObject(wxString VariableName);
@@ -104,9 +99,14 @@ public:
     
     void SaveToFile(wxString filepath, wxString filename);
     void LoadFromFile(wxString filepath, wxString filename);
-private:
     void SendUpdateEvent(wxString info);
+    wxString GetAtomLable(int kind);
+    wxColor GetAtomColor(int kind);
+    wxColor GetBondColor(int kind);
+private:
     virtual void sec30TextCtrl_OnUpdated(wxCommandEvent &event);
+    virtual void TreeCtrlDeleteItem(wxTreeEvent& event);
+    virtual void PickerChangeColor(wxColourPickerEvent& event);
     virtual void MyRadioSelected(wxCommandEvent& event);
     virtual void MyCheckBoxSelected(wxCommandEvent& event);
     DECLARE_EVENT_TABLE()

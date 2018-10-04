@@ -575,23 +575,60 @@ void MyGLContext::Draw_Atom(float r, float x, float y, float z, GLubyte R, GLuby
     glTranslatef(x, y, z);
     //glScaled(0.5, 0.5, 0.5);
     gluSphere(quad,r , Slices , Stacks);
+    //gluDisk(quad,1.0f,2.0f,50,3);
     glPopMatrix();
 }
 
-void MyGLContext::Draw_Lattice(int nColDArray, int nDArray, double** DArray, int nColIArray, int nIArray, int** IArray)
+void MyGLContext::Draw_Bond(float x0, float y0, float z0, float x1, float y1, float z1, float radius, GLubyte R, GLubyte G, GLubyte B, int Slices, int Stacks)
 {
-    for (int i=0; i<nDArray; i++)
-    {
-        Draw_Atom(0.5f, (float)DArray[0][i], (float)DArray[1][i], (float)DArray[2][i], 255, 0, 0, 80, 60);
-    }
-    
-    //Draw_Atom(0.5f, -0.5f, -0.5f, 0.0f, 255, 0, 0, 80, 60);
-    //Draw_Atom(0.5f, -0.5f, 0.5f, 0.0f, 0, 255, 0, 80, 60);
-    //Draw_Atom(0.5f, 0.5f, 0.5f, 0.0f, 0, 0, 255, 80, 60);
-    //Draw_Atom(0.5f, 0.5f, -0.5f, 0.0f, 0, 125, 140, 80, 60);
+    float pi180 = 3.14159265/180.0;
+    float r = sqrt((x1-x0)*(x1-x0) + (y1-y0)*(y1-y0) + (z1-z0)*(z1-z0));
+    float th = 0;
+    if (r==0)
+        th=0;
+    else
+        th = acos((z1-z0)/r) / pi180;
+    float phi = atan2((y1-y0),(x1-x0)) / pi180;
+    glPushMatrix();
+    glColor3ub(R, G, B);
+    glTranslatef(x0, y0, z0);
+    glRotatef(phi, 0.0f, 0.0f, 1.0f);
+    glRotatef(th, 0.0f, 1.0f, 0.0f);
+    gluCylinder(quad, radius, radius, r, Slices, Stacks);
+    glPopMatrix();
 }
 
-void MyGLContext::Draw3D(int nColDArray, int nDArray, double** DArray, int nColIArray, int nIArray, int** IArray, float xMove, float yMove, float XCam, float YCam, float zoom, float zoomCam, float w, float h)
+//check it
+//void cleanup() // call once when you exit program
+//{
+//  gluDeleteQuadric(qobj);
+//}
+
+void MyGLContext::Draw_Lattice(int nColDArray, int* nDArray, double** DArray, int nColIArray, int* nIArray, int** IArray)
+{
+    /***********************************************************************************/
+    /* The structure of data: (note that the number of atoms and bonds can be different)
+     * DArray[0][:] DArray[1][:] DArray[2][:] DArray[3][:] DArray[4][:] DArray[5][:] DArray[6][:] DArray[7][:] DArray[8][:] DArray[9][:] DArray[10][:]  IArray[0][:]   IArray[1][:]   IArray[2][:]  IArray[3][:]   IArray[4][:]   IArray[5][:]
+     *      x0          y0           z0           r0           x1bond0     y1bond0     z1bond0      x2bond0      y2bond0      z2bond0      rbond0         AtomRed0      AtomGreen0     AtomBlue0       BondRed0      BondGreen0    BondBlue0
+     *      x1          y1           z1           r1           x1bond1     y1bond1     z1bond1      x2bond1      y2bond1      z2bond1      rbond1         AtomRed1      AtomGreen1     AtomBlue1       BondRed1      BondGreen1    BondBlue1
+     *      x2          y2           z2           r2           x1bond2     y1bond2     z1bond2      x2bond2      y2bond2      z2bond2      rbond2         AtomRed2      AtomGreen2     AtomBlue2       BondRed2      BondGreen2    BondBlue2
+     *                                                         x1bond3     y1bond3     z1bond3      x2bond3      y2bond3      z2bond3      rbond3                                                      BondRed3      BondGreen3    BondBlue3
+     *                                                         x1bond4     y1bond4     z1bond4      x2bond4      y2bond4      z2bond4      rbond4                                                      BondRed4      BondGreen4    BondBlue4
+     */
+    /***********************************************************************************/
+    for (int i=0; i<nDArray[0]; i++)
+    {
+        Draw_Atom((float)DArray[3][i], (float)DArray[0][i], (float)DArray[1][i], (float)DArray[2][i], (GLubyte)IArray[0][i], (GLubyte)IArray[1][i], (GLubyte)IArray[2][i], 60, 40);
+    }
+    
+    for (int i=0; i<nDArray[4]; i++)
+    {
+        Draw_Bond((float)DArray[4][i], (float)DArray[5][i], (float)DArray[6][i],(float)DArray[7][i], (float)DArray[8][i], (float)DArray[9][i], (float)DArray[10][i], (GLubyte)IArray[3][i], (GLubyte)IArray[4][i], (GLubyte)IArray[5][i] ,23,2);
+    }
+    
+}
+
+void MyGLContext::Draw3D(int nColDArray, int* nDArray, double** DArray, int nColIArray, int* nIArray, int** IArray, float xMove, float yMove, float XCam, float YCam, float zoom, float zoomCam, float w, float h)
 {
     glEnable(GL_LIGHTING);
     GLfloat ambient[] = { 0.065, 0.065, 0.065, 0.065 };
@@ -602,9 +639,10 @@ void MyGLContext::Draw3D(int nColDArray, int nDArray, double** DArray, int nColI
     glLoadIdentity();
     //gluLookAt(0, 0, -1,  0, 0, 0, 1, 0, 0);
     //glFrustum(-1.0f, 1.0f, -0.5f, 0.5f, 1.0f, 10.0f);
-    glOrtho(-w, w, -h, h, 0.0f, 50.0f);
+    glOrtho(-w, w, -h, h, -50.0f, 50.0f);
     glTranslatef(XCam + xMove, YCam + yMove, 0.0f);
     float ztot = zoomCam + zoom;
+    if (ztot <= 0.001) ztot = 0.001;
     glScaled(ztot, ztot, ztot);//Zoom
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
@@ -841,7 +879,7 @@ void MyGLCanvas::OnMouseWheel(wxMouseEvent& event)
         ZoomCam = ZoomCam + delta;
     else
         ZoomCam = ZoomCam - delta;
-    if (ZoomCam <=0.0) ZoomCam=0.001;
+    if (ZoomCam <=0.001) ZoomCam=0.001;
     
     Refresh(false);
 }
@@ -994,7 +1032,7 @@ void MyGLCanvas::DoRotate(float l, float m, float Theta)
     double c = cos(Theta);
     double cr2 = c/r2;
     double sr2 = sr/r;
-    for (int i=0; i<nDoubleArray; i++)
+    for (int i=0; i<nDoubleArray[0]; i++)
     {
         double a = (m*DoubleArray0[0][i] - l*DoubleArray0[1][i])/r2;
         double b = l*DoubleArray0[0][i] + m*DoubleArray0[1][i];
@@ -1004,6 +1042,30 @@ void MyGLCanvas::DoRotate(float l, float m, float Theta)
         DoubleArray1[1][i] = -l*a + m*bc - m*r*zs;
         DoubleArray1[2][i] = DoubleArray0[2][i]*c + b*sr;
     }
+    
+    for (int i=0; i<nDoubleArray[4]; i++)
+    {
+        double a = (m*DoubleArray0[4][i] - l*DoubleArray0[5][i])/r2;
+        double b = l*DoubleArray0[4][i] + m*DoubleArray0[5][i];
+        double bc = b*cr2;
+        double zs = DoubleArray0[6][i]*sr2;
+        DoubleArray1[4][i] = m*a + l*bc - l*r*zs;
+        DoubleArray1[5][i] = -l*a + m*bc - m*r*zs;
+        DoubleArray1[6][i] = DoubleArray0[6][i]*c + b*sr;
+    }
+    
+    
+    for (int i=0; i<nDoubleArray[7]; i++)
+    {
+        double a = (m*DoubleArray0[7][i] - l*DoubleArray0[8][i])/r2;
+        double b = l*DoubleArray0[7][i] + m*DoubleArray0[8][i];
+        double bc = b*cr2;
+        double zs = DoubleArray0[9][i]*sr2;
+        DoubleArray1[7][i] = m*a + l*bc - l*r*zs;
+        DoubleArray1[8][i] = -l*a + m*bc - m*r*zs;
+        DoubleArray1[9][i] = DoubleArray0[9][i]*c + b*sr;
+    }
+    
     Refresh(false);
 }
 
@@ -1020,36 +1082,53 @@ void MyGLCanvas::GetDirection(int i0, int j0, int i, int j, float& x, float& y, 
     Theta = (float)sqrt(x*x + y*y);
 }
 
-void MyGLCanvas::CreateDoubleArray(int NumberOfArraysVar, int nArray)
+void MyGLCanvas::CreateDoubleArray(int NumberOfArraysVar, int* nArray)
 {
     NumberOfDoubleArrays=NumberOfArraysVar;
-    nDoubleArray=nArray;
+    nDoubleArray = new int[NumberOfDoubleArrays];
 	DoubleArray = new double*[NumberOfDoubleArrays];
-	for(int i = 0; i < NumberOfDoubleArrays; i++) DoubleArray[i] = new double[nDoubleArray];
+	for(int i = 0; i < NumberOfDoubleArrays; i++)
+    {
+        nDoubleArray[i]=nArray[i];
+        DoubleArray[i] = new double[nDoubleArray[i]];
+    }
     CreateDoubleArray1();
 }
 
 void MyGLCanvas::DiscardDoubleArrays()
 {
-    if (nDoubleArray > 0) for(int i = 0; i < NumberOfDoubleArrays; i++) delete [] DoubleArray[i];
+    for(int i = 0; i < NumberOfDoubleArrays; i++)
+    {
+        if (nDoubleArray[i] > 0) delete [] DoubleArray[i];
+    }
 	if (NumberOfDoubleArrays>0) delete [] DoubleArray;
     DiscardDoubleArrays1();
 }
 
-void MyGLCanvas::CreateIntArray(int NumberOfArraysVar, int nArray)
+void MyGLCanvas::CreateIntArray(int NumberOfArraysVar, int* nArray)
 {
     NumberOfIntArrays=NumberOfArraysVar;
-    nIntArray=nArray;
+    nIntArray = new int[NumberOfIntArrays];
 	IntArray = new int*[NumberOfIntArrays];
-	for(int i = 0; i < NumberOfIntArrays; i++) IntArray[i] = new int[nIntArray];
+	for(int i = 0; i < NumberOfIntArrays; i++)
+    {
+        nIntArray[i]=nArray[i];
+        IntArray[i] = new int[nIntArray[i]];
+    }
 }
 
 void MyGLCanvas::DiscardIntArrays()
 {
-    if (nIntArray>0) for(int i = 0; i < NumberOfIntArrays; i++) delete [] IntArray[i];
+    for(int i = 0; i < NumberOfIntArrays; i++)
+    {
+        if (nIntArray[i] > 0)
+        {
+            delete [] IntArray[i];
+            nIntArray[i] = 0;
+        }
+    }
 	if (NumberOfIntArrays>0) delete [] IntArray;
     NumberOfIntArrays = 0;
-    nIntArray = 0;
 }
 
 
@@ -1059,35 +1138,32 @@ void MyGLCanvas::CreateDoubleArray1()
     DoubleArray1 = new double*[NumberOfDoubleArrays];
 	for(int i = 0; i < NumberOfDoubleArrays; i++)
     {
-        DoubleArray0[i] = new double[nDoubleArray];
-        DoubleArray1[i] = new double[nDoubleArray];
+        DoubleArray0[i] = new double[nDoubleArray[i]];
+        DoubleArray1[i] = new double[nDoubleArray[i]];
     }
 }
 
 void MyGLCanvas::DiscardDoubleArrays1()
 {
-    if (nDoubleArray > 0)
+    for(int i = 0; i < NumberOfDoubleArrays; i++)
     {
-        for(int i = 0; i < NumberOfDoubleArrays; i++)
+        if (nDoubleArray[i] > 0)
         {
             delete [] DoubleArray0[i];
             delete [] DoubleArray1[i];
+            nDoubleArray[i]=0;
         }
     }
 	if (NumberOfDoubleArrays>0) delete [] DoubleArray0;
     if (NumberOfDoubleArrays>0) delete [] DoubleArray1;
     NumberOfDoubleArrays=0;
-    nDoubleArray=0;
 }
 
 void MyGLCanvas::LoadToCanvas()
 {
-    for (int i=0; i<nDoubleArray; i++)
-    {
-        DoubleArray1[0][i] = DoubleArray[0][i];
-        DoubleArray1[1][i] = DoubleArray[1][i];
-        DoubleArray1[2][i] = DoubleArray[2][i];
-    }
+    for (int i=0; i<NumberOfDoubleArrays; i++)
+        for (int j=0; j<nDoubleArray[i]; j++)
+            DoubleArray1[i][j] = DoubleArray[i][j];
     Reload();
 }
 
@@ -1096,13 +1172,11 @@ void MyGLCanvas::Reload()
     XCam += XMove;
     YCam += YMove;
     ZoomCam += Zoom;
+    if (ZoomCam <=0.001) ZoomCam=0.001;
     XMove = 0;
     YMove = 0;
     Zoom = 0;
-    for (int i=0; i<nDoubleArray; i++)
-    {
-        DoubleArray0[0][i] = DoubleArray1[0][i];
-        DoubleArray0[1][i] = DoubleArray1[1][i];
-        DoubleArray0[2][i] = DoubleArray1[2][i];
-    }
+    for (int i=0; i<NumberOfDoubleArrays; i++)
+        for (int j=0; j<nDoubleArray[i]; j++)
+            DoubleArray0[i][j] = DoubleArray1[i][j];
 }

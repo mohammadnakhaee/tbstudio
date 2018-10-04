@@ -10,6 +10,7 @@
 #include "UnitcellClass.h"
 #include "StructureClass.h"
 #include "OrbitalsClass.h"
+#include "ColorsClass.h"
 #include "BondsClass.h"
 
 /**********************************************************************************/
@@ -27,11 +28,13 @@ public:
     StructureClass* structurePanel;
     OrbitalsClass* orbitalsPanel;
     BondsClass* bondsPanel;
+    ColorsClass* ColorsForm;
     Sec30* sec30;
     
     void OnExit(wxCommandEvent& event);
     void OnAbout(wxCommandEvent& event);
 protected:
+    virtual void BtnStructureStyle_OnClick(wxRibbonButtonBarEvent& event);
     virtual void OnchoisSelected(wxCommandEvent& event);
     virtual void BtnOpen_OnClick(wxRibbonButtonBarEvent& event);
     virtual void BtnSave_OnClick(wxRibbonButtonBarEvent& event);
@@ -83,8 +86,13 @@ protected:
     virtual void LoadBondsPanel();
     virtual void EvaluateBondsPanel();
     virtual bool ValidateBondsPanel();
-    void FillBondsPanel();
+    virtual void FillBondsPanel();
     /****************************************/
+    virtual void LoadColorsForm();
+    virtual void EvaluateColorsPanel();
+    virtual bool ValidateColorsPanel();
+    /****************************************/
+    int GetBonds(int* bonds);
 private:
     wxTextCtrl* logfile;
     wxAuiManager aui_mgr;

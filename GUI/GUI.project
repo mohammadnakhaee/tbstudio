@@ -8,6 +8,7 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="src">
+    <File Name="ColorsClass.cpp"/>
     <File Name="OrbitalsClass.cpp"/>
     <File Name="checktree.cpp"/>
     <File Name="BondsClass.cpp"/>
@@ -26,6 +27,7 @@
     <File Name="wxcrafter_bitmaps.cpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="include">
+    <File Name="ColorsClass.h"/>
     <File Name="OrbitalsClass.h"/>
     <File Name="checktree.h"/>
     <File Name="BondsClass.h"/>

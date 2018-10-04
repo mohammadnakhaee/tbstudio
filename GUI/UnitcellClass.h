@@ -24,6 +24,6 @@ protected:
     virtual void Btn_Load_OnClick(wxCommandEvent& event);
     virtual void Btn_Save_OnClick(wxCommandEvent& event);
     void ExportToCIF(wxString filepath, wxString filename);
-    wxString GetAtomLable(int kind);
+
 };
 #endif // UNITCELLCLASS_H

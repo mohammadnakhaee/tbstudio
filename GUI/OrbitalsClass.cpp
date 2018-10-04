@@ -13,7 +13,7 @@ OrbitalsClass::OrbitalsClass(wxWindow* parent, Sec30* sec30var, wxWindowID id, c
     GetSizer()->Fit(this);
     /**********************************************************************************************************************************************/
     sec30->AddGroupBox(this,_("Atom Species in the Unit-Cell"),wxColour(wxT("rgb(153,180,209)")));
-    sec30->AddVarVector(this, 1, _("NewType"), _("wxString"), _("New TB Atom Type"), 110, 120);
+    sec30->AddVarVector(this, 1, _("NewType"), _("wxString"), _("New TB Atom Type"), 110, 120,false);
     wxString Labels1[2] = {_("Add TB Atom Type") , _("Remove TB Atom Type")};
     wxObjectEventFunction Funcs1[2] = { wxCommandEventHandler(OrbitalsClass::Btn_AddAtom_OnClick), wxCommandEventHandler(OrbitalsClass::Btn_RemoveAtom_OnClick)};
     sec30->AddButton(this, 2, Labels1, Funcs1);
@@ -64,6 +64,8 @@ void OrbitalsClass::Btn_AddAtom_OnClick(wxCommandEvent& event)
     }
     
     listctr->Append(newtypename);
+    listctr->Update();
+    listctr->Refresh(true);
     
     wxCheckTree* treectr = sec30->GetTreeObject(_("Orbitals"));
     wxTreeItemId rootID;
@@ -85,6 +87,9 @@ void OrbitalsClass::Btn_RemoveAtom_OnClick(wxCommandEvent& event)
     if (item<0) {wxMessageBox(_("Select one of the species from the list."),_("Error")); return;}
     wxString SelectedAtomSpecies = listctr->GetString(item);
     listctr->Delete(item);
+    listctr->Update();
+    listctr->Refresh(true);
+    
     wxCheckTree* treectr = sec30->GetTreeObject(_("Orbitals"));
     wxTreeItemId rootID;
     rootID = treectr->GetRootItem();

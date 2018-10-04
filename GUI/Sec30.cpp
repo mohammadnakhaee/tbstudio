@@ -42,20 +42,7 @@ void Sec30::AddButton(wxWindow *parent, int ButtonCnt, wxString* Labels, wxObjec
     }
 }
 
-void Sec30::AddButton(wxWindow *parent, int ButtonCnt, wxString* ButtonNames, wxString* Labels, wxObjectEventFunction* Funcs)
-{
-    wxBoxSizer* MySizer = new wxBoxSizer(wxHORIZONTAL);
-    parent->GetSizer()->Add(MySizer, 0, wxEXPAND, WXC_FROM_DIP(5));
-    for (int i=0; i < ButtonCnt; i++)
-    {
-        wxButton* btn = new wxButton(parent, wxID_ANY, Labels[i], wxDefaultPosition, wxDLG_UNIT(parent, wxSize(-1,-1)), 0);
-        MySizer->Add(btn, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
-        btn->SetName(ButtonNames[i]);
-        btn->Connect(wxEVT_COMMAND_BUTTON_CLICKED, Funcs[i], NULL, parent);
-    }
-}
-
-void Sec30::AddVarVector(wxWindow *parent, int VecCnt, wxString VariableName, wxString VariableType, wxString VecLabel, int LabelSize, int CtrlSize)
+void Sec30::AddVarVector(wxWindow *parent, int VecCnt, wxString VariableName, wxString VariableType, wxString VecLabel, int LabelSize, int CtrlSize,bool EnableEvent)
 {
     wxBoxSizer* MySizer = new wxBoxSizer(wxHORIZONTAL);
     parent->GetSizer()->Add(MySizer, 0, wxLEFT|wxRIGHT|wxTOP|wxEXPAND, WXC_FROM_DIP(5));
@@ -77,7 +64,7 @@ void Sec30::AddVarVector(wxWindow *parent, int VecCnt, wxString VariableName, wx
         tc->SetName(var);
         //tc->SetColLabelValue(0,VariableType);
         if (VariableType != _("wxString")) tc->SetCellValue(0,0,_("0"));
-        tc->Connect(Sec30EVT_Grid_Updated, wxCommandEventHandler(Sec30::sec30TextCtrl_OnUpdated), NULL, this);
+        if (EnableEvent) tc->Connect(Sec30EVT_Grid_Updated, wxCommandEventHandler(Sec30::sec30TextCtrl_OnUpdated), NULL, this);
     }
     
     MySizer->Layout();
@@ -229,18 +216,7 @@ wxCheckTree* Sec30::AddTreeCtrl(wxWindow *parent, wxString VariableName, int xCt
     wxColour c; //Also it is possible to determine the color in this way: wxColour c=*wxGREEN;
     c.Set(191,205,219,0);
     
-    //gc->Connect(Sec30EVT_Grid_Updated, wxCommandEventHandler(Sec30::sec30TextCtrl_OnUpdated), NULL, this);
-    
-    //gc->Connect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(Sec30::TextCtrl_OnUpdated), NULL, this);
-    //gc->Connect(wxEVT_GRID_CELL_CHANGED, wxGridEventHandler(StructureClass::OnCellChanged), NULL, this);
-    //gc->Connect(MyGridPasteEvent, wxCommandEventHandler(StructureClass::OnGridPaste), NULL, this);
-    
-    
-    //wxTreeItemId id2=ctr->AppendItem(rootID,"2");
-    //ctr->tree_add(id1,"x",true,true);
-    //ctr->tree_add(id1,"y",true,true);
-    //ctr->tree_add(id2,"x",true,false);
-    //ctr->tree_add(id2,"y",true,true);
+    ctr->Connect(wxEVT_COMMAND_TREE_DELETE_ITEM, wxTreeEventHandler(Sec30::TreeCtrlDeleteItem), NULL, this);
     
     ctr->ExpandAll();
     MySizer->Layout();
@@ -316,6 +292,8 @@ wxColourPickerCtrl* Sec30::AddColorCtrl(wxWindow *parent, wxString VariableName,
     colors.insert(icolors,VariableName);
     ctr->SetName(VariableName);
     
+    ctr->Connect(wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler(Sec30::PickerChangeColor), NULL, this);
+    
     MySizer->Layout();
     parent->Layout();
     return ctr;
@@ -329,6 +307,7 @@ wxScrolledWindow* Sec30::AddScrolledPanel(wxWindow *parent, int xCtrlSize, int y
     ctr->SetMinSize(wxSize(xCtrlSize,yCtrlSize));
     wxBoxSizer* MySizer = new wxBoxSizer(wxVERTICAL);
     ctr->SetSizer(MySizer,true);
+    ctr->SetName(parent->GetName());
     
     parent->Layout();
     return ctr;
@@ -377,6 +356,20 @@ void Sec30::sec30TextCtrl_OnUpdated(wxCommandEvent& event)
     //wxString type = tc->GetHint();
     wxString name = tc->GetParent()->GetName();
     //wxString value = tc->GetValue();
+    SendUpdateEvent(name);
+}
+
+void Sec30::TreeCtrlDeleteItem(wxTreeEvent& event)
+{
+    wxCheckTree* tc= (wxCheckTree*)event.GetEventObject();
+    wxString name = tc->GetParent()->GetName();
+    SendUpdateEvent(name);
+}
+
+void Sec30::PickerChangeColor(wxColourPickerEvent& event)
+{
+    wxColourPickerCtrl* tc= (wxColourPickerCtrl*)event.GetEventObject();
+    wxString name = tc->GetParent()->GetName();
     SendUpdateEvent(name);
 }
 
@@ -1248,6 +1241,318 @@ void Sec30::LoadFromFile(wxString filepath, wxString filename)
 
 }
 
+wxString Sec30::GetAtomLable(int kind)
+{
+    wxString Lable;
+    Lable=wxT("H");
+    switch (kind)
+    {
+    case 2: Lable=wxT("He"); break;
+    case 3: Lable=wxT("Li"); break;
+    case 4: Lable=wxT("Be"); break;
+    case 5: Lable=wxT("B"); break;
+    case 6: Lable=wxT("C"); break;
+    case 7: Lable=wxT("N"); break;
+    case 8: Lable=wxT("O"); break;
+    case 9: Lable=wxT("F"); break;
+    case 10: Lable=wxT("Ne"); break;
+    case 11: Lable=wxT("Na"); break;
+    case 12: Lable=wxT("Mg"); break;
+    case 13: Lable=wxT("Al"); break;
+    case 14: Lable=wxT("Si"); break;
+    case 15: Lable=wxT("P"); break;
+    case 16: Lable=wxT("S"); break;
+    case 17: Lable=wxT("Cl"); break;
+    case 18: Lable=wxT("Ar"); break;
+    case 19: Lable=wxT("K"); break;
+    case 20: Lable=wxT("Ca"); break;
+    case 21: Lable=wxT("Sc"); break;
+    case 22: Lable=wxT("Ti"); break;
+    case 23: Lable=wxT("V"); break;
+    case 24: Lable=wxT("Cr"); break;
+    case 25: Lable=wxT("Mn"); break;
+    case 26: Lable=wxT("Fe"); break;
+    case 27: Lable=wxT("Co"); break;
+    case 28: Lable=wxT("Ni"); break;
+    case 29: Lable=wxT("Cu"); break;
+    case 30: Lable=wxT("Zn"); break;
+    case 31: Lable=wxT("Ga"); break;
+    case 32: Lable=wxT("Ge"); break;
+    case 33: Lable=wxT("As"); break;
+    case 34: Lable=wxT("Se"); break;
+    case 35: Lable=wxT("Br"); break;
+    case 36: Lable=wxT("Kr"); break;
+    case 37: Lable=wxT("Rb"); break;
+    case 38: Lable=wxT("Sr"); break;
+    case 39: Lable=wxT("Y"); break;
+    case 40: Lable=wxT("Zr"); break;
+    case 41: Lable=wxT("Nb"); break;
+    case 42: Lable=wxT("Mo"); break;
+    case 43: Lable=wxT("Tc"); break;
+    case 44: Lable=wxT("Ru"); break;
+    case 45: Lable=wxT("Rh"); break;
+    case 46: Lable=wxT("Pd"); break;
+    case 47: Lable=wxT("Ag"); break;
+    case 48: Lable=wxT("Cd"); break;
+    case 49: Lable=wxT("In"); break;
+    case 50: Lable=wxT("Sn"); break;
+    case 51: Lable=wxT("Sb"); break;
+    case 52: Lable=wxT("Te"); break;
+    case 53: Lable=wxT("I"); break;
+    case 54: Lable=wxT("Xe"); break;
+    case 55: Lable=wxT("Cs"); break;
+    case 56: Lable=wxT("Ba"); break;
+    case 57: Lable=wxT("La"); break;
+    case 58: Lable=wxT("Ce"); break;
+    case 59: Lable=wxT("Pr"); break;
+    case 60: Lable=wxT("Nd"); break;
+    case 61: Lable=wxT("Pm"); break;
+    case 62: Lable=wxT("Sm"); break;
+    case 63: Lable=wxT("Eu"); break;
+    case 64: Lable=wxT("Gd"); break;
+    case 65: Lable=wxT("Tb"); break;
+    case 66: Lable=wxT("Dy"); break;
+    case 67: Lable=wxT("Ho"); break;
+    case 68: Lable=wxT("Er"); break;
+    case 69: Lable=wxT("Tm"); break;
+    case 70: Lable=wxT("Yb"); break;
+    case 71: Lable=wxT("Lu"); break;
+    case 72: Lable=wxT("Hf"); break;
+    case 73: Lable=wxT("Ta"); break;
+    case 74: Lable=wxT("W"); break;
+    case 75: Lable=wxT("Re"); break;
+    case 76: Lable=wxT("Os"); break;
+    case 77: Lable=wxT("Ir"); break;
+    case 78: Lable=wxT("Pt"); break;
+    case 79: Lable=wxT("Au"); break;
+    case 80: Lable=wxT("Hg"); break;
+    case 81: Lable=wxT("Tl"); break;
+    case 82: Lable=wxT("Pb"); break;
+    case 83: Lable=wxT("Bi"); break;
+    case 84: Lable=wxT("Po"); break;
+    case 85: Lable=wxT("At"); break;
+    case 86: Lable=wxT("Rn"); break;
+    case 87: Lable=wxT("Fr"); break;
+    case 88: Lable=wxT("Ra"); break;
+    case 89: Lable=wxT("Ac"); break;
+    case 90: Lable=wxT("Th"); break;
+    case 91: Lable=wxT("Pa"); break;
+    case 92: Lable=wxT("U"); break;
+    case 93: Lable=wxT("Np"); break;
+    case 94: Lable=wxT("Pu"); break;
+    case 95: Lable=wxT("Am"); break;
+    case 96: Lable=wxT("Cm"); break;
+    case 97: Lable=wxT("Bk"); break;
+    case 98: Lable=wxT("Cf"); break;
+    case 99: Lable=wxT("Es"); break;
+    case 100: Lable=wxT("Fm"); break;
+    case 101: Lable=wxT("Md"); break;
+    case 102: Lable=wxT("No"); break;
+    case 103: Lable=wxT("Lr"); break;
+    case 104: Lable=wxT("Rf"); break;
+    case 105: Lable=wxT("Db"); break;
+    case 106: Lable=wxT("Sg"); break;
+    case 107: Lable=wxT("Bh"); break;
+    case 108: Lable=wxT("Hs"); break;
+    case 109: Lable=wxT("Mt"); break;
+    case 110: Lable=wxT("Ds"); break;
+    case 111: Lable=wxT("Rg"); break;
+    case 112: Lable=wxT("Cn"); break;
+    case 113: Lable=wxT("Uut"); break;
+    case 114: Lable=wxT("Fl"); break;
+    case 115: Lable=wxT("Uup"); break;
+    case 116: Lable=wxT("Lv"); break;
+    case 117: Lable=wxT("Uus"); break;
+    case 118: Lable=wxT("Uuo"); break;
+    }
+    return Lable;
+}
+
+wxColor Sec30::GetAtomColor(int kind)
+{
+    wxColor c;
+    c.Set(200, 200, 200, 255);
+    switch (kind)
+    {
+    case 2: c.Set(100, 0, 0, 255); break;
+    case 3: c.Set(100, 50, 0, 255); break;
+    case 4: c.Set(100, 0, 50, 255); break;
+    case 5: c.Set(100, 50, 50, 255); break;
+    case 6: c.Set(0, 100, 0, 255); break;
+    case 7: c.Set(50, 100, 0, 255); break;
+    case 8: c.Set(0, 100, 50, 255); break;
+    case 9: c.Set(50, 100, 50, 255); break;
+    case 10: c.Set(0, 0, 100, 255); break;
+    case 11: c.Set(50, 0, 100, 255); break;
+    case 12: c.Set(0, 50, 100, 255); break;
+    case 13: c.Set(50, 50, 100, 255); break;
+    case 14: c.Set(150, 0, 0, 255); break;
+    case 15: c.Set(150, 50, 0, 255); break;
+    case 16: c.Set(150, 0, 50, 255); break;
+    case 17: c.Set(150, 50, 50, 255); break;
+    case 18: c.Set(0, 150, 0, 255); break;
+    case 19: c.Set(50, 150, 0, 255); break;
+    case 20: c.Set(0, 150, 50, 255); break;
+    case 21: c.Set(50, 150, 50, 255); break;
+    case 22: c.Set(0, 0, 150, 255); break;
+    case 23: c.Set(50, 0, 150, 255); break;
+    case 24: c.Set(0, 50, 150, 255); break;
+    case 25: c.Set(50, 50, 150, 255); break;
+    case 26: c.Set(170, 0, 0, 255); break;
+    case 27: c.Set(170, 80, 0, 255); break;
+    case 28: c.Set(170, 0, 80, 255); break;
+    case 29: c.Set(170, 80, 80, 255); break;
+    case 30: c.Set(0, 170, 0, 255); break;
+    case 31: c.Set(80, 170, 0, 255); break;
+    case 32: c.Set(0, 170, 80, 255); break;
+    case 33: c.Set(80, 170, 80, 255); break;
+    case 34: c.Set(0, 0, 170, 255); break;
+    case 35: c.Set(80, 0, 170, 255); break;
+    case 36: c.Set(0, 80, 170, 255); break;
+    case 37: c.Set(80, 80, 170, 255); break;
+    case 38: c.Set(20, 250, 250, 255); break;
+    case 39: c.Set(20, 170, 170, 255); break;
+    case 40: c.Set(20, 250, 170, 255); break;
+    case 41: c.Set(20, 170, 250, 255); break;
+    case 42: c.Set(250, 20, 250, 255); break;
+    case 43: c.Set(170, 20, 170, 255); break;
+    case 44: c.Set(250, 20, 170, 255); break;
+    case 45: c.Set(170, 20, 250, 255); break;
+    case 46: c.Set(250, 250, 20, 255); break;
+    case 47: c.Set(170, 170, 20, 255); break;
+    case 48: c.Set(170, 250, 20, 255); break;
+    case 49: c.Set(250, 170, 20, 255); break;
+    case 50: c.Set(120, 0, 0, 255); break;
+    case 51: c.Set(120, 30, 0, 255); break;
+    case 52: c.Set(120, 0, 30, 255); break;
+    case 53: c.Set(120, 30, 30, 255); break;
+    case 54: c.Set(0, 120, 0, 255); break;
+    case 55: c.Set(30, 120, 0, 255); break;
+    case 56: c.Set(0, 120, 30, 255); break;
+    case 57: c.Set(30, 120, 30, 255); break;
+    case 58: c.Set(0, 0, 120, 255); break;
+    case 59: c.Set(30, 0, 120, 255); break;
+    case 60: c.Set(0, 30, 120, 255); break;
+    case 61: c.Set(30, 30, 120, 255); break;
+    case 62: c.Set(210, 0, 0, 255); break;
+    case 63: c.Set(210, 60, 0, 255); break;
+    case 64: c.Set(210, 0, 60, 255); break;
+    case 65: c.Set(210, 60, 60, 255); break;
+    case 66: c.Set(0, 210, 0, 255); break;
+    case 67: c.Set(60, 210, 0, 255); break;
+    case 68: c.Set(0, 210, 60, 255); break;
+    case 69: c.Set(60, 210, 60, 255); break;
+    case 70: c.Set(0, 0, 210, 255); break;
+    case 71: c.Set(60, 0, 210, 255); break;
+    case 72: c.Set(0, 60, 210, 255); break;
+    case 73: c.Set(60, 60, 210, 255); break;
+    case 74: c.Set(120, 0, 0, 255); break;
+    case 75: c.Set(120, 70, 0, 255); break;
+    case 76: c.Set(120, 0, 70, 255); break;
+    case 77: c.Set(120, 70, 70, 255); break;
+    case 78: c.Set(0, 120, 0, 255); break;
+    case 79: c.Set(70, 120, 0, 255); break;
+    case 80: c.Set(0, 120, 70, 255); break;
+    case 81: c.Set(70, 120, 70, 255); break;
+    case 82: c.Set(0, 0, 120, 255); break;
+    case 83: c.Set(70, 0, 120, 255); break;
+    case 84: c.Set(0, 70, 120, 255); break;
+    case 85: c.Set(70, 70, 120, 255); break;
+    case 86: c.Set(250, 0, 0, 255); break;
+    case 87: c.Set(250, 100, 0, 255); break;
+    case 88: c.Set(250, 0, 100, 255); break;
+    case 89: c.Set(250, 100, 100, 255); break;
+    case 90: c.Set(0, 250, 0, 255); break;
+    case 91: c.Set(100, 250, 0, 255); break;
+    case 92: c.Set(0, 250, 100, 255); break;
+    case 93: c.Set(100, 250, 100, 255); break;
+    case 94: c.Set(0, 0, 250, 255); break;
+    case 95: c.Set(100, 0, 250, 255); break;
+    case 96: c.Set(0, 100, 250, 255); break;
+    case 97: c.Set(100, 100, 250, 255); break;
+    case 98: c.Set(50, 100, 100, 255); break;
+    case 99: c.Set(50, 100, 200, 255); break;
+    case 100: c.Set(50, 200, 100, 255); break;
+    case 101: c.Set(50, 200, 200, 255); break;
+    case 102: c.Set(100, 50, 100, 255); break;
+    case 103: c.Set(100, 50, 200, 255); break;
+    case 104: c.Set(200, 50, 100, 255); break;
+    case 105: c.Set(200, 50, 200, 255); break;
+    case 106: c.Set(100, 100, 50, 255); break;
+    case 107: c.Set(100, 200, 50, 255); break;
+    case 108: c.Set(200, 100, 50, 255); break;
+    case 109: c.Set(200, 200, 50, 255); break;
+    case 110: c.Set(100, 100, 100, 255); break;
+    case 111: c.Set(150, 150, 150, 255); break;
+    case 112: c.Set(200, 200, 200, 255); break;
+    case 113: c.Set(70, 80, 110, 255); break;
+    case 114: c.Set(110, 80, 70, 255); break;
+    case 115: c.Set(80, 110, 70, 255); break;
+    case 116: c.Set(70, 110, 80, 255); break;
+    case 117: c.Set(110, 70, 80, 255); break;
+    case 118: c.Set(80, 70, 110, 255); break;
+    }
+    return c;
+}
+
+wxColor Sec30::GetBondColor(int kind)
+{
+    wxColor c;
+    c.Set(210, 0, 60, 255);
+    switch (kind)
+    {
+    case 2: c.Set(140, 0, 0, 255); break;
+    case 3: c.Set(140, 50, 0, 255); break;
+    case 4: c.Set(110, 10, 50, 255); break;
+    case 5: c.Set(200, 50, 50, 255); break;
+    case 6: c.Set(0, 170, 0, 255); break;
+    case 7: c.Set(50, 170, 0, 255); break;
+    case 8: c.Set(0, 170, 50, 255); break;
+    case 9: c.Set(50, 170, 50, 255); break;
+    case 10: c.Set(0, 0, 170, 255); break;
+    case 11: c.Set(50, 0, 170, 255); break;
+    case 12: c.Set(0, 50, 170, 255); break;
+    case 13: c.Set(50, 50, 170, 255); break;
+    case 14: c.Set(250, 0, 0, 255); break;
+    case 15: c.Set(250, 50, 0, 255); break;
+    case 16: c.Set(250, 0, 50, 255); break;
+    case 17: c.Set(250, 50, 50, 255); break;
+    case 18: c.Set(0, 250, 0, 255); break;
+    case 19: c.Set(50, 250, 0, 255); break;
+    case 20: c.Set(0, 250, 50, 255); break;
+    case 21: c.Set(50, 250, 50, 255); break;
+    case 22: c.Set(0, 0, 250, 255); break;
+    case 23: c.Set(50, 0, 250, 255); break;
+    case 24: c.Set(0, 50, 250, 255); break;
+    case 25: c.Set(50, 50, 250, 255); break;
+    case 26: c.Set(170, 0, 0, 255); break;
+    case 27: c.Set(170, 80, 0, 255); break;
+    case 28: c.Set(170, 0, 80, 255); break;
+    case 29: c.Set(170, 80, 80, 255); break;
+    case 30: c.Set(0, 170, 0, 255); break;
+    case 31: c.Set(80, 170, 0, 255); break;
+    case 32: c.Set(0, 170, 80, 255); break;
+    case 33: c.Set(80, 170, 80, 255); break;
+    case 34: c.Set(0, 0, 170, 255); break;
+    case 35: c.Set(80, 0, 170, 255); break;
+    case 36: c.Set(0, 80, 170, 255); break;
+    case 37: c.Set(80, 80, 170, 255); break;
+    case 38: c.Set(20, 250, 250, 255); break;
+    case 39: c.Set(20, 170, 170, 255); break;
+    case 40: c.Set(20, 250, 170, 255); break;
+    case 41: c.Set(20, 170, 250, 255); break;
+    case 42: c.Set(250, 20, 250, 255); break;
+    case 43: c.Set(170, 20, 170, 255); break;
+    case 44: c.Set(250, 20, 170, 255); break;
+    case 45: c.Set(170, 20, 250, 255); break;
+    case 46: c.Set(250, 250, 20, 255); break;
+    case 47: c.Set(170, 170, 20, 255); break;
+    case 48: c.Set(170, 250, 20, 255); break;
+    case 49: c.Set(250, 170, 20, 255); break;
+    case 50: c.Set(120, 0, 0, 255); break;
+    }
+    return c;
+}
 
 /*
 void Sec30::SetVecValue(wxWindow *parent, wxString VariableName, double* Array, int nArray)

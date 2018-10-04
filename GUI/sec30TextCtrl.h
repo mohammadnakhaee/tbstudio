@@ -61,9 +61,9 @@ public:
 
    
 private:
-    //virtual void SendUpdateEvent();
-    // virtual void OnCellChanged(wxGridEvent &event); You should not use This Function Name. It seems it is connected by default without DECLARE_EVENT_TABLE()
-    //virtual void myOnKeyDown(wxKeyEvent &event);
+    virtual void SendUpdateEvent();
+     virtual void OnCellChanged(wxGridEvent &event); You should not use This Function Name. It seems it is connected by default without DECLARE_EVENT_TABLE()
+
        //DECLARE_EVENT_TABLE()
 };
 /******************************************************************************/

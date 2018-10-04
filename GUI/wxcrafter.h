@@ -22,6 +22,7 @@
 #include <wx/panel.h>
 #include <wx/stattext.h>
 #include <wx/notebook.h>
+#include <wx/dialog.h>
 #if wxVERSION_NUMBER >= 2900
 #include <wx/persist.h>
 #include <wx/persist/toplevel.h>
@@ -47,6 +48,8 @@ protected:
     wxRibbonPanel* m_ribbonPanel981;
     wxRibbonButtonBar* m_ribbonButtonBar983;
     wxRibbonPage* m_ribbonPage462;
+    wxRibbonPanel* m_ribbonPanel1043;
+    wxRibbonButtonBar* m_ribbonButtonBar1045;
     wxRibbonPage* m_ribbonPage606;
     wxRibbonPanel* m_ribbonPanel608;
     wxRibbonButtonBar* m_ribbonButtonBar610;
@@ -67,6 +70,7 @@ protected:
     virtual void MainFrameBaseClass_Move(wxMoveEvent& event) { event.Skip(); }
     virtual void BtnOpen_OnClick(wxRibbonButtonBarEvent& event) { event.Skip(); }
     virtual void BtnSave_OnClick(wxRibbonButtonBarEvent& event) { event.Skip(); }
+    virtual void BtnStructureStyle_OnClick(wxRibbonButtonBarEvent& event) { event.Skip(); }
     virtual void BtnMain_OnClick(wxRibbonButtonBarEvent& event) { event.Skip(); }
     virtual void BtnTerminal_OnClick(wxRibbonButtonBarEvent& event) { event.Skip(); }
     virtual void BtnGrid_OnClick(wxRibbonButtonBarEvent& event) { event.Skip(); }
@@ -110,6 +114,19 @@ protected:
 public:
     GridBaseClass(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(400,300), long style = wxTAB_TRAVERSAL);
     virtual ~GridBaseClass();
+};
+
+
+class ColorsBaseClass : public wxDialog
+{
+protected:
+
+protected:
+    virtual void OnClose(wxCloseEvent& event) { event.Skip(); }
+
+public:
+    ColorsBaseClass(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Colors"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxDEFAULT_DIALOG_STYLE|wxSTAY_ON_TOP|wxCLOSE_BOX|wxBORDER_STATIC);
+    virtual ~ColorsBaseClass();
 };
 
 #endif

@@ -118,6 +118,7 @@ MainFrame::MainFrame(wxWindow* parent)
     panelSizer1->Add(logfile, 1, wxEXPAND);
     CenteralPanel->SetSizer(panelSizer1);
     
+    LoadColorsForm();
     LoadUnitcellPanel();
     LoadStructurePanel();
     LoadOrbitalsPanel();
@@ -685,6 +686,8 @@ void MainFrame::sec30_OnUpdated(wxCommandEvent& event)
         EvaluateOrbitalsPanel();
     else if (info == _("BondsClass"))
         EvaluateBondsPanel();
+    else if (info == _("ColorsClass"))
+        EvaluateColorsPanel();
 }
 /****************************************************************************************************************************************************************/
 /****************************************************************************************************************************************************************/
@@ -755,6 +758,11 @@ void MainFrame::LoadBondsPanel()
     scrolledwindow->SetScrollRate(-1,15);
     bondsPanel->graph3d = graph3d;
 }
+
+void MainFrame::LoadColorsForm()
+{
+    ColorsForm = new ColorsClass(this, sec30);
+}
 /****************************************************************************************************************************************************************/
 /****************************************************************************************************************************************************************/
 void MainFrame::EvaluateUnitcellPanel()
@@ -784,16 +792,21 @@ void MainFrame::EvaluateBondsPanel()
 {
     if (ValidateBondsPanel()) ShowGraph3D();
 }
+
+void MainFrame::EvaluateColorsPanel()
+{
+    if (ValidateColorsPanel()) ShowGraph3D();
+}
 /****************************************************************************************************************************************************************/
 /****************************************************************************************************************************************************************/
 bool MainFrame::ValidateUnitCellPanel()
 {
-    bool isValid=true;
-    int AtomCnt=0;
-    double A,B,C;
-    double a[3],b[3],c[3];
-    double astrain,bstrain,cstrain;
-    double x,y,z;
+    bool isValid = true;
+    int AtomCnt = 0;
+    double A, B, C;
+    double a[3], b[3], c[3];
+    double astrain, bstrain, cstrain;
+    double x, y, z;
     int kind;
     int nRow = 0;
     int nCol = 0;
@@ -812,6 +825,12 @@ bool MainFrame::ValidateUnitCellPanel()
     isValid = isValid && sec30->GetVar(_("astrain[0]"), astrain);
     isValid = isValid && sec30->GetVar(_("bstrain[0]"), bstrain);
     isValid = isValid && sec30->GetVar(_("cstrain[0]"), cstrain);
+    for (int i0=0; i0<3; i0++)
+    {
+        a[i0]=a[i0]*astrain;
+        b[i0]=b[i0]*bstrain;
+        c[i0]=c[i0]*cstrain;
+    }
     
     int i=-1;
     bool isLineValid=true;
@@ -846,7 +865,7 @@ bool MainFrame::ValidateUnitCellPanel()
 
 bool MainFrame::ValidateStructurePanel()
 {
-    bool isValid=true;
+    bool isValid = true;
     bool CustomViewmode,TBViewmode,TBEssentialViewmode;
     sec30->GetRadioVar(_("CustomViewmode[0]"),CustomViewmode);
     sec30->GetRadioVar(_("TBViewmode[0]"),TBViewmode);
@@ -892,12 +911,53 @@ bool MainFrame::ValidateStructurePanel()
 bool MainFrame::ValidateOrbitalsPanel()
 {
     bool isValid = true;
+    
+    wxCheckTree* treectr = sec30->GetTreeObject(_("Orbitals"));
+    
+    int cnt=0;
+	std::stack<wxTreeItemId> items;
+	if (treectr->GetRootItem().IsOk())
+    {
+		items.push(treectr->GetRootItem());
+    }
+
+	while (!items.empty())
+	{
+		wxTreeItemId next = items.top();
+		items.pop();
+        
+		wxTreeItemIdValue cookie;
+		wxTreeItemId nextChild = treectr->GetFirstChild(next, cookie);
+		while (nextChild.IsOk())
+		{
+			items.push(nextChild);
+            wxString itemtext = treectr->GetItemText(nextChild);
+            if (itemtext.Contains(_("Shell"))) cnt++;
+			nextChild = treectr->GetNextSibling(nextChild);
+		}
+	}
+    
+    sec30->SetVar(_("nShells[0]"),cnt, false);
+    
+    
     return isValid;
 }
 
 bool MainFrame::ValidateBondsPanel()
 {
     bool isValid = true;
+    bool WorkingViewmode;
+    sec30->GetRadioVar(_("WorkingViewmode[0]"),WorkingViewmode);
+
+
+    
+    return isValid;
+}
+
+bool MainFrame::ValidateColorsPanel()
+{
+    bool isValid = true;
+    
     return isValid;
 }
 /****************************************************************************************************************************************************************/
@@ -958,4 +1018,46 @@ void MainFrame::FillBondsPanel()
                     eunitcellsctr->Append(item);
                 }
             }
+}
+
+int MainFrame::GetBonds(int* bonds)
+{
+    wxCheckTree* bondstreectr = sec30->GetTreeObject(_("Bonds"));
+    
+    int cnt=0;
+	std::stack<wxTreeItemId> items;
+	if (bondstreectr->GetRootItem().IsOk())
+    {
+		items.push(bondstreectr->GetRootItem());
+        
+        
+        cnt++;
+    }
+
+	while (!items.empty())
+	{
+		wxTreeItemId next = items.top();
+		items.pop();
+        
+		wxTreeItemIdValue cookie;
+		wxTreeItemId nextChild = bondstreectr->GetFirstChild(next, cookie);
+		while (nextChild.IsOk())
+		{
+			items.push(nextChild);
+            
+            
+            cnt++;
+			nextChild = bondstreectr->GetNextSibling(nextChild);
+		}
+	}
+
+	return cnt;
+}
+
+void MainFrame::BtnStructureStyle_OnClick(wxRibbonButtonBarEvent& event)
+{
+    if (ColorsForm->IsShown())
+        ColorsForm->Hide();
+    else
+        ColorsForm->Show(true);
 }
