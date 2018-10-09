@@ -20,7 +20,8 @@ BondsClass::BondsClass(wxWindow* parent, Sec30* sec30var, wxWindowID id, const w
     /**********************************************************************************************************************************************/
     sec30->AddGroupBox(this,_("Essential Unit-Cell"),wxColour(wxT("rgb(153,180,209)")));
     sec30->AddCheckBox(this, _("WorkingViewmode"), _("Show the working unit cells"));
-    sec30->AddListBox(this, _("EssentialUnitcellList"), 340, 120);
+    wxListBox* esslistctr = sec30->AddListBox(this, _("EssentialUnitcellList"), 340, 120);
+    esslistctr->Connect(wxEVT_COMMAND_LISTBOX_SELECTED, wxCommandEventHandler(BondsClass::EssList_OnSelected), NULL, this);
     /**********************************************************************************************************************************************/
     sec30->AddGroupBox(this,_("Connect Two Atoms"),wxColour(wxT("rgb(153,180,209)")));
     sec30->AddVarVector(this, 2, _("AtomIndex1"), _("int"), _("(i,n): Atom and Shell Index in Cell (0,0,0)"), 190, 50);
@@ -164,4 +165,9 @@ void BondsClass::OnDelete(wxCommandEvent &event)
     treectr->Delete(ClickedID);
     treectr->Update();
     treectr->Refresh(true);
+}
+
+void BondsClass::EssList_OnSelected(wxCommandEvent& event)
+{
+    sec30->SendUpdateEvent(this->GetName());
 }

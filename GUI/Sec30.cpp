@@ -42,19 +42,6 @@ void Sec30::AddButton(wxWindow *parent, int ButtonCnt, wxString* Labels, wxObjec
     }
 }
 
-void Sec30::AddButton(wxWindow *parent, int ButtonCnt, wxString* ButtonNames, wxString* Labels, wxObjectEventFunction* Funcs)
-{
-    wxBoxSizer* MySizer = new wxBoxSizer(wxHORIZONTAL);
-    parent->GetSizer()->Add(MySizer, 0, wxEXPAND, WXC_FROM_DIP(5));
-    for (int i=0; i < ButtonCnt; i++)
-    {
-        wxButton* btn = new wxButton(parent, wxID_ANY, Labels[i], wxDefaultPosition, wxDLG_UNIT(parent, wxSize(-1,-1)), 0);
-        MySizer->Add(btn, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
-        btn->SetName(ButtonNames[i]);
-        btn->Connect(wxEVT_COMMAND_BUTTON_CLICKED, Funcs[i], NULL, parent);
-    }
-}
-
 void Sec30::AddVarVector(wxWindow *parent, int VecCnt, wxString VariableName, wxString VariableType, wxString VecLabel, int LabelSize, int CtrlSize,bool EnableEvent)
 {
     wxBoxSizer* MySizer = new wxBoxSizer(wxHORIZONTAL);
@@ -326,7 +313,7 @@ wxScrolledWindow* Sec30::AddScrolledPanel(wxWindow *parent, int xCtrlSize, int y
     return ctr;
 }
 
-void Sec30::AddCheckListBox(wxWindow *parent, wxString VariableName, int xCtrlSize, int yCtrlSize)
+wxCheckListBox* Sec30::AddCheckListBox(wxWindow *parent, wxString VariableName, int xCtrlSize, int yCtrlSize)
 {
     wxBoxSizer* MySizer = new wxBoxSizer(wxHORIZONTAL);
     parent->GetSizer()->Add(MySizer, 0, wxLEFT|wxRIGHT|wxTOP|wxEXPAND, WXC_FROM_DIP(5));
@@ -339,9 +326,10 @@ void Sec30::AddCheckListBox(wxWindow *parent, wxString VariableName, int xCtrlSi
     ctr->SetMinSize(wxSize(xCtrlSize,yCtrlSize));
     checklists.insert(ichecklists,VariableName);
     ctr->SetName(VariableName);
+    return ctr;
 }
 
-void Sec30::AddListBox(wxWindow *parent, wxString VariableName, int xCtrlSize, int yCtrlSize)
+wxListBox* Sec30::AddListBox(wxWindow *parent, wxString VariableName, int xCtrlSize, int yCtrlSize)
 {
     wxBoxSizer* MySizer = new wxBoxSizer(wxHORIZONTAL);
     parent->GetSizer()->Add(MySizer, 0, wxLEFT|wxRIGHT|wxTOP|wxEXPAND, WXC_FROM_DIP(5));
@@ -354,6 +342,7 @@ void Sec30::AddListBox(wxWindow *parent, wxString VariableName, int xCtrlSize, i
     ctr->SetMinSize(wxSize(xCtrlSize,yCtrlSize));
     lists.insert(ilists,VariableName);
     ctr->SetName(VariableName);
+    return ctr;
 }
 
 void Sec30::GetDim(wxString VariableName, int& nRow, int& nCol)
@@ -595,7 +584,7 @@ wxColourPickerCtrl* Sec30::GetColorObject(wxString VariableName)
     wxColourPickerCtrl* ctr= (wxColourPickerCtrl*)FindWindowByName(VariableName,GetParent());
     return ctr;
 }
-
+    
 void Sec30::SaveToFile(wxString filepath, wxString filename)
 {
     wxString fname1 = filepath + wxT("/") + filename;

@@ -31,8 +31,9 @@ GraphClass::~GraphClass()
     DiscardAtomicStructure();
 }
 
-void GraphClass::CreateAtomicStructure(Sec30* sec30Var)
+void GraphClass::CreateAtomicStructure(Sec30* sec30Var, bool IsNewAllocate)
 {
+    bool isCountingMode = IsNewAllocate;
     sec30 = sec30Var;
     int nUnitcellAtoms = 0;
     sec30->GetVar(_("nAtoms[0]"),nUnitcellAtoms);
@@ -92,6 +93,7 @@ void GraphClass::CreateAtomicStructure(Sec30* sec30Var)
     }
     
     FindEssentials();
+    SetWorkingList(isellected, jsellected, ksellected);
     
     int lmin,lmax,mmin,mmax,nmin,nmax;
     if (CustomViewmode)
@@ -112,40 +114,49 @@ void GraphClass::CreateAtomicStructure(Sec30* sec30Var)
     if (nmin>nmax) {int dummy = nmax; nmax = nmin; nmin = dummy;}
     
     /************************************************/
-    int nShowingAtoms = 0;
-    sec30->GetVar(_("nShowingAtoms[0]"),nShowingAtoms);
-    int nShowingBonds = GetShowingBondCount(lmin, lmax, mmin, mmax, nmin, nmax, nUnitcellAtoms);
-    int ndoublearr[11]={nShowingAtoms,nShowingAtoms,nShowingAtoms,nShowingAtoms,nShowingBonds,nShowingBonds,nShowingBonds,nShowingBonds,nShowingBonds,nShowingBonds,nShowingBonds};
-    int nintarr[6]={nShowingAtoms,nShowingAtoms,nShowingAtoms,nShowingBonds,nShowingBonds,nShowingBonds};
-    glc->CreateDoubleArray(11,ndoublearr);
-    glc->CreateIntArray(6,nintarr);
+    if (!isCountingMode)
+    {
+        int ndoublearr[11]={nShowingAtoms,nShowingAtoms,nShowingAtoms,nShowingAtoms,nShowingBonds,nShowingBonds,nShowingBonds,nShowingBonds,nShowingBonds,nShowingBonds,nShowingBonds};
+        int nintarr[6]={nShowingAtoms,nShowingAtoms,nShowingAtoms,nShowingBonds,nShowingBonds,nShowingBonds};
+        glc->CreateDoubleArray(11,ndoublearr);
+        glc->CreateIntArray(6,nintarr);
+    }
+    else
+    {
+        nShowingAtoms = 0;
+        nShowingBonds = 0;
+    }
     /************************************************/
-    if ( CustomViewmode || TBViewmode)
+    if ( !WorkingViewmode && (CustomViewmode || TBViewmode))
     {
         /*************atoms************/
         int iAtom = -1;
         for (int i=lmax; i>=lmin; i--)
             for (int j=mmax; j>=mmin; j--)
                 for (int k=nmax; k>=nmin; k--)
-                    if (!WorkingViewmode || (WorkingViewmode && i==isellected && j==jsellected && k==ksellected && isSellected) || (WorkingViewmode && i==0 && j==0 && k==0 && isSellected))
                     for (int icell=0; icell<nUnitcellAtoms; icell++)
                     {
                         iAtom++;
-                        glc->DoubleArray[0][iAtom] = XArray[icell] + i*a[0] + j*b[0] + k*c[0];
-                        glc->DoubleArray[1][iAtom] = YArray[icell] + i*a[1] + j*b[1] + k*c[1];
-                        glc->DoubleArray[2][iAtom] = ZArray[icell] + i*a[2] + j*b[2] + k*c[2];
-                        glc->DoubleArray[3][iAtom] = GetAtomRadius(kind[icell]);
-                        int atomKindindex = kind[icell];
-                        if (atomKindindex < 1) atomKindindex = 1;
-                        if (atomKindindex > 118) atomKindindex = 118;
-                        wxColourPickerCtrl* cctrl = sec30->GetColorObject(_("AColor") + wxString::Format(wxT("%d"),atomKindindex));
-                        wxColour c = cctrl->GetColour();
-                        int r = c.Red();
-                        int g = c.Green();
-                        int b = c.Blue();
-                        glc->IntArray[0][iAtom] = r;
-                        glc->IntArray[1][iAtom] = g;
-                        glc->IntArray[2][iAtom] = b;
+                        if (!isCountingMode)
+                        {
+                            glc->DoubleArray[0][iAtom] = XArray[icell] + i*a[0] + j*b[0] + k*c[0];
+                            glc->DoubleArray[1][iAtom] = YArray[icell] + i*a[1] + j*b[1] + k*c[1];
+                            glc->DoubleArray[2][iAtom] = ZArray[icell] + i*a[2] + j*b[2] + k*c[2];
+                            glc->DoubleArray[3][iAtom] = GetAtomRadius(kind[icell]);
+                            int atomKindindex = kind[icell];
+                            if (atomKindindex < 1) atomKindindex = 1;
+                            if (atomKindindex > 118) atomKindindex = 118;
+                            wxColourPickerCtrl* cctrl = sec30->GetColorObject(_("AColor") + wxString::Format(wxT("%d"),atomKindindex));
+                            wxColour c = cctrl->GetColour();
+                            int r = c.Red();
+                            int g = c.Green();
+                            int b = c.Blue();
+                            glc->IntArray[0][iAtom] = r;
+                            glc->IntArray[1][iAtom] = g;
+                            glc->IntArray[2][iAtom] = b;
+                        }
+                        else
+                            nShowingAtoms = iAtom + 1;
                     }
                     
         /*************bonds************/
@@ -154,7 +165,6 @@ void GraphClass::CreateAtomicStructure(Sec30* sec30Var)
             for (int j=mmax; j>=mmin; j--)
                 for (int k=nmax; k>=nmin; k--)
                 {
-                    if (!WorkingViewmode || (WorkingViewmode && i==isellected && j==jsellected && k==ksellected && isSellected) || (WorkingViewmode && i==0 && j==0 && k==0 && isSellected))
                     for (int icell=0; icell<nUnitcellAtoms; icell++)
                     {
                         int iMyess, jMyess, kMyess;
@@ -182,28 +192,37 @@ void GraphClass::CreateAtomicStructure(Sec30* sec30Var)
                                 while (bond.IsOk() && isBondInRange)
                                 {
                                     iBond++;
-                                    wxString BondInfo = treectr->GetItemText(bond);
-                                    int iAtomIndex,nShellIndex,jAtomIndex,mShellIndex,bondtype;
-                                    GetBondInfo(BondInfo, iAtomIndex,nShellIndex,jAtomIndex,mShellIndex,bondtype);
-                                    //wxMessageBox(wxString::Format(wxT("%d,%d,%d,%d,%d"),iAtomIndex,nShellIndex,jAtomIndex,mShellIndex,bondtype));
-                                    glc->DoubleArray[4][iBond] = XArray[iAtomIndex] + i*a[0] + j*b[0] + k*c[0];
-                                    glc->DoubleArray[5][iBond] = YArray[iAtomIndex] + i*a[1] + j*b[1] + k*c[1];
-                                    glc->DoubleArray[6][iBond] = ZArray[iAtomIndex] + i*a[2] + j*b[2] + k*c[2];
-                                    glc->DoubleArray[7][iBond] = XArray[jAtomIndex] + (iMyess + i)*a[0] + (jMyess + j)*b[0] + (kMyess + k)*c[0];
-                                    glc->DoubleArray[8][iBond] = YArray[jAtomIndex] + (iMyess + i)*a[1] + (jMyess + j)*b[1] + (kMyess + k)*c[1];
-                                    glc->DoubleArray[9][iBond] = ZArray[jAtomIndex] + (iMyess + i)*a[2] + (jMyess + j)*b[2] + (kMyess + k)*c[2];
-                                    double radius = GetAtomRadius(kind[iAtomIndex]);
-                                    double radius2 = GetAtomRadius(kind[jAtomIndex]);
-                                    if (radius > radius2) radius = radius2;
-                                    glc->DoubleArray[10][iBond] = radius / 2.3;
-                                    wxColourPickerCtrl* cctrl = sec30->GetColorObject(_("BColor") + wxString::Format(wxT("%d"),bondtype));
-                                    wxColour c = cctrl->GetColour();
-                                    int r = c.Red();
-                                    int g = c.Green();
-                                    int b = c.Blue();
-                                    glc->IntArray[3][iBond] = r;
-                                    glc->IntArray[4][iBond] = g;
-                                    glc->IntArray[5][iBond] = b;
+                                    if (!isCountingMode)
+                                    {
+                                        wxString BondInfo = treectr->GetItemText(bond);
+                                        int iAtomIndex,nShellIndex,jAtomIndex,mShellIndex,bondtype;
+                                        GetBondInfo(BondInfo, iAtomIndex,nShellIndex,jAtomIndex,mShellIndex,bondtype);
+                                        //wxMessageBox(wxString::Format(wxT("%d,%d,%d,%d,%d"),iAtomIndex,nShellIndex,jAtomIndex,mShellIndex,bondtype));
+                                        bool isBondValid = (iAtomIndex >= 0 && iAtomIndex < nUnitcellAtoms) && (jAtomIndex >= 0 && jAtomIndex < nUnitcellAtoms);
+                                        if (isBondValid)
+                                        {
+                                            glc->DoubleArray[4][iBond] = XArray[iAtomIndex] + i*a[0] + j*b[0] + k*c[0];
+                                            glc->DoubleArray[5][iBond] = YArray[iAtomIndex] + i*a[1] + j*b[1] + k*c[1];
+                                            glc->DoubleArray[6][iBond] = ZArray[iAtomIndex] + i*a[2] + j*b[2] + k*c[2];
+                                            glc->DoubleArray[7][iBond] = XArray[jAtomIndex] + (iMyess + i)*a[0] + (jMyess + j)*b[0] + (kMyess + k)*c[0];
+                                            glc->DoubleArray[8][iBond] = YArray[jAtomIndex] + (iMyess + i)*a[1] + (jMyess + j)*b[1] + (kMyess + k)*c[1];
+                                            glc->DoubleArray[9][iBond] = ZArray[jAtomIndex] + (iMyess + i)*a[2] + (jMyess + j)*b[2] + (kMyess + k)*c[2];
+                                            double radius = GetAtomRadius(kind[iAtomIndex]);
+                                            double radius2 = GetAtomRadius(kind[jAtomIndex]);
+                                            if (radius > radius2) radius = radius2;
+                                            glc->DoubleArray[10][iBond] = radius / 2.3;
+                                            wxColourPickerCtrl* cctrl = sec30->GetColorObject(_("BColor") + wxString::Format(wxT("%d"),bondtype));
+                                            wxColour c = cctrl->GetColour();
+                                            int r = c.Red();
+                                            int g = c.Green();
+                                            int b = c.Blue();
+                                            glc->IntArray[3][iBond] = r;
+                                            glc->IntArray[4][iBond] = g;
+                                            glc->IntArray[5][iBond] = b;
+                                        }
+                                    }
+                                    else
+                                        nShowingBonds = iBond + 1;
                                     bond = treectr->GetNextSibling(bond);
                                 }
                             }
@@ -212,61 +231,103 @@ void GraphClass::CreateAtomicStructure(Sec30* sec30Var)
                 }
     }
     
-    if (TBEssentialViewmode)
+    if ((!WorkingViewmode && TBEssentialViewmode) || WorkingViewmode)
     {
         int i, j ,k;
-        
+        int nList0 = 0;
         /*************atoms************/
-        std::list<int>::iterator ii0 = EssentialListi.begin();
-        std::list<int>::iterator ij0 = EssentialListj.begin();
-        std::list<int>::iterator ik0 = EssentialListk.begin();
+        std::list<int>::iterator ii0, ij0, ik0;
+        if (!WorkingViewmode)
+        {
+            ii0 = EssentialListi.begin();
+            ij0 = EssentialListj.begin();
+            ik0 = EssentialListk.begin();
+            nList0 = EssentialListi.size();
+        }
+        else
+        {
+            ii0 = WorkingListi.begin();
+            ij0 = WorkingListj.begin();
+            ik0 = WorkingListk.begin();
+            nList0 = WorkingListi.size();
+        }
+        
         int iAtom = -1;
-        for (int s0=0; s0!=EssentialListi.size(); s0++)
+        for (int s0=0; s0!=nList0; s0++)
         {
             i = *ii0++;
             j = *ij0++;
             k = *ik0++;
-            if (!WorkingViewmode || (WorkingViewmode && i==isellected && j==jsellected && k==ksellected && isSellected) || (WorkingViewmode && i==0 && j==0 && k==0 && isSellected))
             for (int icell=0; icell<nUnitcellAtoms; icell++)
             {
                 iAtom++;
-                glc->DoubleArray[0][iAtom] = XArray[icell] + i*a[0] + j*b[0] + k*c[0];
-                glc->DoubleArray[1][iAtom] = YArray[icell] + i*a[1] + j*b[1] + k*c[1];
-                glc->DoubleArray[2][iAtom] = ZArray[icell] + i*a[2] + j*b[2] + k*c[2];
-                glc->DoubleArray[3][iAtom] = GetAtomRadius(kind[icell]);
-                int atomKindindex = kind[icell];
-                if (atomKindindex < 1) atomKindindex = 1;
-                if (atomKindindex > 118) atomKindindex = 118;
-                wxColourPickerCtrl* cctrl = sec30->GetColorObject(_("AColor") + wxString::Format(wxT("%d"),atomKindindex));
-                wxColour c = cctrl->GetColour();
-                int r = c.Red();
-                int g = c.Green();
-                int b = c.Blue();
-                glc->IntArray[0][iAtom] = r;
-                glc->IntArray[1][iAtom] = g;
-                glc->IntArray[2][iAtom] = b;
+                if (!isCountingMode)
+                {
+                    glc->DoubleArray[0][iAtom] = XArray[icell] + i*a[0] + j*b[0] + k*c[0];
+                    glc->DoubleArray[1][iAtom] = YArray[icell] + i*a[1] + j*b[1] + k*c[1];
+                    glc->DoubleArray[2][iAtom] = ZArray[icell] + i*a[2] + j*b[2] + k*c[2];
+                    glc->DoubleArray[3][iAtom] = GetAtomRadius(kind[icell]);
+                    int atomKindindex = kind[icell];
+                    if (atomKindindex < 1) atomKindindex = 1;
+                    if (atomKindindex > 118) atomKindindex = 118;
+                    wxColourPickerCtrl* cctrl = sec30->GetColorObject(_("AColor") + wxString::Format(wxT("%d"),atomKindindex));
+                    wxColour c = cctrl->GetColour();
+                    int r = c.Red();
+                    int g = c.Green();
+                    int b = c.Blue();
+                    glc->IntArray[0][iAtom] = r;
+                    glc->IntArray[1][iAtom] = g;
+                    glc->IntArray[2][iAtom] = b;
+                }
+                else
+                    nShowingAtoms = iAtom + 1;
             }
         }
         
         /*************bonds************/
-        ii0 = EssentialListi.begin();
-        ij0 = EssentialListj.begin();
-        ik0 = EssentialListk.begin();
+        nList0 = 0;
+        if (!WorkingViewmode)
+        {
+            ii0 = EssentialListi.begin();
+            ij0 = EssentialListj.begin();
+            ik0 = EssentialListk.begin();
+            nList0 = EssentialListi.size();
+        }
+        else
+        {
+            ii0 = WorkingListi.begin();
+            ij0 = WorkingListj.begin();
+            ik0 = WorkingListk.begin();
+            nList0 = WorkingListi.size();
+        }
+        
         int iBond = -1;
-        for (int s0=0; s0!=EssentialListi.size(); s0++)
+        for (int s0=0; s0!=nList0; s0++)
         {
             i = *ii0++;
             j = *ij0++;
             k = *ik0++;
-            if (!WorkingViewmode || (WorkingViewmode && i==isellected && j==jsellected && k==ksellected && isSellected) || (WorkingViewmode && i==0 && j==0 && k==0 && isSellected))
             for (int icell=0; icell<nUnitcellAtoms; icell++)
             {
                 int iMyess, jMyess, kMyess;
-                std::list<int>::iterator ii = EssentialListi.begin();
-                std::list<int>::iterator ij = EssentialListj.begin();
-                std::list<int>::iterator ik = EssentialListk.begin();
+                std::list<int>::iterator ii,ij,ik;
+                int nList = 0;
+                if (!WorkingViewmode)
+                {
+                    ii = EssentialListi.begin();
+                    ij = EssentialListj.begin();
+                    ik = EssentialListk.begin();
+                    nList = EssentialListi.size();
+                }
+                else
+                {
+                    ii = WorkingListi.begin();
+                    ij = WorkingListj.begin();
+                    ik = WorkingListk.begin();
+                    nList = WorkingListi.size();
+                }
                 
-                for (int s=0; s!=EssentialListi.size(); s++)
+                for (int s=0; s!=nList; s++)
                 {
                     /**Relatively, My Essential index in list**/
                     iMyess = *ii++;
@@ -286,28 +347,37 @@ void GraphClass::CreateAtomicStructure(Sec30* sec30Var)
                         while (bond.IsOk() && isBondInRange)
                         {
                             iBond++;
-                            wxString BondInfo = treectr->GetItemText(bond);
-                            int iAtomIndex,nShellIndex,jAtomIndex,mShellIndex,bondtype;
-                            GetBondInfo(BondInfo, iAtomIndex,nShellIndex,jAtomIndex,mShellIndex,bondtype);
-                            //wxMessageBox(wxString::Format(wxT("%d,%d,%d,%d,%d"),iAtomIndex,nShellIndex,jAtomIndex,mShellIndex,bondtype));
-                            glc->DoubleArray[4][iBond] = XArray[iAtomIndex] + i*a[0] + j*b[0] + k*c[0];
-                            glc->DoubleArray[5][iBond] = YArray[iAtomIndex] + i*a[1] + j*b[1] + k*c[1];
-                            glc->DoubleArray[6][iBond] = ZArray[iAtomIndex] + i*a[2] + j*b[2] + k*c[2];
-                            glc->DoubleArray[7][iBond] = XArray[jAtomIndex] + (iMyess + i)*a[0] + (jMyess + j)*b[0] + (kMyess + k)*c[0];
-                            glc->DoubleArray[8][iBond] = YArray[jAtomIndex] + (iMyess + i)*a[1] + (jMyess + j)*b[1] + (kMyess + k)*c[1];
-                            glc->DoubleArray[9][iBond] = ZArray[jAtomIndex] + (iMyess + i)*a[2] + (jMyess + j)*b[2] + (kMyess + k)*c[2];
-                            double radius = GetAtomRadius(kind[iAtomIndex]);
-                            double radius2 = GetAtomRadius(kind[jAtomIndex]);
-                            if (radius > radius2) radius = radius2;
-                            glc->DoubleArray[10][iBond] = radius / 2.3;
-                            wxColourPickerCtrl* cctrl = sec30->GetColorObject(_("BColor") + wxString::Format(wxT("%d"),bondtype));
-                            wxColour c = cctrl->GetColour();
-                            int r = c.Red();
-                            int g = c.Green();
-                            int b = c.Blue();
-                            glc->IntArray[3][iBond] = r;
-                            glc->IntArray[4][iBond] = g;
-                            glc->IntArray[5][iBond] = b;
+                            if (!isCountingMode)
+                            {
+                                wxString BondInfo = treectr->GetItemText(bond);
+                                int iAtomIndex,nShellIndex,jAtomIndex,mShellIndex,bondtype;
+                                GetBondInfo(BondInfo, iAtomIndex,nShellIndex,jAtomIndex,mShellIndex,bondtype);
+                                //wxMessageBox(wxString::Format(wxT("%d,%d,%d,%d,%d"),iAtomIndex,nShellIndex,jAtomIndex,mShellIndex,bondtype));
+                                bool isBondValid = (iAtomIndex >= 0 && iAtomIndex < nUnitcellAtoms) && (jAtomIndex >= 0 && jAtomIndex < nUnitcellAtoms);
+                                if (isBondValid)
+                                {
+                                    glc->DoubleArray[4][iBond] = XArray[iAtomIndex] + i*a[0] + j*b[0] + k*c[0];
+                                    glc->DoubleArray[5][iBond] = YArray[iAtomIndex] + i*a[1] + j*b[1] + k*c[1];
+                                    glc->DoubleArray[6][iBond] = ZArray[iAtomIndex] + i*a[2] + j*b[2] + k*c[2];
+                                    glc->DoubleArray[7][iBond] = XArray[jAtomIndex] + (iMyess + i)*a[0] + (jMyess + j)*b[0] + (kMyess + k)*c[0];
+                                    glc->DoubleArray[8][iBond] = YArray[jAtomIndex] + (iMyess + i)*a[1] + (jMyess + j)*b[1] + (kMyess + k)*c[1];
+                                    glc->DoubleArray[9][iBond] = ZArray[jAtomIndex] + (iMyess + i)*a[2] + (jMyess + j)*b[2] + (kMyess + k)*c[2];
+                                    double radius = GetAtomRadius(kind[iAtomIndex]);
+                                    double radius2 = GetAtomRadius(kind[jAtomIndex]);
+                                    if (radius > radius2) radius = radius2;
+                                    glc->DoubleArray[10][iBond] = radius / 2.3;
+                                    wxColourPickerCtrl* cctrl = sec30->GetColorObject(_("BColor") + wxString::Format(wxT("%d"),bondtype));
+                                    wxColour c = cctrl->GetColour();
+                                    int r = c.Red();
+                                    int g = c.Green();
+                                    int b = c.Blue();
+                                    glc->IntArray[3][iBond] = r;
+                                    glc->IntArray[4][iBond] = g;
+                                    glc->IntArray[5][iBond] = b;
+                                }
+                            }
+                            else
+                                nShowingBonds = iBond + 1;
                             bond = treectr->GetNextSibling(bond);
                         }
                     }
@@ -318,115 +388,12 @@ void GraphClass::CreateAtomicStructure(Sec30* sec30Var)
         
     }
     
-    glc->LoadToCanvas();
-}
-
-int GraphClass::GetShowingBondCount(int lmin, int lmax, int mmin, int mmax, int nmin, int nmax, int nUnitcellAtoms)
-{
-    int i, j ,k;
-    bool CustomViewmode,TBViewmode,TBEssentialViewmode;
-    sec30->GetRadioVar(_("CustomViewmode[0]"),CustomViewmode);
-    sec30->GetRadioVar(_("TBViewmode[0]"),TBViewmode);
-    sec30->GetRadioVar(_("TBEssentialViewmode[0]"),TBEssentialViewmode);
-    int iBond = 0;
+   
     
-    if (CustomViewmode || TBViewmode)
-    {
-        for (i=lmax; i>=lmin; i--)
-            for (j=mmax; j>=mmin; j--)
-                for (k=nmax; k>=nmin; k--)
-                {
-                    for (int icell=0; icell<nUnitcellAtoms; icell++)
-                    {
-                        int iMyess, jMyess, kMyess;
-                        std::list<int>::iterator ii = EssentialListi.begin();
-                        std::list<int>::iterator ij = EssentialListj.begin();
-                        std::list<int>::iterator ik = EssentialListk.begin();
-                        
-                        for (int s=0; s!=EssentialListi.size(); s++)
-                        {
-                            /**Relatively, My Essential index in list**/
-                            iMyess = *ii++;
-                            jMyess = *ij++;
-                            kMyess = *ik++;
-                            /******************************************/
-                            wxCheckTree* treectr = sec30->GetTreeObject(_("Bonds"));
-                            wxTreeItemId rootID = treectr->GetRootItem();
-                            wxString cellItem = wxString::Format(wxT("cell(0,0,0)-cell(%d,%d,%d)"), iMyess, jMyess, kMyess);
-                            wxTreeItemId lmnID = treectr->FindItemIn(rootID,cellItem);
-                            
-                            AtomIndexListi.clear();
-                            AtomIndexListj.clear();
-                            if (lmnID)
-                            {
-                                wxTreeItemIdValue cookie;
-                                wxTreeItemId bond = treectr->GetFirstChild(lmnID, cookie);
-                                bool isBondInRange = (iMyess + i <= lmax && iMyess + i >= lmin) && (jMyess + j <= mmax && jMyess + j >= mmin) && (kMyess + k <= nmax && kMyess + k >= nmin);
-                                while (bond.IsOk() && isBondInRange)
-                                {
-                                    wxString BondInfo = treectr->GetItemText(bond);
-                                    int iAtomIndex,nShellIndex,jAtomIndex,mShellIndex,bondtype;
-                                    GetBondInfo(BondInfo, iAtomIndex,nShellIndex,jAtomIndex,mShellIndex,bondtype);
-                                    if (isAtomIndexNew(iAtomIndex,jAtomIndex)) iBond++;
-                                    bond = treectr->GetNextSibling(bond);
-                                }
-                            }
-                        }
-                    }
-                }
-    }
-    
-    if (TBEssentialViewmode)
-    {
-        std::list<int>::iterator ii0 = EssentialListi.begin();
-        std::list<int>::iterator ij0 = EssentialListj.begin();
-        std::list<int>::iterator ik0 = EssentialListk.begin();
-        for (int s0=0; s0!=EssentialListi.size(); s0++)
-        {
-            i = *ii0++;
-            j = *ij0++;
-            k = *ik0++;
-            for (int icell=0; icell<nUnitcellAtoms; icell++)
-            {
-                int iMyess, jMyess, kMyess;
-                std::list<int>::iterator ii = EssentialListi.begin();
-                std::list<int>::iterator ij = EssentialListj.begin();
-                std::list<int>::iterator ik = EssentialListk.begin();
-                
-                for (int s=0; s!=EssentialListi.size(); s++)
-                {
-                    /**Relatively, My Essential index in list**/
-                    iMyess = *ii++;
-                    jMyess = *ij++;
-                    kMyess = *ik++;
-                    /******************************************/
-                    wxCheckTree* treectr = sec30->GetTreeObject(_("Bonds"));
-                    wxTreeItemId rootID = treectr->GetRootItem();
-                    wxString cellItem = wxString::Format(wxT("cell(0,0,0)-cell(%d,%d,%d)"), iMyess, jMyess, kMyess);
-                    wxTreeItemId lmnID = treectr->FindItemIn(rootID,cellItem);
-                    
-                    AtomIndexListi.clear();
-                    AtomIndexListj.clear();
-                    if (lmnID)
-                    {
-                        wxTreeItemIdValue cookie;
-                        wxTreeItemId bond = treectr->GetFirstChild(lmnID, cookie);
-                        bool isBondInRange = (iMyess + i <= lmax && iMyess + i >= lmin) && (jMyess + j <= mmax && jMyess + j >= mmin) && (kMyess + k <= nmax && kMyess + k >= nmin);
-                        while (bond.IsOk() && isBondInRange)
-                        {
-                            wxString BondInfo = treectr->GetItemText(bond);
-                            int iAtomIndex,nShellIndex,jAtomIndex,mShellIndex,bondtype;
-                            GetBondInfo(BondInfo, iAtomIndex,nShellIndex,jAtomIndex,mShellIndex,bondtype);
-                            if (isAtomIndexNew(iAtomIndex,jAtomIndex)) iBond++;
-                            bond = treectr->GetNextSibling(bond);
-                        }
-                    }
-                }
-            }
-        }
-    }
-    
-    return iBond;
+    if (isCountingMode)
+        CreateAtomicStructure(sec30, false);
+    else
+        glc->LoadToCanvas();
 }
 
 void GraphClass::GetBondInfo(const wxString& bondtextvar, int& i, int& n, int& j, int& m, int& bondtype)
@@ -496,6 +463,25 @@ void GraphClass::FindEssentials()
         for (int j=mmax; j>=mmin; j--)
             for (int k=nmax; k>=nmin; k--)
                 isItNew(i,j,k);
+}
+
+void GraphClass::SetWorkingList(int l, int m, int n)
+{
+    WorkingListi.clear();
+    WorkingListj.clear();
+    WorkingListk.clear();
+    std::list<int>::iterator ii = WorkingListi.begin();
+    std::list<int>::iterator ij = WorkingListj.begin();
+    std::list<int>::iterator ik = WorkingListk.begin();
+    WorkingListi.insert(ii,0);
+    WorkingListj.insert(ij,0);
+    WorkingListk.insert(ik,0);
+    if ( !(l==0 && m==0 && n==0) )
+    {
+        WorkingListi.insert(ii,l);
+        WorkingListj.insert(ij,m);
+        WorkingListk.insert(ik,n);
+    }
 }
 
 void GraphClass::DiscardAtomicStructure()

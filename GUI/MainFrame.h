@@ -64,9 +64,6 @@ protected:
     virtual void MainFrameBaseClass_Resize(wxSizeEvent& event);
     virtual void m_glCanvas17_OnPaint(wxPaintEvent& event);
     virtual void BtnTest_OnClick(wxCommandEvent& event);
-    virtual void Init_graph3d();
-    virtual void Init_graph2d0();
-    virtual void Init_graph2d();
     virtual void ClearGraph3D();
     virtual void ShowGraph3D();
     virtual void UpdateGraph3D();

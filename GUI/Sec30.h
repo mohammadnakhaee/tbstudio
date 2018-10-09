@@ -72,8 +72,8 @@ public:
     wxComboBox* AddComboCtrl(wxWindow *parent, wxString VariableName, wxString MyLabel, int LabelSize, int CtrlSize);
     wxColourPickerCtrl* AddColorCtrl(wxWindow *parent, wxString VariableName, wxString MyLabel, wxColour color, int LabelSize, int CtrlSize);
     wxScrolledWindow* AddScrolledPanel(wxWindow *parent, int xCtrlSize, int yCtrlSize, long style = wxSIMPLE_BORDER|wxHSCROLL|wxVSCROLL);
-    void AddCheckListBox(wxWindow *parent, wxString VariableName, int xCtrlSize, int yCtrlSize);
-    void AddListBox(wxWindow *parent, wxString VariableName, int xCtrlSize, int yCtrlSize);
+    wxCheckListBox* AddCheckListBox(wxWindow *parent, wxString VariableName, int xCtrlSize, int yCtrlSize);
+    wxListBox* AddListBox(wxWindow *parent, wxString VariableName, int xCtrlSize, int yCtrlSize);
     void GetDim(wxString VariableName, int& nRow, int& nCol);
     void SetVar(wxString VariableName, double Value, bool FireEvent);
     void SetVar(wxString VariableName, int Value, bool FireEvent);
@@ -92,10 +92,6 @@ public:
     bool GetVar(wxString VariableName, int iRow, int iCol, bool& Value);
     bool GetVar(wxString VariableName, int iRow, int iCol, wxString& Value);
     void SetRadioVar(wxString VariableName, bool Value, bool FireEvent);
-    void GetRadioVar(wxString VariableName, bool& Value);
-    void SetCheckVar(wxString VariableName, bool Value, bool FireEvent);
-    void GetCheckVar(wxString VariableName, bool& Value);
-    wxCheckTree* GetTreeObject(wxString VariableName);
     wxCheckListBox* GetCheckListObject(wxString VariableName);
     wxListBox* GetListObject(wxString VariableName);
     wxChoice* GetChoiceObject(wxString VariableName);

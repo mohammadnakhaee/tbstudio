@@ -25,6 +25,7 @@ protected:
     void Btn_Set_OnClick(wxCommandEvent& event);
     void BondsTree_RightDown(wxMouseEvent& event);
     void OnDelete(wxCommandEvent &event);
+    void EssList_OnSelected(wxCommandEvent& event);
     DECLARE_EVENT_TABLE()
 };
 #endif // BONDSCLASS_H

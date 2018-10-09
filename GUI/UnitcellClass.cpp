@@ -15,8 +15,6 @@ UnitcellClass::UnitcellClass(wxWindow* parent, Sec30* sec30var, wxWindowID id, c
     /*************Hidden Variables**************/
     sec30->AddVarVector(this, 1, _("nAtoms"), _("int"));
     sec30->SetVar(_("nAtoms[0]"),0, false);
-    sec30->AddVarVector(this, 1, _("nShowingAtoms"), _("int"));
-    sec30->SetVar(_("nShowingAtoms[0]"),0, false);
     sec30->AddVarVector(this, 1, _("nShells"), _("int"));
     sec30->SetVar(_("nShells[0]"),0, false);
     sec30->AddVarVector(this, 1, _("nShowingBonds"), _("int"));
