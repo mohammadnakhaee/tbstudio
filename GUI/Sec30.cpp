@@ -42,6 +42,19 @@ void Sec30::AddButton(wxWindow *parent, int ButtonCnt, wxString* Labels, wxObjec
     }
 }
 
+void Sec30::AddButton(wxWindow *parent, int ButtonCnt, wxString* ButtonNames, wxString* Labels, wxObjectEventFunction* Funcs)
+{
+    wxBoxSizer* MySizer = new wxBoxSizer(wxHORIZONTAL);
+    parent->GetSizer()->Add(MySizer, 0, wxEXPAND, WXC_FROM_DIP(5));
+    for (int i=0; i < ButtonCnt; i++)
+    {
+        wxButton* btn = new wxButton(parent, wxID_ANY, Labels[i], wxDefaultPosition, wxDLG_UNIT(parent, wxSize(-1,-1)), 0);
+        MySizer->Add(btn, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+        btn->SetName(ButtonNames[i]);
+        btn->Connect(wxEVT_COMMAND_BUTTON_CLICKED, Funcs[i], NULL, parent);
+    }
+}
+
 void Sec30::AddVarVector(wxWindow *parent, int VecCnt, wxString VariableName, wxString VariableType, wxString VecLabel, int LabelSize, int CtrlSize,bool EnableEvent)
 {
     wxBoxSizer* MySizer = new wxBoxSizer(wxHORIZONTAL);

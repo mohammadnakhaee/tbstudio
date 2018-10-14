@@ -51,7 +51,7 @@ MainFrame::MainFrame(wxWindow* parent)
     sec30=new Sec30(this);
     sec30->Connect(Sec30EVT_OnUpdated, wxCommandEventHandler(sec30_OnUpdated), NULL, this);
     
-    
+    /*
     CML::IOData* iod = static_cast<MainFrame*>(mainFrame)->iod;
     int SelectedCalcBoxIndex = iod->SelectedCalcBoxIndex;
     std::list<CML::CalcBox>::iterator cb=iod->CalcBoxs.begin();
@@ -67,9 +67,9 @@ MainFrame::MainFrame(wxWindow* parent)
     cb->UnitCell->nAtoms++;
     wxString str = wxString::Format(wxT("%02d: %s {%5.4f,%5.4f,%5.4f}"), cb->UnitCell->nAtoms,NewAtom.GetAtomLable(NewAtom.Kind),NewAtom.x,NewAtom.y,NewAtom.z);
     LBAtoms->Append(str);
+    */
     
-    
-    
+    /*
     std::list<double>::iterator x=tbmodel->XArray.end();
     tbmodel->XArray.insert(x,-0.5);
     tbmodel->XArray.insert(x,0.5);
@@ -90,12 +90,12 @@ MainFrame::MainFrame(wxWindow* parent)
     tbmodel->KindArray.insert(k,0.5);
     tbmodel->KindArray.insert(k,0.5);
     tbmodel->KindArray.insert(k,-0.5);
+    */
     
-    
-    Draw_Atom(0.5f, -0.5f, -0.5f, 0.0f, 255, 0, 0, 80, 60);
-    Draw_Atom(0.5f, -0.5f, 0.5f, 0.0f, 0, 255, 0, 80, 60);
-    Draw_Atom(0.5f, 0.5f, 0.5f, 0.0f, 0, 0, 255, 80, 60);
-    Draw_Atom(0.5f, 0.5f, -0.5f, 0.0f, 0, 125, 140, 80, 60);
+    //Draw_Atom(0.5f, -0.5f, -0.5f, 0.0f, 255, 0, 0, 80, 60);
+    //Draw_Atom(0.5f, -0.5f, 0.5f, 0.0f, 0, 255, 0, 80, 60);
+    //Draw_Atom(0.5f, 0.5f, 0.5f, 0.0f, 0, 0, 255, 80, 60);
+    //Draw_Atom(0.5f, 0.5f, -0.5f, 0.0f, 0, 125, 140, 80, 60);
     
     unsigned int AUI_Flags = wxAUI_MGR_ALLOW_FLOATING|wxAUI_MGR_ALLOW_ACTIVE_PANE|
     wxAUI_MGR_TRANSPARENT_DRAG|wxAUI_MGR_TRANSPARENT_HINT|wxAUI_MGR_VENETIAN_BLINDS_HINT|
@@ -107,7 +107,7 @@ MainFrame::MainFrame(wxWindow* parent)
     aui_mgr.GetArtProvider()->SetMetric(wxAUI_DOCKART_PANE_BORDER_SIZE, 1);
     
     wxPanel* CenteralPanel= new wxPanel(mainpanel);
-    CenterPanel->SetBackgroundColour(* wxRED); //Google it to know why it does not work.
+    //CenterPanel->SetBackgroundColour(* wxRED); //Google it to know why it does not work.
     aui_mgr.AddPane(CenteralPanel, wxCENTER);
     aui_mgr.Update();
     

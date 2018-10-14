@@ -92,6 +92,10 @@ public:
     bool GetVar(wxString VariableName, int iRow, int iCol, bool& Value);
     bool GetVar(wxString VariableName, int iRow, int iCol, wxString& Value);
     void SetRadioVar(wxString VariableName, bool Value, bool FireEvent);
+    void GetRadioVar(wxString VariableName, bool& Value);
+    void SetCheckVar(wxString VariableName, bool Value, bool FireEvent);
+    void GetCheckVar(wxString VariableName, bool& Value);
+    wxCheckTree* GetTreeObject(wxString VariableName);
     wxCheckListBox* GetCheckListObject(wxString VariableName);
     wxListBox* GetListObject(wxString VariableName);
     wxChoice* GetChoiceObject(wxString VariableName);
