@@ -579,6 +579,91 @@ void MyGLContext::Draw_Atom(float r, float x, float y, float z, GLubyte R, GLuby
     glPopMatrix();
 }
 
+void MyGLContext::Draw_UnitCellBox(float a[3], float b[3], float c[3], float i, float j, float k, GLubyte R, GLubyte G, GLubyte B)
+{
+    glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
+    glPushMatrix();
+    glColor3ub(R, G, B);
+    
+    glBegin(GL_QUADS);
+    float x0, y0, z0;
+    
+    x0 = i*a[0] + j*b[0] + k*c[0];
+    y0 = i*a[1] + j*b[1] + k*c[1];
+    z0 = i*a[2] + j*b[2] + k*c[2];
+    
+    glVertex3f(x0,y0,z0);
+    glVertex3f(x0 + a[0], y0 + a[1], z0 + a[2]);
+    glVertex3f(x0 + a[0] + b[0],y0 + a[1] + b[1],z0 + a[2] + b[2]);
+    glVertex3f(x0 + b[0],y0 + b[1],z0 + b[2]);
+    
+    glVertex3f(x0 + b[0],y0 + b[1],z0 + b[2]);
+    glVertex3f(x0 + a[0] + b[0],y0 + a[1] + b[1],z0 + a[2] + b[2]);
+    glVertex3f(x0 + a[0], y0 + a[1], z0 + a[2]);
+    glVertex3f(x0,y0,z0);
+    
+    glVertex3f(x0,y0,z0);
+    glVertex3f(x0 + a[0], y0 + a[1], z0 + a[2]);
+    glVertex3f(x0 + a[0] + c[0],y0 + a[1] + c[1],z0 + a[2] + c[2]);
+    glVertex3f(x0 + c[0],y0 + c[1],z0 + c[2]);
+    
+    glVertex3f(x0 + c[0],y0 + c[1],z0 + c[2]);
+    glVertex3f(x0 + a[0] + c[0],y0 + a[1] + c[1],z0 + a[2] + c[2]);
+    glVertex3f(x0 + a[0], y0 + a[1], z0 + a[2]);
+    glVertex3f(x0,y0,z0);
+    
+    glVertex3f(x0,y0,z0);
+    glVertex3f(x0 + b[0], y0 + b[1], z0 + b[2]);
+    glVertex3f(x0 + b[0] + c[0],y0 + b[1] + c[1],z0 + b[2] + c[2]);
+    glVertex3f(x0 + c[0],y0 + c[1],z0 + c[2]);
+    
+    glVertex3f(x0 + c[0],y0 + c[1],z0 + c[2]);
+    glVertex3f(x0 + b[0] + c[0],y0 + b[1] + c[1],z0 + b[2] + c[2]);
+    glVertex3f(x0 + b[0], y0 + b[1], z0 + b[2]);
+    glVertex3f(x0,y0,z0);
+    
+    
+    x0 = (i+1)*a[0] + (j+1)*b[0] + (k+1)*c[0];
+    y0 = (i+1)*a[1] + (j+1)*b[1] + (k+1)*c[1];
+    z0 = (i+1)*a[2] + (j+1)*b[2] + (k+1)*c[2];
+    
+    glVertex3f(x0,y0,z0);
+    glVertex3f(x0 - a[0], y0 - a[1], z0 - a[2]);
+    glVertex3f(x0 - a[0] - b[0],y0 - a[1] - b[1],z0 - a[2] - b[2]);
+    glVertex3f(x0 - b[0],y0 - b[1],z0 - b[2]);
+    
+    glVertex3f(x0 - b[0],y0 - b[1],z0 - b[2]);
+    glVertex3f(x0 - a[0] - b[0],y0 - a[1] - b[1],z0 - a[2] - b[2]);
+    glVertex3f(x0 - a[0], y0 - a[1], z0 - a[2]);
+    glVertex3f(x0,y0,z0);
+    
+    glVertex3f(x0,y0,z0);
+    glVertex3f(x0 - a[0], y0 - a[1], z0 - a[2]);
+    glVertex3f(x0 - a[0] - c[0],y0 - a[1] - c[1],z0 - a[2] - c[2]);
+    glVertex3f(x0 - c[0],y0 - c[1],z0 - c[2]);
+    
+    glVertex3f(x0 - c[0],y0 - c[1],z0 - c[2]);
+    glVertex3f(x0 - a[0] - c[0],y0 - a[1] - c[1],z0 - a[2] - c[2]);
+    glVertex3f(x0 - a[0], y0 - a[1], z0 - a[2]);
+    glVertex3f(x0,y0,z0);
+    
+    glVertex3f(x0,y0,z0);
+    glVertex3f(x0 - b[0], y0 - b[1], z0 - b[2]);
+    glVertex3f(x0 - b[0] - c[0],y0 - b[1] - c[1],z0 - b[2] - c[2]);
+    glVertex3f(x0 - c[0],y0 - c[1],z0 - c[2]);
+    
+    glVertex3f(x0 - c[0],y0 - c[1],z0 - c[2]);
+    glVertex3f(x0 - b[0] - c[0],y0 - b[1] - c[1],z0 - b[2] - c[2]);
+    glVertex3f(x0 - b[0], y0 - b[1], z0 - b[2]);
+    glVertex3f(x0,y0,z0);
+    
+    glEnd();
+    
+    glPopMatrix();
+    glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
+}
+
+
 void MyGLContext::Draw_Bond(float x0, float y0, float z0, float x1, float y1, float z1, float radius, GLubyte R, GLubyte G, GLubyte B, int Slices, int Stacks)
 {
     float pi180 = 3.14159265/180.0;
@@ -598,22 +683,59 @@ void MyGLContext::Draw_Bond(float x0, float y0, float z0, float x1, float y1, fl
     glPopMatrix();
 }
 
+void MyGLContext::Draw_Vector(float x0, float y0, float z0, float x1, float y1, float z1, float radius, GLubyte R, GLubyte G, GLubyte B, int Slices, int Stacks)
+{
+    float ConeHeight = 0.15f;
+    float pi180 = 3.14159265/180.0;
+    float r = sqrt((x1-x0)*(x1-x0) + (y1-y0)*(y1-y0) + (z1-z0)*(z1-z0));
+    float th = 0;
+    if (r<=0)
+        th=0;
+    else
+        th = acos((z1-z0)/r) / pi180;
+    float phi = atan2((y1-y0),(x1-x0)) / pi180;
+    glPushMatrix();
+    glColor3ub(R, G, B);
+    glTranslatef(x0, y0, z0);
+    glRotatef(phi, 0.0f, 0.0f, 1.0f);
+    glRotatef(th, 0.0f, 1.0f, 0.0f);
+    gluCylinder(quad, radius, radius, r - ConeHeight, Slices, Stacks);
+    glPopMatrix();
+    
+    glPushMatrix();
+    glColor3ub(R, G, B);
+    glTranslatef(x1 / r * (r-ConeHeight), y1 / r * (r-ConeHeight), z1 / r * (r-ConeHeight));
+    glRotatef(phi, 0.0f, 0.0f, 1.0f);
+    glRotatef(th, 0.0f, 1.0f, 0.0f);
+    gluCylinder(quad, 0.0f, 2.3f*radius, 0.000001f, Slices, Stacks);
+    glPopMatrix();
+    
+    glPushMatrix();
+    glColor3ub(R, G, B);
+    glTranslatef(x1 / r * (r-ConeHeight), y1 / r * (r-ConeHeight), z1 / r * (r-ConeHeight));
+    glRotatef(phi, 0.0f, 0.0f, 1.0f);
+    glRotatef(th, 0.0f, 1.0f, 0.0f);
+    gluCylinder(quad, 2.3f*radius, 0.0f, ConeHeight, Slices, Stacks);
+    glPopMatrix();
+}
+
 //check it
 //void cleanup() // call once when you exit program
 //{
 //  gluDeleteQuadric(qobj);
 //}
 
-void MyGLContext::Draw_Lattice(int nColDArray, int* nDArray, double** DArray, int nColIArray, int* nIArray, int** IArray)
+void MyGLContext::Draw_Lattice(int nColDArray, int* nDArray, double** DArray, int nColIArray, int* nIArray, int** IArray, double Coordinate[3][3])
 {
+    if (nColDArray == 0) return;
     /***********************************************************************************/
     /* The structure of data: (note that the number of atoms and bonds can be different)
-     * DArray[0][:] DArray[1][:] DArray[2][:] DArray[3][:] DArray[4][:] DArray[5][:] DArray[6][:] DArray[7][:] DArray[8][:] DArray[9][:] DArray[10][:]  IArray[0][:]   IArray[1][:]   IArray[2][:]  IArray[3][:]   IArray[4][:]   IArray[5][:]
-     *      x0          y0           z0           r0           x1bond0     y1bond0     z1bond0      x2bond0      y2bond0      z2bond0      rbond0         AtomRed0      AtomGreen0     AtomBlue0       BondRed0      BondGreen0    BondBlue0
-     *      x1          y1           z1           r1           x1bond1     y1bond1     z1bond1      x2bond1      y2bond1      z2bond1      rbond1         AtomRed1      AtomGreen1     AtomBlue1       BondRed1      BondGreen1    BondBlue1
-     *      x2          y2           z2           r2           x1bond2     y1bond2     z1bond2      x2bond2      y2bond2      z2bond2      rbond2         AtomRed2      AtomGreen2     AtomBlue2       BondRed2      BondGreen2    BondBlue2
-     *                                                         x1bond3     y1bond3     z1bond3      x2bond3      y2bond3      z2bond3      rbond3                                                      BondRed3      BondGreen3    BondBlue3
-     *                                                         x1bond4     y1bond4     z1bond4      x2bond4      y2bond4      z2bond4      rbond4                                                      BondRed4      BondGreen4    BondBlue4
+     * DArray[0][:] DArray[1][:] DArray[2][:] DArray[3][:] DArray[4][:] DArray[5][:] DArray[6][:] DArray[7][:] DArray[8][:] DArray[9][:] DArray[10][:] DArray[11][:] DArray[12][:] DArray[13][:] IArray[0][:]   IArray[1][:]   IArray[2][:]  IArray[3][:]   IArray[4][:]  IArray[5][:]  IArray[6][:] IArray[7][:] IArray[8][:]       IArray[9][:]
+     *      x0          y0           z0           r0           x1bond0     y1bond0     z1bond0      x2bond0      y2bond0      z2bond0      rbond0          a0             a1            a2        AtomRed0      AtomGreen0     AtomBlue0       BondRed0      BondGreen0    BondBlue0     unitcell0i    unitcell0j  unitcell0k        xyzCoord=0,1
+     *      x1          y1           z1           r1           x1bond1     y1bond1     z1bond1      x2bond1      y2bond1      z2bond1      rbond1          b0             b1            b2        AtomRed1      AtomGreen1     AtomBlue1       BondRed1      BondGreen1    BondBlue1     unitcell1i    unitcell1j  unitcell1k        abcCoord=0,1
+     *      x2          y2           z2           r2           x1bond2     y1bond2     z1bond2      x2bond2      y2bond2      z2bond2      rbond2          c0             c1            c2        AtomRed2      AtomGreen2     AtomBlue2       BondRed2      BondGreen2    BondBlue2     unitcell2i    unitcell2j  unitcell2k      UnitCellMode=0,1,2
+     *                                                         x1bond3     y1bond3     z1bond3      x2bond3      y2bond3      z2bond3      rbond3                                                                                              BondRed3      BondGreen3    BondBlue3     unitcell3i    unitcell3j  unitcell3k
+     *                                                         x1bond4     y1bond4     z1bond4      x2bond4      y2bond4      z2bond4      rbond4                                                                                              BondRed4      BondGreen4    BondBlue4
      */
     /***********************************************************************************/
     for (int i=0; i<nDArray[0]; i++)
@@ -626,9 +748,65 @@ void MyGLContext::Draw_Lattice(int nColDArray, int* nDArray, double** DArray, in
         Draw_Bond((float)DArray[4][i], (float)DArray[5][i], (float)DArray[6][i],(float)DArray[7][i], (float)DArray[8][i], (float)DArray[9][i], (float)DArray[10][i], (GLubyte)IArray[3][i], (GLubyte)IArray[4][i], (GLubyte)IArray[5][i] ,23,2);
     }
     
+    //try{}
+    //catch(std::exception& ex)
+    //{wxMessageBox(ex.what());}
+    
+    float a[3],b[3],c[3];
+    a[0] = (float)DArray[11][0];
+    a[1] = (float)DArray[12][0];
+    a[2] = (float)DArray[13][0];
+    b[0] = (float)DArray[11][1];
+    b[1] = (float)DArray[12][1];
+    b[2] = (float)DArray[13][1];
+    c[0] = (float)DArray[11][2];
+    c[1] = (float)DArray[12][2];
+    c[2] = (float)DArray[13][2];
+    
+    int xyzCoord = IArray[9][0];
+    int abcCoord = IArray[9][1];
+    int UnitCellMode = IArray[9][2];
+
+    if (xyzCoord != 0)
+    {
+        Draw_Vector(0.0f, 0.0f, 0.0f, (float)Coordinate[0][0], (float)Coordinate[0][1], (float)Coordinate[0][2], 0.018f, (GLubyte)255, (GLubyte)0, (GLubyte)0 ,23,2);
+        Draw_Vector(0.0f, 0.0f, 0.0f, (float)Coordinate[1][0], (float)Coordinate[1][1], (float)Coordinate[1][2], 0.018f, (GLubyte)0, (GLubyte)255, (GLubyte)0 ,23,2);
+        Draw_Vector(0.0f, 0.0f, 0.0f, (float)Coordinate[2][0], (float)Coordinate[2][1], (float)Coordinate[2][2], 0.018f, (GLubyte)0, (GLubyte)0, (GLubyte)255 ,23,2);
+    }
+    
+    if (abcCoord != 0)
+    {
+        Draw_Vector(0.0f, 0.0f, 0.0f, a[0], a[1], a[2], 0.012f, (GLubyte)175, (GLubyte)50, (GLubyte)50 ,23,2);
+        Draw_Vector(0.0f, 0.0f, 0.0f, b[0], b[1], b[2], 0.012f, (GLubyte)50, (GLubyte)175, (GLubyte)50 ,23,2);
+        Draw_Vector(0.0f, 0.0f, 0.0f, c[0], c[1], c[2], 0.012f, (GLubyte)50, (GLubyte)50, (GLubyte)175 ,23,2);
+    }
+    
+    if (xyzCoord != 0 || abcCoord != 0) Draw_Atom(0.036f, 0.0f, 0.0f, 0.0f, (GLubyte)0, (GLubyte)0, (GLubyte)0, 30, 20);
+
+    if (UnitCellMode != 0)
+    {
+        if (UnitCellMode == 1)
+        {
+            for (int i=0; i<nIArray[6]; i++)
+            {
+                Draw_UnitCellBox(a, b, c, 0, 0, 0, (GLubyte)0, (GLubyte)0, (GLubyte)0);
+            }
+
+        }
+        else
+        {
+            for (int i=0; i<nIArray[6]; i++)
+            {
+                int icell = IArray[6][i];
+                int jcell = IArray[7][i];
+                int kcell = IArray[8][i];
+                Draw_UnitCellBox(a, b, c, icell, jcell, kcell, (GLubyte)0, (GLubyte)0, (GLubyte)0);
+            }
+        }
+    }
 }
 
-void MyGLContext::Draw3D(int nColDArray, int* nDArray, double** DArray, int nColIArray, int* nIArray, int** IArray, float xMove, float yMove, float XCam, float YCam, float zoom, float zoomCam, float w, float h)
+void MyGLContext::Draw3D(int nColDArray, int* nDArray, double** DArray, int nColIArray, int* nIArray, int** IArray, double Coordinate[3][3], float xMove, float yMove, float XCam, float YCam, float zoom, float zoomCam, float w, float h)
 {
     glEnable(GL_LIGHTING);
     GLfloat ambient[] = { 0.065, 0.065, 0.065, 0.065 };
@@ -654,7 +832,6 @@ void MyGLContext::Draw3D(int nColDArray, int* nDArray, double** DArray, int nCol
     //glRotatef(xangle, (float)sin(theta), -(float)cos(theta), 0.0f);
     //glRotatef(zangle, 0.0f, 0.0f, 1.0f);
     
-    
     //Polygons3D(); //It works, but we do not need it no longer
     //Glu Functions Begin
     quad = gluNewQuadric();
@@ -665,7 +842,7 @@ void MyGLContext::Draw3D(int nColDArray, int* nDArray, double** DArray, int nCol
     //glEnable(GL_BLEND);
     //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     //glHint(GL_LINE_SMOOTH_HINT, GL_DONT_CARE);
-    Draw_Lattice(nColDArray, nDArray, DArray, nColIArray, nIArray, IArray);
+    Draw_Lattice(nColDArray, nDArray, DArray, nColIArray, nIArray, IArray, Coordinate);
     gluDeleteQuadric(quad);
     //Glu Functions End
     glFlush();  // Render now
@@ -718,6 +895,26 @@ MyGLCanvas::MyGLCanvas(wxWindow *parent, int DimVar, int *attribList)
             ++i;
         }
     }
+    
+    Coordinate0[0][0] = 1.0;
+    Coordinate0[0][1] = 0.0;
+    Coordinate0[0][2] = 0.0;
+    Coordinate0[1][0] = 0.0;
+    Coordinate0[1][1] = 1.0;
+    Coordinate0[1][2] = 0.0;
+    Coordinate0[2][0] = 0.0;
+    Coordinate0[2][1] = 0.0;
+    Coordinate0[2][2] = 1.0;
+    
+    Coordinate1[0][0] = 1.0;
+    Coordinate1[0][1] = 0.0;
+    Coordinate1[0][2] = 0.0;
+    Coordinate1[1][0] = 0.0;
+    Coordinate1[1][1] = 1.0;
+    Coordinate1[1][2] = 0.0;
+    Coordinate1[2][0] = 0.0;
+    Coordinate1[2][1] = 0.0;
+    Coordinate1[2][2] = 1.0;
 }
 
 void MyGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
@@ -748,9 +945,7 @@ void MyGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
     //glMatrixMode(GL_MODELVIEW);
     //canvas.DrawRotatedCube(m_xangle, m_yangle);
     
-
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // Black and opaque
-    
     
     int w,h;
     w=ClientSize.x;
@@ -778,7 +973,7 @@ void MyGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
         
         if (Dim==3)
             context.Draw3D(NumberOfDoubleArrays, nDoubleArray, DoubleArray1,
-                            NumberOfIntArrays, nIntArray, IntArray,
+                            NumberOfIntArrays, nIntArray, IntArray, Coordinate1,
                             XMove, YMove, XCam, YCam, Zoom, ZoomCam, w3d,h3d);
         else
             context.Draw2D();
@@ -791,7 +986,7 @@ void MyGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
         
         if (Dim==3)
             context.Draw3D(NumberOfDoubleArrays, nDoubleArray, DoubleArray1,
-                            NumberOfIntArrays, nIntArray, IntArray,
+                            NumberOfIntArrays, nIntArray, IntArray, Coordinate1,
                             XMove, YMove, XCam, YCam, Zoom, ZoomCam, w3d,h3d);
         else
             context.Draw2D();
@@ -802,7 +997,7 @@ void MyGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
     {
         if (Dim==3)
             context.Draw3D(NumberOfDoubleArrays, nDoubleArray, DoubleArray1,
-                            NumberOfIntArrays, nIntArray, IntArray,
+                            NumberOfIntArrays, nIntArray, IntArray, Coordinate1,
                             XMove, YMove, XCam, YCam, Zoom, ZoomCam, w3d,h3d);
         else
             context.Draw2D();
@@ -872,15 +1067,13 @@ void MyGLCanvas::OnKeyDown(wxKeyEvent& event)
 void MyGLCanvas::OnMouseWheel(wxMouseEvent& event)
 {
     bool scrldwn = event.GetWheelRotation() < 0;
-    float delta = 0.005*0.01f*event.GetWheelDelta();
-    //scrldwn=scrldwn;
-    //int d = event.GetWheelDelta();
+    //float delta = 0.01*0.01f*event.GetWheelDelta(); //Constant delta
+    float delta = (ZoomCam*0.1)*0.01f*event.GetWheelDelta(); //Zoom dependent delta (It seems better)
     if (scrldwn)
         ZoomCam = ZoomCam + delta;
     else
         ZoomCam = ZoomCam - delta;
     if (ZoomCam <=0.001) ZoomCam=0.001;
-    
     Refresh(false);
 }
 
@@ -890,7 +1083,6 @@ void MyGLCanvas::OnSpinTimer(wxTimerEvent& WXUNUSED(event))
         Spin(1.0, 0.0 , 0.0);
     else
         Animate();
-    
 }
 
 void MyGLCanvas::OnMouseLeftDown(wxMouseEvent& event)
@@ -1032,12 +1224,25 @@ void MyGLCanvas::DoRotate(float l, float m, float Theta)
     double c = cos(Theta);
     double cr2 = c/r2;
     double sr2 = sr/r;
+    
+    double a,b,bc,zs;
+    for (int i=0; i<3; i++)
+    {
+        a = (m*Coordinate0[i][0] - l*Coordinate0[i][1])/r2;
+        b = l*Coordinate0[i][0] + m*Coordinate0[i][1];
+        bc = b*cr2;
+        zs = Coordinate0[i][2]*sr2;
+        Coordinate1[i][0] = m*a + l*bc - l*r*zs;
+        Coordinate1[i][1] = -l*a + m*bc - m*r*zs;
+        Coordinate1[i][2] = Coordinate0[i][2]*c + b*sr;
+    }
+    
     for (int i=0; i<nDoubleArray[0]; i++)
     {
-        double a = (m*DoubleArray0[0][i] - l*DoubleArray0[1][i])/r2;
-        double b = l*DoubleArray0[0][i] + m*DoubleArray0[1][i];
-        double bc = b*cr2;
-        double zs = DoubleArray0[2][i]*sr2;
+        a = (m*DoubleArray0[0][i] - l*DoubleArray0[1][i])/r2;
+        b = l*DoubleArray0[0][i] + m*DoubleArray0[1][i];
+        bc = b*cr2;
+        zs = DoubleArray0[2][i]*sr2;
         DoubleArray1[0][i] = m*a + l*bc - l*r*zs;
         DoubleArray1[1][i] = -l*a + m*bc - m*r*zs;
         DoubleArray1[2][i] = DoubleArray0[2][i]*c + b*sr;
@@ -1045,25 +1250,35 @@ void MyGLCanvas::DoRotate(float l, float m, float Theta)
     
     for (int i=0; i<nDoubleArray[4]; i++)
     {
-        double a = (m*DoubleArray0[4][i] - l*DoubleArray0[5][i])/r2;
-        double b = l*DoubleArray0[4][i] + m*DoubleArray0[5][i];
-        double bc = b*cr2;
-        double zs = DoubleArray0[6][i]*sr2;
+        a = (m*DoubleArray0[4][i] - l*DoubleArray0[5][i])/r2;
+        b = l*DoubleArray0[4][i] + m*DoubleArray0[5][i];
+        bc = b*cr2;
+        zs = DoubleArray0[6][i]*sr2;
         DoubleArray1[4][i] = m*a + l*bc - l*r*zs;
         DoubleArray1[5][i] = -l*a + m*bc - m*r*zs;
         DoubleArray1[6][i] = DoubleArray0[6][i]*c + b*sr;
     }
     
-    
     for (int i=0; i<nDoubleArray[7]; i++)
     {
-        double a = (m*DoubleArray0[7][i] - l*DoubleArray0[8][i])/r2;
-        double b = l*DoubleArray0[7][i] + m*DoubleArray0[8][i];
-        double bc = b*cr2;
-        double zs = DoubleArray0[9][i]*sr2;
+        a = (m*DoubleArray0[7][i] - l*DoubleArray0[8][i])/r2;
+        b = l*DoubleArray0[7][i] + m*DoubleArray0[8][i];
+        bc = b*cr2;
+        zs = DoubleArray0[9][i]*sr2;
         DoubleArray1[7][i] = m*a + l*bc - l*r*zs;
         DoubleArray1[8][i] = -l*a + m*bc - m*r*zs;
         DoubleArray1[9][i] = DoubleArray0[9][i]*c + b*sr;
+    }
+    
+    for (int i=0; i<nDoubleArray[11]; i++)
+    {
+        a = (m*DoubleArray0[11][i] - l*DoubleArray0[12][i])/r2;
+        b = l*DoubleArray0[11][i] + m*DoubleArray0[12][i];
+        bc = b*cr2;
+        zs = DoubleArray0[13][i]*sr2;
+        DoubleArray1[11][i] = m*a + l*bc - l*r*zs;
+        DoubleArray1[12][i] = -l*a + m*bc - m*r*zs;
+        DoubleArray1[13][i] = DoubleArray0[13][i]*c + b*sr;
     }
     
     Refresh(false);
@@ -1159,11 +1374,85 @@ void MyGLCanvas::DiscardDoubleArrays1()
     NumberOfDoubleArrays=0;
 }
 
+void MyGLCanvas::RotationMatrix(double Theta, double lmn[3][3])
+{
+    double l = Coordinate0[2][0];
+    double m = Coordinate0[2][1];
+    double n = Coordinate0[2][2];
+    if (n >=0.0 && n<0.0000001)
+    {
+        n=0.0000001;
+    }
+    if (n <0.0 && n>-0.0000001)
+    {
+        n=-0.0000001;
+    }
+    if (n>0.9999999)
+    {
+        l=0.0000001;
+        m=0.0000001;
+        n=0.9999999;
+    }
+    if (n<-0.9999999)
+    {
+        l=0.0000001;
+        m=0.0000001;
+        n=-0.9999999;
+    }
+    double lmnnorm = sqrt(l*l + m*m + n*n);
+    l = l/lmnnorm;
+    m = m/lmnnorm;
+    n = n/lmnnorm;
+    lmn[0][0] = (n*(m*cos(Theta) + l*n*sin(Theta)))/(sqrt(n*n)*sqrt(1.0 - n*n));
+    lmn[1][0] = (n*(-(l*cos(Theta)) + m*n*sin(Theta)))/(sqrt(n*n)*sqrt(1.0 - n*n));
+    lmn[2][0] = -((n*sqrt(1.0 - n*n)*sin(Theta))/sqrt(n*n));
+    lmn[0][1] = (sqrt(n*n)*(l*n*cos(Theta) - m*sin(Theta)))/(n*sqrt(1 - n*n));
+    lmn[1][1] = (sqrt(n*n)*(m*n*cos(Theta) + l*sin(Theta)))/(n*sqrt(1 - n*n));
+    lmn[2][1] = -((n*sqrt(1 - n*n)*cos(Theta))/sqrt(n*n));
+    lmn[0][2] = l;
+    lmn[1][2] = m;
+    lmn[2][2] = n;
+}
+
 void MyGLCanvas::LoadToCanvas()
 {
-    for (int i=0; i<NumberOfDoubleArrays; i++)
+    double Theta = 0.0;
+    double lmn[3][3] = {0,0,0,0,0,0,0,0,0};
+    RotationMatrix(Theta, lmn);
+    double X1[3] = {lmn[0][0],lmn[1][0],lmn[2][0]};
+    double CosTheta = Coordinate0[0][0]*X1[0] + Coordinate0[0][1]*X1[1] + Coordinate0[0][2]*X1[2];
+    double direct[3] = {-Coordinate0[0][1]*X1[2] + X1[1]*Coordinate0[0][2], Coordinate0[0][0]*X1[2] - X1[0]*Coordinate0[0][2], -Coordinate0[0][0]*X1[1] + X1[0]*Coordinate0[0][1]};
+    double CosTheta2 = Coordinate0[2][0]*direct[0] + Coordinate0[2][1]*direct[1] + Coordinate0[2][2]*direct[2];
+    if (CosTheta2 > 0)
+        Theta = acos(CosTheta);
+    else
+        Theta = -acos(CosTheta);
+    RotationMatrix(Theta, lmn);
+    
+    for (int i=0; i<=2; i++)
+        for (int j=0; j<nDoubleArray[i]; j++)
+            DoubleArray1[i][j] = lmn[i][0] * DoubleArray[0][j] + lmn[i][1] * DoubleArray[1][j] + lmn[i][2] * DoubleArray[2][j];
+            
+    for (int i=3; i<=3; i++)
         for (int j=0; j<nDoubleArray[i]; j++)
             DoubleArray1[i][j] = DoubleArray[i][j];
+    
+    for (int i=4; i<=6; i++)
+        for (int j=0; j<nDoubleArray[i]; j++)
+            DoubleArray1[i][j] = lmn[i - 4][0] * DoubleArray[4][j] + lmn[i - 4][1] * DoubleArray[5][j] + lmn[i - 4][2] * DoubleArray[6][j];
+    
+    for (int i=7; i<=9; i++)
+        for (int j=0; j<nDoubleArray[i]; j++)
+            DoubleArray1[i][j] = lmn[i - 7][0] * DoubleArray[7][j] + lmn[i - 7][1] * DoubleArray[8][j] + lmn[i - 7][2] * DoubleArray[9][j];
+    
+    for (int i=10; i<=10; i++)
+        for (int j=0; j<nDoubleArray[i]; j++)
+            DoubleArray1[i][j] = DoubleArray[i][j];
+            
+    for (int i=11; i<=13; i++)
+        for (int j=0; j<nDoubleArray[i]; j++)
+            DoubleArray1[i][j] = lmn[i - 11][0] * DoubleArray[11][j] + lmn[i - 11][1] * DoubleArray[12][j] + lmn[i - 11][2] * DoubleArray[13][j];  
+    
     Reload();
 }
 
@@ -1176,6 +1465,10 @@ void MyGLCanvas::Reload()
     XMove = 0;
     YMove = 0;
     Zoom = 0;
+    for (int i=0; i<3; i++)
+        for (int j=0; j<3; j++)
+            Coordinate0[i][j] = Coordinate1[i][j];
+    
     for (int i=0; i<NumberOfDoubleArrays; i++)
         for (int j=0; j<nDoubleArray[i]; j++)
             DoubleArray0[i][j] = DoubleArray1[i][j];

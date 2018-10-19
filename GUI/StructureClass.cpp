@@ -33,9 +33,10 @@ StructureClass::StructureClass(wxWindow* parent, Sec30* sec30var, wxWindowID id,
     sec30->AddVarVector(this, 1, _("TBl"), _("int"), _("a direction"), 100, 100);
     sec30->AddVarVector(this, 1, _("TBm"), _("int"), _("b direction"), 100, 100);
     sec30->AddVarVector(this, 1, _("TBn"), _("int"), _("c direction"), 100, 100);
-    sec30->SetVar(_("TBl[0]"), 1, false);
-    sec30->SetVar(_("TBm[0]"), 1, false);
-    sec30->SetVar(_("TBn[0]"), 0, false);
+    /**********************************************************************************************************************************************/
+    sec30->AddGroupBox(this,_("View options"),wxColour(wxT("rgb(153,180,209)")));
+    sec30->AddCheckBox(this, _("xyzShow"), _("Show Cartesian Unit Vectors"));
+    sec30->AddCheckBox(this, _("abcShow"), _("Show Primitive Unit Vectors"));
     /**********************************************************************************************************************************************/
     sec30->AddGroupBox(this,_("Import and Export XYZ Coordinates in Angstrom"),wxColour(wxT("rgb(153,180,209)")));
     wxString Labels2[2] = { _("Import"), _("Export")};

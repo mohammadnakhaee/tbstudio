@@ -12,6 +12,7 @@ public:
     GraphClass(wxWindow* parent, int Dim);
     virtual ~GraphClass();
     
+    int nShowingUnitcell = -1;
     int nShowingAtoms = -1;
     int nShowingBonds = -1;
     void CreateAtomicStructure(Sec30* sec30var, bool IsNewAllocate = true);

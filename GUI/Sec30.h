@@ -46,18 +46,6 @@ class Sec30  : public wxWindow
 public:
     Sec30(wxWindow* parent);
     ~Sec30();
-
-    std::list<wxString> vars;
-    std::list<wxString> grids;
-    std::list<wxString> radios;
-    std::list<wxString> checks;
-    std::list<wxString> trees;
-    std::list<wxString> checklists;
-    std::list<wxString> lists;
-    std::list<wxString> choices;
-    std::list<wxString> combos;
-    std::list<wxString> colors;
-    
     void AddGroupBox(wxWindow *parent, wxString Caption, wxColour BGColor);
     void AddButton(wxWindow *parent, int ButtonCnt, wxString* Labels, wxObjectEventFunction* Funcs);
     void AddButton(wxWindow *parent, int ButtonCnt, wxString* ButtonNames, wxString* Labels, wxObjectEventFunction* Funcs);
@@ -68,8 +56,8 @@ public:
     void AddRadioButton(wxWindow *parent, wxString VariableName, wxString Label);
     void AddCheckBox(wxWindow *parent, wxString VariableName, wxString Label);
     wxCheckTree* AddTreeCtrl(wxWindow *parent, wxString VariableName, int xCtrlSize, int yCtrlSize);
-    wxChoice* AddChoiceCtrl(wxWindow *parent, wxString VariableName, wxString MyLabel, int LabelSize, int CtrlSize);
-    wxComboBox* AddComboCtrl(wxWindow *parent, wxString VariableName, wxString MyLabel, int LabelSize, int CtrlSize);
+    wxChoice* AddChoiceCtrl(wxWindow *parent, wxString VariableName, wxString MyLabel, int LabelSize, int CtrlSize, bool EnableEvent);
+    wxComboBox* AddComboCtrl(wxWindow *parent, wxString VariableName, wxString MyLabel, int LabelSize, int CtrlSize, bool EnableEvent);
     wxColourPickerCtrl* AddColorCtrl(wxWindow *parent, wxString VariableName, wxString MyLabel, wxColour color, int LabelSize, int CtrlSize);
     wxScrolledWindow* AddScrolledPanel(wxWindow *parent, int xCtrlSize, int yCtrlSize, long style = wxSIMPLE_BORDER|wxHSCROLL|wxVSCROLL);
     wxCheckListBox* AddCheckListBox(wxWindow *parent, wxString VariableName, int xCtrlSize, int yCtrlSize);
@@ -111,10 +99,10 @@ public:
 private:
     virtual void sec30TextCtrl_OnUpdated(wxCommandEvent &event);
     virtual void TreeCtrlDeleteItem(wxTreeEvent& event);
-    virtual void PickerChangeColor(wxColourPickerEvent& event);
-    virtual void MyRadioSelected(wxCommandEvent& event);
-    virtual void MyCheckBoxSelected(wxCommandEvent& event);
+    virtual void Choice_OnChanged(wxCommandEvent& event);
     DECLARE_EVENT_TABLE()
 };
 
 #endif // SEC30_H
+
+

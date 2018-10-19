@@ -116,13 +116,43 @@ void GraphClass::CreateAtomicStructure(Sec30* sec30Var, bool IsNewAllocate)
     /************************************************/
     if (!isCountingMode)
     {
-        int ndoublearr[11]={nShowingAtoms,nShowingAtoms,nShowingAtoms,nShowingAtoms,nShowingBonds,nShowingBonds,nShowingBonds,nShowingBonds,nShowingBonds,nShowingBonds,nShowingBonds};
-        int nintarr[6]={nShowingAtoms,nShowingAtoms,nShowingAtoms,nShowingBonds,nShowingBonds,nShowingBonds};
-        glc->CreateDoubleArray(11,ndoublearr);
-        glc->CreateIntArray(6,nintarr);
+        int ndoublearr[14]={nShowingAtoms,nShowingAtoms,nShowingAtoms,nShowingAtoms,nShowingBonds,nShowingBonds,nShowingBonds,nShowingBonds,nShowingBonds,nShowingBonds,nShowingBonds,3,3,3};
+        int nintarr[10]={nShowingAtoms,nShowingAtoms,nShowingAtoms,nShowingBonds,nShowingBonds,nShowingBonds,nShowingUnitcell,nShowingUnitcell,nShowingUnitcell,3};
+        glc->CreateDoubleArray(14,ndoublearr);
+        glc->CreateIntArray(10,nintarr);
+        
+        glc->DoubleArray[11][0] = a[0];
+        glc->DoubleArray[12][0] = a[1];
+        glc->DoubleArray[13][0] = a[2];
+        glc->DoubleArray[11][1] = b[0];
+        glc->DoubleArray[12][1] = b[1];
+        glc->DoubleArray[13][1] = b[2];
+        glc->DoubleArray[11][2] = c[0];
+        glc->DoubleArray[12][2] = c[1];
+        glc->DoubleArray[13][2] = c[2];
+        
+        bool xyzShow = false;
+        sec30->GetCheckVar(_("xyzShow[0]"), xyzShow);
+        bool abcShow = false;
+        sec30->GetCheckVar(_("abcShow[0]"), abcShow);
+        
+        if (xyzShow)
+            glc->IntArray[9][0] = 1;
+        else
+            glc->IntArray[9][0] = 0;
+        
+        if (abcShow)
+            glc->IntArray[9][1] = 1;
+        else
+            glc->IntArray[9][1] = 0;
+            
+        wxComboBox* unitcellctr =  sec30->GetComboObject(_("ShowUnitCellMode"));
+        glc->IntArray[9][2] = unitcellctr->GetSelection();
+        
     }
     else
     {
+        nShowingUnitcell =0;
         nShowingAtoms = 0;
         nShowingBonds = 0;
     }
@@ -131,9 +161,21 @@ void GraphClass::CreateAtomicStructure(Sec30* sec30Var, bool IsNewAllocate)
     {
         /*************atoms************/
         int iAtom = -1;
+        int iCell = -1;
         for (int i=lmax; i>=lmin; i--)
             for (int j=mmax; j>=mmin; j--)
                 for (int k=nmax; k>=nmin; k--)
+                {
+                    if (isCountingMode)
+                        nShowingUnitcell++;
+                    else
+                    {
+                        iCell++;
+                        glc->IntArray[6][iCell] = i;
+                        glc->IntArray[7][iCell] = j;
+                        glc->IntArray[8][iCell] = k;
+                    }
+                    
                     for (int icell=0; icell<nUnitcellAtoms; icell++)
                     {
                         iAtom++;
@@ -158,6 +200,7 @@ void GraphClass::CreateAtomicStructure(Sec30* sec30Var, bool IsNewAllocate)
                         else
                             nShowingAtoms = iAtom + 1;
                     }
+                }
                     
         /*************bonds************/
         int iBond = -1;
@@ -252,12 +295,25 @@ void GraphClass::CreateAtomicStructure(Sec30* sec30Var, bool IsNewAllocate)
             nList0 = WorkingListi.size();
         }
         
+        if (isCountingMode) nShowingUnitcell = nList0;
+
+        
+        int iCell = -1;            
         int iAtom = -1;
         for (int s0=0; s0!=nList0; s0++)
         {
             i = *ii0++;
             j = *ij0++;
             k = *ik0++;
+            
+            if (!isCountingMode)
+            {
+                iCell++;
+                glc->IntArray[6][iCell] = i;
+                glc->IntArray[7][iCell] = j;
+                glc->IntArray[8][iCell] = k;
+            }
+            
             for (int icell=0; icell<nUnitcellAtoms; icell++)
             {
                 iAtom++;
@@ -387,8 +443,6 @@ void GraphClass::CreateAtomicStructure(Sec30* sec30Var, bool IsNewAllocate)
         }
         
     }
-    
-   
     
     if (isCountingMode)
         CreateAtomicStructure(sec30, false);

@@ -31,11 +31,13 @@ public:
     void Polygons2D();
     void Polygons3D();
     void Draw_Atom(float r, float x, float y, float z, GLubyte R, GLubyte G, GLubyte B, int Slices, int Stacks);
+    void Draw_UnitCellBox(float a[3], float b[3], float c[3], float i, float j, float k, GLubyte R, GLubyte G, GLubyte B);
     void Draw_Bond(float x0, float y0, float z0, float x1, float y1, float z1, float radius, GLubyte R, GLubyte G, GLubyte B, int Slices, int Stacks);
-    void Draw_Lattice(int nColDArray, int* nDArray, double** DArray, int nColIArray, int* nIArray, int** IArray);
+    void Draw_Vector(float x0, float y0, float z0, float x1, float y1, float z1, float radius, GLubyte R, GLubyte G, GLubyte B, int Slices, int Stacks);
+    void Draw_Lattice(int nColDArray, int* nDArray, double** DArray, int nColIArray, int* nIArray, int** IArray, double Coordinate[3][3]);
     void background();
     void Draw2D();
-    void Draw3D(int nColDArray, int* nDArray, double** DArray, int nColIArray, int* nIArray, int** IArray, float xMove, float yMove, float XCam, float YCam, float zoom, float zoomCam, float w, float h);
+    void Draw3D(int nColDArray, int* nDArray, double** DArray, int nColIArray, int* nIArray, int** IArray, double Coordinate[3][3], float xMove, float yMove, float XCam, float YCam, float zoom, float zoomCam, float w, float h);
 private:
     // textures for the cube faces
     GLuint m_textures[1];
@@ -87,7 +89,9 @@ private:
     bool isZoomMode = false;
     double** DoubleArray0;
     double** DoubleArray1;
-            
+    double Coordinate0[3][3];
+    double Coordinate1[3][3];
+    
     wxTimer m_spinTimer;
     bool m_useStereo;
     bool m_stereoWarningAlreadyDisplayed;
@@ -109,6 +113,7 @@ private:
     void OnSaveRasterImage(wxCommandEvent &WXUNUSED(event));
     
     void CreateDoubleArray1();
+    void RotationMatrix(double Theta, double lmn[3][3]);
     void DiscardDoubleArrays1();
     void DoMove(float l, float m);
     void DoRotate(float l, float m, float Theta);

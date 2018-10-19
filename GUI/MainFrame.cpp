@@ -785,7 +785,7 @@ void MainFrame::EvaluateStructurePanel()
 
 void MainFrame::EvaluateOrbitalsPanel()
 {
-    if (ValidateOrbitalsPanel()) return;
+    if (ValidateOrbitalsPanel()) ShowGraph3D();
 }
 
 void MainFrame::EvaluateBondsPanel()
