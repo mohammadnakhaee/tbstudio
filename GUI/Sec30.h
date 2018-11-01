@@ -46,6 +46,18 @@ class Sec30  : public wxWindow
 public:
     Sec30(wxWindow* parent);
     ~Sec30();
+
+    std::list<wxString> vars;
+    std::list<wxString> grids;
+    std::list<wxString> radios;
+    std::list<wxString> checks;
+    std::list<wxString> trees;
+    std::list<wxString> checklists;
+    std::list<wxString> lists;
+    std::list<wxString> choices;
+    std::list<wxString> combos;
+    std::list<wxString> colors;
+    
     void AddGroupBox(wxWindow *parent, wxString Caption, wxColour BGColor);
     void AddButton(wxWindow *parent, int ButtonCnt, wxString* Labels, wxObjectEventFunction* Funcs);
     void AddButton(wxWindow *parent, int ButtonCnt, wxString* ButtonNames, wxString* Labels, wxObjectEventFunction* Funcs);
@@ -100,6 +112,10 @@ private:
     virtual void sec30TextCtrl_OnUpdated(wxCommandEvent &event);
     virtual void TreeCtrlDeleteItem(wxTreeEvent& event);
     virtual void Choice_OnChanged(wxCommandEvent& event);
+    virtual void ComboBox_OnChanged(wxCommandEvent& event);
+    virtual void PickerChangeColor(wxColourPickerEvent& event);
+    virtual void MyRadioSelected(wxCommandEvent& event);
+    virtual void MyCheckBoxSelected(wxCommandEvent& event);
     DECLARE_EVENT_TABLE()
 };
 
