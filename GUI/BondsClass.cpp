@@ -24,10 +24,14 @@ BondsClass::BondsClass(wxWindow* parent, Sec30* sec30var, wxWindowID id, const w
     esslistctr->Connect(wxEVT_COMMAND_LISTBOX_SELECTED, wxCommandEventHandler(BondsClass::EssList_OnSelected), NULL, this);
     /**********************************************************************************************************************************************/
     sec30->AddGroupBox(this,_("Connect Two Atoms"),wxColour(wxT("rgb(153,180,209)")));
+    wxString Labels2[1] = {_("Pick the selected pair of atoms")};
+    wxString Names2[1] = {_("PickAtomBtn")};
+    wxObjectEventFunction Funcs2[1] = { wxCommandEventHandler(BondsClass::Btn_Pick_OnClick)};
+    sec30->AddButton(this, 1, Names2, Labels2, Funcs2);
     sec30->AddGroupBox(this,_("Atom index and shell number in cell (0,0,0):"),wxColour(wxT("rgb(255,255,255)")));
-    sec30->AddVarVector(this, 2, _("AtomIndex1"), _("int"), _("(i,n)"), 60, 50);
+    sec30->AddVarVector(this, 2, _("AtomIndex1"), _("int"), _("(i,n)"), 60, 50, false);
     sec30->AddGroupBox(this,_("Atom index and shell number in selected cell:"),wxColour(wxT("rgb(255,255,255)")));
-    sec30->AddVarVector(this, 2, _("AtomIndex2"), _("int"), _("(j,m)"), 60, 50);
+    sec30->AddVarVector(this, 2, _("AtomIndex2"), _("int"), _("(j,m)"), 60, 50, false);
     sec30->SetVar(_("AtomIndex1[0]"),1,false);
     sec30->SetVar(_("AtomIndex1[1]"),1,false);
     sec30->SetVar(_("AtomIndex2[0]"),1,false);
@@ -49,7 +53,7 @@ BondsClass::BondsClass(wxWindow* parent, Sec30* sec30var, wxWindowID id, const w
     sec30->AddButton(this, 1, Labels1, Funcs1);
     /**********************************************************************************************************************************************/
     sec30->AddGroupBox(this,_("List of Bonds in TB Model"),wxColour(wxT("rgb(153,180,209)")));
-    wxCheckTree* treectr = sec30->AddTreeCtrl(this, _("Bonds"), 340, 500);
+    wxCheckTree* treectr = sec30->AddTreeCtrl(this, _("Bonds"), 340, 500, true);
     wxTreeItemId rootID=treectr->AddRoot("TB Model");
     treectr->Connect(wxEVT_RIGHT_DOWN, wxMouseEventHandler(BondsClass::BondsTree_RightDown), NULL, this);
     /**********************************************************************************************************************************************/
@@ -134,6 +138,19 @@ void BondsClass::Btn_Set_OnClick(wxCommandEvent& event)
     //wxQueueEvent(this->GetParent(),event0);
 }
 
+void BondsClass::Btn_Pick_OnClick(wxCommandEvent& event)
+{
+    wxButton* btnctr = (wxButton*)event.GetEventObject();
+    //wxButton* btnctr =  sec30->GetButtonObject(_("PickAtomBtn"));
+    //btnctr->SetBackgroundColour(wxColour(wxT("rgb(209,153,180)")));
+    if (btnctr->GetForegroundColour() == *wxBLACK)
+        btnctr->SetForegroundColour(*wxRED);
+    else
+        btnctr->SetForegroundColour(*wxBLACK);
+    
+    sec30->SendUpdateEvent(this->GetName(),0);
+}
+
 /*
 bool on_check_or_label(int flags)
 {
@@ -171,5 +188,7 @@ void BondsClass::OnDelete(wxCommandEvent &event)
 
 void BondsClass::EssList_OnSelected(wxCommandEvent& event)
 {
-    sec30->SendUpdateEvent(this->GetName());
+    bool WorkingViewmode;
+    sec30->GetRadioVar(_("WorkingViewmode[0]"),WorkingViewmode);
+    if (WorkingViewmode) sec30->SendUpdateEvent(this->GetName());
 }

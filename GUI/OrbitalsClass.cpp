@@ -23,7 +23,7 @@ OrbitalsClass::OrbitalsClass(wxWindow* parent, Sec30* sec30var, wxWindowID id, c
     sec30->AddButton(this, 2, Labels2, Funcs2);
     /**********************************************************************************************************************************************/
     sec30->AddGroupBox(this,_("Orbitals in Different Atom Species"),wxColour(wxT("rgb(153,180,209)")));
-    sec30->AddTreeCtrl(this, _("Orbitals"), 340, 600);
+    sec30->AddTreeCtrl(this, _("Orbitals"), 340, 600, false);
     /**********************************************************************************************************************************************/
     sec30->AddGroupBox(this,_(""),wxColour(wxT("rgb(153,180,209)")));
     /**********************************************************************************************************************************************/
@@ -112,10 +112,10 @@ void OrbitalsClass::Btn_AddShell_OnClick(wxCommandEvent& event)
     wxString cnt = wxString::Format(wxT("%d"), nChild + 1);
     wxTreeItemId shellID = treectr->tree_add(selectedID, _("Shell ") + cnt, true, true);
     
-    treectr->tree_add(shellID,_("s"),true,false);
-    treectr->tree_add(shellID,_("px"),true,false);
-    treectr->tree_add(shellID,_("py"),true,false);
-    treectr->tree_add(shellID,_("pz"),true,false);
+    treectr->tree_add(shellID,_("s"),true,true);
+    treectr->tree_add(shellID,_("px"),true,true);
+    treectr->tree_add(shellID,_("py"),true,true);
+    treectr->tree_add(shellID,_("pz"),true,true);
     treectr->tree_add(shellID,_("dxy"),true,false);
     treectr->tree_add(shellID,_("dyz"),true,false);
     treectr->tree_add(shellID,_("dzx"),true,false);

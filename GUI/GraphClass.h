@@ -22,6 +22,12 @@ public:
     void SetWorkingList(int l, int m, int n);
     void DiscardAtomicStructure();
     double GetAtomRadius(int kind);
+    void SetLeftMouseMode(int mouseEventMode);
+    int GetSelectedCount();
+    int GetShowingAtomsCount();
+    int GetShowingBondsCount();
+    int GetShowingUnitcellCount();
+    void GetAtoms_Selection(int* &Atoms);
     
 protected:
     std::list<int> EssentialListi;

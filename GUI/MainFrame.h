@@ -10,9 +10,10 @@
 #include "UnitcellClass.h"
 #include "StructureClass.h"
 #include "OrbitalsClass.h"
-#include "ColorsClass.h"
 #include "BondsClass.h"
-
+//#include "ProjectionClass.h"
+#include "ColorsClass.h"
+#include "unistd.h"
 /**********************************************************************************/
 
 class MainFrame : public MainFrameBaseClass
@@ -21,6 +22,7 @@ public:
     MainFrame(wxWindow* parent);
     virtual ~MainFrame();
     
+    int* SelectedAtoms;
     GraphClass* graph3d;
     GraphClass* graph2d0;
     GraphClass* graph2d;
@@ -28,12 +30,17 @@ public:
     StructureClass* structurePanel;
     OrbitalsClass* orbitalsPanel;
     BondsClass* bondsPanel;
+    //ProjectionClass* projectionPanel;
     ColorsClass* ColorsForm;
     Sec30* sec30;
     
     void OnExit(wxCommandEvent& event);
     void OnAbout(wxCommandEvent& event);
 protected:
+    virtual void BtnMove_OnClick(wxRibbonButtonBarEvent& event);
+    virtual void BtnRotate_OnClick(wxRibbonButtonBarEvent& event);
+    virtual void BtnScale_OnClick(wxRibbonButtonBarEvent& event);
+    virtual void BtnSelect_OnClick(wxRibbonButtonBarEvent& event);
     virtual void BtnStructureStyle_OnClick(wxRibbonButtonBarEvent& event);
     virtual void OnchoisSelected(wxCommandEvent& event);
     virtual void BtnOpen_OnClick(wxRibbonButtonBarEvent& event);
@@ -84,9 +91,14 @@ protected:
     virtual bool ValidateOrbitalsPanel();
     /****************************************/
     virtual void LoadBondsPanel();
-    virtual void EvaluateBondsPanel();
+    virtual void EvaluateBondsPanel(int redraw);
     virtual bool ValidateBondsPanel();
     virtual void FillBondsPanel();
+    /****************************************/
+    virtual void LoadProjectionPanel();
+    virtual void EvaluateProjectionPanel(int redraw);
+    virtual bool ValidateProjectionPanel();
+    virtual void FillProjectionPanel();
     /****************************************/
     virtual void LoadColorsForm();
     virtual void EvaluateColorsPanel();
@@ -102,5 +114,6 @@ private:
     std::list<int> EssentialListk;
     bool isItNew(int i,int j,int k);
     virtual void sec30_OnUpdated(wxCommandEvent& event);
+    virtual void myOpenGL_EVT_SelectionChanged(wxCommandEvent& event);
 };
 #endif // MAINFRAME_H

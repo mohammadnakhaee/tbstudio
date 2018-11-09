@@ -52,7 +52,7 @@ protected:
     wxRibbonButtonBar* m_ribbonButtonBar1045;
     wxRibbonPage* m_ribbonPage606;
     wxRibbonPanel* m_ribbonPanel608;
-    wxRibbonButtonBar* m_ribbonButtonBar610;
+    wxRibbonButtonBar* BtnMouse;
     wxRibbonPage* m_ribbonPage548;
     wxRibbonPanel* m_ribbonPanel550;
     wxRibbonButtonBar* m_ribbonButtonBar582;
@@ -74,6 +74,10 @@ protected:
     virtual void BtnMain_OnClick(wxRibbonButtonBarEvent& event) { event.Skip(); }
     virtual void BtnTerminal_OnClick(wxRibbonButtonBarEvent& event) { event.Skip(); }
     virtual void BtnGrid_OnClick(wxRibbonButtonBarEvent& event) { event.Skip(); }
+    virtual void BtnSelect_OnClick(wxRibbonButtonBarEvent& event) { event.Skip(); }
+    virtual void BtnMove_OnClick(wxRibbonButtonBarEvent& event) { event.Skip(); }
+    virtual void BtnRotate_OnClick(wxRibbonButtonBarEvent& event) { event.Skip(); }
+    virtual void BtnScale_OnClick(wxRibbonButtonBarEvent& event) { event.Skip(); }
     virtual void B2D(wxRibbonButtonBarEvent& event) { event.Skip(); }
     virtual void Btn3D_OnClick(wxRibbonButtonBarEvent& event) { event.Skip(); }
     virtual void B3D(wxRibbonButtonBarEvent& event) { event.Skip(); }

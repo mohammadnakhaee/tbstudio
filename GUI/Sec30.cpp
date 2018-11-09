@@ -213,7 +213,7 @@ void Sec30::AddCheckBox(wxWindow *parent, wxString VariableName, wxString Label)
     parent->Layout();
 }
 
-wxCheckTree* Sec30::AddTreeCtrl(wxWindow *parent, wxString VariableName, int xCtrlSize, int yCtrlSize)
+wxCheckTree* Sec30::AddTreeCtrl(wxWindow *parent, wxString VariableName, int xCtrlSize, int yCtrlSize, bool EnableEvent)
 {
     wxBoxSizer* MySizer = new wxBoxSizer(wxHORIZONTAL);
     parent->GetSizer()->Add(MySizer, 0, wxLEFT|wxRIGHT|wxTOP|wxEXPAND, WXC_FROM_DIP(5));
@@ -229,7 +229,7 @@ wxCheckTree* Sec30::AddTreeCtrl(wxWindow *parent, wxString VariableName, int xCt
     wxColour c; //Also it is possible to determine the color in this way: wxColour c=*wxGREEN;
     c.Set(191,205,219,0);
     
-    ctr->Connect(wxEVT_COMMAND_TREE_DELETE_ITEM, wxTreeEventHandler(Sec30::TreeCtrlDeleteItem), NULL, this);
+    if (EnableEvent) ctr->Connect(wxEVT_COMMAND_TREE_DELETE_ITEM, wxTreeEventHandler(Sec30::TreeCtrlDeleteItem), NULL, this);
     
     ctr->ExpandAll();
     MySizer->Layout();
@@ -424,11 +424,12 @@ void Sec30::MyCheckBoxSelected(wxCommandEvent& event)
     SendUpdateEvent(name);
 }
 
-void Sec30::SendUpdateEvent(wxString info)
+void Sec30::SendUpdateEvent(wxString info, int MyID)
 {
     wxCommandEvent* event = new wxCommandEvent(Sec30EVT_OnUpdated);
     //event->SetEventObject(this);
     event->SetString(info);
+    event->SetInt(MyID);
     wxQueueEvent(this,event);
 }
 
@@ -584,6 +585,12 @@ void Sec30::GetCheckVar(wxString VariableName, bool& Value)
     Value = ((wxCheckBox*)FindWindowByName(VariableName,GetParent()))->GetValue();
 }
 
+wxButton* Sec30::GetButtonObject(wxString VariableName)
+{
+    wxButton* ctr= (wxButton*)FindWindowByName(VariableName,GetParent());
+    return ctr;
+}
+
 wxCheckTree* Sec30::GetTreeObject(wxString VariableName)
 {
     wxCheckTree* ctr= (wxCheckTree*)FindWindowByName(VariableName,GetParent());
@@ -619,7 +626,19 @@ wxColourPickerCtrl* Sec30::GetColorObject(wxString VariableName)
     wxColourPickerCtrl* ctr= (wxColourPickerCtrl*)FindWindowByName(VariableName,GetParent());
     return ctr;
 }
-    
+
+myGrid* Sec30::GetGridObject(wxString VariableName)
+{
+    myGrid* ctr= (myGrid*)FindWindowByName(VariableName,GetParent());
+    return ctr;
+}
+
+sec30TextCtrl* Sec30::GetTextCtrlObject(wxString VariableName)
+{
+    sec30TextCtrl* ctr= (sec30TextCtrl*)FindWindowByName(VariableName,GetParent());
+    return ctr;
+}
+ 
 void Sec30::SaveToFile(wxString filepath, wxString filename)
 {
     wxString fname1 = filepath + wxT("/") + filename;
@@ -1538,30 +1557,30 @@ wxColor Sec30::GetBondColor(int kind)
     c.Set(210, 0, 60, 255);
     switch (kind)
     {
-    case 2: c.Set(140, 0, 0, 255); break;
-    case 3: c.Set(140, 50, 0, 255); break;
-    case 4: c.Set(110, 10, 50, 255); break;
-    case 5: c.Set(200, 50, 50, 255); break;
-    case 6: c.Set(0, 170, 0, 255); break;
-    case 7: c.Set(50, 170, 0, 255); break;
-    case 8: c.Set(0, 170, 50, 255); break;
-    case 9: c.Set(50, 170, 50, 255); break;
+    case 2: c.Set(0, 220, 0, 255); break;
+    case 3: c.Set(150, 170, 0, 255); break;
+    case 4: c.Set(150, 170, 150, 255); break;
+    case 5: c.Set(0, 170, 0, 255); break;
+    case 6: c.Set(140, 90, 0, 255); break;
+    case 7: c.Set(0, 170, 150, 255); break;
+    case 8: c.Set(110, 0, 90, 255); break;
+    case 9: c.Set(200, 90, 90, 255); break;
     case 10: c.Set(0, 0, 170, 255); break;
-    case 11: c.Set(50, 0, 170, 255); break;
-    case 12: c.Set(0, 50, 170, 255); break;
-    case 13: c.Set(50, 50, 170, 255); break;
-    case 14: c.Set(250, 0, 0, 255); break;
-    case 15: c.Set(250, 50, 0, 255); break;
-    case 16: c.Set(250, 0, 50, 255); break;
-    case 17: c.Set(250, 50, 50, 255); break;
-    case 18: c.Set(0, 250, 0, 255); break;
-    case 19: c.Set(50, 250, 0, 255); break;
-    case 20: c.Set(0, 250, 50, 255); break;
-    case 21: c.Set(50, 250, 50, 255); break;
-    case 22: c.Set(0, 0, 250, 255); break;
-    case 23: c.Set(50, 0, 250, 255); break;
-    case 24: c.Set(0, 50, 250, 255); break;
-    case 25: c.Set(50, 50, 250, 255); break;
+    case 11: c.Set(150, 0, 170, 255); break;
+    case 12: c.Set(0, 150, 170, 255); break;
+    case 13: c.Set(150, 150, 170, 255); break;
+    case 14: c.Set(220, 0, 0, 255); break;
+    case 15: c.Set(220, 150, 0, 255); break;
+    case 16: c.Set(220, 0, 150, 255); break;
+    case 17: c.Set(220, 150, 150, 255); break;
+    case 18: c.Set(140, 0, 0, 255); break;
+    case 19: c.Set(150, 220, 0, 255); break;
+    case 20: c.Set(0, 220, 150, 255); break;
+    case 21: c.Set(150, 220, 150, 255); break;
+    case 22: c.Set(0, 0, 220, 255); break;
+    case 23: c.Set(50, 0, 220, 255); break;
+    case 24: c.Set(0, 50, 220, 255); break;
+    case 25: c.Set(50, 50, 220, 255); break;
     case 26: c.Set(170, 0, 0, 255); break;
     case 27: c.Set(170, 80, 0, 255); break;
     case 28: c.Set(170, 0, 80, 255); break;

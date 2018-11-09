@@ -67,7 +67,7 @@ public:
     void AddGrid(wxWindow *parent, int nRow, int nCol, wxString VariableName, wxString* ColTypes, int* ColPrecision);
     void AddRadioButton(wxWindow *parent, wxString VariableName, wxString Label);
     void AddCheckBox(wxWindow *parent, wxString VariableName, wxString Label);
-    wxCheckTree* AddTreeCtrl(wxWindow *parent, wxString VariableName, int xCtrlSize, int yCtrlSize);
+    wxCheckTree* AddTreeCtrl(wxWindow *parent, wxString VariableName, int xCtrlSize, int yCtrlSize, bool EnableEvent);
     wxChoice* AddChoiceCtrl(wxWindow *parent, wxString VariableName, wxString MyLabel, int LabelSize, int CtrlSize, bool EnableEvent);
     wxComboBox* AddComboCtrl(wxWindow *parent, wxString VariableName, wxString MyLabel, int LabelSize, int CtrlSize, bool EnableEvent);
     wxColourPickerCtrl* AddColorCtrl(wxWindow *parent, wxString VariableName, wxString MyLabel, wxColour color, int LabelSize, int CtrlSize);
@@ -95,16 +95,19 @@ public:
     void GetRadioVar(wxString VariableName, bool& Value);
     void SetCheckVar(wxString VariableName, bool Value, bool FireEvent);
     void GetCheckVar(wxString VariableName, bool& Value);
+    wxButton* GetButtonObject(wxString VariableName);
     wxCheckTree* GetTreeObject(wxString VariableName);
     wxCheckListBox* GetCheckListObject(wxString VariableName);
     wxListBox* GetListObject(wxString VariableName);
     wxChoice* GetChoiceObject(wxString VariableName);
     wxComboBox* GetComboObject(wxString VariableName);
     wxColourPickerCtrl* GetColorObject(wxString VariableName);
+    myGrid* GetGridObject(wxString VariableName);
+    sec30TextCtrl* GetTextCtrlObject(wxString VariableName);
     
     void SaveToFile(wxString filepath, wxString filename);
     void LoadFromFile(wxString filepath, wxString filename);
-    void SendUpdateEvent(wxString info);
+    void SendUpdateEvent(wxString info, int MyID = 1);
     wxString GetAtomLable(int kind);
     wxColor GetAtomColor(int kind);
     wxColor GetBondColor(int kind);

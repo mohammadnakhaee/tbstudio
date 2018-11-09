@@ -53,9 +53,9 @@ UnitcellClass::UnitcellClass(wxWindow* parent, Sec30* sec30var, wxWindowID id, c
     sec30->AddGroupBox(this,_("Atom species and Fractional Coordinates"),wxColour(wxT("rgb(153,180,209)")));
     wxString ColNames[4] = { _("Kind"), _("a"), _("b"), _("c")};
     wxString ColTypes[4] = { _("int"), _("double"), _("double"), _("double")};
-    int ColSizes[4] = { 50, 75, 75, 75};
+    int ColSizes[4] = { 50, 82, 82, 82};
     int ColPrecision[4] = { 0, 8, 8, 8};
-    sec30->AddGrid(this, 99, 4, _("KABC_Coords"), ColNames, ColTypes, ColSizes, ColPrecision, 340, 300);
+    sec30->AddGrid(this, 99, 4, _("KABC_Coords"), ColNames, ColTypes, ColSizes, ColPrecision, 350, 500);
     /**********************************************************************************************************************************************/
     sec30->AddGroupBox(this,_(""),wxColour(wxT("rgb(153,180,209)")));
     /**********************************************************************************************************************************************/
@@ -67,7 +67,6 @@ UnitcellClass::~UnitcellClass()
     //catch(std::exception& ex)
     //{wxMessageBox(ex.what());}
 }
-
 
 void UnitcellClass::Btn_Load_OnClick(wxCommandEvent& event)
 {
@@ -83,7 +82,6 @@ void UnitcellClass::Btn_Load_OnClick(wxCommandEvent& event)
         wxString dgPath = OpenDialog->GetDirectory();
         
         wxString fl = dgPath + wxT("/") + dgFileName;
-        
 	}
  
 	OpenDialog->Destroy();

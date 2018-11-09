@@ -8,10 +8,10 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="src">
+    <File Name="BondsClass.cpp"/>
     <File Name="ColorsClass.cpp"/>
     <File Name="OrbitalsClass.cpp"/>
     <File Name="checktree.cpp"/>
-    <File Name="BondsClass.cpp"/>
     <File Name="StructureClass.cpp"/>
     <File Name="UnitcellClass.cpp"/>
     <File Name="Sec30.cpp"/>
@@ -27,10 +27,10 @@
     <File Name="wxcrafter_bitmaps.cpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="include">
+    <File Name="BondsClass.h"/>
     <File Name="ColorsClass.h"/>
     <File Name="OrbitalsClass.h"/>
     <File Name="checktree.h"/>
-    <File Name="BondsClass.h"/>
     <File Name="StructureClass.h"/>
     <File Name="UnitcellClass.h"/>
     <File Name="Sec30.h"/>

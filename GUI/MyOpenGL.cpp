@@ -58,7 +58,8 @@ enum
 // helper functions
 // ----------------------------------------------------------------------------
 
-
+// this is a definition so can't be in a header
+wxDEFINE_EVENT(MyOpenGL_EVT_SelectionChanged, wxCommandEvent);
 
 static void CheckGLError()
 {
@@ -155,37 +156,6 @@ return 0;
 }
 
 int frameCnt=0;
-
-int samplemulti(mglGraph *gr,double w, double h)
-{
-  gr->SubPlot(2,2,0); gr->Title("Axis origin, Grid"); gr->SetOrigin(0,0);
-  gr->Axis(); gr->Grid(); gr->FPlot("x^3");
-
-  gr->SubPlot(2,2,1); gr->Title("2 axis");
-  gr->SetRanges(-1,1,-1,1); gr->SetOrigin(-1,-1,-1);  // first axis
-  gr->Axis(); gr->Label('y',"axis 1",0);  gr->FPlot("sin(pi*x)");
-  gr->SetRanges(0,1,0,1);   gr->SetOrigin(1,1,1);   // second axis
-  gr->Axis(); gr->Label('y',"axis 2",0);  gr->FPlot("cos(pi*x)");
-
-  gr->SubPlot(2,2,3); gr->Title("More axis");
-  gr->SetOrigin(NAN,NAN); gr->SetRange('x',-1,1);
-  gr->Axis(); gr->Label('x',"x",0); gr->Label('y',"y_1",0);
-  gr->FPlot("x^2","k");
-  gr->SetRanges(-1,1,-1,1); gr->SetOrigin(-1.3,-1); // second axis
-  gr->Axis("y","r");  gr->Label('y',"#r{y_2}",0.2);
-  gr->FPlot("x^3","r");
-
-  gr->SubPlot(2,2,2); gr->Title("4 segments, inverted axis");
-  gr->SetOrigin(0,0);
-  gr->InPlot(0.5,1,0.5,1);  gr->SetRanges(0,10,0,2);  gr->Axis();
-  gr->FPlot("sqrt(x/2)");   gr->Label('x',"W",1); gr->Label('y',"U",1);
-  gr->InPlot(0,0.5,0.5,1);  gr->SetRanges(1,0,0,2); gr->Axis("x");
-  gr->FPlot("sqrt(x)+x^3"); gr->Label('x',"\\tau",-1);
-  gr->InPlot(0.5,1,0,0.5);  gr->SetRanges(0,10,4,0);  gr->Axis("y");
-  gr->FPlot("x/4"); gr->Label('y',"L",-1);
-  gr->InPlot(0,0.5,0,0.5);  gr->SetRanges(1,0,4,0); gr->FPlot("4*x^2");
-  return 0;
-}
 
 int it=0;
 
@@ -568,6 +538,22 @@ void MyGLContext::Draw2D()
     CheckGLError();
 }
 
+void MyGLContext::DrawSelectionFrame(float x1, float y1, float x2, float y2)
+{
+    glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
+    glBegin(GL_QUADS);              // Each set of 4 vertices form a quad
+      glColor3f(0.0f, 0.0f, 1.0f);
+      glVertex3f(x1, y1, 50.0f);
+      glColor3f(1.0f, 0.0f, 0.0f);
+      glVertex3f(x2, y1, 50.0f);
+      glColor3f(0.0f, 0.0f, 1.0f);
+      glVertex3f(x2, y2, 50.0f);
+      glColor3f(1.0f, 0.0f, 0.0f);
+      glVertex3f(x1, y2, 50.0f);
+   glEnd();
+   glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
+}
+
 void MyGLContext::Draw_Atom(float r, float x, float y, float z, GLubyte R, GLubyte G, GLubyte B, int Slices, int Stacks)
 {
     glPushMatrix();
@@ -730,28 +716,14 @@ void MyGLContext::Draw_Lattice(int nColDArray, int* nDArray, double** DArray, in
     if (nColDArray == 0) return;
     /***********************************************************************************/
     /* The structure of data: (note that the number of atoms and bonds can be different)
-     * DArray[0][:] DArray[1][:] DArray[2][:] DArray[3][:] DArray[4][:] DArray[5][:] DArray[6][:] DArray[7][:] DArray[8][:] DArray[9][:] DArray[10][:] DArray[11][:] DArray[12][:] DArray[13][:] IArray[0][:]   IArray[1][:]   IArray[2][:]  IArray[3][:]   IArray[4][:]  IArray[5][:]  IArray[6][:] IArray[7][:] IArray[8][:]       IArray[9][:]
-     *      x0          y0           z0           r0           x1bond0     y1bond0     z1bond0      x2bond0      y2bond0      z2bond0      rbond0          a0             a1            a2        AtomRed0      AtomGreen0     AtomBlue0       BondRed0      BondGreen0    BondBlue0     unitcell0i    unitcell0j  unitcell0k        xyzCoord=0,1
-     *      x1          y1           z1           r1           x1bond1     y1bond1     z1bond1      x2bond1      y2bond1      z2bond1      rbond1          b0             b1            b2        AtomRed1      AtomGreen1     AtomBlue1       BondRed1      BondGreen1    BondBlue1     unitcell1i    unitcell1j  unitcell1k        abcCoord=0,1
-     *      x2          y2           z2           r2           x1bond2     y1bond2     z1bond2      x2bond2      y2bond2      z2bond2      rbond2          c0             c1            c2        AtomRed2      AtomGreen2     AtomBlue2       BondRed2      BondGreen2    BondBlue2     unitcell2i    unitcell2j  unitcell2k      UnitCellMode=0,1,2
-     *                                                         x1bond3     y1bond3     z1bond3      x2bond3      y2bond3      z2bond3      rbond3                                                                                              BondRed3      BondGreen3    BondBlue3     unitcell3i    unitcell3j  unitcell3k
+     * DArray[0][:] DArray[1][:] DArray[2][:] DArray[3][:] DArray[4][:] DArray[5][:] DArray[6][:] DArray[7][:] DArray[8][:] DArray[9][:] DArray[10][:] DArray[11][:] DArray[12][:] DArray[13][:] IArray[0][:]   IArray[1][:]   IArray[2][:]  IArray[3][:]   IArray[4][:]  IArray[5][:]  IArray[6][:] IArray[7][:] IArray[8][:]       IArray[9][:]         IArray[10][:]   IArray[11][:]   IArray[12][:]   IArray[13][:]     IArray[14][:]
+     *      x0          y0           z0           r0           x1bond0     y1bond0     z1bond0      x2bond0      y2bond0      z2bond0      rbond0          a0             a1            a2        AtomRed0      AtomGreen0     AtomBlue0       BondRed0      BondGreen0    BondBlue0     unitcell0i    unitcell0j  unitcell0k        xyzCoord=0,1          isSelected0        i0              j0               k0          index0InCell000
+     *      x1          y1           z1           r1           x1bond1     y1bond1     z1bond1      x2bond1      y2bond1      z2bond1      rbond1          b0             b1            b2        AtomRed1      AtomGreen1     AtomBlue1       BondRed1      BondGreen1    BondBlue1     unitcell1i    unitcell1j  unitcell1k        abcCoord=0,1          isSelected1        i1              j1               k1          index1InCell000
+     *      x2          y2           z2           r2           x1bond2     y1bond2     z1bond2      x2bond2      y2bond2      z2bond2      rbond2          c0             c1            c2        AtomRed2      AtomGreen2     AtomBlue2       BondRed2      BondGreen2    BondBlue2     unitcell2i    unitcell2j  unitcell2k      UnitCellMode=0,1,2                         i2              j2               k2          index2InCell000
+     *                                                         x1bond3     y1bond3     z1bond3      x2bond3      y2bond3      z2bond3      rbond3                                                                                              BondRed3      BondGreen3    BondBlue3     unitcell3i    unitcell3j  unitcell3k      SelectionFrame=0,1
      *                                                         x1bond4     y1bond4     z1bond4      x2bond4      y2bond4      z2bond4      rbond4                                                                                              BondRed4      BondGreen4    BondBlue4
      */
     /***********************************************************************************/
-    for (int i=0; i<nDArray[0]; i++)
-    {
-        Draw_Atom((float)DArray[3][i], (float)DArray[0][i], (float)DArray[1][i], (float)DArray[2][i], (GLubyte)IArray[0][i], (GLubyte)IArray[1][i], (GLubyte)IArray[2][i], 60, 40);
-    }
-    
-    for (int i=0; i<nDArray[4]; i++)
-    {
-        Draw_Bond((float)DArray[4][i], (float)DArray[5][i], (float)DArray[6][i],(float)DArray[7][i], (float)DArray[8][i], (float)DArray[9][i], (float)DArray[10][i], (GLubyte)IArray[3][i], (GLubyte)IArray[4][i], (GLubyte)IArray[5][i] ,23,2);
-    }
-    
-    //try{}
-    //catch(std::exception& ex)
-    //{wxMessageBox(ex.what());}
-    
     float a[3],b[3],c[3];
     a[0] = (float)DArray[11][0];
     a[1] = (float)DArray[12][0];
@@ -766,6 +738,42 @@ void MyGLContext::Draw_Lattice(int nColDArray, int* nDArray, double** DArray, in
     int xyzCoord = IArray[9][0];
     int abcCoord = IArray[9][1];
     int UnitCellMode = IArray[9][2];
+    int SelectionFrame = IArray[9][3];
+    
+    if (SelectionFrame==1)
+    {
+        DrawSelectionFrame((float)DArray[14][0], (float)DArray[14][1], (float)DArray[14][2], (float)DArray[14][3]);
+    }
+    
+    GLfloat selectambient[] = { 20.0, 0.0, 0.0, 0.565 };
+    GLfloat normalambient[] = { 0.065, 0.065, 0.065, 0.065 };
+    for (int i=0; i<nDArray[0]; i++)
+    {
+        GLubyte Red = 200;
+        GLubyte Green = 100;
+        GLubyte Blue = 100;
+        if (IArray[10][i]==0)
+        {
+            Red = (GLubyte)IArray[0][i];
+            Green = (GLubyte)IArray[1][i];
+            Blue = (GLubyte)IArray[2][i];
+        }
+        else
+        {
+            glLightfv(GL_LIGHT0, GL_AMBIENT, selectambient);
+        }
+        Draw_Atom((float)DArray[3][i], (float)DArray[0][i], (float)DArray[1][i], (float)DArray[2][i], Red, Green, Blue, 60, 40);
+        glLightfv(GL_LIGHT0, GL_AMBIENT, normalambient);
+    }
+    
+    for (int i=0; i<nDArray[4]; i++)
+    {
+        Draw_Bond((float)DArray[4][i], (float)DArray[5][i], (float)DArray[6][i],(float)DArray[7][i], (float)DArray[8][i], (float)DArray[9][i], (float)DArray[10][i], (GLubyte)IArray[3][i], (GLubyte)IArray[4][i], (GLubyte)IArray[5][i] ,23,2);
+    }
+    
+    //try{}
+    //catch(std::exception& ex)
+    //{wxMessageBox(ex.what());}
 
     if (xyzCoord != 0)
     {
@@ -804,6 +812,8 @@ void MyGLContext::Draw_Lattice(int nColDArray, int* nDArray, double** DArray, in
             }
         }
     }
+    
+
 }
 
 void MyGLContext::Draw3D(int nColDArray, int* nDArray, double** DArray, int nColIArray, int* nIArray, int** IArray, double Coordinate[3][3], float xMove, float yMove, float XCam, float YCam, float zoom, float zoomCam, float w, float h)
@@ -821,7 +831,7 @@ void MyGLContext::Draw3D(int nColDArray, int* nDArray, double** DArray, int nCol
     glTranslatef(XCam + xMove, YCam + yMove, 0.0f);
     float ztot = zoomCam + zoom;
     if (ztot <= 0.001) ztot = 0.001;
-    glScaled(ztot, ztot, ztot);//Zoom
+    glScaled(ztot*2, ztot*2, ztot*2);//Zoom
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glTranslatef(0.0f, 0.0f, -2.0f);
@@ -839,8 +849,18 @@ void MyGLContext::Draw3D(int nColDArray, int* nDArray, double** DArray, int nCol
     glLineWidth(1.0);
     //glShadeModel(GL_SMOOTH);
     //glEnable(GL_LINE_SMOOTH);
+    /*****************************************************/
+    /***********For opacity of Selection Frame************/
     //glEnable(GL_BLEND);
+    //glBlendEquation(GL_FUNC_ADD);
     //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    //glShadeModel(GL_FLAT);
+    
+    //glEnable(GL_ALPHA_TEST);
+    //glAlphaFunc(GL_GREATER,0.5f); // read the doc and tweak to eliminate thin green borders
+    //glAlphaFunc(GL_ALWAYS,0.5f);
+    //glDepthMask(GL_TRUE);
+    /*****************************************************/
     //glHint(GL_LINE_SMOOTH_HINT, GL_DONT_CARE);
     Draw_Lattice(nColDArray, nDArray, DArray, nColIArray, nIArray, IArray, Coordinate);
     gluDeleteQuadric(quad);
@@ -1094,6 +1114,11 @@ void MyGLCanvas::OnMouseLeftDown(wxMouseEvent& event)
     isMouseLeftDown = true;
     isMouseRightDown = false;
     isMouseMiddleDown = false;
+    ShowSelectionFrame = false;
+    IntArray[9][3] = 0; //SelectionFrame=false
+    const wxPoint cpt = event.GetPosition();
+    ClientMouseX0 = cpt.x;
+    ClientMouseY0 = cpt.y;
     //To get mouse position relative to top-left corner of current window or canvas, add this in a mouse event handler:
     //const wxPoint pt = wxGetMousePosition();
     //int mouseX = pt.x - this->GetScreenPosition().x;
@@ -1102,8 +1127,65 @@ void MyGLCanvas::OnMouseLeftDown(wxMouseEvent& event)
 
 void MyGLCanvas::OnMouseLeftUp(wxMouseEvent& event)
 {
+    const wxPoint pt = wxGetMousePosition();
+    mouseX = pt.x;
+    mouseY = pt.y;
     isMouseLeftDown = false;
-    Reload();
+    
+    if (mouseY==mouseY0 && mouseX==mouseX0)
+    {
+        const wxSize ClientSize = GetClientSize();
+        int w,h;
+        w=ClientSize.x;
+        h=ClientSize.y;
+        float max = (float)w;
+        if (h>w) max = (float)h;
+        float w3d=w/max;
+        float h3d=h/max;
+        const wxPoint pt0 = event.GetPosition();
+        float x = (float)(w3d*pt0.x/w - w3d/2.0f);
+        float y = -(float)(h3d*pt0.y/h - h3d/2.0f);
+        int AtomIndex[1];
+        AtomIndex[0] = RayTraceGetAtomIndex(x, y);
+        if (AtomIndex[0] != -1)
+        {
+            if (event.CmdDown())
+                AddToSelectionList(1, AtomIndex, false, false);
+            else if (event.AltDown())
+                AddToSelectionList(1, AtomIndex, false, true);
+            else
+                AddToSelectionList(1, AtomIndex, true, false);
+        }
+        else
+            AddToSelectionList(0, AtomIndex, true, true);
+        //wxMessageBox(_("Atom index : ") + wxString::Format(wxT("(%d,%d)"), i000, sh000) + _(" in cell(0,0,0) and ") + wxString::Format(wxT("(%d,%d)"), ilmn, shlmn) + _(" in cell") + listucell + _(" in your TB model."),_("Error"));
+        //wxMessageBox(_("Atom index : ") + wxString::Format(wxT("%d"), AtomIndex[0]),_("Info"));
+    }
+    else if (ShowSelectionFrame)
+    {
+        ShowSelectionFrame = false;
+        IntArray[9][3] = 0; //SelectionFrame=false
+        
+        int* AtomIndex;
+        int nSelected = 0;
+        FrameGetAtomIndex(nSelected, AtomIndex);
+        
+        if (nSelected != 0)
+        {
+            if (event.CmdDown())
+                AddToSelectionList(nSelected, AtomIndex, false, false);
+            else if (event.AltDown())
+                AddToSelectionList(nSelected, AtomIndex, false, true);
+            else
+                AddToSelectionList(nSelected, AtomIndex, true, false);
+            
+            delete [] AtomIndex;
+        }
+        else
+            AddToSelectionList(nSelected, AtomIndex, true, true);
+    }
+    else
+        Reload();
 }
 
 void MyGLCanvas::OnMouseMove(wxMouseEvent& event)
@@ -1113,11 +1195,17 @@ void MyGLCanvas::OnMouseMove(wxMouseEvent& event)
         const wxPoint pt = wxGetMousePosition();
         mouseX = pt.x;
         mouseY = pt.y;
+        const wxPoint cpt = event.GetPosition();
+        ClientMouseX = cpt.x;
+        ClientMouseY = cpt.y;
         float l=0;
         float m=0;
         float value=0;
         GetDirection(mouseX0, mouseY0, mouseX, mouseY, l, m, value);
-        
+        ShowSelectionFrame = false;
+        IntArray[9][3] = 0; //SelectionFrame=false
+        if (isSelectMode)
+            DoSelect(ClientMouseX0, ClientMouseY0, ClientMouseX, ClientMouseY);
         if (isMoveMode)
             DoMove(l,m);
         else if (isRotationMode)
@@ -1157,6 +1245,8 @@ void MyGLCanvas::OnMouseRightDown(wxMouseEvent& event)
     isMouseRightDown = true;
     isMouseLeftDown = false;
     isMouseMiddleDown = false;
+    ShowSelectionFrame = false;
+    IntArray[9][3] = 0; //SelectionFrame=false
 }
 
 void MyGLCanvas::OnMouseRightUp(wxMouseEvent& event)
@@ -1186,6 +1276,8 @@ void MyGLCanvas::OnMouseMiddleDown(wxMouseEvent& event)
     isMouseMiddleDown = true;
     isMouseRightDown = false;
     isMouseLeftDown = false;
+    ShowSelectionFrame = false;
+    IntArray[9][3] = 0; //SelectionFrame=false
 }
 
 void MyGLCanvas::OnMouseMiddleUp(wxMouseEvent& event)
@@ -1197,6 +1289,33 @@ void MyGLCanvas::OnMouseMiddleUp(wxMouseEvent& event)
 void MyGLCanvas::OnSaveRasterImage(wxCommandEvent &WXUNUSED(event))
 {
     
+}
+
+void MyGLCanvas::DoSelect(float x1, float y1, float x2, float y2)
+{
+    const wxSize ClientSize = GetClientSize();
+    int w,h;
+    w=ClientSize.x;
+    h=ClientSize.y;
+    float max = (float)w;
+    if (h>w) max = (float)h;
+    float w3d=w/max;
+    float h3d=h/max;
+    
+    ShowSelectionFrame = true;
+    IntArray[9][3] = 1; //SelectionFrame=true
+    
+    SelectionFramX1 = (x1*w3d/w - w3d/2.0f  - XCam/2.0)/ZoomCam;
+    SelectionFramY1 = -(y1*h3d/h - h3d/2.0f + YCam/2.0)/ZoomCam;
+    SelectionFramX2 = (x2*w3d/w - w3d/2.0f  - XCam/2.0)/ZoomCam;
+    SelectionFramY2 = -(y2*h3d/h - h3d/2.0f + YCam/2.0)/ZoomCam;
+    
+    DoubleArray1[14][0] = fmin(SelectionFramX1,SelectionFramX2);
+    DoubleArray1[14][1] = fmin(SelectionFramY1,SelectionFramY2);
+    DoubleArray1[14][2] = fmax(SelectionFramX1,SelectionFramX2);
+    DoubleArray1[14][3] = fmax(SelectionFramY1,SelectionFramY2);
+    
+    Refresh(true);
 }
 
 void MyGLCanvas::DoMove(float l, float m)
@@ -1336,6 +1455,7 @@ void MyGLCanvas::DiscardIntArrays()
 {
     for(int i = 0; i < NumberOfIntArrays; i++)
     {
+        int nn = nIntArray[i];
         if (nIntArray[i] > 0)
         {
             delete [] IntArray[i];
@@ -1345,7 +1465,6 @@ void MyGLCanvas::DiscardIntArrays()
 	if (NumberOfIntArrays>0) delete [] IntArray;
     NumberOfIntArrays = 0;
 }
-
 
 void MyGLCanvas::CreateDoubleArray1()
 {
@@ -1453,6 +1572,10 @@ void MyGLCanvas::LoadToCanvas()
         for (int j=0; j<nDoubleArray[i]; j++)
             DoubleArray1[i][j] = lmn[i - 11][0] * DoubleArray[11][j] + lmn[i - 11][1] * DoubleArray[12][j] + lmn[i - 11][2] * DoubleArray[13][j];  
     
+    for (int i=14; i<NumberOfDoubleArrays; i++)
+        for (int j=0; j<nDoubleArray[i]; j++)
+            DoubleArray1[i][j] = DoubleArray[i][j];
+    
     Reload();
 }
 
@@ -1472,4 +1595,109 @@ void MyGLCanvas::Reload()
     for (int i=0; i<NumberOfDoubleArrays; i++)
         for (int j=0; j<nDoubleArray[i]; j++)
             DoubleArray0[i][j] = DoubleArray1[i][j];
+}
+
+int MyGLCanvas::RayTraceGetAtomIndex(float x, float y)
+{
+    std::list<int> InRayTrace;
+    std::list<int>::iterator it;
+    int AtomIndex = -1;
+    for (int i=0; i<nDoubleArray[0]; i++)
+    {
+        float xi = (float)DoubleArray0[0][i];
+        float yi = (float)DoubleArray0[1][i];
+        float ri = (float)DoubleArray0[3][i];
+        if ((x-xi*ZoomCam-XCam/2.0)*(x-xi*ZoomCam-XCam/2.0) + (y-yi*ZoomCam-YCam/2.0)*(y-yi*ZoomCam-YCam/2.0) < ri*ri*ZoomCam*ZoomCam)
+        {
+            //it = InRayTrace.end();
+            InRayTrace.push_back(i);
+        }
+    }
+    
+    int nlist = InRayTrace.size();
+    if (nlist > 0)
+    {
+        it = InRayTrace.begin();
+        double zmax = DoubleArray0[2][*it];
+        AtomIndex = *it;
+        for (int i = 1; i < nlist; i++)
+        {
+            *it++;
+            if (DoubleArray0[2][*it] > zmax)
+            {
+                zmax = DoubleArray0[2][*it];
+                AtomIndex = *it;
+            }
+        }
+    }
+    
+    return AtomIndex;
+}
+
+void MyGLCanvas::FrameGetAtomIndex(int &nList, int* &List)
+{
+    float x1 = (float)DoubleArray1[14][0];
+    float y1 = (float)DoubleArray1[14][1];
+    float x2 = (float)DoubleArray1[14][2];
+    float y2 = (float)DoubleArray1[14][3];
+    float X1 = x1*ZoomCam+XCam/2.0;
+    float Y1 = y1*ZoomCam+YCam/2.0;
+    float X2 = x2*ZoomCam+XCam/2.0;
+    float Y2 = y2*ZoomCam+YCam/2.0;
+    
+    std::list<int> SelectedList;
+    for (int i=0; i<nDoubleArray[0]; i++)
+    {
+        float xi = (float)DoubleArray0[0][i];
+        float yi = (float)DoubleArray0[1][i];
+        float ri = (float)DoubleArray0[3][i];
+        
+        float X = xi*ZoomCam+XCam/2.0;
+        float Y = yi*ZoomCam+YCam/2.0;
+        float rad = ri*ZoomCam;
+        if ( X > X1 - rad && X < X2 + rad && Y > Y1 - rad && Y < Y2 + rad)
+        {
+            SelectedList.push_back(i);
+        }
+    }
+    
+    nList = SelectedList.size();
+    
+    if (nList>0)
+    {
+        List = new int[nList];
+        std::list<int>::iterator it;
+        int i=-1;
+        for(it = SelectedList.begin(); it!=SelectedList.end(); it++)
+        {
+            i++;
+            List[i] = *it;
+        }
+    }
+}
+
+void MyGLCanvas::AddToSelectionList(int nNew, int* indexes, bool ClearList, bool RemoveIndexes)
+{
+    if (ClearList)
+    {
+        for (int i=0; i != nIntArray[10];i++)
+            IntArray[10][i]=0;
+    }
+    
+    for(int i=0; i<nNew; i++)
+    {
+        if (RemoveIndexes)
+            IntArray[10][indexes[i]] = 0;
+        else
+            IntArray[10][indexes[i]] = 1;
+    }
+    
+    nSelection=0;
+    for (int i=0; i != nIntArray[10];i++)
+        if (IntArray[10][i] == 1) nSelection++;
+    
+    wxCommandEvent* event = new wxCommandEvent(MyOpenGL_EVT_SelectionChanged);
+    wxQueueEvent(this->GetParent()->GetParent(),event);
+    
+    Refresh(true);
 }

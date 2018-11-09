@@ -37,18 +37,19 @@ void GraphClass::CreateAtomicStructure(Sec30* sec30Var, bool IsNewAllocate)
     sec30 = sec30Var;
     int nUnitcellAtoms = 0;
     sec30->GetVar(_("nAtoms[0]"),nUnitcellAtoms);
+    glc->nSelection = 0;
     
     int kind[nUnitcellAtoms];
     double XArray[nUnitcellAtoms];
     double YArray[nUnitcellAtoms];
     double ZArray[nUnitcellAtoms];
     
-    for (int icell=0; icell<nUnitcellAtoms; icell++)
+    for (int i0=0; i0<nUnitcellAtoms; i0++)
     {
-        sec30->GetVar(_("KABC_Coords"), icell, 0, kind[icell]);
-        sec30->GetVar(_("XYZ_Coords"), icell, 0, XArray[icell]);
-        sec30->GetVar(_("XYZ_Coords"), icell, 1, YArray[icell]);
-        sec30->GetVar(_("XYZ_Coords"), icell, 2, ZArray[icell]);
+        sec30->GetVar(_("KABC_Coords"), i0, 0, kind[i0]);
+        sec30->GetVar(_("XYZ_Coords"), i0, 0, XArray[i0]);
+        sec30->GetVar(_("XYZ_Coords"), i0, 1, YArray[i0]);
+        sec30->GetVar(_("XYZ_Coords"), i0, 2, ZArray[i0]);
     }
     
     double a[3],b[3],c[3];
@@ -116,10 +117,10 @@ void GraphClass::CreateAtomicStructure(Sec30* sec30Var, bool IsNewAllocate)
     /************************************************/
     if (!isCountingMode)
     {
-        int ndoublearr[14]={nShowingAtoms,nShowingAtoms,nShowingAtoms,nShowingAtoms,nShowingBonds,nShowingBonds,nShowingBonds,nShowingBonds,nShowingBonds,nShowingBonds,nShowingBonds,3,3,3};
-        int nintarr[10]={nShowingAtoms,nShowingAtoms,nShowingAtoms,nShowingBonds,nShowingBonds,nShowingBonds,nShowingUnitcell,nShowingUnitcell,nShowingUnitcell,3};
-        glc->CreateDoubleArray(14,ndoublearr);
-        glc->CreateIntArray(10,nintarr);
+        int ndoublearr[15]={nShowingAtoms,nShowingAtoms,nShowingAtoms,nShowingAtoms,nShowingBonds,nShowingBonds,nShowingBonds,nShowingBonds,nShowingBonds,nShowingBonds,nShowingBonds,3,3,3,4};
+        int nintarr[16]={nShowingAtoms,nShowingAtoms,nShowingAtoms,nShowingBonds,nShowingBonds,nShowingBonds,nShowingUnitcell,nShowingUnitcell,nShowingUnitcell,4,nShowingAtoms,nShowingAtoms,nShowingAtoms,nShowingAtoms,nShowingAtoms,nShowingAtoms};
+        glc->CreateDoubleArray(15,ndoublearr);
+        glc->CreateIntArray(16,nintarr);
         
         glc->DoubleArray[11][0] = a[0];
         glc->DoubleArray[12][0] = a[1];
@@ -130,6 +131,11 @@ void GraphClass::CreateAtomicStructure(Sec30* sec30Var, bool IsNewAllocate)
         glc->DoubleArray[11][2] = c[0];
         glc->DoubleArray[12][2] = c[1];
         glc->DoubleArray[13][2] = c[2];
+        
+        glc->DoubleArray[14][0] = 0.0;
+        glc->DoubleArray[14][1] = 0.0;
+        glc->DoubleArray[14][2] = 0.0;
+        glc->DoubleArray[14][3] = 0.0;
         
         bool xyzShow = false;
         sec30->GetCheckVar(_("xyzShow[0]"), xyzShow);
@@ -145,10 +151,11 @@ void GraphClass::CreateAtomicStructure(Sec30* sec30Var, bool IsNewAllocate)
             glc->IntArray[9][1] = 1;
         else
             glc->IntArray[9][1] = 0;
-            
+        
         wxComboBox* unitcellctr =  sec30->GetComboObject(_("ShowUnitCellMode"));
         glc->IntArray[9][2] = unitcellctr->GetSelection();
         
+        glc->IntArray[9][3] = 0;
     }
     else
     {
@@ -176,16 +183,16 @@ void GraphClass::CreateAtomicStructure(Sec30* sec30Var, bool IsNewAllocate)
                         glc->IntArray[8][iCell] = k;
                     }
                     
-                    for (int icell=0; icell<nUnitcellAtoms; icell++)
+                    for (int i0=0; i0<nUnitcellAtoms; i0++)
                     {
                         iAtom++;
                         if (!isCountingMode)
                         {
-                            glc->DoubleArray[0][iAtom] = XArray[icell] + i*a[0] + j*b[0] + k*c[0];
-                            glc->DoubleArray[1][iAtom] = YArray[icell] + i*a[1] + j*b[1] + k*c[1];
-                            glc->DoubleArray[2][iAtom] = ZArray[icell] + i*a[2] + j*b[2] + k*c[2];
-                            glc->DoubleArray[3][iAtom] = GetAtomRadius(kind[icell]);
-                            int atomKindindex = kind[icell];
+                            glc->DoubleArray[0][iAtom] = XArray[i0] + i*a[0] + j*b[0] + k*c[0];
+                            glc->DoubleArray[1][iAtom] = YArray[i0] + i*a[1] + j*b[1] + k*c[1];
+                            glc->DoubleArray[2][iAtom] = ZArray[i0] + i*a[2] + j*b[2] + k*c[2];
+                            glc->DoubleArray[3][iAtom] = GetAtomRadius(kind[i0]);
+                            int atomKindindex = kind[i0];
                             if (atomKindindex < 1) atomKindindex = 1;
                             if (atomKindindex > 118) atomKindindex = 118;
                             wxColourPickerCtrl* cctrl = sec30->GetColorObject(_("AColor") + wxString::Format(wxT("%d"),atomKindindex));
@@ -196,6 +203,12 @@ void GraphClass::CreateAtomicStructure(Sec30* sec30Var, bool IsNewAllocate)
                             glc->IntArray[0][iAtom] = r;
                             glc->IntArray[1][iAtom] = g;
                             glc->IntArray[2][iAtom] = b;
+                            glc->IntArray[10][iAtom] = 0;
+                            glc->IntArray[11][iAtom] = i;
+                            glc->IntArray[12][iAtom] = j;
+                            glc->IntArray[13][iAtom] = k;
+                            glc->IntArray[14][iAtom] = i0;
+                            glc->IntArray[15][iAtom] = kind[i0];
                         }
                         else
                             nShowingAtoms = iAtom + 1;
@@ -208,7 +221,7 @@ void GraphClass::CreateAtomicStructure(Sec30* sec30Var, bool IsNewAllocate)
             for (int j=mmax; j>=mmin; j--)
                 for (int k=nmax; k>=nmin; k--)
                 {
-                    for (int icell=0; icell<nUnitcellAtoms; icell++)
+                    for (int i0=0; i0<nUnitcellAtoms; i0++)
                     {
                         int iMyess, jMyess, kMyess;
                         std::list<int>::iterator ii = EssentialListi.begin();
@@ -314,16 +327,16 @@ void GraphClass::CreateAtomicStructure(Sec30* sec30Var, bool IsNewAllocate)
                 glc->IntArray[8][iCell] = k;
             }
             
-            for (int icell=0; icell<nUnitcellAtoms; icell++)
+            for (int i0=0; i0<nUnitcellAtoms; i0++)
             {
                 iAtom++;
                 if (!isCountingMode)
                 {
-                    glc->DoubleArray[0][iAtom] = XArray[icell] + i*a[0] + j*b[0] + k*c[0];
-                    glc->DoubleArray[1][iAtom] = YArray[icell] + i*a[1] + j*b[1] + k*c[1];
-                    glc->DoubleArray[2][iAtom] = ZArray[icell] + i*a[2] + j*b[2] + k*c[2];
-                    glc->DoubleArray[3][iAtom] = GetAtomRadius(kind[icell]);
-                    int atomKindindex = kind[icell];
+                    glc->DoubleArray[0][iAtom] = XArray[i0] + i*a[0] + j*b[0] + k*c[0];
+                    glc->DoubleArray[1][iAtom] = YArray[i0] + i*a[1] + j*b[1] + k*c[1];
+                    glc->DoubleArray[2][iAtom] = ZArray[i0] + i*a[2] + j*b[2] + k*c[2];
+                    glc->DoubleArray[3][iAtom] = GetAtomRadius(kind[i0]);
+                    int atomKindindex = kind[i0];
                     if (atomKindindex < 1) atomKindindex = 1;
                     if (atomKindindex > 118) atomKindindex = 118;
                     wxColourPickerCtrl* cctrl = sec30->GetColorObject(_("AColor") + wxString::Format(wxT("%d"),atomKindindex));
@@ -334,6 +347,12 @@ void GraphClass::CreateAtomicStructure(Sec30* sec30Var, bool IsNewAllocate)
                     glc->IntArray[0][iAtom] = r;
                     glc->IntArray[1][iAtom] = g;
                     glc->IntArray[2][iAtom] = b;
+                    glc->IntArray[10][iAtom] = 0;
+                    glc->IntArray[11][iAtom] = i;
+                    glc->IntArray[12][iAtom] = j;
+                    glc->IntArray[13][iAtom] = k;
+                    glc->IntArray[14][iAtom] = i0;
+                    glc->IntArray[15][iAtom] = kind[i0];
                 }
                 else
                     nShowingAtoms = iAtom + 1;
@@ -363,7 +382,7 @@ void GraphClass::CreateAtomicStructure(Sec30* sec30Var, bool IsNewAllocate)
             i = *ii0++;
             j = *ij0++;
             k = *ik0++;
-            for (int icell=0; icell<nUnitcellAtoms; icell++)
+            for (int i0=0; i0<nUnitcellAtoms; i0++)
             {
                 int iMyess, jMyess, kMyess;
                 std::list<int>::iterator ii,ij,ik;
@@ -613,3 +632,54 @@ double GraphClass::GetAtomRadius(int kind)
     if (k < 1) k=1;
     return (10.0 + pow(log(abs(k) + 1),2.75)/2.0 )/100.0;
 }
+
+void GraphClass::SetLeftMouseMode(int mouseEventMode)
+{
+    glc->isSelectMode = false;
+    glc->isMoveMode = false;
+    glc->isRotationMode = false;
+    glc->isZoomMode = false;
+    if (mouseEventMode == 0)
+        glc->isSelectMode = true;
+    else if (mouseEventMode == 1)
+        glc->isMoveMode = true;
+    else if (mouseEventMode == 2)
+        glc->isRotationMode = true;
+    else if (mouseEventMode == 3)
+        glc->isZoomMode = true;
+    
+}
+
+int GraphClass::GetSelectedCount()
+{
+    return glc->nSelection;
+}
+
+int GraphClass::GetShowingAtomsCount()
+{
+    return nShowingAtoms;
+}
+
+int GraphClass::GetShowingBondsCount()
+{
+    return nShowingBonds;
+}
+
+int GraphClass::GetShowingUnitcellCount()
+{
+    return nShowingUnitcell;
+}
+
+void GraphClass::GetAtoms_Selection(int* &Atoms)
+{
+    if (nShowingAtoms>0)
+    {
+        for (int i=0; i != nShowingAtoms;i++)
+        {
+            int myindex = glc->IntArray[10][i];
+            Atoms[i] = myindex;
+        }
+    }
+}
+
+    
