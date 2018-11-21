@@ -52,53 +52,7 @@ MainFrame::MainFrame(wxWindow* parent)
     sec30=new Sec30(this);
     sec30->Connect(Sec30EVT_OnUpdated, wxCommandEventHandler(sec30_OnUpdated), NULL, this);
     this->Connect(MyOpenGL_EVT_SelectionChanged, wxCommandEventHandler(myOpenGL_EVT_SelectionChanged), NULL, this);
-    
-    /*
-    CML::IOData* iod = static_cast<MainFrame*>(mainFrame)->iod;
-    int SelectedCalcBoxIndex = iod->SelectedCalcBoxIndex;
-    std::list<CML::CalcBox>::iterator cb=iod->CalcBoxs.begin();
-    for (int i=0; i < SelectedCalcBoxIndex; i++) cb++;
-    
-    CML::Atom NewAtom;
-    NewAtom.Kind=1;
-    NewAtom.x=0;
-    NewAtom.y=0;
-    NewAtom.z=0;
-    std::list<CML::Atom>::iterator atm=cb->UnitCell->Atoms.end();
-    cb->UnitCell->Atoms.insert(atm,NewAtom);
-    cb->UnitCell->nAtoms++;
-    wxString str = wxString::Format(wxT("%02d: %s {%5.4f,%5.4f,%5.4f}"), cb->UnitCell->nAtoms,NewAtom.GetAtomLable(NewAtom.Kind),NewAtom.x,NewAtom.y,NewAtom.z);
-    LBAtoms->Append(str);
-    */
-    
-    /*
-    std::list<double>::iterator x=tbmodel->XArray.end();
-    tbmodel->XArray.insert(x,-0.5);
-    tbmodel->XArray.insert(x,0.5);
-    tbmodel->XArray.insert(x,0.5);
-    tbmodel->XArray.insert(x,-0.5);
-    std::list<double>::iterator y=tbmodel->YArray.end();
-    tbmodel->YArray.insert(y,-0.5);
-    tbmodel->YArray.insert(y,-0.5);
-    tbmodel->YArray.insert(y,0.5);
-    tbmodel->YArray.insert(y,0.5);
-    std::list<double>::iterator z=tbmodel->ZArray.end();
-    tbmodel->ZArray.insert(z,0.0);
-    tbmodel->ZArray.insert(z,0.0);
-    tbmodel->ZArray.insert(z,0.0);
-    tbmodel->ZArray.insert(z,0.0);
-    std::list<int>::iterator k=tbmodel->KindArray.end();
-    tbmodel->KindArray.insert(k,-0.5);
-    tbmodel->KindArray.insert(k,0.5);
-    tbmodel->KindArray.insert(k,0.5);
-    tbmodel->KindArray.insert(k,-0.5);
-    */
-    
-    //Draw_Atom(0.5f, -0.5f, -0.5f, 0.0f, 255, 0, 0, 80, 60);
-    //Draw_Atom(0.5f, -0.5f, 0.5f, 0.0f, 0, 255, 0, 80, 60);
-    //Draw_Atom(0.5f, 0.5f, 0.5f, 0.0f, 0, 0, 255, 80, 60);
-    //Draw_Atom(0.5f, 0.5f, -0.5f, 0.0f, 0, 125, 140, 80, 60);
-    
+
     unsigned int AUI_Flags = wxAUI_MGR_ALLOW_FLOATING|wxAUI_MGR_ALLOW_ACTIVE_PANE|
     wxAUI_MGR_TRANSPARENT_DRAG|wxAUI_MGR_TRANSPARENT_HINT|wxAUI_MGR_VENETIAN_BLINDS_HINT|
     wxAUI_MGR_RECTANGLE_HINT|wxAUI_MGR_HINT_FADE|wxAUI_MGR_NO_VENETIAN_BLINDS_FADE|
@@ -130,6 +84,7 @@ MainFrame::MainFrame(wxWindow* parent)
     LoadOrbitalsPanel();
     LoadBondsPanel();
     LoadProjectionPanel();
+    LoadSKPanel();
     
     MainRibbon->SetActivePage((size_t)0);
     LeftPanel->ChangeSelection(0);
@@ -147,11 +102,11 @@ MainFrame::MainFrame(wxWindow* parent)
     aui_mgr.Update();
     /////////////////////////////////////////////////////////////////////////////////////
     
-    //wxConfig::Get()->Write(CFG_AUI_PERSPECTIVE, aui_mgr.SavePerspective());
-    //SetAppName(wxT("TBModel"));
-    //SetVendorName(wxT("CMT Group, Antwerp University, Antwerpen, Belgium."));
+    wxConfig::Get()->Write(CFG_AUI_PERSPECTIVE, aui_mgr.SavePerspective());
+    SetAppName(wxT("TBModel"));
+    SetVendorName(wxT("CMT Group, Antwerp University, Antwerpen, Belgium."));
     //const wxString perspective = _("layout2|name=0394df705cc5b7dc000000dc00000001;caption=;state=768;dir=5;layer=0;row=0;pos=0;prop=100000;bestw=20;besth=20;minw=-1;minh=-1;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=-1;floath=-1|name=072d48e05cc5b7de000006ab00000002;caption=Structure;state=12584956;dir=1;layer=0;row=0;pos=0;prop=100000;bestw=800;besth=600;minw=-1;minh=-1;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=-1;floath=-1|name=072dae405cc5b7de000007ba00000003;caption=Current Band-Structure;state=12584956;dir=2;layer=1;row=0;pos=0;prop=100000;bestw=525;besth=0;minw=-1;minh=-1;maxw=-1;maxh=-1;floatx=1426;floaty=329;floatw=541;floath=39|name=072dd1605cc5b7de000008ed00000004;caption=Initial Band-Structure;state=12601340;dir=2;layer=1;row=0;pos=1;prop=100000;bestw=525;besth=0;minw=-1;minh=-1;maxw=-1;maxh=-1;floatx=1041;floaty=477;floatw=541;floath=39|dock_size(5,0,0)=22|dock_size(1,0,0)=633|dock_size(2,1,0)=343|");
-    //aui_mgr.LoadPerspective(perspective,false);
+    aui_mgr.LoadPerspective(perspective,false);
     
     EvaluateUnitcellPanel();
     // Create the TB Model Class which includes all information about the system
@@ -159,24 +114,24 @@ MainFrame::MainFrame(wxWindow* parent)
     
     //
     
-    /*
+    
     unsigned int ntb_Flags = wxAUI_NB_TAB_SPLIT|wxAUI_NB_CLOSE_ON_ACTIVE_TAB|wxAUI_NB_TOP|
     wxAUI_NB_SCROLL_BUTTONS|wxAUI_NB_WINDOWLIST_BUTTON|wxAUI_NB_MIDDLE_CLICK_CLOSE|wxAUI_NB_TAB_MOVE|wxAUI_NB_TAB_FIXED_WIDTH;
     aui_ntb = new wxAuiNotebook(LeftPanel,wxID_ANY,wxPoint(0,0),wxSize(100,100),ntb_Flags);
-    // Set up the sizer for the panel
+     Set up the sizer for the panel
     wxBoxSizer* panelSizer2 = new wxBoxSizer(wxHORIZONTAL);
     panelSizer2->Add(aui_ntb, 1, wxEXPAND);
     LeftPanel->SetSizer(panelSizer2);
-    */
     
-    //ShowStartPage();
     
-    //wxAuiPaneInfo inf = wxAuiPaneInfo().Dockable(true).TopDockable(true).BottomDockable(true).LeftDockable(true).RightDockable(true).Caption(wxT("Notbook")).BestSize(600,800).Dock();
-    //aui_mgr.AddPane(SidePanel,inf);
-    //m_ribbonButtonBar528->Connect(wxID_ANY, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrameBaseClass::b2), NULL, this);
-    //wxGLAttributes m_glCanvas17Attr = wxGLAttributes().PlatformDefaults().Defaults();
-    //m_glCanvas17Attr.PlatformDefaults().Defaults().EndList();
-    //bool accepted = wxGLCanvas::IsDisplaySupported(m_glCanvas17Attr);
+    ShowStartPage();
+    
+    wxAuiPaneInfo inf = wxAuiPaneInfo().Dockable(true).TopDockable(true).BottomDockable(true).LeftDockable(true).RightDockable(true).Caption(wxT("Notbook")).BestSize(600,800).Dock();
+    aui_mgr.AddPane(SidePanel,inf);
+    m_ribbonButtonBar528->Connect(wxID_ANY, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrameBaseClass::b2), NULL, this);
+    wxGLAttributes m_glCanvas17Attr = wxGLAttributes().PlatformDefaults().Defaults();
+    m_glCanvas17Attr.PlatformDefaults().Defaults().EndList();
+    bool accepted = wxGLCanvas::IsDisplaySupported(m_glCanvas17Attr);
 }
 
 MainFrame::~MainFrame()
@@ -613,7 +568,9 @@ void MainFrame::BtnTerminal_OnClick(wxRibbonButtonBarEvent& event)
 void MainFrame::Init_graph3d()
 {
     graph3d = new GraphClass(mainpanel,3);
-    graph3d->CreateAtomicStructure(sec30);
+    for (int i=1; i<=50; i++) graph3d->BColorCtrl[i-1] = sec30->GetColorObject(_("BColor") + wxString::Format(wxT("%d"),i));
+    //for (int i=1; i<=118; i++) graph3d->AColorCtrl[i-1] = sec30->GetColorObject(_("AColor") + wxString::Format(wxT("%d"),i));
+    graph3d->CreateAtomicStructure(sec30, true);
     aui_mgr.SetDockSizeConstraint(0.333333,0.75);
     aui_mgr.AddPane(graph3d, wxAuiPaneInfo().Gripper(false).Floatable(true).Dockable(true).Caption("Structure").CloseButton(false).MaximizeButton(true).MinimizeButton(true).BestSize(800,600).Dock().Top());
     aui_mgr.Update();
@@ -684,7 +641,7 @@ void MainFrame::ClearGraph3D()
 
 void MainFrame::ShowGraph3D()
 {
-    graph3d->CreateAtomicStructure(sec30);
+    graph3d->CreateAtomicStructure(sec30, true);
     graph3d->Refresh(false);
 }
 
@@ -699,15 +656,22 @@ void MainFrame::UpdateGraph3D()
 /****************************************************************************************************************************************************************/
 void MainFrame::sec30_OnUpdated(wxCommandEvent& event)
 {
-    int redraw = event.GetInt();
-    if (redraw == 1) ClearGraph3D();
     wxString info = event.GetString();
+    int redraw = event.GetInt();
+    
+    if (info == _("SKClass"))
+        EvaluateSKPanel();
+    else
+    {
+        if (redraw == 1) ClearGraph3D();
+    }
+    
     if (info == _("UnitcellClass"))
         EvaluateUnitcellPanel();
     else if (info == _("StructureClass"))
         EvaluateStructurePanel();
     else if (info == _("OrbitalsClass"))
-        EvaluateOrbitalsPanel();
+        EvaluateOrbitalsPanel(redraw);
     else if (info == _("BondsClass"))
         EvaluateBondsPanel(redraw);
     else if (info == _("ProjectionClass"))
@@ -799,10 +763,10 @@ void MainFrame::myOpenGL_EVT_SelectionChanged(wxCommandEvent& event)
         wxCheckTree* treectr = sec30->GetTreeObject(_("Bonds"));
         wxTreeItemId rootID = treectr->GetRootItem();
         
-        wxString cellItem1 = wxString::Format(wxT("cell(0,0,0)-cell(%d,%d,%d)"), iMyess, jMyess, kMyess);
+        wxString cellItem1 = wxString::Format(wxT("(0,0,0)-(%d,%d,%d)"), iMyess, jMyess, kMyess);
         wxTreeItemId lmnID1 = treectr->FindItemIn(rootID,cellItem1);
         
-        wxString cellItem2 = wxString::Format(wxT("cell(0,0,0)-cell(%d,%d,%d)"), -iMyess, -jMyess, -kMyess);
+        wxString cellItem2 = wxString::Format(wxT("(0,0,0)-(%d,%d,%d)"), -iMyess, -jMyess, -kMyess);
         wxTreeItemId lmnID2 = treectr->FindItemIn(rootID,cellItem2);
         
         wxString cellItem;
@@ -811,7 +775,7 @@ void MainFrame::myOpenGL_EVT_SelectionChanged(wxCommandEvent& event)
         if (lmnID1.IsOk())
         {
             isfound = true;
-            cellItem = wxString::Format(wxT("cell(0,0,0)-cell(%d,%d,%d)"), iMyess, jMyess, kMyess);
+            cellItem = wxString::Format(wxT("(0,0,0)-(%d,%d,%d)"), iMyess, jMyess, kMyess);
             lmnID = treectr->FindItemIn(rootID,cellItem);
             ind000 = i1000;
             indlmn = i2000;
@@ -819,7 +783,7 @@ void MainFrame::myOpenGL_EVT_SelectionChanged(wxCommandEvent& event)
         else if (lmnID2.IsOk())
         {
             isfound = true;
-            cellItem = wxString::Format(wxT("cell(0,0,0)-cell(%d,%d,%d)"), -iMyess, -jMyess, -kMyess);
+            cellItem = wxString::Format(wxT("(0,0,0)-(%d,%d,%d)"), -iMyess, -jMyess, -kMyess);
             lmnID = treectr->FindItemIn(rootID,cellItem);
             ind000 = i2000;
             indlmn = i1000;
@@ -938,7 +902,6 @@ void MainFrame::LoadBondsPanel()
 
 void MainFrame::LoadProjectionPanel()
 {
-    /*
     wxScrolledWindow* scrolledwindow = new wxScrolledWindow(LeftPanel,wxID_ANY,wxDefaultPosition, wxSize(-1,-1));
     LeftPanel->AddPage(scrolledwindow,"Projection",true);
     LeftPanel->Update();
@@ -952,7 +915,25 @@ void MainFrame::LoadProjectionPanel()
     scrolledwindow->FitInside();
     scrolledwindow->SetScrollRate(-1,15);
     projectionPanel->graph3d = graph3d;
-     */
+}
+
+void MainFrame::LoadSKPanel()
+{
+    wxScrolledWindow* scrolledwindow = new wxScrolledWindow(LeftPanel,wxID_ANY,wxDefaultPosition, wxSize(-1,-1));
+    LeftPanel->AddPage(scrolledwindow,"SK",true);
+    LeftPanel->Update();
+    
+    skPanel = new SKClass(scrolledwindow,sec30);
+    
+    wxBoxSizer* panelSizer1 = new wxBoxSizer(wxVERTICAL);
+    panelSizer1->Add(skPanel, 1, wxEXPAND);
+    scrolledwindow->SetSizer(panelSizer1);
+    
+    scrolledwindow->FitInside();
+    scrolledwindow->SetScrollRate(-1,15);
+    skPanel->graph3d = graph3d;
+    skPanel->graph2d0 = graph2d0;
+    skPanel->graph2d = graph2d;
 }
 
 void MainFrame::LoadColorsForm()
@@ -965,7 +946,10 @@ void MainFrame::EvaluateUnitcellPanel()
 {
     wxListBox* eunitcellsctr = sec30->GetListObject( _("EssentialUnitcellList"));
     eunitcellsctr->Clear();
-    if (ValidateUnitCellPanel()) EvaluateStructurePanel();
+    if (ValidateUnitCellPanel())
+    {
+        EvaluateStructurePanel();
+    }
 }
 
 void MainFrame::EvaluateStructurePanel()
@@ -979,9 +963,13 @@ void MainFrame::EvaluateStructurePanel()
     }
 }
 
-void MainFrame::EvaluateOrbitalsPanel()
+void MainFrame::EvaluateOrbitalsPanel(int redraw)
 {
-    if (ValidateOrbitalsPanel()) ShowGraph3D();
+    if (ValidateOrbitalsPanel())
+    {
+        FillProjectionPanel();
+        if (redraw == 1) ShowGraph3D();
+    }
 }
 
 void MainFrame::EvaluateBondsPanel(int redraw)
@@ -1109,6 +1097,11 @@ void MainFrame::EvaluateProjectionPanel(int redraw)
     if (ValidateProjectionPanel()) ShowGraph3D();
 }
 
+void MainFrame::EvaluateSKPanel()
+{
+    if (ValidateSKPanel()) return;
+}
+
 void MainFrame::EvaluateColorsPanel()
 {
     if (ValidateColorsPanel()) ShowGraph3D();
@@ -1120,6 +1113,7 @@ bool MainFrame::ValidateUnitCellPanel()
     bool isValid = true;
     int AtomCnt = 0;
     double A, B, C;
+    double a0[3], b0[3], c0[3];
     double a[3], b[3], c[3];
     double astrain, bstrain, cstrain;
     double x, y, z;
@@ -1128,24 +1122,37 @@ bool MainFrame::ValidateUnitCellPanel()
     int nCol = 0;
     sec30->GetDim(_("KABC_Coords"), nRow, nCol);
     
-    isValid = isValid && sec30->GetVar(_("a[0]"), a[0]);
-    isValid = isValid && sec30->GetVar(_("a[1]"), a[1]);
-    isValid = isValid && sec30->GetVar(_("a[2]"), a[2]);
-    isValid = isValid && sec30->GetVar(_("b[0]"), b[0]);
-    isValid = isValid && sec30->GetVar(_("b[1]"), b[1]);
-    isValid = isValid && sec30->GetVar(_("b[2]"), b[2]);
-    isValid = isValid && sec30->GetVar(_("c[0]"), c[0]);
-    isValid = isValid && sec30->GetVar(_("c[1]"), c[1]);
-    isValid = isValid && sec30->GetVar(_("c[2]"), c[2]);
+    isValid = isValid && sec30->GetVar(_("a0[0]"), a0[0]);
+    isValid = isValid && sec30->GetVar(_("a0[1]"), a0[1]);
+    isValid = isValid && sec30->GetVar(_("a0[2]"), a0[2]);
+    isValid = isValid && sec30->GetVar(_("b0[0]"), b0[0]);
+    isValid = isValid && sec30->GetVar(_("b0[1]"), b0[1]);
+    isValid = isValid && sec30->GetVar(_("b0[2]"), b0[2]);
+    isValid = isValid && sec30->GetVar(_("c0[0]"), c0[0]);
+    isValid = isValid && sec30->GetVar(_("c0[1]"), c0[1]);
+    isValid = isValid && sec30->GetVar(_("c0[2]"), c0[2]);
     
     isValid = isValid && sec30->GetVar(_("astrain[0]"), astrain);
     isValid = isValid && sec30->GetVar(_("bstrain[0]"), bstrain);
     isValid = isValid && sec30->GetVar(_("cstrain[0]"), cstrain);
     for (int i0=0; i0<3; i0++)
     {
-        a[i0]=a[i0]*astrain;
-        b[i0]=b[i0]*bstrain;
-        c[i0]=c[i0]*cstrain;
+        a[i0]=a0[i0]*astrain;
+        b[i0]=b0[i0]*bstrain;
+        c[i0]=c0[i0]*cstrain;
+    }
+    
+    if (isValid)
+    {
+        sec30->SetVar(_("a[0]"),a[0],false);
+        sec30->SetVar(_("a[1]"),a[1],false);
+        sec30->SetVar(_("a[2]"),a[2],false);
+        sec30->SetVar(_("b[0]"),b[0],false);
+        sec30->SetVar(_("b[1]"),b[1],false);
+        sec30->SetVar(_("b[2]"),b[2],false);
+        sec30->SetVar(_("c[0]"),c[0],false);
+        sec30->SetVar(_("c[1]"),c[1],false);
+        sec30->SetVar(_("c[2]"),c[2],false);
     }
     
     int i=-1;
@@ -1167,6 +1174,11 @@ bool MainFrame::ValidateUnitCellPanel()
             sec30->SetVar(_("XYZ_Coords"), i, 0, x, false);
             sec30->SetVar(_("XYZ_Coords"), i, 1, y, false);
             sec30->SetVar(_("XYZ_Coords"), i, 2, z, false);
+            
+            wxString name = wxString::Format(wxT("AtomInd%d"),AtomCnt);
+            wxStaticText* lab = sec30->GetComboLabelObject(name);
+            wxString label = wxString::Format(wxT("Atom %d"),i+1);
+            lab->SetLabel(label + _(" [") +sec30->GetAtomLable(kind)+ _("]"));
         }
     }
     
@@ -1257,6 +1269,42 @@ bool MainFrame::ValidateProjectionPanel()
     return isValid;
 }
 
+bool MainFrame::ValidateSKPanel()
+{
+    logfile->AppendText(_("\n"));
+    int ErrorIndex = 0;
+    bool isValid = true;
+    int nOnSites=0;
+    sec30->GetVar(_("nAtoms[0]"),nOnSites);
+    if (nOnSites == 0)
+    {
+        ErrorIndex++;
+        if (ErrorIndex==1){isValid = false;logfile->AppendText(_("Error list:\n"));}
+        logfile->AppendText(wxString::Format(wxT("Error %d: There is not any atom in your structure!\n"),ErrorIndex));
+    }
+    
+    for (int i = 1; i<=nOnSites; i++)
+    {
+        wxString name = wxString::Format(wxT("AtomInd%d"),i);
+        wxComboBox* comb = sec30->GetComboObject(name);
+        wxStaticText* comblabel = sec30->GetComboLabelObject(name);
+        wxString label = comb->GetStringSelection();
+        if (label == _("Not set"))
+        {
+            ErrorIndex++;
+            if (ErrorIndex==1) {isValid = false;logfile->AppendText(_("Error list:\n"));}
+            logfile->AppendText(wxString::Format(wxT("Error %d: "),ErrorIndex) + _("The projection for the ") + comblabel->GetLabel() + _(" has not yet been set.\n"));
+        }
+    }
+    
+    wxCheckTree* bonds = sec30->GetTreeObject(_("Bonds"));
+    wxTreeItemId rootID = bonds->GetRootItem();
+    wxTreeItemId lmnID = bonds->FindItemIn(rootID,ucell);
+    
+    if (!isValid) logfile->AppendText(_("Fix the problems and try again ...\n"));
+    return isValid;
+}
+
 bool MainFrame::ValidateColorsPanel()
 {
     bool isValid = true;
@@ -1264,6 +1312,73 @@ bool MainFrame::ValidateColorsPanel()
     return isValid;
 }
 /****************************************************************************************************************************************************************/
+void MainFrame::UpdateSKList()
+{
+    myGrid* gc = sec30->GetGridObject(_("SK"));
+    int nRows = gc->GetNumberRows();
+    gc->DeleteRows(0,nRows,true);
+    wxColour c; //Also it is possible to determine the color in this way: wxColour c=*wxGREEN;
+    c.Set(191,205,219,0);
+    
+    int TotalIndex = -1;
+    
+    int nOnSites=0;
+    sec30->GetVar(_("nAtoms[0]"),nOnSites);
+    
+    gc->InsertRows(0, nOnSites + 1,false);
+    
+    TotalIndex++;
+    gc->SetCellValue(TotalIndex, 0, _("On-Sites"));
+    gc->SetReadOnly(TotalIndex, 0);
+    gc->SetReadOnly(TotalIndex, 1);
+    gc->SetReadOnly(TotalIndex, 2);
+    gc->SetCellBackgroundColour(TotalIndex, 0, c);
+    gc->SetCellBackgroundColour(TotalIndex, 1, c);
+    gc->SetCellBackgroundColour(TotalIndex, 2, c);
+    
+    int TotalNumberOfParameters = 0;
+    
+    for (int i = 1; i<=nOnSites; i++)
+    {
+        TotalIndex++;
+        TotalNumberOfParameters++;
+        wxString name = wxString::Format(wxT("AtomInd%d"),i);
+        wxComboBox* comb = sec30->GetComboObject(name);
+        wxString label = comb->GetStringSelection();
+        
+        gc->SetCellValue(TotalIndex, 0, label);
+        gc->SetReadOnly(TotalIndex, 0);
+        gc->SetCellBackgroundColour(TotalIndex, 0, c);
+        
+        gc->SetCellValue(TotalIndex, 1, _("0"));
+    }
+    
+    wxComboBox* comboctr = sec30->GetComboObject(_("AtomLabel"));
+    int nBondType = comboctr->GetCount();
+    
+    wxCheckTree* bonds = sec30->GetTreeObject(_("Bonds"));
+    for (int BondTypeIndex = 1; BondTypeIndex <= nBondType; BondTypeIndex++)
+    {
+        wxString bondinfotest = wxString::Format(wxT("Bond %d"), BondTypeIndex);
+        wxTreeItemId rootID = bonds->GetRootItem();
+        wxTreeItemId testID = bonds->ContainsItemIn(rootID,bondinfotest);
+        
+        if (testID)
+        {
+            TotalIndex++;
+            gc->InsertRows(TotalIndex, 1,true);
+            gc->SetCellValue(TotalIndex, 0, bondinfotest);
+            gc->SetReadOnly(TotalIndex, 0);
+            gc->SetReadOnly(TotalIndex, 1);
+            gc->SetReadOnly(TotalIndex, 2);
+            gc->SetCellBackgroundColour(TotalIndex, 0, c);
+            gc->SetCellBackgroundColour(TotalIndex, 1, c);
+            gc->SetCellBackgroundColour(TotalIndex, 2, c);
+        }
+        
+    }
+}
+
 void MainFrame::OnchoisSelected(wxCommandEvent& event)
 {
 }
@@ -1325,7 +1440,33 @@ void MainFrame::FillBondsPanel()
 
 void MainFrame::FillProjectionPanel()
 {
+    //Clear All labels in Projection panel after the nAtoms. It will be set later as long as the lines are valid in unitcell panel
+    int maxIndex=0;
+    sec30->GetVar(_("nAtoms[0]"),maxIndex);
+    for (int i = maxIndex + 1; i<=99; i++)
+    {
+        wxString name = wxString::Format(wxT("AtomInd%d"),i);
+        wxStaticText* lab = sec30->GetComboLabelObject(name);
+        wxString label = wxString::Format(wxT("Atom %d"),i);
+        lab->SetLabel(label);
+    }
     
+    wxListBox* listctr = sec30->GetListObject(_("AtomSpeciesList"));
+    int nspec = listctr->GetCount();
+    
+    for (int i = 1; i<=99; i++)
+    {
+        wxString name = wxString::Format(wxT("AtomInd%d"),i);
+        wxComboBox* ctr = sec30->GetComboObject(name);
+        int oldind = ctr->GetSelection();
+        ctr->Clear();
+        ctr->Append(_("Not set"));
+        for(int j=0; j<nspec; j++) ctr->Append(listctr->GetString(j));
+        if (oldind < nspec)
+            ctr->SetSelection(oldind);
+        else
+            ctr->SetSelection(0);
+    }
 }
 
 int MainFrame::GetBonds(int* bonds)

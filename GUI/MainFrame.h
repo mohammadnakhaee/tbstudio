@@ -11,7 +11,8 @@
 #include "StructureClass.h"
 #include "OrbitalsClass.h"
 #include "BondsClass.h"
-//#include "ProjectionClass.h"
+#include "ProjectionClass.h"
+#include "SKClass.h"
 #include "ColorsClass.h"
 #include "unistd.h"
 /**********************************************************************************/
@@ -30,7 +31,8 @@ public:
     StructureClass* structurePanel;
     OrbitalsClass* orbitalsPanel;
     BondsClass* bondsPanel;
-    //ProjectionClass* projectionPanel;
+    ProjectionClass* projectionPanel;
+    SKClass* skPanel;
     ColorsClass* ColorsForm;
     Sec30* sec30;
     
@@ -87,7 +89,7 @@ protected:
     virtual bool ValidateStructurePanel();
     /****************************************/
     virtual void LoadOrbitalsPanel();
-    virtual void EvaluateOrbitalsPanel();
+    virtual void EvaluateOrbitalsPanel(int redraw);
     virtual bool ValidateOrbitalsPanel();
     /****************************************/
     virtual void LoadBondsPanel();
@@ -100,10 +102,6 @@ protected:
     virtual bool ValidateProjectionPanel();
     virtual void FillProjectionPanel();
     /****************************************/
-    virtual void LoadColorsForm();
-    virtual void EvaluateColorsPanel();
-    virtual bool ValidateColorsPanel();
-    /****************************************/
     int GetBonds(int* bonds);
 private:
     wxTextCtrl* logfile;
@@ -113,6 +111,7 @@ private:
     std::list<int> EssentialListj;
     std::list<int> EssentialListk;
     bool isItNew(int i,int j,int k);
+    void UpdateSKList();
     virtual void sec30_OnUpdated(wxCommandEvent& event);
     virtual void myOpenGL_EVT_SelectionChanged(wxCommandEvent& event);
 };

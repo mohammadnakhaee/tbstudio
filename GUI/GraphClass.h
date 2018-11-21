@@ -12,6 +12,9 @@ public:
     GraphClass(wxWindow* parent, int Dim);
     virtual ~GraphClass();
     
+    //wxColourPickerCtrl* AColorCtrl[118];
+    wxColourPickerCtrl* BColorCtrl[50];
+    //wxColour BondColors[50];
     int nShowingUnitcell = -1;
     int nShowingAtoms = -1;
     int nShowingBonds = -1;

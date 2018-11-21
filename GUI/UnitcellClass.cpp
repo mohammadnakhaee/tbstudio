@@ -28,7 +28,29 @@ UnitcellClass::UnitcellClass(wxWindow* parent, Sec30* sec30var, wxWindowID id, c
     wxObjectEventFunction Funcs1[2] = { wxCommandEventHandler(UnitcellClass::Btn_Load_OnClick), wxCommandEventHandler(UnitcellClass::Btn_Save_OnClick)};
     sec30->AddButton(this, 2, Labels1, Funcs1);
     /**********************************************************************************************************************************************/
-    sec30->AddGroupBox(this,_("Unit Vectors"),wxColour(wxT("rgb(153,180,209)")));
+    sec30->AddGroupBox(this,_("Optimized Unit Vectors"),wxColour(wxT("rgb(153,180,209)")));
+    sec30->AddVarVector(this, 3, _("a0"), _("double"), _("a0"), 25, 100);
+    sec30->AddVarVector(this, 3, _("b0"), _("double"), _("b0"), 25, 100);
+    sec30->AddVarVector(this, 3, _("c0"), _("double"), _("c0"), 25, 100);
+    sec30->SetVar(_("a0[0]"), 1.0, false);
+    sec30->SetVar(_("a0[1]"),0.0, false);
+    sec30->SetVar(_("a0[2]"),0.0, false);
+    sec30->SetVar(_("b0[0]"),0.0, false);
+    sec30->SetVar(_("b0[1]"),1.0, false);
+    sec30->SetVar(_("b0[2]"),0.0, false);
+    sec30->SetVar(_("c0[0]"),0.0, false);
+    sec30->SetVar(_("c0[1]"),0.0, false);
+    sec30->SetVar(_("c0[2]"),1.0, false);
+    /**********************************************************************************************************************************************/
+    sec30->AddGroupBox(this,_("Strain Coefficients"),wxColour(wxT("rgb(153,180,209)")));
+    sec30->AddVarVector(this, 1, _("astrain"), _("double"), _("a"), 25, 100);
+    sec30->AddVarVector(this, 1, _("bstrain"), _("double"), _("b"), 25, 100);
+    sec30->AddVarVector(this, 1, _("cstrain"), _("double"), _("c"), 25, 100);
+    sec30->SetVar(_("astrain[0]"),1.0, false);
+    sec30->SetVar(_("bstrain[0]"),1.0, false);
+    sec30->SetVar(_("cstrain[0]"),1.0, false);
+    /**********************************************************************************************************************************************/
+    sec30->AddGroupBox(this,_("Strained Unit Vectors"),wxColour(wxT("rgb(153,180,209)")));
     sec30->AddVarVector(this, 3, _("a"), _("double"), _("a"), 25, 100);
     sec30->AddVarVector(this, 3, _("b"), _("double"), _("b"), 25, 100);
     sec30->AddVarVector(this, 3, _("c"), _("double"), _("c"), 25, 100);
@@ -41,14 +63,6 @@ UnitcellClass::UnitcellClass(wxWindow* parent, Sec30* sec30var, wxWindowID id, c
     sec30->SetVar(_("c[0]"),0.0, false);
     sec30->SetVar(_("c[1]"),0.0, false);
     sec30->SetVar(_("c[2]"),1.0, false);
-    /**********************************************************************************************************************************************/
-    sec30->AddGroupBox(this,_("Strain Coefficients"),wxColour(wxT("rgb(153,180,209)")));
-    sec30->AddVarVector(this, 1, _("astrain"), _("double"), _("a"), 25, 100);
-    sec30->AddVarVector(this, 1, _("bstrain"), _("double"), _("b"), 25, 100);
-    sec30->AddVarVector(this, 1, _("cstrain"), _("double"), _("c"), 25, 100);
-    sec30->SetVar(_("astrain[0]"),1.0, false);
-    sec30->SetVar(_("bstrain[0]"),1.0, false);
-    sec30->SetVar(_("cstrain[0]"),1.0, false);
     /**********************************************************************************************************************************************/
     sec30->AddGroupBox(this,_("Atom species and Fractional Coordinates"),wxColour(wxT("rgb(153,180,209)")));
     wxString ColNames[4] = { _("Kind"), _("a"), _("b"), _("c")};

@@ -52,6 +52,19 @@ void GraphClass::CreateAtomicStructure(Sec30* sec30Var, bool IsNewAllocate)
         sec30->GetVar(_("XYZ_Coords"), i0, 2, ZArray[i0]);
     }
     
+    int ar[nUnitcellAtoms], ag[nUnitcellAtoms], ab[nUnitcellAtoms];
+    for (int i0 = 0; i0<nUnitcellAtoms; i0++)
+    {
+        int atomKindindex = kind[i0];
+        if (atomKindindex < 1) atomKindindex = 1;
+        if (atomKindindex > 118) atomKindindex = 118;
+        wxColourPickerCtrl* cctrl = sec30->GetColorObject(_("AColor") + wxString::Format(wxT("%d"),atomKindindex));
+        wxColour c = cctrl->GetColour();
+        ar[i0] = c.Red();
+        ag[i0] = c.Green();
+        ab[i0] = c.Blue();
+    }
+    
     double a[3],b[3],c[3];
     sec30->GetVar(_("a[0]"), a[0]);
     sec30->GetVar(_("a[1]"), a[1]);
@@ -97,13 +110,13 @@ void GraphClass::CreateAtomicStructure(Sec30* sec30Var, bool IsNewAllocate)
     SetWorkingList(isellected, jsellected, ksellected);
     
     int lmin,lmax,mmin,mmax,nmin,nmax;
-    if (CustomViewmode)
+    if (CustomViewmode && !WorkingViewmode)
     {
         lmin = ma[0]; lmax = ma[1];
         mmin = mb[0]; mmax = mb[1];
         nmin = mc[0]; nmax = mc[1];
     }
-    else if (TBViewmode || TBEssentialViewmode)
+    else if (TBViewmode || TBEssentialViewmode || WorkingViewmode)
     {
         lmin = -TBl; lmax = TBl;
         mmin = -TBm; mmax = TBm;
@@ -192,17 +205,9 @@ void GraphClass::CreateAtomicStructure(Sec30* sec30Var, bool IsNewAllocate)
                             glc->DoubleArray[1][iAtom] = YArray[i0] + i*a[1] + j*b[1] + k*c[1];
                             glc->DoubleArray[2][iAtom] = ZArray[i0] + i*a[2] + j*b[2] + k*c[2];
                             glc->DoubleArray[3][iAtom] = GetAtomRadius(kind[i0]);
-                            int atomKindindex = kind[i0];
-                            if (atomKindindex < 1) atomKindindex = 1;
-                            if (atomKindindex > 118) atomKindindex = 118;
-                            wxColourPickerCtrl* cctrl = sec30->GetColorObject(_("AColor") + wxString::Format(wxT("%d"),atomKindindex));
-                            wxColour c = cctrl->GetColour();
-                            int r = c.Red();
-                            int g = c.Green();
-                            int b = c.Blue();
-                            glc->IntArray[0][iAtom] = r;
-                            glc->IntArray[1][iAtom] = g;
-                            glc->IntArray[2][iAtom] = b;
+                            glc->IntArray[0][iAtom] = ar[i0];
+                            glc->IntArray[1][iAtom] = ag[i0];
+                            glc->IntArray[2][iAtom] = ab[i0];
                             glc->IntArray[10][iAtom] = 0;
                             glc->IntArray[11][iAtom] = i;
                             glc->IntArray[12][iAtom] = j;
@@ -214,8 +219,9 @@ void GraphClass::CreateAtomicStructure(Sec30* sec30Var, bool IsNewAllocate)
                             nShowingAtoms = iAtom + 1;
                     }
                 }
-                    
+                
         /*************bonds************/
+        wxCheckTree* Bondstreectr = sec30->GetTreeObject(_("Bonds"));
         int iBond = -1;
         for (int i=lmax; i>=lmin; i--)
             for (int j=mmax; j>=mmin; j--)
@@ -235,22 +241,21 @@ void GraphClass::CreateAtomicStructure(Sec30* sec30Var, bool IsNewAllocate)
                             jMyess = *ij++;
                             kMyess = *ik++;
                             /******************************************/
-                            wxCheckTree* treectr = sec30->GetTreeObject(_("Bonds"));
-                            wxTreeItemId rootID = treectr->GetRootItem();
-                            wxString cellItem = wxString::Format(wxT("cell(0,0,0)-cell(%d,%d,%d)"), iMyess, jMyess, kMyess);
-                            wxTreeItemId lmnID = treectr->FindItemIn(rootID,cellItem);
+                            wxTreeItemId rootID = Bondstreectr->GetRootItem();
+                            wxString cellItem = wxString::Format(wxT("(0,0,0)-(%d,%d,%d)"), iMyess, jMyess, kMyess);
+                            wxTreeItemId lmnID = Bondstreectr->FindItemIn(rootID,cellItem);
                             
                             if (lmnID)
                             {
                                 wxTreeItemIdValue cookie;
-                                wxTreeItemId bond = treectr->GetFirstChild(lmnID, cookie);
+                                wxTreeItemId bond = Bondstreectr->GetFirstChild(lmnID, cookie);
                                 bool isBondInRange = (iMyess + i <= lmax && iMyess + i >= lmin) && (jMyess + j <= mmax && jMyess + j >= mmin) && (kMyess + k <= nmax && kMyess + k >= nmin);
                                 while (bond.IsOk() && isBondInRange)
                                 {
                                     iBond++;
                                     if (!isCountingMode)
                                     {
-                                        wxString BondInfo = treectr->GetItemText(bond);
+                                        wxString BondInfo = Bondstreectr->GetItemText(bond);
                                         int iAtomIndex,nShellIndex,jAtomIndex,mShellIndex,bondtype;
                                         GetBondInfo(BondInfo, iAtomIndex,nShellIndex,jAtomIndex,mShellIndex,bondtype);
                                         //wxMessageBox(wxString::Format(wxT("%d,%d,%d,%d,%d"),iAtomIndex,nShellIndex,jAtomIndex,mShellIndex,bondtype));
@@ -267,19 +272,26 @@ void GraphClass::CreateAtomicStructure(Sec30* sec30Var, bool IsNewAllocate)
                                             double radius2 = GetAtomRadius(kind[jAtomIndex]);
                                             if (radius > radius2) radius = radius2;
                                             glc->DoubleArray[10][iBond] = radius / 2.3;
-                                            wxColourPickerCtrl* cctrl = sec30->GetColorObject(_("BColor") + wxString::Format(wxT("%d"),bondtype));
+                                            //wxColourPickerCtrl* cctrl = sec30->GetColorObject(_("BColor") + wxString::Format(wxT("%d"),bondtype));
+                                            wxColourPickerCtrl* cctrl = BColorCtrl[bondtype - 1];
                                             wxColour c = cctrl->GetColour();
                                             int r = c.Red();
                                             int g = c.Green();
                                             int b = c.Blue();
-                                            glc->IntArray[3][iBond] = r;
-                                            glc->IntArray[4][iBond] = g;
-                                            glc->IntArray[5][iBond] = b;
+                                            glc->IntArray[3][iBond] = -1;
+                                            glc->IntArray[4][iBond] = -1;
+                                            glc->IntArray[5][iBond] = -1;
+                                            if (Bondstreectr->GetItemState(bond) >= wxCheckTree::CHECKED && Bondstreectr->GetItemState(lmnID) >= wxCheckTree::CHECKED)
+                                            {
+                                                glc->IntArray[3][iBond] = r;
+                                                glc->IntArray[4][iBond] = g;
+                                                glc->IntArray[5][iBond] = b;
+                                            }
                                         }
                                     }
                                     else
                                         nShowingBonds = iBond + 1;
-                                    bond = treectr->GetNextSibling(bond);
+                                    bond = Bondstreectr->GetNextSibling(bond);
                                 }
                             }
                         }
@@ -336,17 +348,9 @@ void GraphClass::CreateAtomicStructure(Sec30* sec30Var, bool IsNewAllocate)
                     glc->DoubleArray[1][iAtom] = YArray[i0] + i*a[1] + j*b[1] + k*c[1];
                     glc->DoubleArray[2][iAtom] = ZArray[i0] + i*a[2] + j*b[2] + k*c[2];
                     glc->DoubleArray[3][iAtom] = GetAtomRadius(kind[i0]);
-                    int atomKindindex = kind[i0];
-                    if (atomKindindex < 1) atomKindindex = 1;
-                    if (atomKindindex > 118) atomKindindex = 118;
-                    wxColourPickerCtrl* cctrl = sec30->GetColorObject(_("AColor") + wxString::Format(wxT("%d"),atomKindindex));
-                    wxColour c = cctrl->GetColour();
-                    int r = c.Red();
-                    int g = c.Green();
-                    int b = c.Blue();
-                    glc->IntArray[0][iAtom] = r;
-                    glc->IntArray[1][iAtom] = g;
-                    glc->IntArray[2][iAtom] = b;
+                    glc->IntArray[0][iAtom] = ar[i0];
+                    glc->IntArray[1][iAtom] = ag[i0];
+                    glc->IntArray[2][iAtom] = ab[i0];
                     glc->IntArray[10][iAtom] = 0;
                     glc->IntArray[11][iAtom] = i;
                     glc->IntArray[12][iAtom] = j;
@@ -360,6 +364,7 @@ void GraphClass::CreateAtomicStructure(Sec30* sec30Var, bool IsNewAllocate)
         }
         
         /*************bonds************/
+        wxCheckTree* Bondstreectr = sec30->GetTreeObject(_("Bonds"));
         nList0 = 0;
         if (!WorkingViewmode)
         {
@@ -409,22 +414,21 @@ void GraphClass::CreateAtomicStructure(Sec30* sec30Var, bool IsNewAllocate)
                     jMyess = *ij++;
                     kMyess = *ik++;
                     /******************************************/
-                    wxCheckTree* treectr = sec30->GetTreeObject(_("Bonds"));
-                    wxTreeItemId rootID = treectr->GetRootItem();
-                    wxString cellItem = wxString::Format(wxT("cell(0,0,0)-cell(%d,%d,%d)"), iMyess, jMyess, kMyess);
-                    wxTreeItemId lmnID = treectr->FindItemIn(rootID,cellItem);
+                    wxTreeItemId rootID = Bondstreectr->GetRootItem();
+                    wxString cellItem = wxString::Format(wxT("(0,0,0)-(%d,%d,%d)"), iMyess, jMyess, kMyess);
+                    wxTreeItemId lmnID = Bondstreectr->FindItemIn(rootID,cellItem);
                     
                     if (lmnID)
                     {
                         wxTreeItemIdValue cookie;
-                        wxTreeItemId bond = treectr->GetFirstChild(lmnID, cookie);
+                        wxTreeItemId bond = Bondstreectr->GetFirstChild(lmnID, cookie);
                         bool isBondInRange = (iMyess + i <= lmax && iMyess + i >= lmin) && (jMyess + j <= mmax && jMyess + j >= mmin) && (kMyess + k <= nmax && kMyess + k >= nmin);
                         while (bond.IsOk() && isBondInRange)
                         {
                             iBond++;
                             if (!isCountingMode)
                             {
-                                wxString BondInfo = treectr->GetItemText(bond);
+                                wxString BondInfo = Bondstreectr->GetItemText(bond);
                                 int iAtomIndex,nShellIndex,jAtomIndex,mShellIndex,bondtype;
                                 GetBondInfo(BondInfo, iAtomIndex,nShellIndex,jAtomIndex,mShellIndex,bondtype);
                                 //wxMessageBox(wxString::Format(wxT("%d,%d,%d,%d,%d"),iAtomIndex,nShellIndex,jAtomIndex,mShellIndex,bondtype));
@@ -441,19 +445,26 @@ void GraphClass::CreateAtomicStructure(Sec30* sec30Var, bool IsNewAllocate)
                                     double radius2 = GetAtomRadius(kind[jAtomIndex]);
                                     if (radius > radius2) radius = radius2;
                                     glc->DoubleArray[10][iBond] = radius / 2.3;
-                                    wxColourPickerCtrl* cctrl = sec30->GetColorObject(_("BColor") + wxString::Format(wxT("%d"),bondtype));
+                                    //wxColourPickerCtrl* cctrl = sec30->GetColorObject(_("BColor") + wxString::Format(wxT("%d"),bondtype));
+                                    wxColourPickerCtrl* cctrl = BColorCtrl[bondtype - 1];
                                     wxColour c = cctrl->GetColour();
                                     int r = c.Red();
                                     int g = c.Green();
                                     int b = c.Blue();
-                                    glc->IntArray[3][iBond] = r;
-                                    glc->IntArray[4][iBond] = g;
-                                    glc->IntArray[5][iBond] = b;
+                                    glc->IntArray[3][iBond] = -1;
+                                    glc->IntArray[4][iBond] = -1;
+                                    glc->IntArray[5][iBond] = -1;
+                                    if (Bondstreectr->GetItemState(bond) >= wxCheckTree::CHECKED && Bondstreectr->GetItemState(lmnID) >= wxCheckTree::CHECKED)
+                                    {
+                                        glc->IntArray[3][iBond] = r;
+                                        glc->IntArray[4][iBond] = g;
+                                        glc->IntArray[5][iBond] = b;
+                                    }
                                 }
                             }
                             else
                                 nShowingBonds = iBond + 1;
-                            bond = treectr->GetNextSibling(bond);
+                            bond = Bondstreectr->GetNextSibling(bond);
                         }
                     }
                     /*******************************************/
@@ -464,9 +475,13 @@ void GraphClass::CreateAtomicStructure(Sec30* sec30Var, bool IsNewAllocate)
     }
     
     if (isCountingMode)
+    {
         CreateAtomicStructure(sec30, false);
+    }
     else
+    {
         glc->LoadToCanvas();
+    }
 }
 
 void GraphClass::GetBondInfo(const wxString& bondtextvar, int& i, int& n, int& j, int& m, int& bondtype)

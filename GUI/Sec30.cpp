@@ -55,7 +55,7 @@ void Sec30::AddButton(wxWindow *parent, int ButtonCnt, wxString* ButtonNames, wx
     }
 }
 
-void Sec30::AddVarVector(wxWindow *parent, int VecCnt, wxString VariableName, wxString VariableType, wxString VecLabel, int LabelSize, int CtrlSize,bool EnableEvent)
+void Sec30::AddVarVector(wxWindow *parent, int VecCnt, wxString VariableName, wxString VariableType, wxString VecLabel, int LabelSize, int CtrlSize,bool EnableEvent, bool ReadOnly)
 {
     wxBoxSizer* MySizer = new wxBoxSizer(wxHORIZONTAL);
     parent->GetSizer()->Add(MySizer, 0, wxLEFT|wxRIGHT|wxTOP|wxEXPAND, WXC_FROM_DIP(5));
@@ -68,7 +68,7 @@ void Sec30::AddVarVector(wxWindow *parent, int VecCnt, wxString VariableName, wx
     
     for (int i=0; i < VecCnt; i++)
     {
-        sec30TextCtrl* tc=new sec30TextCtrl(parent, wxID_ANY, VariableType, wxDefaultPosition, wxSize(CtrlSize,-1));
+        sec30TextCtrl* tc=new sec30TextCtrl(parent, wxID_ANY, VariableType, wxDefaultPosition, wxSize(CtrlSize,-1), ReadOnly);
         MySizer->Add(tc, 0, wxRIGHT, WXC_FROM_DIP(5));
         tc->SetMinSize(wxSize(CtrlSize,-1));
         
@@ -229,8 +229,12 @@ wxCheckTree* Sec30::AddTreeCtrl(wxWindow *parent, wxString VariableName, int xCt
     wxColour c; //Also it is possible to determine the color in this way: wxColour c=*wxGREEN;
     c.Set(191,205,219,0);
     
-    if (EnableEvent) ctr->Connect(wxEVT_COMMAND_TREE_DELETE_ITEM, wxTreeEventHandler(Sec30::TreeCtrlDeleteItem), NULL, this);
-    
+    if (EnableEvent)
+    {
+        ctr->Connect(wxEVT_COMMAND_TREE_DELETE_ITEM, wxTreeEventHandler(Sec30::TreeCtrlDeleteItem), NULL, this);
+        //ctr->Connect(wxEVT_CHECKTREE_CHOICE, wxCommandEventHandler(Sec30::TreeCtrlLeftClick), NULL, this);
+        ctr->Connect(CHECKTREE_CheckChanged, wxCommandEventHandler(Sec30::TreeCtrlLeftClick), NULL, this);
+    }
     ctr->ExpandAll();
     MySizer->Layout();
     parent->Layout();
@@ -272,6 +276,7 @@ wxComboBox* Sec30::AddComboCtrl(wxWindow *parent, wxString VariableName, wxStrin
     wxStaticText* st = new wxStaticText(parent, wxID_ANY, MyLabel + wxT(":"), wxDefaultPosition, wxDLG_UNIT(parent, wxSize(-1,-1)), 0);
     MySizer->Add(st, 0, wxLEFT|wxRIGHT|wxTOP, WXC_FROM_DIP(5));
     st->SetMinSize(wxSize(LabelSize,-1));
+    st->SetName(_("LOf") + VariableName);
     
     std::list<wxString>::iterator icombos = combos.end();
     
@@ -379,6 +384,13 @@ void Sec30::sec30TextCtrl_OnUpdated(wxCommandEvent& event)
 }
 
 void Sec30::TreeCtrlDeleteItem(wxTreeEvent& event)
+{
+    wxCheckTree* tc= (wxCheckTree*)event.GetEventObject();
+    wxString name = tc->GetParent()->GetName();
+    SendUpdateEvent(name);
+}
+
+void Sec30::TreeCtrlLeftClick(wxCommandEvent& event)
 {
     wxCheckTree* tc= (wxCheckTree*)event.GetEventObject();
     wxString name = tc->GetParent()->GetName();
@@ -621,6 +633,12 @@ wxComboBox* Sec30::GetComboObject(wxString VariableName)
     return ctr;
 }
 
+wxStaticText* Sec30::GetComboLabelObject(wxString VariableName)
+{
+    wxStaticText* ctr= (wxStaticText*)FindWindowByName(_("LOf") + VariableName,GetParent());
+    return ctr;
+}
+
 wxColourPickerCtrl* Sec30::GetColorObject(wxString VariableName)
 {
     wxColourPickerCtrl* ctr= (wxColourPickerCtrl*)FindWindowByName(VariableName,GetParent());
@@ -678,9 +696,12 @@ void Sec30::SaveToFile(wxString filepath, wxString filename)
             out.write((char *)&len, sizeof len);
             out.write(VariableName.c_str(), len);
             
-            int nRow=0;
-            int nCol=0;
-            GetDim(VariableName, nRow, nCol);
+            myGrid* gc = GetGridObject(VariableName);
+            int nRow = gc->GetNumberRows();
+            int nCol = gc->GetNumberCols();
+            out.write((char *) &nRow, sizeof nRow);
+            out.write((char *) &nCol, sizeof nCol);
+            
             for (int irow=0; irow<nRow;irow++)
                 for (int icol=0; icol<nCol; icol++)
                 {
@@ -688,6 +709,8 @@ void Sec30::SaveToFile(wxString filepath, wxString filename)
                     len = val.size();
                     out.write((char *)&len, sizeof len);
                     out.write(val.c_str(), len);
+                    bool isreadonly = gc->IsReadOnly(irow, icol);
+                    out.write((char *)&isreadonly, sizeof isreadonly);
                 }
         }
         ///////////////////////////////////////////////////////////////
@@ -865,6 +888,12 @@ void Sec30::SaveToFile(wxString filepath, wxString filename)
             out.write((char *)&len, sizeof len);
             out.write(VariableName.c_str(), len);
             
+            wxStaticText* LabelCtr = GetComboLabelObject(VariableName);
+            wxString LabelString = LabelCtr->GetLabel();
+            size_t len2 = LabelString.size();
+            out.write((char *)&len2, sizeof len2);
+            out.write(LabelString.c_str(), len2);
+            
             wxComboBox* ctr = ((wxComboBox*)FindWindowByName(VariableName,GetParent()));
             int nItems = ctr->GetCount();
             out.write((char *) &nItems, sizeof nItems);
@@ -947,7 +976,7 @@ void Sec30::LoadFromFile(wxString filepath, wxString filename)
         }
         ///////////////////////////////////////////////////////////////
         infile.read(reinterpret_cast<char *>(&n), sizeof n);
-
+        
         for(int it=0; it != n; it++)
         {
             size_t ns1=0;
@@ -960,10 +989,19 @@ void Sec30::LoadFromFile(wxString filepath, wxString filename)
                 VariableNameBuf[i] = ch;
             }
             wxString VariableName = wxString(VariableNameBuf,ns1);
-
+            
+            myGrid* gc = GetGridObject(VariableName);
+            int n0 = gc->GetNumberRows();
+            gc->DeleteRows(0,n0,true);
+            
             int nRow=0;
             int nCol=0;
-            GetDim(VariableName, nRow, nCol);
+            infile.read(reinterpret_cast<char *>(&nRow), sizeof nRow);
+            infile.read(reinterpret_cast<char *>(&nCol), sizeof nCol);
+            wxColour c; //Also it is possible to determine the color in this way: wxColour c=*wxGREEN;
+            c.Set(191,205,219,0);
+            gc->InsertRows(0, nRow,false);
+            
             for (int irow=0; irow<nRow;irow++)
                 for (int icol=0; icol<nCol; icol++)
                 {
@@ -978,6 +1016,14 @@ void Sec30::LoadFromFile(wxString filepath, wxString filename)
                     }
                     wxString Val=wxString(ValBuf,ns2);
                     SetVar(VariableName, irow, icol, Val, false);
+                    
+                    bool isreadonly;
+                    infile.read(reinterpret_cast<char *>(&isreadonly), sizeof isreadonly);
+                    gc->SetReadOnly(irow, icol, isreadonly);
+                    if (isreadonly)
+                        gc->SetCellBackgroundColour(irow, icol, c);
+                    else
+                        gc->SetCellBackgroundColour(irow, icol, *wxWHITE);
                 }
         }
         ///////////////////////////////////////////////////////////////
@@ -1238,6 +1284,20 @@ void Sec30::LoadFromFile(wxString filepath, wxString filename)
                 VariableNameBuf[i] = ch;
             }
             wxString VariableName = wxString(VariableNameBuf,ns1);
+            
+            size_t ns2=0;
+            infile.read(reinterpret_cast<char *>(&ns2), sizeof ns2);
+            char* LabelNameBuf = new char[ns2];
+            for (int i = 0; i < ns2; i++)
+            {
+                char ch;
+                infile.read(&ch, sizeof ch);
+                LabelNameBuf[i] = ch;
+            }
+            wxString LabelName = wxString(LabelNameBuf,ns2);
+            
+            wxStaticText* labelctr = GetComboLabelObject(VariableName);
+            labelctr->SetLabel(LabelName);
             
             wxComboBox* ctr = ((wxComboBox*)FindWindowByName(VariableName,GetParent()));
             ctr->Clear();

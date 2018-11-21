@@ -2,8 +2,9 @@
 
 wxDEFINE_EVENT(wxEVT_CHECKTREE_FOCUS, wxTreeEvent);
 wxDEFINE_EVENT(wxEVT_CHECKTREE_CHOICE, wxTreeEvent);
-
 //IMPLEMENT_DYNAMIC_CLASS(wxCheckTree, wxTreeCtrl)
+// this is a definition so can't be in a header
+wxDEFINE_EVENT(CHECKTREE_CheckChanged, wxCommandEvent);
 
 bool on_check_or_label(int flags)
 {
@@ -386,6 +387,10 @@ void wxCheckTree::On_Left_Up( wxMouseEvent& event )
 
             last_ld=wxTreeItemId();
             last_mo=id;
+            
+            wxCommandEvent* event2 = new wxCommandEvent(CHECKTREE_CheckChanged);
+            event2->SetEventObject(this);
+            wxQueueEvent(this,event2);
         }
         else
         {
@@ -403,6 +408,7 @@ void wxCheckTree::On_Left_Up( wxMouseEvent& event )
         last_ld=wxTreeItemId();
         last_mo=wxTreeItemId();
     }
+    
 }
 
 void wxCheckTree::On_Mouse_Motion( wxMouseEvent& event )

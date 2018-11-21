@@ -799,7 +799,10 @@ void MyGLContext::Draw_Lattice(int nColDArray, int* nDArray, double** DArray, in
     
     for (int i=0; i<nDArray[4]; i++)
     {
-        Draw_Bond((float)DArray[4][i], (float)DArray[5][i], (float)DArray[6][i],(float)DArray[7][i], (float)DArray[8][i], (float)DArray[9][i], (float)DArray[10][i], (GLubyte)IArray[3][i], (GLubyte)IArray[4][i], (GLubyte)IArray[5][i] ,23,2);
+        if (IArray[3][i] >= 0) //&& IArray[4][i] >= 0 && IArray[5][i] >= 0)
+        {
+            Draw_Bond((float)DArray[4][i], (float)DArray[5][i], (float)DArray[6][i],(float)DArray[7][i], (float)DArray[8][i], (float)DArray[9][i], (float)DArray[10][i], (GLubyte)IArray[3][i], (GLubyte)IArray[4][i], (GLubyte)IArray[5][i] ,23,2);
+        }
     }
     
     //try{}

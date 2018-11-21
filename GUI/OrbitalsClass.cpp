@@ -75,6 +75,8 @@ void OrbitalsClass::Btn_AddAtom_OnClick(wxCommandEvent& event)
     treectr->Expand(rootID);
     treectr->Update();
     treectr->Refresh(true);
+    
+    sec30->SendUpdateEvent(this->GetName(),0);
 }
 
 void OrbitalsClass::Btn_RemoveAtom_OnClick(wxCommandEvent& event)
@@ -96,6 +98,8 @@ void OrbitalsClass::Btn_RemoveAtom_OnClick(wxCommandEvent& event)
     treectr->Expand(rootID);
     treectr->Update();
     treectr->Refresh(true);
+    
+    sec30->SendUpdateEvent(this->GetName(),0);
 }
 
 void OrbitalsClass::Btn_AddShell_OnClick(wxCommandEvent& event)
