@@ -102,6 +102,14 @@ protected:
     virtual bool ValidateProjectionPanel();
     virtual void FillProjectionPanel();
     /****************************************/
+    virtual void LoadSKPanel();
+    virtual void EvaluateSKPanel();
+    virtual bool ValidateSKPanel();
+    /****************************************/
+    virtual void LoadColorsForm();
+    virtual void EvaluateColorsPanel();
+    virtual bool ValidateColorsPanel();
+    /****************************************/
     int GetBonds(int* bonds);
 private:
     wxTextCtrl* logfile;

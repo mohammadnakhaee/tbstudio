@@ -52,7 +52,53 @@ MainFrame::MainFrame(wxWindow* parent)
     sec30=new Sec30(this);
     sec30->Connect(Sec30EVT_OnUpdated, wxCommandEventHandler(sec30_OnUpdated), NULL, this);
     this->Connect(MyOpenGL_EVT_SelectionChanged, wxCommandEventHandler(myOpenGL_EVT_SelectionChanged), NULL, this);
-
+    
+    /*
+    CML::IOData* iod = static_cast<MainFrame*>(mainFrame)->iod;
+    int SelectedCalcBoxIndex = iod->SelectedCalcBoxIndex;
+    std::list<CML::CalcBox>::iterator cb=iod->CalcBoxs.begin();
+    for (int i=0; i < SelectedCalcBoxIndex; i++) cb++;
+    
+    CML::Atom NewAtom;
+    NewAtom.Kind=1;
+    NewAtom.x=0;
+    NewAtom.y=0;
+    NewAtom.z=0;
+    std::list<CML::Atom>::iterator atm=cb->UnitCell->Atoms.end();
+    cb->UnitCell->Atoms.insert(atm,NewAtom);
+    cb->UnitCell->nAtoms++;
+    wxString str = wxString::Format(wxT("%02d: %s {%5.4f,%5.4f,%5.4f}"), cb->UnitCell->nAtoms,NewAtom.GetAtomLable(NewAtom.Kind),NewAtom.x,NewAtom.y,NewAtom.z);
+    LBAtoms->Append(str);
+    */
+    
+    /*
+    std::list<double>::iterator x=tbmodel->XArray.end();
+    tbmodel->XArray.insert(x,-0.5);
+    tbmodel->XArray.insert(x,0.5);
+    tbmodel->XArray.insert(x,0.5);
+    tbmodel->XArray.insert(x,-0.5);
+    std::list<double>::iterator y=tbmodel->YArray.end();
+    tbmodel->YArray.insert(y,-0.5);
+    tbmodel->YArray.insert(y,-0.5);
+    tbmodel->YArray.insert(y,0.5);
+    tbmodel->YArray.insert(y,0.5);
+    std::list<double>::iterator z=tbmodel->ZArray.end();
+    tbmodel->ZArray.insert(z,0.0);
+    tbmodel->ZArray.insert(z,0.0);
+    tbmodel->ZArray.insert(z,0.0);
+    tbmodel->ZArray.insert(z,0.0);
+    std::list<int>::iterator k=tbmodel->KindArray.end();
+    tbmodel->KindArray.insert(k,-0.5);
+    tbmodel->KindArray.insert(k,0.5);
+    tbmodel->KindArray.insert(k,0.5);
+    tbmodel->KindArray.insert(k,-0.5);
+    */
+    
+    //Draw_Atom(0.5f, -0.5f, -0.5f, 0.0f, 255, 0, 0, 80, 60);
+    //Draw_Atom(0.5f, -0.5f, 0.5f, 0.0f, 0, 255, 0, 80, 60);
+    //Draw_Atom(0.5f, 0.5f, 0.5f, 0.0f, 0, 0, 255, 80, 60);
+    //Draw_Atom(0.5f, 0.5f, -0.5f, 0.0f, 0, 125, 140, 80, 60);
+    
     unsigned int AUI_Flags = wxAUI_MGR_ALLOW_FLOATING|wxAUI_MGR_ALLOW_ACTIVE_PANE|
     wxAUI_MGR_TRANSPARENT_DRAG|wxAUI_MGR_TRANSPARENT_HINT|wxAUI_MGR_VENETIAN_BLINDS_HINT|
     wxAUI_MGR_RECTANGLE_HINT|wxAUI_MGR_HINT_FADE|wxAUI_MGR_NO_VENETIAN_BLINDS_FADE|
@@ -102,11 +148,11 @@ MainFrame::MainFrame(wxWindow* parent)
     aui_mgr.Update();
     /////////////////////////////////////////////////////////////////////////////////////
     
-    wxConfig::Get()->Write(CFG_AUI_PERSPECTIVE, aui_mgr.SavePerspective());
-    SetAppName(wxT("TBModel"));
-    SetVendorName(wxT("CMT Group, Antwerp University, Antwerpen, Belgium."));
+    //wxConfig::Get()->Write(CFG_AUI_PERSPECTIVE, aui_mgr.SavePerspective());
+    //SetAppName(wxT("TBModel"));
+    //SetVendorName(wxT("CMT Group, Antwerp University, Antwerpen, Belgium."));
     //const wxString perspective = _("layout2|name=0394df705cc5b7dc000000dc00000001;caption=;state=768;dir=5;layer=0;row=0;pos=0;prop=100000;bestw=20;besth=20;minw=-1;minh=-1;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=-1;floath=-1|name=072d48e05cc5b7de000006ab00000002;caption=Structure;state=12584956;dir=1;layer=0;row=0;pos=0;prop=100000;bestw=800;besth=600;minw=-1;minh=-1;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=-1;floath=-1|name=072dae405cc5b7de000007ba00000003;caption=Current Band-Structure;state=12584956;dir=2;layer=1;row=0;pos=0;prop=100000;bestw=525;besth=0;minw=-1;minh=-1;maxw=-1;maxh=-1;floatx=1426;floaty=329;floatw=541;floath=39|name=072dd1605cc5b7de000008ed00000004;caption=Initial Band-Structure;state=12601340;dir=2;layer=1;row=0;pos=1;prop=100000;bestw=525;besth=0;minw=-1;minh=-1;maxw=-1;maxh=-1;floatx=1041;floaty=477;floatw=541;floath=39|dock_size(5,0,0)=22|dock_size(1,0,0)=633|dock_size(2,1,0)=343|");
-    aui_mgr.LoadPerspective(perspective,false);
+    //aui_mgr.LoadPerspective(perspective,false);
     
     EvaluateUnitcellPanel();
     // Create the TB Model Class which includes all information about the system
@@ -114,24 +160,24 @@ MainFrame::MainFrame(wxWindow* parent)
     
     //
     
-    
+    /*
     unsigned int ntb_Flags = wxAUI_NB_TAB_SPLIT|wxAUI_NB_CLOSE_ON_ACTIVE_TAB|wxAUI_NB_TOP|
     wxAUI_NB_SCROLL_BUTTONS|wxAUI_NB_WINDOWLIST_BUTTON|wxAUI_NB_MIDDLE_CLICK_CLOSE|wxAUI_NB_TAB_MOVE|wxAUI_NB_TAB_FIXED_WIDTH;
     aui_ntb = new wxAuiNotebook(LeftPanel,wxID_ANY,wxPoint(0,0),wxSize(100,100),ntb_Flags);
-     Set up the sizer for the panel
+    // Set up the sizer for the panel
     wxBoxSizer* panelSizer2 = new wxBoxSizer(wxHORIZONTAL);
     panelSizer2->Add(aui_ntb, 1, wxEXPAND);
     LeftPanel->SetSizer(panelSizer2);
+    */
     
+    //ShowStartPage();
     
-    ShowStartPage();
-    
-    wxAuiPaneInfo inf = wxAuiPaneInfo().Dockable(true).TopDockable(true).BottomDockable(true).LeftDockable(true).RightDockable(true).Caption(wxT("Notbook")).BestSize(600,800).Dock();
-    aui_mgr.AddPane(SidePanel,inf);
-    m_ribbonButtonBar528->Connect(wxID_ANY, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrameBaseClass::b2), NULL, this);
-    wxGLAttributes m_glCanvas17Attr = wxGLAttributes().PlatformDefaults().Defaults();
-    m_glCanvas17Attr.PlatformDefaults().Defaults().EndList();
-    bool accepted = wxGLCanvas::IsDisplaySupported(m_glCanvas17Attr);
+    //wxAuiPaneInfo inf = wxAuiPaneInfo().Dockable(true).TopDockable(true).BottomDockable(true).LeftDockable(true).RightDockable(true).Caption(wxT("Notbook")).BestSize(600,800).Dock();
+    //aui_mgr.AddPane(SidePanel,inf);
+    //m_ribbonButtonBar528->Connect(wxID_ANY, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrameBaseClass::b2), NULL, this);
+    //wxGLAttributes m_glCanvas17Attr = wxGLAttributes().PlatformDefaults().Defaults();
+    //m_glCanvas17Attr.PlatformDefaults().Defaults().EndList();
+    //bool accepted = wxGLCanvas::IsDisplaySupported(m_glCanvas17Attr);
 }
 
 MainFrame::~MainFrame()
