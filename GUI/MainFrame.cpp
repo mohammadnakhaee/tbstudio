@@ -130,7 +130,6 @@ MainFrame::MainFrame(wxWindow* parent)
     LoadOrbitalsPanel();
     LoadBondsPanel();
     LoadProjectionPanel();
-    LoadSKPanel();
     
     MainRibbon->SetActivePage((size_t)0);
     LeftPanel->ChangeSelection(0);
@@ -702,16 +701,9 @@ void MainFrame::UpdateGraph3D()
 /****************************************************************************************************************************************************************/
 void MainFrame::sec30_OnUpdated(wxCommandEvent& event)
 {
-    wxString info = event.GetString();
     int redraw = event.GetInt();
-    
-    if (info == _("SKClass"))
-        EvaluateSKPanel();
-    else
-    {
-        if (redraw == 1) ClearGraph3D();
-    }
-    
+    if (redraw == 1) ClearGraph3D();
+    wxString info = event.GetString();
     if (info == _("UnitcellClass"))
         EvaluateUnitcellPanel();
     else if (info == _("StructureClass"))
@@ -963,25 +955,6 @@ void MainFrame::LoadProjectionPanel()
     projectionPanel->graph3d = graph3d;
 }
 
-void MainFrame::LoadSKPanel()
-{
-    wxScrolledWindow* scrolledwindow = new wxScrolledWindow(LeftPanel,wxID_ANY,wxDefaultPosition, wxSize(-1,-1));
-    LeftPanel->AddPage(scrolledwindow,"SK",true);
-    LeftPanel->Update();
-    
-    skPanel = new SKClass(scrolledwindow,sec30);
-    
-    wxBoxSizer* panelSizer1 = new wxBoxSizer(wxVERTICAL);
-    panelSizer1->Add(skPanel, 1, wxEXPAND);
-    scrolledwindow->SetSizer(panelSizer1);
-    
-    scrolledwindow->FitInside();
-    scrolledwindow->SetScrollRate(-1,15);
-    skPanel->graph3d = graph3d;
-    skPanel->graph2d0 = graph2d0;
-    skPanel->graph2d = graph2d;
-}
-
 void MainFrame::LoadColorsForm()
 {
     ColorsForm = new ColorsClass(this, sec30);
@@ -1143,11 +1116,6 @@ void MainFrame::EvaluateProjectionPanel(int redraw)
     if (ValidateProjectionPanel()) ShowGraph3D();
 }
 
-void MainFrame::EvaluateSKPanel()
-{
-    if (ValidateSKPanel()) return;
-}
-
 void MainFrame::EvaluateColorsPanel()
 {
     if (ValidateColorsPanel()) ShowGraph3D();
@@ -1223,7 +1191,7 @@ bool MainFrame::ValidateUnitCellPanel()
             
             wxString name = wxString::Format(wxT("AtomInd%d"),AtomCnt);
             wxStaticText* lab = sec30->GetComboLabelObject(name);
-            wxString label = wxString::Format(wxT("Atom %d"),i+1);
+            wxString label = wxString::Format(wxT("Atom %d"),i);
             lab->SetLabel(label + _(" [") +sec30->GetAtomLable(kind)+ _("]"));
         }
     }
@@ -1315,42 +1283,6 @@ bool MainFrame::ValidateProjectionPanel()
     return isValid;
 }
 
-bool MainFrame::ValidateSKPanel()
-{
-    logfile->AppendText(_("\n"));
-    int ErrorIndex = 0;
-    bool isValid = true;
-    int nOnSites=0;
-    sec30->GetVar(_("nAtoms[0]"),nOnSites);
-    if (nOnSites == 0)
-    {
-        ErrorIndex++;
-        if (ErrorIndex==1){isValid = false;logfile->AppendText(_("Error list:\n"));}
-        logfile->AppendText(wxString::Format(wxT("Error %d: There is not any atom in your structure!\n"),ErrorIndex));
-    }
-    
-    for (int i = 1; i<=nOnSites; i++)
-    {
-        wxString name = wxString::Format(wxT("AtomInd%d"),i);
-        wxComboBox* comb = sec30->GetComboObject(name);
-        wxStaticText* comblabel = sec30->GetComboLabelObject(name);
-        wxString label = comb->GetStringSelection();
-        if (label == _("Not set"))
-        {
-            ErrorIndex++;
-            if (ErrorIndex==1) {isValid = false;logfile->AppendText(_("Error list:\n"));}
-            logfile->AppendText(wxString::Format(wxT("Error %d: "),ErrorIndex) + _("The projection for the ") + comblabel->GetLabel() + _(" has not yet been set.\n"));
-        }
-    }
-    
-    wxCheckTree* bonds = sec30->GetTreeObject(_("Bonds"));
-    wxTreeItemId rootID = bonds->GetRootItem();
-    wxTreeItemId lmnID = bonds->FindItemIn(rootID,ucell);
-    
-    if (!isValid) logfile->AppendText(_("Fix the problems and try again ...\n"));
-    return isValid;
-}
-
 bool MainFrame::ValidateColorsPanel()
 {
     bool isValid = true;
@@ -1358,73 +1290,6 @@ bool MainFrame::ValidateColorsPanel()
     return isValid;
 }
 /****************************************************************************************************************************************************************/
-void MainFrame::UpdateSKList()
-{
-    myGrid* gc = sec30->GetGridObject(_("SK"));
-    int nRows = gc->GetNumberRows();
-    gc->DeleteRows(0,nRows,true);
-    wxColour c; //Also it is possible to determine the color in this way: wxColour c=*wxGREEN;
-    c.Set(191,205,219,0);
-    
-    int TotalIndex = -1;
-    
-    int nOnSites=0;
-    sec30->GetVar(_("nAtoms[0]"),nOnSites);
-    
-    gc->InsertRows(0, nOnSites + 1,false);
-    
-    TotalIndex++;
-    gc->SetCellValue(TotalIndex, 0, _("On-Sites"));
-    gc->SetReadOnly(TotalIndex, 0);
-    gc->SetReadOnly(TotalIndex, 1);
-    gc->SetReadOnly(TotalIndex, 2);
-    gc->SetCellBackgroundColour(TotalIndex, 0, c);
-    gc->SetCellBackgroundColour(TotalIndex, 1, c);
-    gc->SetCellBackgroundColour(TotalIndex, 2, c);
-    
-    int TotalNumberOfParameters = 0;
-    
-    for (int i = 1; i<=nOnSites; i++)
-    {
-        TotalIndex++;
-        TotalNumberOfParameters++;
-        wxString name = wxString::Format(wxT("AtomInd%d"),i);
-        wxComboBox* comb = sec30->GetComboObject(name);
-        wxString label = comb->GetStringSelection();
-        
-        gc->SetCellValue(TotalIndex, 0, label);
-        gc->SetReadOnly(TotalIndex, 0);
-        gc->SetCellBackgroundColour(TotalIndex, 0, c);
-        
-        gc->SetCellValue(TotalIndex, 1, _("0"));
-    }
-    
-    wxComboBox* comboctr = sec30->GetComboObject(_("AtomLabel"));
-    int nBondType = comboctr->GetCount();
-    
-    wxCheckTree* bonds = sec30->GetTreeObject(_("Bonds"));
-    for (int BondTypeIndex = 1; BondTypeIndex <= nBondType; BondTypeIndex++)
-    {
-        wxString bondinfotest = wxString::Format(wxT("Bond %d"), BondTypeIndex);
-        wxTreeItemId rootID = bonds->GetRootItem();
-        wxTreeItemId testID = bonds->ContainsItemIn(rootID,bondinfotest);
-        
-        if (testID)
-        {
-            TotalIndex++;
-            gc->InsertRows(TotalIndex, 1,true);
-            gc->SetCellValue(TotalIndex, 0, bondinfotest);
-            gc->SetReadOnly(TotalIndex, 0);
-            gc->SetReadOnly(TotalIndex, 1);
-            gc->SetReadOnly(TotalIndex, 2);
-            gc->SetCellBackgroundColour(TotalIndex, 0, c);
-            gc->SetCellBackgroundColour(TotalIndex, 1, c);
-            gc->SetCellBackgroundColour(TotalIndex, 2, c);
-        }
-        
-    }
-}
-
 void MainFrame::OnchoisSelected(wxCommandEvent& event)
 {
 }

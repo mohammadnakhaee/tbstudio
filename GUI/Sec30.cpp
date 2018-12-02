@@ -55,35 +55,6 @@ void Sec30::AddButton(wxWindow *parent, int ButtonCnt, wxString* ButtonNames, wx
     }
 }
 
-void Sec30::AddVarVector(wxWindow *parent, int VecCnt, wxString VariableName, wxString VariableType, wxString VecLabel, int LabelSize, int CtrlSize,bool EnableEvent, bool ReadOnly)
-{
-    wxBoxSizer* MySizer = new wxBoxSizer(wxHORIZONTAL);
-    parent->GetSizer()->Add(MySizer, 0, wxLEFT|wxRIGHT|wxTOP|wxEXPAND, WXC_FROM_DIP(5));
-    
-    wxStaticText* st = new wxStaticText(parent, wxID_ANY, VecLabel + wxT(":"), wxDefaultPosition, wxDLG_UNIT(parent, wxSize(-1,-1)), 0);
-    MySizer->Add(st, 0, wxLEFT|wxRIGHT|wxTOP, WXC_FROM_DIP(5));
-    st->SetMinSize(wxSize(LabelSize,-1));
-    
-    std::list<wxString>::iterator ivar = vars.end();
-    
-    for (int i=0; i < VecCnt; i++)
-    {
-        sec30TextCtrl* tc=new sec30TextCtrl(parent, wxID_ANY, VariableType, wxDefaultPosition, wxSize(CtrlSize,-1), ReadOnly);
-        MySizer->Add(tc, 0, wxRIGHT, WXC_FROM_DIP(5));
-        tc->SetMinSize(wxSize(CtrlSize,-1));
-        
-        wxString var = wxString::Format(wxT("%s[%d]"), VariableName, i);
-        vars.insert(ivar,var);
-        tc->SetName(var);
-        //tc->SetColLabelValue(0,VariableType);
-        if (VariableType != _("wxString")) tc->SetCellValue(0,0,_("0"));
-        if (EnableEvent) tc->Connect(Sec30EVT_Grid_Updated, wxCommandEventHandler(Sec30::sec30TextCtrl_OnUpdated), NULL, this);
-    }
-    
-    MySizer->Layout();
-    parent->Layout();
-}
-
 void Sec30::AddVarVector(wxWindow *parent, int VecCnt, wxString VariableName, wxString VariableType)
 {
     std::list<wxString>::iterator ivar = vars.end();
@@ -696,12 +667,9 @@ void Sec30::SaveToFile(wxString filepath, wxString filename)
             out.write((char *)&len, sizeof len);
             out.write(VariableName.c_str(), len);
             
-            myGrid* gc = GetGridObject(VariableName);
-            int nRow = gc->GetNumberRows();
-            int nCol = gc->GetNumberCols();
-            out.write((char *) &nRow, sizeof nRow);
-            out.write((char *) &nCol, sizeof nCol);
-            
+            int nRow=0;
+            int nCol=0;
+            GetDim(VariableName, nRow, nCol);
             for (int irow=0; irow<nRow;irow++)
                 for (int icol=0; icol<nCol; icol++)
                 {
@@ -709,8 +677,6 @@ void Sec30::SaveToFile(wxString filepath, wxString filename)
                     len = val.size();
                     out.write((char *)&len, sizeof len);
                     out.write(val.c_str(), len);
-                    bool isreadonly = gc->IsReadOnly(irow, icol);
-                    out.write((char *)&isreadonly, sizeof isreadonly);
                 }
         }
         ///////////////////////////////////////////////////////////////
@@ -976,7 +942,7 @@ void Sec30::LoadFromFile(wxString filepath, wxString filename)
         }
         ///////////////////////////////////////////////////////////////
         infile.read(reinterpret_cast<char *>(&n), sizeof n);
-        
+
         for(int it=0; it != n; it++)
         {
             size_t ns1=0;
@@ -989,19 +955,10 @@ void Sec30::LoadFromFile(wxString filepath, wxString filename)
                 VariableNameBuf[i] = ch;
             }
             wxString VariableName = wxString(VariableNameBuf,ns1);
-            
-            myGrid* gc = GetGridObject(VariableName);
-            int n0 = gc->GetNumberRows();
-            gc->DeleteRows(0,n0,true);
-            
+
             int nRow=0;
             int nCol=0;
-            infile.read(reinterpret_cast<char *>(&nRow), sizeof nRow);
-            infile.read(reinterpret_cast<char *>(&nCol), sizeof nCol);
-            wxColour c; //Also it is possible to determine the color in this way: wxColour c=*wxGREEN;
-            c.Set(191,205,219,0);
-            gc->InsertRows(0, nRow,false);
-            
+            GetDim(VariableName, nRow, nCol);
             for (int irow=0; irow<nRow;irow++)
                 for (int icol=0; icol<nCol; icol++)
                 {
@@ -1016,14 +973,6 @@ void Sec30::LoadFromFile(wxString filepath, wxString filename)
                     }
                     wxString Val=wxString(ValBuf,ns2);
                     SetVar(VariableName, irow, icol, Val, false);
-                    
-                    bool isreadonly;
-                    infile.read(reinterpret_cast<char *>(&isreadonly), sizeof isreadonly);
-                    gc->SetReadOnly(irow, icol, isreadonly);
-                    if (isreadonly)
-                        gc->SetCellBackgroundColour(irow, icol, c);
-                    else
-                        gc->SetCellBackgroundColour(irow, icol, *wxWHITE);
                 }
         }
         ///////////////////////////////////////////////////////////////
