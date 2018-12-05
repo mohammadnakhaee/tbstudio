@@ -55,6 +55,35 @@ void Sec30::AddButton(wxWindow *parent, int ButtonCnt, wxString* ButtonNames, wx
     }
 }
 
+void Sec30::AddVarVector(wxWindow *parent, int VecCnt, wxString VariableName, wxString VariableType, wxString VecLabel, int LabelSize, int CtrlSize,bool EnableEvent)
+{
+    wxBoxSizer* MySizer = new wxBoxSizer(wxHORIZONTAL);
+    parent->GetSizer()->Add(MySizer, 0, wxLEFT|wxRIGHT|wxTOP|wxEXPAND, WXC_FROM_DIP(5));
+    
+    wxStaticText* st = new wxStaticText(parent, wxID_ANY, VecLabel + wxT(":"), wxDefaultPosition, wxDLG_UNIT(parent, wxSize(-1,-1)), 0);
+    MySizer->Add(st, 0, wxLEFT|wxRIGHT|wxTOP, WXC_FROM_DIP(5));
+    st->SetMinSize(wxSize(LabelSize,-1));
+    
+    std::list<wxString>::iterator ivar = vars.end();
+    
+    for (int i=0; i < VecCnt; i++)
+    {
+        sec30TextCtrl* tc=new sec30TextCtrl(parent, wxID_ANY, VariableType, wxDefaultPosition, wxSize(CtrlSize,-1));
+        MySizer->Add(tc, 0, wxRIGHT, WXC_FROM_DIP(5));
+        tc->SetMinSize(wxSize(CtrlSize,-1));
+        
+        wxString var = wxString::Format(wxT("%s[%d]"), VariableName, i);
+        vars.insert(ivar,var);
+        tc->SetName(var);
+        //tc->SetColLabelValue(0,VariableType);
+        if (VariableType != _("wxString")) tc->SetCellValue(0,0,_("0"));
+        if (EnableEvent) tc->Connect(Sec30EVT_Grid_Updated, wxCommandEventHandler(Sec30::sec30TextCtrl_OnUpdated), NULL, this);
+    }
+    
+    MySizer->Layout();
+    parent->Layout();
+}
+
 void Sec30::AddVarVector(wxWindow *parent, int VecCnt, wxString VariableName, wxString VariableType)
 {
     std::list<wxString>::iterator ivar = vars.end();

@@ -100,6 +100,11 @@ public:
     wxCheckListBox* GetCheckListObject(wxString VariableName);
     wxListBox* GetListObject(wxString VariableName);
     wxChoice* GetChoiceObject(wxString VariableName);
+    wxComboBox* GetComboObject(wxString VariableName);
+    wxStaticText* GetComboLabelObject(wxString VariableName);
+    wxColourPickerCtrl* GetColorObject(wxString VariableName);
+    myGrid* GetGridObject(wxString VariableName);
+    sec30TextCtrl* GetTextCtrlObject(wxString VariableName);
     
     void SaveToFile(wxString filepath, wxString filename);
     void LoadFromFile(wxString filepath, wxString filename);
