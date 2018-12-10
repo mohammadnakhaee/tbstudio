@@ -25,7 +25,7 @@
 class  sec30TextCtrl : public myGrid
 {
 public:
-	sec30TextCtrl(wxWindow *parent, wxWindowID id, wxString Type, const wxPoint &pos=wxDefaultPosition, const wxSize &size=wxDefaultSize)
+	sec30TextCtrl(wxWindow *parent, wxWindowID id, wxString Type, const wxPoint &pos=wxDefaultPosition, const wxSize &size=wxDefaultSize, const bool ReadOnly=false)
     :myGrid(parent, id, pos, size,0){
         //SetMinSize(size);
         //EnableGridLines(false);
@@ -33,13 +33,6 @@ public:
         CreateGrid( 1, 1);
         SetColSize(0, size.x-1);// in pixels
         SetColLabelSize(1);
-        SetRowLabelSize(1);
-        //EnableCellEditControl(false);
-        //SetCellAlignment(wxALIGN_CENTRE,0,0);
-        DisableColResize(0);
-        DisableRowResize(0);
-        EnableScrolling(false,false);
-        //SetWindowStyle(GetWindowStyle() & ~ wxVSCROLL & ~ wxHSCROLL );
         ShowScrollbars(wxSHOW_SB_NEVER,wxSHOW_SB_NEVER);
         if (Type=="wxString")
         {}
@@ -52,7 +45,7 @@ public:
         
         SetCellAlignment (0,0, wxALIGN_LEFT,wxALIGN_BOTTOM);
         //SetDefaultCellAlignment(wxALIGN_LEFT,wxALIGN_CENTRE);
-        
+        SetReadOnly(0,0,ReadOnly);
         
     };
     

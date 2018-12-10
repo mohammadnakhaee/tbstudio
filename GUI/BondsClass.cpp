@@ -18,6 +18,7 @@ BondsClass::BondsClass(wxWindow* parent, Sec30* sec30var, wxWindowID id, const w
     SetSize(wxDLG_UNIT(this, wxSize(-1,-1)));
     GetSizer()->Fit(this);
     /**********************************************************************************************************************************************/
+    /**********************************************************************************************************************************************/
     sec30->AddGroupBox(this,_("Essential Unit-Cell"),wxColour(wxT("rgb(153,180,209)")));
     sec30->AddCheckBox(this, _("WorkingViewmode"), _("Show the working unit cells"));
     wxListBox* esslistctr = sec30->AddListBox(this, _("EssentialUnitcellList"), 340, 120);
@@ -83,7 +84,7 @@ void BondsClass::Btn_Set_OnClick(wxCommandEvent& event)
     if (i000 > maxIndex || ilmn > maxIndex) {wxMessageBox(_("You have ") + wxString::Format(wxT("%d"), maxIndex) + _(" atom(s) in your unit cell.") ,_("Error")); return;}
     
     wxListBox* listctr = sec30->GetListObject(_("EssentialUnitcellList"));
-    if (listctr->GetCount() < 1) {wxMessageBox(_("There is a problem in your structure. Please check your inputs in Unit Cell and Structure Panels."),_("Error")); return;}
+    if (listctr->GetCount() < 1) {wxMessageBox(_("There is a problem in your structure. Please check your inputs in the Unit Cell and the Structure Panels."),_("Error")); return;}
     int lmn = listctr->GetSelection();
     if (lmn < 0) {wxMessageBox(_("Please select the unit cell at which the second atom is located."),_("Error")); return;}
     wxString listucell = listctr->GetString(lmn);

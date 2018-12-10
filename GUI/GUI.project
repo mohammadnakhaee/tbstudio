@@ -8,6 +8,7 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="src">
+    <File Name="SKClass.cpp"/>
     <File Name="ProjectionClass.cpp"/>
     <File Name="BondsClass.cpp"/>
     <File Name="ColorsClass.cpp"/>
@@ -28,6 +29,7 @@
     <File Name="wxcrafter_bitmaps.cpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="include">
+    <File Name="SKClass.h"/>
     <File Name="ProjectionClass.h"/>
     <File Name="BondsClass.h"/>
     <File Name="ColorsClass.h"/>

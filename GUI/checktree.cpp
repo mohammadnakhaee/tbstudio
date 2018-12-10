@@ -616,7 +616,7 @@ wxTreeItemId wxCheckTree::ContainsItemIn(wxTreeItemId root, const wxString& sSea
 {
 	wxTreeItemIdValue cookie;
 	wxTreeItemId search;
-	wxTreeItemId item = GetFirstChild( root, cookie );
+	wxTreeItemId item = GetFirstChild(root, cookie);
 	wxTreeItemId child;
     
     wxString sDataRoot = GetItemText(GetRootItem());

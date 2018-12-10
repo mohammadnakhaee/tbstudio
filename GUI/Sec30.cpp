@@ -55,35 +55,6 @@ void Sec30::AddButton(wxWindow *parent, int ButtonCnt, wxString* ButtonNames, wx
     }
 }
 
-void Sec30::AddVarVector(wxWindow *parent, int VecCnt, wxString VariableName, wxString VariableType, wxString VecLabel, int LabelSize, int CtrlSize,bool EnableEvent)
-{
-    wxBoxSizer* MySizer = new wxBoxSizer(wxHORIZONTAL);
-    parent->GetSizer()->Add(MySizer, 0, wxLEFT|wxRIGHT|wxTOP|wxEXPAND, WXC_FROM_DIP(5));
-    
-    wxStaticText* st = new wxStaticText(parent, wxID_ANY, VecLabel + wxT(":"), wxDefaultPosition, wxDLG_UNIT(parent, wxSize(-1,-1)), 0);
-    MySizer->Add(st, 0, wxLEFT|wxRIGHT|wxTOP, WXC_FROM_DIP(5));
-    st->SetMinSize(wxSize(LabelSize,-1));
-    
-    std::list<wxString>::iterator ivar = vars.end();
-    
-    for (int i=0; i < VecCnt; i++)
-    {
-        sec30TextCtrl* tc=new sec30TextCtrl(parent, wxID_ANY, VariableType, wxDefaultPosition, wxSize(CtrlSize,-1));
-        MySizer->Add(tc, 0, wxRIGHT, WXC_FROM_DIP(5));
-        tc->SetMinSize(wxSize(CtrlSize,-1));
-        
-        wxString var = wxString::Format(wxT("%s[%d]"), VariableName, i);
-        vars.insert(ivar,var);
-        tc->SetName(var);
-        //tc->SetColLabelValue(0,VariableType);
-        if (VariableType != _("wxString")) tc->SetCellValue(0,0,_("0"));
-        if (EnableEvent) tc->Connect(Sec30EVT_Grid_Updated, wxCommandEventHandler(Sec30::sec30TextCtrl_OnUpdated), NULL, this);
-    }
-    
-    MySizer->Layout();
-    parent->Layout();
-}
-
 void Sec30::AddVarVector(wxWindow *parent, int VecCnt, wxString VariableName, wxString VariableType)
 {
     std::list<wxString>::iterator ivar = vars.end();
@@ -103,7 +74,7 @@ void Sec30::AddVarVector(wxWindow *parent, int VecCnt, wxString VariableName, wx
     parent->Layout();
 }
 
-void Sec30::AddGrid(wxWindow *parent, int nRow, int nCol, wxString VariableName, wxString* ColNames, wxString* ColTypes, int* ColSizes, int* ColPrecision, int xCtrlSize, int yCtrlSize)
+void Sec30::AddGrid(wxWindow *parent, int nRow, int nCol, wxString VariableName, wxString* ColNames, wxString* ColTypes, int* ColSizes, int* ColPrecision, int xCtrlSize, int yCtrlSize, bool EnableEvent)
 {
     wxBoxSizer* MySizer = new wxBoxSizer(wxHORIZONTAL);
     parent->GetSizer()->Add(MySizer, 0, wxLEFT|wxRIGHT|wxTOP|wxEXPAND, WXC_FROM_DIP(5));
@@ -144,7 +115,7 @@ void Sec30::AddGrid(wxWindow *parent, int nRow, int nCol, wxString VariableName,
     gc->SetRowLabelSize(35);
     gc->SetColMinimalAcceptableWidth(1);
     
-    gc->Connect(Sec30EVT_Grid_Updated, wxCommandEventHandler(Sec30::sec30TextCtrl_OnUpdated), NULL, this);
+    if (EnableEvent) gc->Connect(Sec30EVT_Grid_Updated, wxCommandEventHandler(Sec30::sec30TextCtrl_OnUpdated), NULL, this);
     
     //gc->Connect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(Sec30::TextCtrl_OnUpdated), NULL, this);
     //gc->Connect(wxEVT_GRID_CELL_CHANGED, wxGridEventHandler(StructureClass::OnCellChanged), NULL, this);
@@ -696,9 +667,12 @@ void Sec30::SaveToFile(wxString filepath, wxString filename)
             out.write((char *)&len, sizeof len);
             out.write(VariableName.c_str(), len);
             
-            int nRow=0;
-            int nCol=0;
-            GetDim(VariableName, nRow, nCol);
+            myGrid* gc = GetGridObject(VariableName);
+            int nRow = gc->GetNumberRows();
+            int nCol = gc->GetNumberCols();
+            out.write((char *) &nRow, sizeof nRow);
+            out.write((char *) &nCol, sizeof nCol);
+            
             for (int irow=0; irow<nRow;irow++)
                 for (int icol=0; icol<nCol; icol++)
                 {
@@ -706,6 +680,8 @@ void Sec30::SaveToFile(wxString filepath, wxString filename)
                     len = val.size();
                     out.write((char *)&len, sizeof len);
                     out.write(val.c_str(), len);
+                    bool isreadonly = gc->IsReadOnly(irow, icol);
+                    out.write((char *)&isreadonly, sizeof isreadonly);
                 }
         }
         ///////////////////////////////////////////////////////////////
@@ -971,7 +947,7 @@ void Sec30::LoadFromFile(wxString filepath, wxString filename)
         }
         ///////////////////////////////////////////////////////////////
         infile.read(reinterpret_cast<char *>(&n), sizeof n);
-
+        
         for(int it=0; it != n; it++)
         {
             size_t ns1=0;
@@ -984,10 +960,19 @@ void Sec30::LoadFromFile(wxString filepath, wxString filename)
                 VariableNameBuf[i] = ch;
             }
             wxString VariableName = wxString(VariableNameBuf,ns1);
-
+            
+            myGrid* gc = GetGridObject(VariableName);
+            int n0 = gc->GetNumberRows();
+            gc->DeleteRows(0,n0,true);
+            
             int nRow=0;
             int nCol=0;
-            GetDim(VariableName, nRow, nCol);
+            infile.read(reinterpret_cast<char *>(&nRow), sizeof nRow);
+            infile.read(reinterpret_cast<char *>(&nCol), sizeof nCol);
+            wxColour c; //Also it is possible to determine the color in this way: wxColour c=*wxGREEN;
+            c.Set(191,205,219,0);
+            gc->InsertRows(0, nRow,false);
+            
             for (int irow=0; irow<nRow;irow++)
                 for (int icol=0; icol<nCol; icol++)
                 {
@@ -1002,6 +987,14 @@ void Sec30::LoadFromFile(wxString filepath, wxString filename)
                     }
                     wxString Val=wxString(ValBuf,ns2);
                     SetVar(VariableName, irow, icol, Val, false);
+                    
+                    bool isreadonly;
+                    infile.read(reinterpret_cast<char *>(&isreadonly), sizeof isreadonly);
+                    gc->SetReadOnly(irow, icol, isreadonly);
+                    if (isreadonly)
+                        gc->SetCellBackgroundColour(irow, icol, c);
+                    else
+                        gc->SetCellBackgroundColour(irow, icol, *wxWHITE);
                 }
         }
         ///////////////////////////////////////////////////////////////
@@ -1648,6 +1641,137 @@ wxColor Sec30::GetBondColor(int kind)
     return c;
 }
 
+void Sec30::GetBondInfo(const wxString& bondtextvar, int& i, int& n, int& j, int& m, int& bondtype)
+{
+    wxString bondtext = bondtextvar;
+    bondtext.Replace(wxString(" "), wxString(""));
+    bondtext.Replace(wxString("["), wxString(""));
+    bondtext.Replace(wxString("]"), wxString(""));
+    bondtext.Replace(wxString("("), wxString(""));
+    bondtext.Replace(wxString(")"), wxString(""));
+    bondtext.Replace(wxString("Bond"), wxString(""));
+    bondtext.Replace(wxString("="), wxString(","));
+    
+    wxStringTokenizer tokenizer(bondtext, ",");
+    tokenizer.GetNextToken();
+    tokenizer.GetNextToken();
+    long i0,n0,j0,m0,b0;
+    tokenizer.GetNextToken().ToLong(&i0);
+    tokenizer.GetNextToken().ToLong(&n0);
+    tokenizer.GetNextToken();
+    tokenizer.GetNextToken();
+    tokenizer.GetNextToken().ToLong(&j0);
+    tokenizer.GetNextToken().ToLong(&m0);
+    tokenizer.GetNextToken().ToLong(&b0);
+    i=i0-1;
+    n=n0;
+    j=j0-1;
+    m=m0;
+    bondtype=b0;
+}
+
+void Sec30::GetOrbitalInfo(wxCheckTree* orbsTree, wxString AtomName, int ShellNumber, wxString &Orbs, int &nOrbs, bool &IsShell)
+{
+    wxTreeItemId rootID = orbsTree->GetRootItem();
+    wxTreeItemId atomID = orbsTree->FindItemIn(rootID,AtomName);
+    wxString ShellName = wxString::Format(wxT("Shell %d"),ShellNumber);
+    wxTreeItemId shellID = orbsTree->FindItemIn(atomID,ShellName);
+    nOrbs=0;
+    Orbs=_("(");
+    IsShell = false;
+    if (shellID.IsOk())
+    {
+        IsShell = true;
+        wxTreeItemIdValue cookie;
+        wxTreeItemId child = orbsTree->GetFirstChild(shellID, cookie);
+        while( child.IsOk() )
+        {
+            if (orbsTree->GetItemState(child) >= 4)
+            {
+                nOrbs++;
+                if (nOrbs != 1) Orbs = Orbs + _(", ");
+                Orbs = Orbs + orbsTree->GetItemText(child);
+            }
+            child = orbsTree->GetNextChild(shellID, cookie);
+        }
+    }
+    
+    Orbs = Orbs + _(")");
+}
+
+void Sec30::GetOrbQuantumNumbers(const wxString& OrbitalName, int& l, int& m)
+{
+    if (OrbitalName.StartsWith("s"))
+    {
+        l = 0;
+        m = 0;
+    }
+    else if (OrbitalName.StartsWith("p"))
+    {
+        l = 1;
+        if (OrbitalName.Contains("{y}"))
+            m = -1;
+        else if (OrbitalName.Contains("{z}"))
+            m = 0;
+        else if (OrbitalName.Contains("{z}"))
+            m = 1;
+    }
+    else if (OrbitalName.StartsWith("d"))
+    {
+        l=2;
+        if (OrbitalName.Contains("{xy}"))
+            m = -2;
+        else if (OrbitalName.Contains("{yz}"))
+            m = -1;
+        else if (OrbitalName.Contains("{3z^2-r^2}"))
+            m = 0;
+        else if (OrbitalName.Contains("{xz}"))
+            m = 1;
+        else if (OrbitalName.Contains("{x^2-y^2}"))
+            m = 2;
+    }
+    else if (OrbitalName.StartsWith("f"))
+    {
+        l=3;
+        if (OrbitalName.Contains("{y(3x^2-y^2)}"))
+            m = -3;
+        else if (OrbitalName.Contains("{xyz}"))
+            m = -2;
+        else if (OrbitalName.Contains("{y(5z^2-r^2)}"))
+            m = -1;
+        else if (OrbitalName.Contains("{z(5z^2-3r^2)}"))
+            m = 0;
+        else if (OrbitalName.Contains("{x(5z^2-r^2)}"))
+            m = 1;
+        else if (OrbitalName.Contains("{z(x^2-y^2)}"))
+            m = 2;
+        else if (OrbitalName.Contains("{x(x^2-3y^2)}"))
+            m = 3;
+    }
+    else if (OrbitalName.StartsWith("g"))
+    {
+        l=4;
+        if (OrbitalName.Contains("{xy(x^2-y^2)}"))
+            m = -4;
+        else if (OrbitalName.Contains("{yz(3x^2-y^2)}"))
+            m = -3;
+        else if (OrbitalName.Contains("{xy(7z^2-r^2)}"))
+            m = -2;
+        else if (OrbitalName.Contains("{yz(7z^2-3r^2)}"))
+            m = -1;
+        else if (OrbitalName.Contains("{35z^4-30z^2r^2+3r^4}"))
+            m = 0;
+        else if (OrbitalName.Contains("{xz(7z^2-3r^2)}"))
+            m = 1;
+        else if (OrbitalName.Contains("{(x^2-y^2)(7z^2-r^2)}"))
+            m = 2;
+        else if (OrbitalName.Contains("{xz(x^2-3y^2)}"))
+            m = 3;
+        else if (OrbitalName.Contains("{x^2(x^2-3y^2)-y^2(3x^2-y^2)}"))
+            m = 4;
+    }
+}
+
 /*
 void Sec30::SetVecValue(wxWindow *parent, wxString VariableName, double* Array, int nArray)
 {
@@ -1659,3 +1783,4 @@ void Sec30::SetVecValue(wxWindow *parent, wxString VariableName, double* Array, 
     }
 }
 */
+

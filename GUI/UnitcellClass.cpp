@@ -13,6 +13,8 @@ UnitcellClass::UnitcellClass(wxWindow* parent, Sec30* sec30var, wxWindowID id, c
     GetSizer()->Fit(this);
     /**********************************************************************************************************************************************/
     /*************Hidden Variables**************/
+    sec30->AddVarVector(this, 1, _("AllSK"), _("string"));
+    sec30->SetVar(_("AllSK[0]"),_("sss,sps,sds,pps,ppp,pds,pdp,dds,ddp,ddd"), false);//All SK parameters in this version of software //number of (s,p,d) = 3; if you are going to add more please note that you should add the name of orbitals in file OrbitalsClass.cpp in function Btn_AddShell_OnClick
     sec30->AddVarVector(this, 1, _("nAtoms"), _("int"));
     sec30->SetVar(_("nAtoms[0]"),0, false);
     sec30->AddVarVector(this, 1, _("nShells"), _("int"));

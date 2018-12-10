@@ -117,14 +117,14 @@ void OrbitalsClass::Btn_AddShell_OnClick(wxCommandEvent& event)
     wxTreeItemId shellID = treectr->tree_add(selectedID, _("Shell ") + cnt, true, true);
     
     treectr->tree_add(shellID,_("s"),true,true);
-    treectr->tree_add(shellID,_("px"),true,true);
-    treectr->tree_add(shellID,_("py"),true,true);
-    treectr->tree_add(shellID,_("pz"),true,true);
-    treectr->tree_add(shellID,_("dxy"),true,false);
-    treectr->tree_add(shellID,_("dyz"),true,false);
-    treectr->tree_add(shellID,_("dzx"),true,false);
-    treectr->tree_add(shellID,_("dx2y2"),true,false);
-    treectr->tree_add(shellID,_("dz2"),true,false);
+    treectr->tree_add(shellID,_("p_y"),true,true);
+    treectr->tree_add(shellID,_("p_z"),true,true);
+    treectr->tree_add(shellID,_("p_x"),true,true);
+    treectr->tree_add(shellID,_("d_{xy}"),true,false);
+    treectr->tree_add(shellID,_("d_{yz}"),true,false);
+    treectr->tree_add(shellID,_("d_{3z^2-r^2}"),true,false);
+    treectr->tree_add(shellID,_("d_{xz}"),true,false);
+    treectr->tree_add(shellID,_("d_{x^2-y^2}"),true,false);
     
     treectr->Expand(rootID);
     treectr->Expand(selectedID);

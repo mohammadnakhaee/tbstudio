@@ -23,6 +23,7 @@
 #include <wx/choice.h>
 #include <wx/bmpcbox.h>
 #include <wx/clrpicker.h>
+#include <wx/tokenzr.h>
 /******************************************************************************/
 
 /******************************************************************************/
@@ -46,7 +47,7 @@ class Sec30  : public wxWindow
 public:
     Sec30(wxWindow* parent);
     ~Sec30();
-
+    
     std::list<wxString> vars;
     std::list<wxString> grids;
     std::list<wxString> radios;
@@ -61,9 +62,9 @@ public:
     void AddGroupBox(wxWindow *parent, wxString Caption, wxColour BGColor);
     void AddButton(wxWindow *parent, int ButtonCnt, wxString* Labels, wxObjectEventFunction* Funcs);
     void AddButton(wxWindow *parent, int ButtonCnt, wxString* ButtonNames, wxString* Labels, wxObjectEventFunction* Funcs);
-    void AddVarVector(wxWindow *parent, int VecCnt, wxString VariableName, wxString VariableType, wxString VecLabel, int LabelSize, int CtrlSize, bool EnableEvent = true);
+    void AddVarVector(wxWindow *parent, int VecCnt, wxString VariableName, wxString VariableType, wxString VecLabel, int LabelSize, int CtrlSize, bool EnableEvent = true, bool ReadOnly = false);
     void AddVarVector(wxWindow *parent, int VecCnt, wxString VariableName, wxString VariableType);
-    void AddGrid(wxWindow *parent, int nRow, int nCol, wxString VariableName, wxString* ColNames, wxString* ColTypes, int* ColSizes, int* ColPrecision, int xCtrlSize, int yCtrlSize);
+    void AddGrid(wxWindow *parent, int nRow, int nCol, wxString VariableName, wxString* ColNames, wxString* ColTypes, int* ColSizes, int* ColPrecision, int xCtrlSize, int yCtrlSize, bool EnableEvent=true);
     void AddGrid(wxWindow *parent, int nRow, int nCol, wxString VariableName, wxString* ColTypes, int* ColPrecision);
     void AddRadioButton(wxWindow *parent, wxString VariableName, wxString Label);
     void AddCheckBox(wxWindow *parent, wxString VariableName, wxString Label);
@@ -100,11 +101,6 @@ public:
     wxCheckListBox* GetCheckListObject(wxString VariableName);
     wxListBox* GetListObject(wxString VariableName);
     wxChoice* GetChoiceObject(wxString VariableName);
-    wxComboBox* GetComboObject(wxString VariableName);
-    wxStaticText* GetComboLabelObject(wxString VariableName);
-    wxColourPickerCtrl* GetColorObject(wxString VariableName);
-    myGrid* GetGridObject(wxString VariableName);
-    sec30TextCtrl* GetTextCtrlObject(wxString VariableName);
     
     void SaveToFile(wxString filepath, wxString filename);
     void LoadFromFile(wxString filepath, wxString filename);
@@ -112,6 +108,11 @@ public:
     wxString GetAtomLable(int kind);
     wxColor GetAtomColor(int kind);
     wxColor GetBondColor(int kind);
+    void GetUnitcellInfo(const wxString& unitcelltextvar, int& l, int& m, int& n);
+    void GetBondInfo(const wxString& bondtextvar, int& i, int& n, int& j, int& m, int& bondtype);
+    void GetOrbitalInfo(wxCheckTree* orbsTree, wxString AtomName, int ShellNumber, wxString &Orbs, int &nOrbs, bool &IsShell);
+    void GetOrbQuantumNumbers(const wxString& OrbitalName, int& l, int& m);
+    
 private:
     virtual void sec30TextCtrl_OnUpdated(wxCommandEvent &event);
     virtual void TreeCtrlDeleteItem(wxTreeEvent& event);

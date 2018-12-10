@@ -12,6 +12,7 @@
 #include "OrbitalsClass.h"
 #include "BondsClass.h"
 #include "ProjectionClass.h"
+#include "SKClass.h"
 #include "ColorsClass.h"
 #include "unistd.h"
 /**********************************************************************************/
@@ -31,6 +32,7 @@ public:
     OrbitalsClass* orbitalsPanel;
     BondsClass* bondsPanel;
     ProjectionClass* projectionPanel;
+    SKClass* skPanel;
     ColorsClass* ColorsForm;
     Sec30* sec30;
     
@@ -100,11 +102,18 @@ protected:
     virtual bool ValidateProjectionPanel();
     virtual void FillProjectionPanel();
     /****************************************/
+    virtual void LoadSKPanel();
+    virtual void EvaluateSKPanel(int isUpdateSKList);
+    virtual bool ValidateSKPanel();
+    /****************************************/
     virtual void LoadColorsForm();
     virtual void EvaluateColorsPanel();
     virtual bool ValidateColorsPanel();
     /****************************************/
     int GetBonds(int* bonds);
+    void UpdateSKList();
+    bool IsBondContainsParameter(wxString Orbs1, wxString Orbs2, wxString sk);
+    
 private:
     wxTextCtrl* logfile;
     wxAuiManager aui_mgr;
