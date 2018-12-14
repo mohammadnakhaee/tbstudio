@@ -21,6 +21,7 @@
 #include <GL/glut.h>
 #include <math.h>
 #include <exception>
+#include "Sec30.h"
 
 // It just declares MY_EVENT event type
 /******************************************************************************/
@@ -41,8 +42,9 @@ public:
     void Draw_Bond(float x0, float y0, float z0, float x1, float y1, float z1, float radius, GLubyte R, GLubyte G, GLubyte B, int Slices, int Stacks);
     void Draw_Vector(float x0, float y0, float z0, float x1, float y1, float z1, float radius, GLubyte R, GLubyte G, GLubyte B, int Slices, int Stacks);
     void Draw_Lattice(int nColDArray, int* nDArray, double** DArray, int nColIArray, int* nIArray, int** IArray, double Coordinate[3][3]);
+    void PlotFigToTexture(int w, int h, Sec30* sec30, int MyID);
     void background();
-    void Draw2D();
+    void Draw2D(int w, int h, Sec30* sec30, int MyID);
     void Draw3D(int nColDArray, int* nDArray, double** DArray, int nColIArray, int* nIArray, int** IArray, double Coordinate[3][3], float xMove, float yMove, float XCam, float YCam, float zoom, float zoomCam, float w, float h);
 private:
     // textures for the cube faces
@@ -53,12 +55,14 @@ private:
 class MyGLCanvas : public wxGLCanvas
 {
 public:
+    Sec30* sec30;
     bool isSelectMode = false;
     bool isMoveMode = false;
     bool isRotationMode = true;
     bool isZoomMode = false;
     int nSelection = 0;
     
+    int ObjectID = -1;
     int Dim;
     float Zoom=0.25;
     float XMove=0.0;
@@ -82,7 +86,7 @@ public:
     int* nIntArray;
     int** IntArray;
     
-    MyGLCanvas(wxWindow *parent, int DimVar, int *attribList = NULL);
+    MyGLCanvas(wxWindow *parent, int DimVar, Sec30* sec30Var, int MyID, int *attribList = NULL);
     void CreateDoubleArray(int NumberOfArraysVar, int* nArray);
     void DiscardDoubleArrays();
     void CreateIntArray(int NumberOfArraysVar, int* nArray);

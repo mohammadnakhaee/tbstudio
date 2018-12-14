@@ -52,6 +52,7 @@ MainFrame::MainFrame(wxWindow* parent)
     sec30=new Sec30(this);
     sec30->Connect(Sec30EVT_OnUpdated, wxCommandEventHandler(sec30_OnUpdated), NULL, this);
     this->Connect(MyOpenGL_EVT_SelectionChanged, wxCommandEventHandler(myOpenGL_EVT_SelectionChanged), NULL, this);
+    InitializeSec30Arrays();
     
     /*
     CML::IOData* iod = static_cast<MainFrame*>(mainFrame)->iod;
@@ -129,7 +130,7 @@ MainFrame::MainFrame(wxWindow* parent)
     LoadStructurePanel();
     LoadOrbitalsPanel();
     LoadBondsPanel();
-    LoadProjectionPanel();
+    LoadSetupPanel();
     LoadSKPanel();
     
     MainRibbon->SetActivePage((size_t)0);
@@ -611,9 +612,58 @@ void MainFrame::BtnTerminal_OnClick(wxRibbonButtonBarEvent& event)
     
 }
 
+void MainFrame::InitializeSec30Arrays()
+{
+    int nArraysOf0DDouble = 9;
+    int nArraysOf0DInt = 7;
+    int nArraysOf1DDouble = 1;
+    int nArraysOf1DString = 1;
+    int nArraysOf2DDouble = 2;
+    sec30->ArraysOf0DDouble.clear();
+    sec30->ArraysOf0DInt.clear();
+    sec30->ArraysOf1DDouble.clear();
+    sec30->ArraysOf1DString.clear();
+    sec30->ArraysOf2DDouble.clear();
+    for (int i=0; i<nArraysOf0DDouble; i++) sec30->ArraysOf0DDouble.push_back(0.0);
+    for (int i=0; i<nArraysOf0DInt; i++) sec30->ArraysOf0DInt.push_back(0);
+    for (int i=0; i<nArraysOf1DDouble; i++) sec30->ArraysOf1DDouble.push_back(Adouble0D());
+    for (int i=0; i<nArraysOf1DString; i++) sec30->ArraysOf1DString.push_back(Astring0D());
+    for (int i=0; i<nArraysOf2DDouble; i++) sec30->ArraysOf2DDouble.push_back(Adouble1D());
+    
+    /////////////////////////////0D Int///////////////////////////////////////////////////////
+    sec30->ArraysOf0DInt[0] = 0;//bool isBandLoaded;
+    sec30->ArraysOf0DInt[1] = 0;//int nKPoint;
+    sec30->ArraysOf0DInt[2] = 0;//int maxneig;
+    sec30->ArraysOf0DInt[3] = 0;//int mspin;
+    sec30->ArraysOf0DInt[4] = 0;//int DFTnBandMin;
+    sec30->ArraysOf0DInt[5] = 0;//int DFTnBandMax;
+    sec30->ArraysOf0DInt[6] = 0;//bool isSelectMode;
+    
+    /////////////////////////////0D Double///////////////////////////////////////////////////////
+    sec30->ArraysOf0DDouble[0] = 0.0;//double ChemP;
+    sec30->ArraysOf0DDouble[1] = 0.0;//double DFTyMin2d0;
+    sec30->ArraysOf0DDouble[2] = 0.0;//double DFTyMax2d0;
+    sec30->ArraysOf0DDouble[3] = 0.0;//double DFTyMin2d;
+    sec30->ArraysOf0DDouble[4] = 0.0;//double DFTyMax2d;
+    sec30->ArraysOf0DDouble[5] = 0.0;//double DFTxMin2d0;
+    sec30->ArraysOf0DDouble[6] = 0.0;//double DFTxMax2d0;
+    sec30->ArraysOf0DDouble[7] = 0.0;//double DFTxMin2d;
+    sec30->ArraysOf0DDouble[8] = 0.0;//double DFTxMax2d;
+    
+    /////////////////////////////1D Double///////////////////////////////////////////////////////
+    sec30->ArraysOf1DDouble[0] = Adouble0D();//double* dkLabel;
+    
+    /////////////////////////////1D String///////////////////////////////////////////////////////
+    sec30->ArraysOf1DString[0] = Astring0D();//wxString* kLabel;
+    
+    /////////////////////////////2D Double///////////////////////////////////////////////////////
+    sec30->ArraysOf2DDouble[0] = Adouble1D();//double** KPoints; [ka,kb,kc,kx,ky,kz,d_path]
+    sec30->ArraysOf2DDouble[1] = Adouble1D();//double** EigVal;
+}
+
 void MainFrame::Init_graph3d()
 {
-    graph3d = new GraphClass(mainpanel,3);
+    graph3d = new GraphClass(mainpanel, 3, sec30, -1);
     for (int i=1; i<=50; i++) graph3d->BColorCtrl[i-1] = sec30->GetColorObject(_("BColor") + wxString::Format(wxT("%d"),i));
     //for (int i=1; i<=118; i++) graph3d->AColorCtrl[i-1] = sec30->GetColorObject(_("AColor") + wxString::Format(wxT("%d"),i));
     graph3d->CreateAtomicStructure(sec30, true);
@@ -624,14 +674,16 @@ void MainFrame::Init_graph3d()
 
 void MainFrame::Init_graph2d0()
 {
-    graph2d0 = new GraphClass(mainpanel,2);
+    graph2d0 = new GraphClass(mainpanel, 2, sec30, 0);
+    graph2d0->sec30 = sec30;
     aui_mgr.AddPane(graph2d0, wxAuiPaneInfo().Gripper(false).Floatable(true).Dockable(true).Caption("Initial Band-Structure").CloseButton(false).MaximizeButton(true).MinimizeButton(true).Dock().Right());
     aui_mgr.Update();
 }
 
 void MainFrame::Init_graph2d()
 {
-    graph2d = new GraphClass(mainpanel,2);
+    graph2d = new GraphClass(mainpanel, 2, sec30, 1);
+    graph2d->sec30 = sec30;
     aui_mgr.AddPane(graph2d, wxAuiPaneInfo().Gripper(false).Floatable(true).Dockable(true).Caption("Current Band-Structure").CloseButton(false).MaximizeButton(true).MinimizeButton(true).Dock().Right());
     aui_mgr.Update();
 }
@@ -698,6 +750,24 @@ void MainFrame::UpdateGraph3D()
     graph3d->Refresh(false);
 }
 
+void MainFrame::UpdateGraph2D0()
+{
+    graph2d0->Update2d0();
+    graph2d0->Refresh(true);
+}
+
+void MainFrame::UpdateGraph2D()
+{
+    graph2d->Update2d();
+    graph2d->Refresh(true);
+}
+
+void MainFrame::UpdateGraph2Ds()
+{
+    UpdateGraph2D0();
+    UpdateGraph2D();
+}
+
 /****************************************************************************************************************************************************************/
 /****************************************************************************************************************************************************************/
 void MainFrame::sec30_OnUpdated(wxCommandEvent& event)
@@ -707,8 +777,12 @@ void MainFrame::sec30_OnUpdated(wxCommandEvent& event)
     
     if (info == _("SKClass"))
     {
-        int UpdateSKList = redraw;// 2 = update
+        int UpdateSKList = redraw;// 2 = update list
         EvaluateSKPanel(UpdateSKList);
+    }
+    else if (info == _("SetupClass"))
+    {
+        EvaluateSetupPanel();
     }
     else
     {
@@ -723,8 +797,6 @@ void MainFrame::sec30_OnUpdated(wxCommandEvent& event)
         EvaluateOrbitalsPanel(redraw);
     else if (info == _("BondsClass"))
         EvaluateBondsPanel(redraw);
-    else if (info == _("ProjectionClass"))
-        EvaluateProjectionPanel(redraw);
     else if (info == _("ColorsClass"))
         EvaluateColorsPanel();
 }
@@ -949,21 +1021,21 @@ void MainFrame::LoadBondsPanel()
     bondsPanel->graph3d = graph3d;
 }
 
-void MainFrame::LoadProjectionPanel()
+void MainFrame::LoadSetupPanel()
 {
     wxScrolledWindow* scrolledwindow = new wxScrolledWindow(LeftPanel,wxID_ANY,wxDefaultPosition, wxSize(-1,-1));
-    LeftPanel->AddPage(scrolledwindow,"Projection",true);
+    LeftPanel->AddPage(scrolledwindow,"Setup",true);
     LeftPanel->Update();
     
-    projectionPanel = new ProjectionClass(scrolledwindow,sec30);
+    setupPanel = new SetupClass(scrolledwindow,sec30);
     
     wxBoxSizer* panelSizer1 = new wxBoxSizer(wxVERTICAL);
-    panelSizer1->Add(projectionPanel, 1, wxEXPAND);
+    panelSizer1->Add(setupPanel, 1, wxEXPAND);
     scrolledwindow->SetSizer(panelSizer1);
     
     scrolledwindow->FitInside();
     scrolledwindow->SetScrollRate(-1,15);
-    projectionPanel->graph3d = graph3d;
+    setupPanel->graph3d = graph3d;
 }
 
 void MainFrame::LoadSKPanel()
@@ -1016,7 +1088,7 @@ void MainFrame::EvaluateOrbitalsPanel(int redraw)
 {
     if (ValidateOrbitalsPanel())
     {
-        FillProjectionPanel();
+        FillSetupPanel();
         if (redraw == 1) ShowGraph3D();
     }
 }
@@ -1141,21 +1213,20 @@ void MainFrame::EvaluateBondsPanel(int redraw)
     }
 }
 
-void MainFrame::EvaluateProjectionPanel(int redraw)
+void MainFrame::EvaluateSetupPanel()
 {
-    if (ValidateProjectionPanel()) ShowGraph3D();
+    if (ValidateSetupPanel()) UpdateGraph2Ds();
 }
 
 void MainFrame::EvaluateSKPanel(int isUpdateSKList)
 {
-    
     if (isUpdateSKList == 2)
     {
         if (ValidateSKPanel()) UpdateSKList();
     }
     else
     {
-        //RePlotTheBand();
+        if (ValidateSKParametersList()) UpdateGraph2Ds();
     }
 }
 
@@ -1319,10 +1390,19 @@ bool MainFrame::ValidateBondsPanel()
     return isValid;
 }
 
-bool MainFrame::ValidateProjectionPanel()
+bool MainFrame::ValidateSetupPanel()
 {
     bool isValid = true;
-
+    int nMin, nMax;
+    sec30->GetVar(_("DFTBandRange[0]"), nMin);
+    sec30->GetVar(_("DFTBandRange[1]"), nMax);
+    if (nMax >= nMin)
+    {
+        sec30->ArraysOf0DInt[4] = nMin;//int DFTnBandMin;
+        sec30->ArraysOf0DInt[5] = nMax;//int DFTnBandMax;
+    }
+    else
+        isValid = false;
     return isValid;
 }
 
@@ -1482,10 +1562,17 @@ bool MainFrame::ValidateSKPanel()
     {
         WarningIndex++;
         if (WarningIndex==1) {logfile->AppendText(_("\nWarning list:\n"));}
-        logfile->AppendText(wxString::Format(wxT("Warning %d: "),ErrorIndex) + _("No bond was found in bonds list. It will result in molecular levels.\n"));
+        logfile->AppendText(wxString::Format(wxT("Warning %d: "),ErrorIndex) + _("No bond was found in your bonds list. It will result in molecular levels.\n"));
     }
     
     if (!isValid) logfile->AppendText(_("\nFix the errors and try again ...\n"));
+    return isValid;
+}
+
+bool MainFrame::ValidateSKParametersList()
+{
+    bool isValid = true;
+    
     return isValid;
 }
 
@@ -1694,7 +1781,7 @@ void MainFrame::FillBondsPanel()
             }
 }
 
-void MainFrame::FillProjectionPanel()
+void MainFrame::FillSetupPanel()
 {
     //Clear All labels in Projection panel after the nAtoms. It will be set later as long as the lines are valid in unitcell panel
     int maxIndex=0;

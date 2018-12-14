@@ -21,9 +21,11 @@ UnitcellClass::UnitcellClass(wxWindow* parent, Sec30* sec30var, wxWindowID id, c
     sec30->SetVar(_("nShells[0]"),0, false);
     sec30->AddVarVector(this, 1, _("nShowingBonds"), _("int"));
     sec30->SetVar(_("nShowingBonds[0]"),0, false);
-    wxString ColTypes2[3] = {_("double"), _("double"), _("double")};
-    int ColPrecision2[3] = {8, 8, 8};
-    sec30->AddGrid(this, 99, 3, _("XYZ_Coords"), ColTypes2, ColPrecision2);
+    wxString ColTypes1[3] = {_("double"), _("double"), _("double")};
+    int ColPrecision1[3] = {8, 8, 8};
+    sec30->AddGrid(this, 99, 3, _("XYZ_Coords"), ColTypes1, ColPrecision1);
+    sec30->AddVarVector(this, 1, _("isDFTBand"), _("bool"));
+    sec30->SetVar(_("isDFTBand[0]"),false, false);
     /**********************************************************************************************************************************************/
     sec30->AddGroupBox(this,_("Crystallographic Information File"),wxColour(wxT("rgb(153,180,209)")));
     wxString Labels1[2] = { _("Load"), _("Save")};
@@ -97,7 +99,7 @@ void UnitcellClass::Btn_Load_OnClick(wxCommandEvent& event)
         wxString dgFileName = OpenDialog->GetFilename();
         wxString dgPath = OpenDialog->GetDirectory();
         
-        wxString fl = dgPath + wxT("/") + dgFileName;
+        wxString fl = dgPath + wxT("\\") + dgFileName;
 	}
  
 	OpenDialog->Destroy();

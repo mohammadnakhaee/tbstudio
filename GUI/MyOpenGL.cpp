@@ -190,12 +190,179 @@ int samplemulti(mglGraph *gr,double w, double h)
 
 int it=0;
 
+int PlotBand(mglGraph *gr, int w, int h, Sec30* sec30, int MyID)
+{
+    bool isBandLoaded = false;
+    if (sec30->ArraysOf0DInt[0] != 0) isBandLoaded = true;
+    
+    if (isBandLoaded)
+    {
+        int nKPoint = sec30->ArraysOf0DInt[1];
+        int maxneig = sec30->ArraysOf0DInt[2];
+        int mspin = sec30->ArraysOf0DInt[3];
+        int DFTnMin = sec30->ArraysOf0DInt[4];
+        int DFTnMax = sec30->ArraysOf0DInt[5];
+        double ChemP = sec30->ArraysOf0DDouble[0];
+        bool SelectMode = false;
+        if (sec30->ArraysOf0DInt[6] != 0) SelectMode = true;
+        
+        mreal yMin, yMax, xMin, xMax;
+        if (MyID == 0)
+        {
+            yMin = (mreal)sec30->ArraysOf0DDouble[1];
+            yMax = (mreal)sec30->ArraysOf0DDouble[2];
+            xMin = (mreal)sec30->ArraysOf0DDouble[5];
+            xMax = (mreal)sec30->ArraysOf0DDouble[6];
+        }
+        else if (MyID == 1)
+        {
+            yMin = (mreal)sec30->ArraysOf0DDouble[3];
+            yMax = (mreal)sec30->ArraysOf0DDouble[4];
+            xMin = (mreal)sec30->ArraysOf0DDouble[7];
+            xMax = (mreal)sec30->ArraysOf0DDouble[8];
+        }
+        //sec30->ArraysOf2DDouble[0] = Adouble1D();//double** FracKPoint;
+        //sec30->ArraysOf2DDouble[1] = Adouble1D();//double** EigVal;
+        
+        if (DFTnMax < DFTnMin || DFTnMax<1 || DFTnMin<1 || DFTnMin>maxneig || DFTnMax>maxneig) return 0;
+        
+        int nCurve = DFTnMax - DFTnMin + 1;
+        int nX = nKPoint;
+        mglData Y(nX,nCurve);
+        mglData C(nX,nCurve);
+        mglData X(nX);
+        
+        for(long iX=0; iX<nX; iX++)
+        {
+            //mreal x = iX/(nX-1.0);
+            X.a[iX] = (mreal)sec30->ArraysOf2DDouble[0][iX][6];//d_path
+        }
+            
+        for(long iCurve=0; iCurve<nCurve; iCurve++)
+        {
+            for(long iX=0; iX<nX; iX++)
+            {
+                //mreal x = iX/(nX-1.0);
+                Y.a[iCurve*nX + iX] = (mreal)(sec30->ArraysOf2DDouble[1][iX][iCurve + DFTnMin - 1] - ChemP);//Eigen Value - ChemP
+            }
+        }
+        
+        if (SelectMode)
+        {
+            for(long iCurve=0; iCurve<nCurve; iCurve++)
+            {
+                for(long iX=0; iX<nX; iX++)
+                {
+                    //mreal x = iX/(nX-1.0);
+                    C.a[iCurve*nX + iX] = -0.5;
+                    if ( iX > (int)(nX/3.0)) C.a[iCurve*nX + iX] = 0.5;
+                }
+            }
+        }
+        
+        
+        gr->NewFrame();          // start frame
+        //gr->Adjust();
+        //gr->Rasterize();
+        //gr->SubPlot(1,1,0,"");
+        if (SelectMode)
+            gr->SubPlot(1,1,0,"#");
+        else
+            gr->SubPlot(1,1,0,"");
+        //gr->SetSize((int)(w*1.5),(int)(h*1.5),true);
+        //gr->Title("Beam and ray tracing","",-1.5);
+        gr->SetFontSize(4);
+        //gr->Label('x', "k",0);   //x Title
+        //gr->Label('y', "E_k (eV)",0);   //y Title
+        gr->SetRanges(X.a[0], X.a[nX-1], yMin, yMax);
+        double val[]={X.a[0] + 0.00000001};
+        wxString xlabel = sec30->ArraysOf1DString[0][0];
+        gr->SetTicksVal('x', mglData(1,val), xlabel.c_str().AsChar());
+        //gr->SetTicks('x',X.a[nX-1] + 1,-1);
+        int nk = sec30->ArraysOf1DString[0].size();
+        for (int ik=1; ik<nk-1; ik++)
+        {
+            mreal xpos = (mreal)sec30->ArraysOf1DDouble[0][ik];
+            xlabel = sec30->ArraysOf1DString[0][ik];
+            gr->AddTick('x', xpos, xlabel.c_str().AsChar());
+        }
+        mreal xpos2 = X.a[nX-1] - 0.00000001;
+        xlabel = sec30->ArraysOf1DString[0][nk-1];
+        gr->AddTick('x', xpos2, xlabel.c_str().AsChar());
+        
+        //gr->SetTicks(’x’,M_PI,0,0,"\\pi");
+        //gr->AddTick(’x’,0.886,"x^*");
+        //gr->Grid("xy","{xA9A9A9}|");
+        gr->Box();                 //some plotting
+        gr->Axis();                //draw axis
+        //gr->Adjust();
+        if (SelectMode)
+            gr->Tens(X, Y, C, "-2");      // "b" is colour ??
+        else    
+            gr->Plot(X, Y, "{x6495ED}-2");      // "b" is colour ??
+        //gr->Plot(X, Y, "{x800000}-2");      // "marron" is colour ??
+        
+        gr->Line(mglPoint(X.a[0],0.0), mglPoint(X.a[nX-1],0.0), "r2|");
+        for (int ik=1; ik<nk-1; ik++)
+        {
+            mreal xpos = (mreal)sec30->ArraysOf1DDouble[0][ik];
+            gr->Line(mglPoint(xpos, yMin), mglPoint(xpos, yMax), "H2");
+        }
+        
+        gr->SetSize((int)(w*1.5),(int)(h*1.5),false);
+        //float max = (float)w;
+        //if (h>w) max = (float)h;
+        //float w2d=w/max;
+        //float h2d=h/max;
+        //gr->Aspect(w2d,h2d);
+        //gr->Adjust();
+        //gr->Puts(mglPoint(0.7, -0.05), strstream.str().c_str());
+        gr->EndFrame ();          // end frame
+        //gr->WriteFrame ();        // save frame
+        
+        return 0;
+    }
+}
+
 int sample(mglGraph *gr,double w, double h)
+{
+    gr->SetSize(w,h,true);
+    mglData y(100);
+    mglData x(100);
+    for (long j = 0; j < x.nx; j++)
+    {
+        x.a[j] = (5.0*M_PI*(j)/x.nx+it*0.5);
+        y.a[j] = sin(5.0*M_PI*(j)/y.nx+it*0.5);
+    }
+    
+    gr->NewFrame ();          // start frame
+    gr->SubPlot(1,1,0,"<_"); 
+    gr->Aspect(1.0,1.0);
+    
+    
+    gr->Title("Beam and ray tracing","",-1.5);
+    gr->SetFontSize(4);
+    gr->Box();                 //some plotting
+    gr->Axis();                //draw axis
+    gr->Label('x', "x",0);   //x Title
+    gr->Label('y', "f(x) (Arb.)",0);   //y Title
+    gr->Grid("xy","{xA9A9A9}|");
+    
+    gr->Plot(x, y, "{x6495ED}-2");      // "b" is colour ??
+    
+    //gr->Puts(mglPoint(0.7, -0.05), strstream.str().c_str());
+    //gr->EndFrame ();          // end frame
+    //gr->WriteFrame ();        // save frame
+    return 0;
+}
+
+int sampleOK(mglGraph *gr,double w, double h)
 {
     gr->SetSize(w,h,true);
     mglData dat (100);
     for (long j = 0; j < dat.nx; j++)
       dat.a[j] = sin (5.0*M_PI*(j)/dat.nx+it*0.5);
+    
     
     gr->NewFrame ();          // start frame
     gr->SubPlot(1,1,0,"<_"); 
@@ -216,6 +383,7 @@ int sample(mglGraph *gr,double w, double h)
     //gr->WriteFrame ();        // save frame
     return 0;
 }
+
 
 int sample1(mglGraph *gr, double w, double h)
 {
@@ -381,35 +549,30 @@ MyGLContext::MyGLContext(wxGLCanvas *canvas, int DimVar)
         
         //glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, fLargest);
         
-    int w,h,x,y;
-    w=1600;
-    h=400;
-    //GetClientSize(&w,&h); // size of the picture
-    mglGraph gr(w,h);
-    gr.Alpha(true); // draws something using MathGL
-    gr.Light(true);
-    sample(&gr,(double)w,(double)h);
-    //wxImage img(w,h,(unsigned char *)gr.GetRGB(),true);
-    //return img;
-        
-        //const wxImage img(DrawDice(256, i + 1));
-        
-        //const wxImage img(w,h,(unsigned char *)gr.GetRGB(),true);
-        //glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-        //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, img.GetWidth(), img.GetHeight(),
-        //             0, GL_RGB, GL_UNSIGNED_BYTE, img.GetData());
-                     
-        
-        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, gr.GetWidth(), gr.GetHeight(),
-                     0, GL_RGB, GL_UNSIGNED_BYTE, gr.GetRGB());
-                     
-                     //(unsigned char *)
-    //}
+    //int w,h,x,y;
+    //w=1600;
+    //h=400;
+    ////GetClientSize(&w,&h); // size of the picture
+    //mglGraph gr(w,h);
+    //gr.Alpha(true); // draws something using MathGL
+    //gr.Light(true);
+    //sample(&gr,(double)w,(double)h);
+    ////wxImage img(w,h,(unsigned char *)gr.GetRGB(),true);
+    ////return img;
+    //    
+    //    //const wxImage img(DrawDice(256, i + 1));
+    //    
+    //    //const wxImage img(w,h,(unsigned char *)gr.GetRGB(),true);
+    //    //glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    //    //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, img.GetWidth(), img.GetHeight(),
+    //    //             0, GL_RGB, GL_UNSIGNED_BYTE, img.GetData());
+    //glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, gr.GetWidth(), gr.GetHeight(),
+    //                 0, GL_RGB, GL_UNSIGNED_BYTE, gr.GetRGB());
+    //                 
+    //                 //(unsigned char *)
+    ////}
 
-    
-    //
-    
     CheckGLError();
 }
 
@@ -549,8 +712,9 @@ void MyGLContext::Polygons2D()
     */
 }
 
-void MyGLContext::Draw2D()
+void MyGLContext::Draw2D(int w, int h, Sec30* sec30, int MyID)
 {
+    PlotFigToTexture(w, h, sec30, MyID);
     glDisable(GL_LIGHTING);
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
     glPushMatrix();
@@ -567,6 +731,17 @@ void MyGLContext::Draw2D()
     glFlush();  // Render now
     glPopMatrix();
     CheckGLError();
+}
+
+void MyGLContext::PlotFigToTexture(int w, int h, Sec30* sec30, int MyID)
+{
+    //GetClientSize(&w,&h); // size of the picture
+    mglGraph gr;
+    PlotBand(&gr, w, h, sec30, MyID);
+    //sample(&gr, w, h);
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, gr.GetWidth(), gr.GetHeight(),
+                     0, GL_RGB, GL_UNSIGNED_BYTE, gr.GetRGB());
 }
 
 void MyGLContext::DrawSelectionFrame(float x1, float y1, float x2, float y2)
@@ -923,7 +1098,7 @@ wxBEGIN_EVENT_TABLE(MyGLCanvas, wxGLCanvas)
     EVT_MENU(wxID_COPY,MyGLCanvas::OnSaveRasterImage)
 wxEND_EVENT_TABLE()
 
-MyGLCanvas::MyGLCanvas(wxWindow *parent, int DimVar, int *attribList)
+MyGLCanvas::MyGLCanvas(wxWindow *parent, int DimVar, Sec30* sec30Var, int MyID, int *attribList)
     // With perspective OpenGL graphics, the wxFULL_REPAINT_ON_RESIZE style
     // flag should always be set, because even making the canvas smaller should
     // be followed by a paint event that updates the entire canvas with new
@@ -938,7 +1113,9 @@ MyGLCanvas::MyGLCanvas(wxWindow *parent, int DimVar, int *attribList)
       m_useStereo(false),
       m_stereoWarningAlreadyDisplayed(false)
 {
+    ObjectID = MyID;
     Dim = DimVar;
+    sec30 = sec30Var;
     if ( attribList )
     {
         int i = 0;
@@ -1009,15 +1186,6 @@ void MyGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
     float w3d=w/max;
     float h3d=h/max;
     
-    //GetClientSize(&w,&h); // size of the picture
-    mglGraph gr;
-    sample(&gr,(double)w,(double)h);
-    
-    
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, gr.GetWidth(), gr.GetHeight(),
-                     0, GL_RGB, GL_UNSIGNED_BYTE, gr.GetRGB());
-    
     if ( quadStereoSupported )
     {
         glDrawBuffer( GL_BACK_LEFT );
@@ -1030,7 +1198,7 @@ void MyGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
                             NumberOfIntArrays, nIntArray, IntArray, Coordinate1,
                             XMove, YMove, XCam, YCam, Zoom, ZoomCam, w3d,h3d);
         else
-            context.Draw2D();
+            context.Draw2D(w, h, sec30, ObjectID);
             
         CheckGLError();
         glDrawBuffer( GL_BACK_RIGHT );
@@ -1043,7 +1211,7 @@ void MyGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
                             NumberOfIntArrays, nIntArray, IntArray, Coordinate1,
                             XMove, YMove, XCam, YCam, Zoom, ZoomCam, w3d,h3d);
         else
-            context.Draw2D();
+            context.Draw2D(w, h, sec30, ObjectID);
             
         CheckGLError();
     }
@@ -1054,7 +1222,7 @@ void MyGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
                             NumberOfIntArrays, nIntArray, IntArray, Coordinate1,
                             XMove, YMove, XCam, YCam, Zoom, ZoomCam, w3d,h3d);
         else
-            context.Draw2D();
+            context.Draw2D(w, h, sec30, ObjectID);
         if ( m_useStereo && !m_stereoWarningAlreadyDisplayed )
         {
             m_stereoWarningAlreadyDisplayed = true;
@@ -1122,12 +1290,54 @@ void MyGLCanvas::OnMouseWheel(wxMouseEvent& event)
 {
     bool scrldwn = event.GetWheelRotation() < 0;
     //float delta = 0.01*0.01f*event.GetWheelDelta(); //Constant delta
-    float delta = (ZoomCam*0.1)*0.01f*event.GetWheelDelta(); //Zoom dependent delta (It seems better)
-    if (scrldwn)
-        ZoomCam = ZoomCam + delta;
-    else
-        ZoomCam = ZoomCam - delta;
-    if (ZoomCam <=0.001) ZoomCam=0.001;
+    if (Dim==3)
+    {
+        float delta = (ZoomCam*0.1)*0.01f*event.GetWheelDelta(); //Zoom dependent delta (It seems better)
+        if (scrldwn)
+            ZoomCam = ZoomCam + delta;
+        else
+            ZoomCam = ZoomCam - delta;
+        if (ZoomCam <=0.001) ZoomCam=0.001;
+    }
+    else if(Dim==2)
+    {
+        bool isBandLoaded = false;
+        if (sec30->ArraysOf0DInt[0] != 0) isBandLoaded = true;
+        {
+            double y1, y2;
+            if (ObjectID == 0)
+            {
+                y1 = sec30->ArraysOf0DDouble[1];
+                y2 = sec30->ArraysOf0DDouble[2];
+            }
+            else if (ObjectID == 1)
+            {
+                y1 = sec30->ArraysOf0DDouble[3];
+                y2 = sec30->ArraysOf0DDouble[4];
+            }
+            
+            double y0 = (y2 + y1) / 2.0;
+            double r = (y2 - y1) / 2.0;
+            float delta = (r*0.1)*0.01f*event.GetWheelDelta(); //Zoom dependent delta (It seems better)
+            if (scrldwn)
+                r = r + delta;
+            else
+                r = r - delta;
+            if (r <=0.002) r=0.002;
+            
+            if (ObjectID == 0)
+            {
+                sec30->ArraysOf0DDouble[1] = y0 - r;
+                sec30->ArraysOf0DDouble[2] = y0 + r;
+            }
+            else if (ObjectID == 1)
+            {
+                sec30->ArraysOf0DDouble[3] = y0 - r;
+                sec30->ArraysOf0DDouble[4] = y0 + r;
+            }
+        }
+    }
+    
     Refresh(false);
 }
 
@@ -1148,8 +1358,11 @@ void MyGLCanvas::OnMouseLeftDown(wxMouseEvent& event)
     isMouseLeftDown = true;
     isMouseRightDown = false;
     isMouseMiddleDown = false;
-    ShowSelectionFrame = false;
-    IntArray[9][3] = 0; //SelectionFrame=false
+    if (Dim == 3)
+    {
+        ShowSelectionFrame = false;
+        IntArray[9][3] = 0; //SelectionFrame=false
+    }
     const wxPoint cpt = event.GetPosition();
     ClientMouseX0 = cpt.x;
     ClientMouseY0 = cpt.y;
@@ -1165,61 +1378,67 @@ void MyGLCanvas::OnMouseLeftUp(wxMouseEvent& event)
     mouseX = pt.x;
     mouseY = pt.y;
     isMouseLeftDown = false;
-    
-    if (mouseY==mouseY0 && mouseX==mouseX0)
+    if (Dim == 3)
     {
-        const wxSize ClientSize = GetClientSize();
-        int w,h;
-        w=ClientSize.x;
-        h=ClientSize.y;
-        float max = (float)w;
-        if (h>w) max = (float)h;
-        float w3d=w/max;
-        float h3d=h/max;
-        const wxPoint pt0 = event.GetPosition();
-        float x = (float)(w3d*pt0.x/w - w3d/2.0f);
-        float y = -(float)(h3d*pt0.y/h - h3d/2.0f);
-        int AtomIndex[1];
-        AtomIndex[0] = RayTraceGetAtomIndex(x, y);
-        if (AtomIndex[0] != -1)
+        if (mouseY==mouseY0 && mouseX==mouseX0)
         {
-            if (event.CmdDown())
-                AddToSelectionList(1, AtomIndex, false, false);
-            else if (event.AltDown())
-                AddToSelectionList(1, AtomIndex, false, true);
+            const wxSize ClientSize = GetClientSize();
+            int w,h;
+            w=ClientSize.x;
+            h=ClientSize.y;
+            float max = (float)w;
+            if (h>w) max = (float)h;
+            float w3d=w/max;
+            float h3d=h/max;
+            const wxPoint pt0 = event.GetPosition();
+            float x = (float)(w3d*pt0.x/w - w3d/2.0f);
+            float y = -(float)(h3d*pt0.y/h - h3d/2.0f);
+            int AtomIndex[1];
+            AtomIndex[0] = RayTraceGetAtomIndex(x, y);
+            if (AtomIndex[0] != -1)
+            {
+                if (event.CmdDown())
+                    AddToSelectionList(1, AtomIndex, false, false);
+                else if (event.AltDown())
+                    AddToSelectionList(1, AtomIndex, false, true);
+                else
+                    AddToSelectionList(1, AtomIndex, true, false);
+            }
             else
-                AddToSelectionList(1, AtomIndex, true, false);
+                AddToSelectionList(0, AtomIndex, true, true);
+            //wxMessageBox(_("Atom index : ") + wxString::Format(wxT("(%d,%d)"), i000, sh000) + _(" in cell(0,0,0) and ") + wxString::Format(wxT("(%d,%d)"), ilmn, shlmn) + _(" in cell") + listucell + _(" in your TB model."),_("Error"));
+            //wxMessageBox(_("Atom index : ") + wxString::Format(wxT("%d"), AtomIndex[0]),_("Info"));
         }
-        else
-            AddToSelectionList(0, AtomIndex, true, true);
-        //wxMessageBox(_("Atom index : ") + wxString::Format(wxT("(%d,%d)"), i000, sh000) + _(" in cell(0,0,0) and ") + wxString::Format(wxT("(%d,%d)"), ilmn, shlmn) + _(" in cell") + listucell + _(" in your TB model."),_("Error"));
-        //wxMessageBox(_("Atom index : ") + wxString::Format(wxT("%d"), AtomIndex[0]),_("Info"));
-    }
-    else if (ShowSelectionFrame)
-    {
-        ShowSelectionFrame = false;
-        IntArray[9][3] = 0; //SelectionFrame=false
-        
-        int* AtomIndex;
-        int nSelected = 0;
-        FrameGetAtomIndex(nSelected, AtomIndex);
-        
-        if (nSelected != 0)
+        else if (ShowSelectionFrame)
         {
-            if (event.CmdDown())
-                AddToSelectionList(nSelected, AtomIndex, false, false);
-            else if (event.AltDown())
-                AddToSelectionList(nSelected, AtomIndex, false, true);
-            else
-                AddToSelectionList(nSelected, AtomIndex, true, false);
+            ShowSelectionFrame = false;
+            IntArray[9][3] = 0; //SelectionFrame=false
             
-            delete [] AtomIndex;
+            int* AtomIndex;
+            int nSelected = 0;
+            FrameGetAtomIndex(nSelected, AtomIndex);
+            
+            if (nSelected != 0)
+            {
+                if (event.CmdDown())
+                    AddToSelectionList(nSelected, AtomIndex, false, false);
+                else if (event.AltDown())
+                    AddToSelectionList(nSelected, AtomIndex, false, true);
+                else
+                    AddToSelectionList(nSelected, AtomIndex, true, false);
+                
+                delete [] AtomIndex;
+            }
+            else
+                AddToSelectionList(nSelected, AtomIndex, true, true);
         }
         else
-            AddToSelectionList(nSelected, AtomIndex, true, true);
+            Reload();
     }
-    else
-        Reload();
+    else //if (Dim == 2)
+    {
+        
+    }
 }
 
 void MyGLCanvas::OnMouseMove(wxMouseEvent& event)
@@ -1236,16 +1455,19 @@ void MyGLCanvas::OnMouseMove(wxMouseEvent& event)
         float m=0;
         float value=0;
         GetDirection(mouseX0, mouseY0, mouseX, mouseY, l, m, value);
-        ShowSelectionFrame = false;
-        IntArray[9][3] = 0; //SelectionFrame=false
-        if (isSelectMode)
-            DoSelect(ClientMouseX0, ClientMouseY0, ClientMouseX, ClientMouseY);
-        if (isMoveMode)
-            DoMove(l,m);
-        else if (isRotationMode)
-            DoRotate(l,m,(float)(0.01*value));
-        else if (isZoomMode)
-            DoZoom(0.0005*(m-l));
+        if (Dim == 3)
+        {
+            ShowSelectionFrame = false;
+            IntArray[9][3] = 0; //SelectionFrame=false
+            if (isSelectMode)
+                DoSelect(ClientMouseX0, ClientMouseY0, ClientMouseX, ClientMouseY);
+            if (isMoveMode)
+                DoMove(l,m);
+            else if (isRotationMode)
+                DoRotate(l,m,(float)(0.01*value));
+            else if (isZoomMode)
+                DoZoom(0.0005*(m-l));
+        }
     }
     else if (isMouseRightDown)
     {
@@ -1256,7 +1478,7 @@ void MyGLCanvas::OnMouseMove(wxMouseEvent& event)
         float m=0;
         float value=0;
         GetDirection(mouseX0, mouseY0, mouseX, mouseY, l, m, value);
-        DoZoom(0.0005*(m-l));
+        if (Dim == 3) DoZoom(0.0005*(m-l));
     }
     else if (isMouseMiddleDown)
     {
@@ -1267,7 +1489,7 @@ void MyGLCanvas::OnMouseMove(wxMouseEvent& event)
         float m=0;
         float value=0;
         GetDirection(mouseX0, mouseY0, mouseX, mouseY, l, m, value);
-        DoMove(l,m);
+        if (Dim==3) DoMove(l,m);
     }
 }
 
@@ -1279,8 +1501,11 @@ void MyGLCanvas::OnMouseRightDown(wxMouseEvent& event)
     isMouseRightDown = true;
     isMouseLeftDown = false;
     isMouseMiddleDown = false;
-    ShowSelectionFrame = false;
-    IntArray[9][3] = 0; //SelectionFrame=false
+    if (Dim == 3)
+    {
+        ShowSelectionFrame = false;
+        IntArray[9][3] = 0; //SelectionFrame=false
+    }
 }
 
 void MyGLCanvas::OnMouseRightUp(wxMouseEvent& event)
@@ -1310,8 +1535,11 @@ void MyGLCanvas::OnMouseMiddleDown(wxMouseEvent& event)
     isMouseMiddleDown = true;
     isMouseRightDown = false;
     isMouseLeftDown = false;
-    ShowSelectionFrame = false;
-    IntArray[9][3] = 0; //SelectionFrame=false
+    if (Dim == 3)
+    {
+        ShowSelectionFrame = false;
+        IntArray[9][3] = 0; //SelectionFrame=false
+    }
 }
 
 void MyGLCanvas::OnMouseMiddleUp(wxMouseEvent& event)
@@ -1615,20 +1843,23 @@ void MyGLCanvas::LoadToCanvas()
 
 void MyGLCanvas::Reload()
 {
-    XCam += XMove;
-    YCam += YMove;
-    ZoomCam += Zoom;
-    if (ZoomCam <=0.001) ZoomCam=0.001;
-    XMove = 0;
-    YMove = 0;
-    Zoom = 0;
-    for (int i=0; i<3; i++)
-        for (int j=0; j<3; j++)
-            Coordinate0[i][j] = Coordinate1[i][j];
-    
-    for (int i=0; i<NumberOfDoubleArrays; i++)
-        for (int j=0; j<nDoubleArray[i]; j++)
-            DoubleArray0[i][j] = DoubleArray1[i][j];
+    if (Dim==3)
+    {
+        XCam += XMove;
+        YCam += YMove;
+        ZoomCam += Zoom;
+        if (ZoomCam <=0.001) ZoomCam=0.001;
+        XMove = 0;
+        YMove = 0;
+        Zoom = 0;
+        for (int i=0; i<3; i++)
+            for (int j=0; j<3; j++)
+                Coordinate0[i][j] = Coordinate1[i][j];
+        
+        for (int i=0; i<NumberOfDoubleArrays; i++)
+            for (int j=0; j<nDoubleArray[i]; j++)
+                DoubleArray0[i][j] = DoubleArray1[i][j];
+    }
 }
 
 int MyGLCanvas::RayTraceGetAtomIndex(float x, float y)

@@ -25,6 +25,19 @@ OrbitalsClass::OrbitalsClass(wxWindow* parent, Sec30* sec30var, wxWindowID id, c
     sec30->AddGroupBox(this,_("Orbitals in Different Atom Species"),wxColour(wxT("rgb(153,180,209)")));
     sec30->AddTreeCtrl(this, _("Orbitals"), 340, 600, false);
     /**********************************************************************************************************************************************/
+    sec30->AddGroupBox(this,_("Unit-Cell Atoms Projection"),wxColour(wxT("rgb(153,180,209)")));
+    for (int i=1; i<=99; i++)
+    {
+        wxString label = wxString::Format(wxT("Atom %d"),i);
+        wxString name = wxString::Format(wxT("AtomInd%d"),i);
+        //wxString Label = sec30->GetAtomLable(i);
+        wxComboBox* choicectr = sec30->AddComboCtrl(this, name, label, 80, 110, false);
+        choicectr->Append(_("Not set"));
+        choicectr->SetEditable(false);
+        choicectr->SetBackgroundColour(*wxWHITE);
+        choicectr->Select(0);
+    }
+    /**********************************************************************************************************************************************/
     sec30->AddGroupBox(this,_(""),wxColour(wxT("rgb(153,180,209)")));
     /**********************************************************************************************************************************************/
     

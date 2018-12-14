@@ -9,7 +9,8 @@ class GraphClass : public GraphBaseClass
 public:
     Sec30* sec30;
     MyGLCanvas* glc;
-    GraphClass(wxWindow* parent, int Dim);
+    int ObjectID = -1;
+    GraphClass(wxWindow* parent, int Dim, Sec30* sec30Var, int MyID);
     virtual ~GraphClass();
     
     //wxColourPickerCtrl* AColorCtrl[118];
@@ -19,6 +20,8 @@ public:
     int nShowingAtoms = -1;
     int nShowingBonds = -1;
     void CreateAtomicStructure(Sec30* sec30var, bool IsNewAllocate = true);
+    void Update2d0();
+    void Update2d();
     void GetBondInfo(const wxString& bondtextvar, int& i, int& n, int& j, int& m, int& bondtype);
     void GetUnitcellInfo(const wxString& unitcelltextvar, int& l, int& m, int& n);
     void FindEssentials();

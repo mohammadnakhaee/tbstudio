@@ -3,12 +3,14 @@
 
 wxString glGetwxString(GLenum name);
 
-GraphClass::GraphClass(wxWindow* parent, int Dim)
+GraphClass::GraphClass(wxWindow* parent, int Dim, Sec30* sec30Var, int MyID)
     : GraphBaseClass(parent)
 {
+    sec30 = sec30Var;
+    ObjectID = MyID;
     int stereoAttribList[] = { WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_STEREO, 0 };
     bool stereoWindow = false;
-    glc = new MyGLCanvas(this, Dim, stereoWindow ? stereoAttribList : NULL);
+    glc = new MyGLCanvas(this, Dim, sec30, MyID, stereoWindow ? stereoAttribList : NULL);
     
     TopPanel->GetContainingSizer()->Add(glc,wxSizerFlags().Proportion(1).Expand().Border(wxALL, 0));
     // test IsDisplaySupported() function:
@@ -482,6 +484,16 @@ void GraphClass::CreateAtomicStructure(Sec30* sec30Var, bool IsNewAllocate)
     {
         glc->LoadToCanvas();
     }
+}
+
+void GraphClass::Update2d0()
+{
+    
+}
+
+void GraphClass::Update2d()
+{
+    
 }
 
 void GraphClass::GetBondInfo(const wxString& bondtextvar, int& i, int& n, int& j, int& m, int& bondtype)

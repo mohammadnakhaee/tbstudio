@@ -931,6 +931,212 @@ void Sec30::SaveToFile(wxString filepath, wxString filename)
             out.write((char *) &a, sizeof a);
         }
         ///////////////////////////////////////////////////////////////
+        n = ArraysOf0DInt.size();
+        out.write((char *) &n, sizeof n);
+        
+        for(int i1=0; i1!=n; i1++)
+        {
+            int intvar = ArraysOf0DInt[i1];
+            out.write((char *) &intvar, sizeof intvar);
+        }
+        
+        n = ArraysOf1DInt.size();
+        out.write((char *) &n, sizeof n);
+        
+        for(int i1=0; i1!=n; i1++)
+        {
+            int n2 = ArraysOf1DInt[i1].size();
+            out.write((char *) &n2, sizeof n2);
+            for(int i2=0; i2!=n2; i2++)
+            {
+                int intvar = ArraysOf1DInt[i1][i2];
+                out.write((char *) &intvar, sizeof intvar);
+            }
+        }
+        
+        n = ArraysOf2DInt.size();
+        out.write((char *) &n, sizeof n);
+        
+        for(int i1=0; i1!=n; i1++)
+        {
+            int n2 = ArraysOf2DInt[i1].size();
+            out.write((char *) &n2, sizeof n2);
+            for(int i2=0; i2!=n2; i2++)
+            {
+                int n3 = ArraysOf2DInt[i1][i2].size();
+                out.write((char *) &n3, sizeof n3);
+                for(int i3=0; i3!=n3; i3++)
+                {
+                    int intvar = ArraysOf2DInt[i1][i2][i3];
+                    out.write((char *) &intvar, sizeof intvar);
+                }
+            }
+        }
+        
+        n = ArraysOf3DInt.size();
+        out.write((char *) &n, sizeof n);
+        
+        for(int i1=0; i1!=n; i1++)
+        {
+            int n2 = ArraysOf3DInt[i1].size();
+            out.write((char *) &n2, sizeof n2);
+            for(int i2=0; i2!=n2; i2++)
+            {
+                int n3 = ArraysOf3DInt[i1][i2].size();
+                out.write((char *) &n3, sizeof n3);
+                for(int i3=0; i3!=n3; i3++)
+                {
+                    int n4 = ArraysOf3DInt[i1][i2][i3].size();
+                    out.write((char *) &n4, sizeof n4);
+                    for(int i4=0; i4!=n4; i4++)
+                    {
+                        int intvar = ArraysOf3DInt[i1][i2][i3][i4];
+                        out.write((char *) &intvar, sizeof intvar);
+                    }
+                }
+            }
+        }
+        ///////////////////////////////////////////////////////////////
+        n = ArraysOf0DDouble.size();
+        out.write((char *) &n, sizeof n);
+        
+        for(int i1=0; i1!=n; i1++)
+        {
+            double dvar = ArraysOf0DDouble[i1];
+            out.write((char *) &dvar, sizeof dvar);
+        }
+        
+        n = ArraysOf1DDouble.size();
+        out.write((char *) &n, sizeof n);
+        
+        for(int i1=0; i1!=n; i1++)
+        {
+            int n2 = ArraysOf1DDouble[i1].size();
+            out.write((char *) &n2, sizeof n2);
+            for(int i2=0; i2!=n2; i2++)
+            {
+                double dvar = ArraysOf1DDouble[i1][i2];
+                out.write((char *) &dvar, sizeof dvar);
+            }
+        }
+        
+        n = ArraysOf2DDouble.size();
+        out.write((char *) &n, sizeof n);
+        
+        for(int i1=0; i1!=n; i1++)
+        {
+            int n2 = ArraysOf2DDouble[i1].size();
+            out.write((char *) &n2, sizeof n2);
+            for(int i2=0; i2!=n2; i2++)
+            {
+                int n3 = ArraysOf2DDouble[i1][i2].size();
+                out.write((char *) &n3, sizeof n3);
+                for(int i3=0; i3!=n3; i3++)
+                {
+                    double dvar = ArraysOf2DDouble[i1][i2][i3];
+                    out.write((char *) &dvar, sizeof dvar);
+                }
+            }
+        }
+        
+        n = ArraysOf3DDouble.size();
+        out.write((char *) &n, sizeof n);
+        
+        for(int i1=0; i1!=n; i1++)
+        {
+            int n2 = ArraysOf3DDouble[i1].size();
+            out.write((char *) &n2, sizeof n2);
+            for(int i2=0; i2!=n2; i2++)
+            {
+                int n3 = ArraysOf3DDouble[i1][i2].size();
+                out.write((char *) &n3, sizeof n3);
+                for(int i3=0; i3!=n3; i3++)
+                {
+                    int n4 = ArraysOf3DDouble[i1][i2][i3].size();
+                    out.write((char *) &n4, sizeof n4);
+                    for(int i4=0; i4!=n4; i4++)
+                    {
+                        double dvar = ArraysOf3DDouble[i1][i2][i3][i4];
+                        out.write((char *) &dvar, sizeof dvar);
+                    }
+                }
+            }
+        }
+        ///////////////////////////////////////////////////////////////
+        n = ArraysOf0DString.size();
+        out.write((char *) &n, sizeof n);
+        
+        for(int i1=0; i1!=n; i1++)
+        {
+            wxString var = ArraysOf0DString[i1];
+            size_t len = var.size();
+            out.write((char *)&len, sizeof len);
+            out.write(var.c_str(), len);
+        }
+        
+        n = ArraysOf1DString.size();
+        out.write((char *) &n, sizeof n);
+        
+        for(int i1=0; i1!=n; i1++)
+        {
+            int n2 = ArraysOf1DString[i1].size();
+            out.write((char *) &n2, sizeof n2);
+            for(int i2=0; i2!=n2; i2++)
+            {
+                wxString var = ArraysOf1DString[i1][i2];
+                size_t len = var.size();
+                out.write((char *)&len, sizeof len);
+                out.write(var.c_str(), len);
+            }
+        }
+        
+        n = ArraysOf2DString.size();
+        out.write((char *) &n, sizeof n);
+        
+        for(int i1=0; i1!=n; i1++)
+        {
+            int n2 = ArraysOf2DString[i1].size();
+            out.write((char *) &n2, sizeof n2);
+            for(int i2=0; i2!=n2; i2++)
+            {
+                int n3 = ArraysOf2DString[i1][i2].size();
+                out.write((char *) &n3, sizeof n3);
+                for(int i3=0; i3!=n3; i3++)
+                {
+                    wxString var = ArraysOf2DString[i1][i2][i3];
+                    size_t len = var.size();
+                    out.write((char *)&len, sizeof len);
+                    out.write(var.c_str(), len);
+                }
+            }
+        }
+        
+        n = ArraysOf3DString.size();
+        out.write((char *) &n, sizeof n);
+        
+        for(int i1=0; i1!=n; i1++)
+        {
+            int n2 = ArraysOf3DString[i1].size();
+            out.write((char *) &n2, sizeof n2);
+            for(int i2=0; i2!=n2; i2++)
+            {
+                int n3 = ArraysOf3DString[i1][i2].size();
+                out.write((char *) &n3, sizeof n3);
+                for(int i3=0; i3!=n3; i3++)
+                {
+                    int n4 = ArraysOf3DString[i1][i2][i3].size();
+                    out.write((char *) &n4, sizeof n4);
+                    for(int i4=0; i4!=n4; i4++)
+                    {
+                        wxString var = ArraysOf2DString[i1][i2][i3][i4];
+                        size_t len = var.size();
+                        out.write((char *)&len, sizeof len);
+                        out.write(var.c_str(), len);
+                    }
+                }
+            }
+        }
+        ///////////////////////////////////////////////////////////////
         
         out.close();
     }
@@ -1352,6 +1558,285 @@ void Sec30::LoadFromFile(wxString filepath, wxString filename)
             ctr->SetColour(c);
         }
         ///////////////////////////////////////////////////////////////
+        infile.read(reinterpret_cast<char *>(&n), sizeof n);
+        ArraysOf0DInt.clear();
+        
+        for(int i1=0; i1!=n; i1++)
+        {
+            int intvar;
+            infile.read(reinterpret_cast<char *>(&intvar), sizeof intvar);
+            ArraysOf0DInt.push_back(intvar);
+        }
+        
+        infile.read(reinterpret_cast<char *>(&n), sizeof n);
+        ArraysOf1DInt.clear();
+        
+        for(int i1=0; i1!=n; i1++)
+        {
+            int n2;
+            infile.read(reinterpret_cast<char *>(&n2), sizeof n2);
+            Aint0D aint0D;
+            for(int i2=0; i2!=n2; i2++)
+            {
+                int intvar;
+                infile.read(reinterpret_cast<char *>(&intvar), sizeof intvar);
+                aint0D.push_back(intvar);
+            }
+            ArraysOf1DInt.push_back(aint0D);
+        }
+        
+        infile.read(reinterpret_cast<char *>(&n), sizeof n);
+        ArraysOf2DInt.clear();
+        
+        for(int i1=0; i1!=n; i1++)
+        {
+            int n2;
+            infile.read(reinterpret_cast<char *>(&n2), sizeof n2);
+            Aint1D aint1D;
+            for(int i2=0; i2!=n2; i2++)
+            {
+                int n3;
+                infile.read(reinterpret_cast<char *>(&n3), sizeof n3);
+                Aint0D aint0D;
+                for(int i3=0; i3!=n3; i3++)
+                {
+                    int intvar;
+                    infile.read(reinterpret_cast<char *>(&intvar), sizeof intvar);
+                    aint0D.push_back(intvar);
+                }
+                aint1D.push_back(aint0D);
+            }
+            ArraysOf2DInt.push_back(aint1D);
+        }
+        
+        infile.read(reinterpret_cast<char *>(&n), sizeof n);
+        ArraysOf3DInt.clear();
+        
+        for(int i1=0; i1!=n; i1++)
+        {
+            int n2;
+            infile.read(reinterpret_cast<char *>(&n2), sizeof n2);
+            Aint2D aint2D;
+            for(int i2=0; i2!=n2; i2++)
+            {
+                int n3;
+                infile.read(reinterpret_cast<char *>(&n3), sizeof n3);
+                Aint1D aint1D;
+                for(int i3=0; i3!=n3; i3++)
+                {
+                    int n4;
+                    infile.read(reinterpret_cast<char *>(&n4), sizeof n4);
+                    Aint0D aint0D;
+                    for(int i4=0; i4!=n4; i4++)
+                    {
+                        int intvar;
+                        infile.read(reinterpret_cast<char *>(&intvar), sizeof intvar);
+                        aint0D.push_back(intvar);
+                    }
+                    aint1D.push_back(aint0D);
+                }
+                aint2D.push_back(aint1D);
+            }
+            ArraysOf3DInt.push_back(aint2D);
+        }
+        ///////////////////////////////////////////////////////////////
+        infile.read(reinterpret_cast<char *>(&n), sizeof n);
+        ArraysOf0DDouble.clear();
+        
+        for(int i1=0; i1!=n; i1++)
+        {
+            double dvar;
+            infile.read(reinterpret_cast<char *>(&dvar), sizeof dvar);
+            ArraysOf0DDouble.push_back(dvar);
+        }
+        
+        infile.read(reinterpret_cast<char *>(&n), sizeof n);
+        ArraysOf1DDouble.clear();
+        
+        for(int i1=0; i1!=n; i1++)
+        {
+            int n2;
+            infile.read(reinterpret_cast<char *>(&n2), sizeof n2);
+            Adouble0D adouble0D;
+            for(int i2=0; i2!=n2; i2++)
+            {
+                double dvar;
+                infile.read(reinterpret_cast<char *>(&dvar), sizeof dvar);
+                adouble0D.push_back(dvar);
+            }
+            ArraysOf1DDouble.push_back(adouble0D);
+        }
+        
+        infile.read(reinterpret_cast<char *>(&n), sizeof n);
+        ArraysOf2DDouble.clear();
+        
+        for(int i1=0; i1!=n; i1++)
+        {
+            int n2;
+            infile.read(reinterpret_cast<char *>(&n2), sizeof n2);
+            Adouble1D adouble1D;
+            for(int i2=0; i2!=n2; i2++)
+            {
+                int n3;
+                infile.read(reinterpret_cast<char *>(&n3), sizeof n3);
+                Adouble0D adouble0D;
+                for(int i3=0; i3!=n3; i3++)
+                {
+                    double dvar;
+                    infile.read(reinterpret_cast<char *>(&dvar), sizeof dvar);
+                    adouble0D.push_back(dvar);
+                }
+                adouble1D.push_back(adouble0D);
+            }
+            ArraysOf2DDouble.push_back(adouble1D);
+        }
+        
+        infile.read(reinterpret_cast<char *>(&n), sizeof n);
+        ArraysOf3DDouble.clear();
+        
+        for(int i1=0; i1!=n; i1++)
+        {
+            int n2;
+            infile.read(reinterpret_cast<char *>(&n2), sizeof n2);
+            Adouble2D adouble2D;
+            for(int i2=0; i2!=n2; i2++)
+            {
+                int n3;
+                infile.read(reinterpret_cast<char *>(&n3), sizeof n3);
+                Adouble1D adouble1D;
+                for(int i3=0; i3!=n3; i3++)
+                {
+                    int n4;
+                    infile.read(reinterpret_cast<char *>(&n4), sizeof n4);
+                    Adouble0D adouble0D;
+                    for(int i4=0; i4!=n4; i4++)
+                    {
+                        double dvar;
+                        infile.read(reinterpret_cast<char *>(&dvar), sizeof dvar);
+                        adouble0D.push_back(dvar);
+                    }
+                    adouble1D.push_back(adouble0D);
+                }
+                adouble2D.push_back(adouble1D);
+            }
+            ArraysOf3DDouble.push_back(adouble2D);
+        }
+        ///////////////////////////////////////////////////////////////
+        infile.read(reinterpret_cast<char *>(&n), sizeof n);
+        ArraysOf0DString.clear();
+        
+        for(int i1=0; i1!=n; i1++)
+        {
+            size_t ns1=0;
+            infile.read(reinterpret_cast<char *>(&ns1), sizeof ns1);
+            char* StrBuf = new char[ns1];
+            for (int i = 0; i < ns1; i++)
+            {
+                char ch;
+                infile.read(&ch, sizeof ch);
+                StrBuf[i] = ch;
+            }
+            wxString var = wxString(StrBuf,ns1);
+            ArraysOf0DString.push_back(var);
+        }
+        
+        infile.read(reinterpret_cast<char *>(&n), sizeof n);
+        ArraysOf1DString.clear();
+        
+        for(int i1=0; i1!=n; i1++)
+        {
+            int n2;
+            infile.read(reinterpret_cast<char *>(&n2), sizeof n2);
+            Astring0D astring0D;
+            for(int i2=0; i2!=n2; i2++)
+            {
+                size_t ns1=0;
+                infile.read(reinterpret_cast<char *>(&ns1), sizeof ns1);
+                char* StrBuf = new char[ns1];
+                for (int i = 0; i < ns1; i++)
+                {
+                    char ch;
+                    infile.read(&ch, sizeof ch);
+                    StrBuf[i] = ch;
+                }
+                wxString var = wxString(StrBuf,ns1);
+                astring0D.push_back(var);
+            }
+            ArraysOf1DString.push_back(astring0D);
+        }
+        
+        infile.read(reinterpret_cast<char *>(&n), sizeof n);
+        ArraysOf2DString.clear();
+        
+        for(int i1=0; i1!=n; i1++)
+        {
+            int n2;
+            infile.read(reinterpret_cast<char *>(&n2), sizeof n2);
+            Astring1D astring1D;
+            for(int i2=0; i2!=n2; i2++)
+            {
+                int n3;
+                infile.read(reinterpret_cast<char *>(&n3), sizeof n3);
+                Astring0D astring0D;
+                for(int i3=0; i3!=n3; i3++)
+                {
+                    size_t ns1=0;
+                    infile.read(reinterpret_cast<char *>(&ns1), sizeof ns1);
+                    char* StrBuf = new char[ns1];
+                    for (int i = 0; i < ns1; i++)
+                    {
+                        char ch;
+                        infile.read(&ch, sizeof ch);
+                        StrBuf[i] = ch;
+                    }
+                    wxString var = wxString(StrBuf,ns1);
+                    astring0D.push_back(var);
+                }
+                astring1D.push_back(astring0D);
+            }
+            ArraysOf2DString.push_back(astring1D);
+        }
+        
+        infile.read(reinterpret_cast<char *>(&n), sizeof n);
+        ArraysOf3DString.clear();
+        
+        for(int i1=0; i1!=n; i1++)
+        {
+            int n2;
+            infile.read(reinterpret_cast<char *>(&n2), sizeof n2);
+            Astring2D astring2D;
+            for(int i2=0; i2!=n2; i2++)
+            {
+                int n3;
+                infile.read(reinterpret_cast<char *>(&n3), sizeof n3);
+                Astring1D astring1D;
+                for(int i3=0; i3!=n3; i3++)
+                {
+                    int n4;
+                    infile.read(reinterpret_cast<char *>(&n4), sizeof n4);
+                    Astring0D astring0D;
+                    for(int i4=0; i4!=n4; i4++)
+                    {
+                        size_t ns1=0;
+                        infile.read(reinterpret_cast<char *>(&ns1), sizeof ns1);
+                        char* StrBuf = new char[ns1];
+                        for (int i = 0; i < ns1; i++)
+                        {
+                            char ch;
+                            infile.read(&ch, sizeof ch);
+                            StrBuf[i] = ch;
+                        }
+                        wxString var = wxString(StrBuf,ns1);
+                        astring0D.push_back(var);
+                    }
+                    astring1D.push_back(astring0D);
+                }
+                astring2D.push_back(astring1D);
+            }
+            ArraysOf3DString.push_back(astring2D);
+        }
+        ///////////////////////////////////////////////////////////////
+        
         infile.close();
     }
 
@@ -1799,6 +2284,37 @@ void Sec30::GetOrbQuantumNumbers(const wxString& OrbitalName, int& l, int& m)
         else if (OrbitalName.Contains("{x^2(x^2-3y^2)-y^2(3x^2-y^2)}"))
             m = 4;
     }
+}
+
+wxString Sec30::CreateFilePath(wxString Path,wxString FileName)
+{
+    wxString file = Path + wxT("\\") + FileName;
+    return file;
+}
+
+double Sec30::norm(double a[3], double b[3])
+{
+  int i;
+  double r,v[3];
+  
+  r = 0.0;
+  for (i=0;i<3;i++) {
+    v[i] = b[i]-a[i];
+    r += v[i]*v[i];
+  }
+  return sqrt(r);
+}
+
+void Sec30::vk_rtv(double vk[3], double rtv[3][3], double v[3])
+{
+   /* vk[1:3], rtv[1:3][1:3] */
+  int i,j;
+  for (i=0;i<3;i++) {
+    v[i]=0.0;
+    for (j=0;j<3;j++) {
+       v[i] = v[i] + vk[j]*rtv[j][i] ;
+    }
+  }
 }
 
 /*

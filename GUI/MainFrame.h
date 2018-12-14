@@ -11,7 +11,7 @@
 #include "StructureClass.h"
 #include "OrbitalsClass.h"
 #include "BondsClass.h"
-#include "ProjectionClass.h"
+#include "SetupClass.h"
 #include "SKClass.h"
 #include "ColorsClass.h"
 #include "unistd.h"
@@ -31,7 +31,7 @@ public:
     StructureClass* structurePanel;
     OrbitalsClass* orbitalsPanel;
     BondsClass* bondsPanel;
-    ProjectionClass* projectionPanel;
+    SetupClass* setupPanel;
     SKClass* skPanel;
     ColorsClass* ColorsForm;
     Sec30* sec30;
@@ -73,12 +73,16 @@ protected:
     virtual void MainFrameBaseClass_Resize(wxSizeEvent& event);
     virtual void m_glCanvas17_OnPaint(wxPaintEvent& event);
     virtual void BtnTest_OnClick(wxCommandEvent& event);
+    virtual void InitializeSec30Arrays();
     virtual void Init_graph3d();
     virtual void Init_graph2d0();
     virtual void Init_graph2d();
     virtual void ClearGraph3D();
     virtual void ShowGraph3D();
     virtual void UpdateGraph3D();
+    virtual void UpdateGraph2D0();
+    virtual void UpdateGraph2D();
+    virtual void UpdateGraph2Ds();
     /****************************************/
     virtual void LoadUnitcellPanel();
     virtual void EvaluateUnitcellPanel();
@@ -97,14 +101,15 @@ protected:
     virtual bool ValidateBondsPanel();
     virtual void FillBondsPanel();
     /****************************************/
-    virtual void LoadProjectionPanel();
-    virtual void EvaluateProjectionPanel(int redraw);
-    virtual bool ValidateProjectionPanel();
-    virtual void FillProjectionPanel();
+    virtual void LoadSetupPanel();
+    virtual void EvaluateSetupPanel();
+    virtual bool ValidateSetupPanel();
+    virtual void FillSetupPanel();
     /****************************************/
     virtual void LoadSKPanel();
     virtual void EvaluateSKPanel(int isUpdateSKList);
     virtual bool ValidateSKPanel();
+    virtual bool ValidateSKParametersList();
     /****************************************/
     virtual void LoadColorsForm();
     virtual void EvaluateColorsPanel();
