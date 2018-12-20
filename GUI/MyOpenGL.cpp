@@ -1489,7 +1489,14 @@ void MyGLCanvas::OnMouseMove(wxMouseEvent& event)
         float m=0;
         float value=0;
         GetDirection(mouseX0, mouseY0, mouseX, mouseY, l, m, value);
-        if (Dim==3) DoMove(l,m);
+        if (Dim==3)
+        {
+            DoMove(l,m);
+        }
+        else
+        {
+            DoMove2d(l,m);
+        }
     }
 }
 
@@ -1539,6 +1546,23 @@ void MyGLCanvas::OnMouseMiddleDown(wxMouseEvent& event)
     {
         ShowSelectionFrame = false;
         IntArray[9][3] = 0; //SelectionFrame=false
+    }
+    else
+    {
+        if (ObjectID == 0)
+        {
+            OldyMin = sec30->ArraysOf0DDouble[1];
+            OldyMax = sec30->ArraysOf0DDouble[2];
+            OldxMin = sec30->ArraysOf0DDouble[5];
+            OldxMax = sec30->ArraysOf0DDouble[6];
+        }
+        else if (ObjectID == 1)
+        {
+            OldyMin = sec30->ArraysOf0DDouble[3];
+            OldyMax = sec30->ArraysOf0DDouble[4];
+            OldxMin = sec30->ArraysOf0DDouble[7];
+            OldxMax = sec30->ArraysOf0DDouble[8];
+        }
     }
 }
 
@@ -1593,6 +1617,33 @@ void MyGLCanvas::DoMove(float l, float m)
     
     if (l!=0) XMove = -2.0*l*w3d/w;
     if (m!=0) YMove = -2.0*m*h3d/h;
+    Refresh(false);
+}
+
+void MyGLCanvas::DoMove2d(float l, float m)
+{
+    const wxSize ClientSize = GetClientSize();
+    int w,h;
+    w=ClientSize.x;
+    h=ClientSize.y;
+    double dy = (OldyMax - OldyMin) / h * m;
+    double dx = (OldxMax - OldxMin) / w * l;
+    if (ObjectID == 0)
+    {
+        
+        sec30->ArraysOf0DDouble[1] = OldyMin + dy;
+        sec30->ArraysOf0DDouble[2] = OldyMax + dy;
+        //sec30->ArraysOf0DDouble[5] = OldxMin + dx;
+        //sec30->ArraysOf0DDouble[6] = OldxMax + dx;
+    }
+    else if (ObjectID == 1)
+    {
+        sec30->ArraysOf0DDouble[3] = OldyMin + dy;
+        sec30->ArraysOf0DDouble[4] = OldyMax + dy;
+        //sec30->ArraysOf0DDouble[7] = OldxMin + dx;
+        //sec30->ArraysOf0DDouble[8] = OldxMax + dx;
+    }
+        
     Refresh(false);
 }
 

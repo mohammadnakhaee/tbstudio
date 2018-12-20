@@ -15,6 +15,12 @@
 #include "SKClass.h"
 #include "ColorsClass.h"
 #include "unistd.h"
+#include "Embeded.h"
+#include <wx/ribbon/bar.h>
+#include <wx/ribbon/art.h>
+#include <wx/ribbon/page.h>
+#include <wx/ribbon/panel.h>
+#include <wx/ribbon/buttonbar.h>
 /**********************************************************************************/
 
 class MainFrame : public MainFrameBaseClass
@@ -35,6 +41,8 @@ public:
     SKClass* skPanel;
     ColorsClass* ColorsForm;
     Sec30* sec30;
+    
+    wxRibbonButtonBar* RButtonMouse;
     
     void OnExit(wxCommandEvent& event);
     void OnAbout(wxCommandEvent& event);
@@ -129,5 +137,7 @@ private:
     bool isItNew(int i,int j,int k);
     virtual void sec30_OnUpdated(wxCommandEvent& event);
     virtual void myOpenGL_EVT_SelectionChanged(wxCommandEvent& event);
+    virtual void LoadIcons();
+    virtual wxBitmap GetPng(const void* data, size_t length);
 };
 #endif // MAINFRAME_H

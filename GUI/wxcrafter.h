@@ -16,9 +16,6 @@
 #include <wx/sizer.h>
 #include <wx/ribbon/bar.h>
 #include <wx/ribbon/art.h>
-#include <wx/ribbon/page.h>
-#include <wx/ribbon/panel.h>
-#include <wx/ribbon/buttonbar.h>
 #include <wx/panel.h>
 #include <wx/stattext.h>
 #include <wx/notebook.h>
@@ -44,21 +41,6 @@ class MainFrameBaseClass : public wxFrame
 {
 protected:
     wxRibbonBar* MainRibbon;
-    wxRibbonPage* m_ribbonPage340;
-    wxRibbonPanel* m_ribbonPanel981;
-    wxRibbonButtonBar* m_ribbonButtonBar983;
-    wxRibbonPage* m_ribbonPage462;
-    wxRibbonPanel* m_ribbonPanel1043;
-    wxRibbonButtonBar* m_ribbonButtonBar1045;
-    wxRibbonPage* m_ribbonPage606;
-    wxRibbonPanel* m_ribbonPanel608;
-    wxRibbonButtonBar* BtnMouse;
-    wxRibbonPage* m_ribbonPage548;
-    wxRibbonPanel* m_ribbonPanel550;
-    wxRibbonButtonBar* m_ribbonButtonBar582;
-    wxRibbonPage* m_ribbonPage464;
-    wxRibbonPanel* m_ribbonPanel522;
-    wxRibbonButtonBar* m_ribbonButtonBar528;
     wxPanel* LeftPanel0;
     wxPanel* m_panel598;
     wxStaticText* m_staticText602;
@@ -68,20 +50,6 @@ protected:
 protected:
     virtual void MainFrameBaseClass_Resize(wxSizeEvent& event) { event.Skip(); }
     virtual void MainFrameBaseClass_Move(wxMoveEvent& event) { event.Skip(); }
-    virtual void BtnOpen_OnClick(wxRibbonButtonBarEvent& event) { event.Skip(); }
-    virtual void BtnSave_OnClick(wxRibbonButtonBarEvent& event) { event.Skip(); }
-    virtual void BtnStructureStyle_OnClick(wxRibbonButtonBarEvent& event) { event.Skip(); }
-    virtual void BtnMain_OnClick(wxRibbonButtonBarEvent& event) { event.Skip(); }
-    virtual void BtnTerminal_OnClick(wxRibbonButtonBarEvent& event) { event.Skip(); }
-    virtual void BtnGrid_OnClick(wxRibbonButtonBarEvent& event) { event.Skip(); }
-    virtual void BtnSelect_OnClick(wxRibbonButtonBarEvent& event) { event.Skip(); }
-    virtual void BtnMove_OnClick(wxRibbonButtonBarEvent& event) { event.Skip(); }
-    virtual void BtnRotate_OnClick(wxRibbonButtonBarEvent& event) { event.Skip(); }
-    virtual void BtnScale_OnClick(wxRibbonButtonBarEvent& event) { event.Skip(); }
-    virtual void B2D(wxRibbonButtonBarEvent& event) { event.Skip(); }
-    virtual void Btn3D_OnClick(wxRibbonButtonBarEvent& event) { event.Skip(); }
-    virtual void B3D(wxRibbonButtonBarEvent& event) { event.Skip(); }
-    virtual void mgl_test(wxRibbonButtonBarEvent& event) { event.Skip(); }
 
 public:
     wxRibbonBar* GetMainRibbon() { return MainRibbon; }

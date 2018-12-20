@@ -119,7 +119,8 @@ private:
     bool m_useStereo;
     bool m_stereoWarningAlreadyDisplayed;
 
-
+    double OldxMin, OldxMax, OldyMin, OldyMax;
+    
     void OnPaint(wxPaintEvent& event);
     void Spin(float xSpin, float ySpin, float zSpin);
     void Animate(void);
@@ -140,6 +141,7 @@ private:
     void DiscardDoubleArrays1();
     void DoSelect(float x1, float y1, float x2, float y2);
     void DoMove(float l, float m);
+    void DoMove2d(float l, float m);
     void DoRotate(float l, float m, float Theta);
     void DoZoom(float l);
     void GetDirection(int i0, int j0, int i, int j, float& x, float& y, float& z);

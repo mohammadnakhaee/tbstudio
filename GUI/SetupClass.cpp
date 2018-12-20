@@ -43,9 +43,11 @@ SetupClass::SetupClass(wxWindow* parent, Sec30* sec30var, wxWindowID id, const w
     sec30->AddButton(this, 2, Labels2, Funcs2);
     /**********************************************************************************************************************************************/
     sec30->AddGroupBox(this,_("DFT Parameters"),wxColour(wxT("rgb(153,180,209)")));
-    sec30->AddVarVector(this, 2, _("DFTBandRange"), _("int"), _("DFT Band Range"), 100, 100);
+    sec30->AddVarVector(this, 2, _("DFTBandRange"), _("int"), _("DFT Bands Range"), 105, 100);
+    sec30->AddVarVector(this, 1, _("nDFTBandRange"), _("int"), _("Number of Bands"), 105, 100, false, true);
     sec30->SetVar(_("DFTBandRange[0]"), 0, false);
     sec30->SetVar(_("DFTBandRange[1]"), 0, false);
+    sec30->SetVar(_("nDFTBandRange[0]"), 0, false);
     /**********************************************************************************************************************************************/
     wxString Labels3[1] = {_("Select")};
     wxObjectEventFunction Funcs3[1] = { wxCommandEventHandler(SetupClass::Btn_Select_OnClick)};

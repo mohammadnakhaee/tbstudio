@@ -29,6 +29,7 @@
     <File Name="wxcrafter_bitmaps.cpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="include">
+    <File Name="Embeded.h"/>
     <File Name="SetupClass.h"/>
     <File Name="SKClass.h"/>
     <File Name="BondsClass.h"/>

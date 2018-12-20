@@ -24,6 +24,10 @@ protected:
     virtual void Btn_Load_OnClick(wxCommandEvent& event);
     virtual void Btn_Save_OnClick(wxCommandEvent& event);
     void ExportToCIF(wxString filepath, wxString filename);
-
+    void ImportFromCIF(wxString filepath, wxString filename);
+    void GetValueFromLine(wxString str, double &val);
+    void GetValueFromLine(wxString str, int &val);
 };
 #endif // UNITCELLCLASS_H
+
+

@@ -98,8 +98,8 @@ void UnitcellClass::Btn_Load_OnClick(wxCommandEvent& event)
         //int dgFileKind = OpenDialog->GetFilterIndex();
         wxString dgFileName = OpenDialog->GetFilename();
         wxString dgPath = OpenDialog->GetDirectory();
-        
         wxString fl = dgPath + wxT("\\") + dgFileName;
+        ImportFromCIF(dgPath, dgFileName);
 	}
  
 	OpenDialog->Destroy();
@@ -278,3 +278,200 @@ void UnitcellClass::ExportToCIF(wxString filepath, wxString filename)
 }
 
 
+void UnitcellClass::ImportFromCIF(wxString filepath, wxString filename)
+{
+    /********************************************
+                reading a CIF file
+    *********************************************/
+    wxString fname1 = filepath + wxT("/") + filename;
+    std::ifstream infile(fname1);
+    std::string line;
+    bool cell_length_a = false;
+    bool cell_length_b = false;
+    bool cell_length_c = false;
+    bool cell_angle_alpha = false;
+    bool cell_angle_beta = false;
+    bool cell_angle_gamma = false;
+    bool ArgList = false;
+    bool CoordinatesList = false;
+    std::vector<wxString> args;
+    std::vector<int> k;
+    std::vector<double> a;
+    std::vector<double> b;
+    std::vector<double> c;
+    
+    double a0, b0, c0, alpha, beta, gamma;
+    int ind = 0;
+    while (std::getline(infile, line))
+    {
+        ind++;
+        wxString l = wxString(line);
+        double dval;
+        int ival;
+        if (!cell_length_a)
+        {
+            if(l.Contains(_("_cell_length_a")))
+            {
+                GetValueFromLine(l, dval);
+                a0 = dval;
+                cell_length_a = true;
+            }
+        }
+        else if (!cell_length_b)
+        {
+            if(l.Contains(_("_cell_length_b")))
+            {
+                GetValueFromLine(l, dval);
+                b0 = dval;
+                cell_length_b = true;
+            }
+        }
+        else if (!cell_length_c)
+        {
+            if(l.Contains(_("_cell_length_c")))
+            {
+                GetValueFromLine(l, dval);
+                c0 = dval;
+                cell_length_c = true;
+            }
+        }
+        else if (!cell_angle_alpha)
+        {
+            if(l.Contains(_("_cell_angle_alpha")))
+            {
+                GetValueFromLine(l, dval);
+                alpha = dval;
+                cell_angle_alpha = true;
+            }
+        }
+        else if (!cell_angle_beta)
+        {
+            if(l.Contains(_("_cell_angle_beta")))
+            {
+                GetValueFromLine(l, dval);
+                beta = dval;
+                cell_angle_beta = true;
+            }
+        }
+        else if (!cell_angle_gamma)
+        {
+            if(l.Contains(_("_cell_angle_gamma")))
+            {
+                GetValueFromLine(l, dval);
+                gamma = dval;
+                cell_angle_gamma = true;
+            }
+        }
+        else if (!ArgList && !CoordinatesList)
+        {
+            if(l.Contains(_("_atom_site_"))) ArgList = true;
+        }
+        
+        if (ArgList)
+        {
+            args.push_back(l);
+            if(!l.Contains(_("_atom_site_")))
+            {
+                CoordinatesList = true;
+                ArgList = false;
+            }
+        }
+        
+        if (CoordinatesList)
+        {
+            int narg = args.size();
+            wxString frmt = _("");
+            std::istringstream iss(l.c_str().AsChar());
+            for(int i=0; i<narg; i++)
+            {
+                std::string arg;
+                iss >> arg;
+                
+                if( args[i].Contains(_("_atom_site_type_symbol")))
+                {
+                    int myKind = sec30->GetAtomLable(wxString(arg));
+                    k.push_back(myKind);
+                }
+                else if( args[i].Contains(_("_atom_site_fract_x")))
+                {
+                    double val;
+                    wxString sarg(arg);
+                    sscanf(sarg.c_str(),"%lf",&val);
+                    a.push_back(val);
+                }
+                else if( args[i].Contains(_("_atom_site_fract_y")))
+                {
+                    double val;
+                    wxString sarg(arg);
+                    sscanf(sarg.c_str(),"%lf",&val);
+                    b.push_back(val);
+                }
+                else if( args[i].Contains(_("_atom_site_fract_z")))
+                {
+                    double val;
+                    wxString sarg(arg);
+                    sscanf(sarg.c_str(),"%lf",&val);
+                    c.push_back(val);
+                }
+            }
+            
+            int nk = k.size();
+            int na = a.size();
+            int nb = b.size();
+            int nc = c.size();
+            
+            if (nk!=0 && na!=0 && nb!=0 && nc!=0 && na==nk && cell_length_a && cell_length_b && cell_length_c && cell_angle_alpha && cell_angle_beta && cell_angle_gamma)
+            {
+                double PI=3.14159265359;
+                double ax = a0;
+                double bx = b0*cos(gamma/180.0*PI);
+                double by = sqrt(b0*b0 - bx*bx);
+                double cx = c0*cos(beta/180.0*PI);
+                double cy = (a0*b0*cos(alpha/180.0*PI) - bx*c0*cos(beta/180.0*PI))/by;
+                double cz = sqrt(by*by*c0*c0 - a0*a0*b0*b0*cos(alpha)*cos(alpha) + 2*a0*b0*bx*c0*cos(alpha)*cos(beta) - bx*bx*c0*c0*cos(beta)*cos(beta) - by*by*c0*c0*cos(beta)*cos(beta))/by;
+                
+                sec30->SetVar(_("a0[0]"), ax, false);
+                sec30->SetVar(_("a0[1]"),0.0, false);
+                sec30->SetVar(_("a0[2]"),0.0, false);
+                sec30->SetVar(_("b0[0]"),bx, false);
+                sec30->SetVar(_("b0[1]"),by, false);
+                sec30->SetVar(_("b0[2]"),0.0, false);
+                sec30->SetVar(_("c0[0]"),cx, false);
+                sec30->SetVar(_("c0[1]"),cy, false);
+                sec30->SetVar(_("c0[2]"),cz, false);
+                
+                for(int ik = 0; ik<nk; ik++)
+                {
+                    sec30->SetVar(_("KABC_Coords"), ik, 0, k[ik], false);
+                    sec30->SetVar(_("KABC_Coords"), ik, 1, a[ik], false);
+                    sec30->SetVar(_("KABC_Coords"), ik, 2, b[ik], false);
+                    sec30->SetVar(_("KABC_Coords"), ik, 3, c[ik], false);
+                }
+                sec30->SetVar(_("nAtoms[0]"), nk, false);
+                
+                sec30->SetVar(_("astrain[0]"),1.0, false);
+                sec30->SetVar(_("bstrain[0]"),1.0, false);
+                sec30->SetVar(_("cstrain[0]"),1.0, true);
+            }
+            else
+            {
+                wxMessageBox(_("Unable to open the file."),_("Error"));
+                return;
+            }
+        }
+    }
+}
+
+void UnitcellClass::GetValueFromLine(wxString str, double &val)
+{
+    std::istringstream iss(str.c_str().AsChar());
+    std::string dummy;
+    iss >> dummy >> val;
+}
+
+void UnitcellClass::GetValueFromLine(wxString str, int &val)
+{
+    std::istringstream iss(str.c_str().AsChar());
+    std::string dummy;
+    iss >> dummy >> val;
+}

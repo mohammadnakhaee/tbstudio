@@ -30,90 +30,6 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
     MainRibbon->SetArtProvider(new wxRibbonDefaultArtProvider);
     
     boxSizer211->Add(MainRibbon, 0, wxEXPAND, WXC_FROM_DIP(5));
-    
-    m_ribbonPage340 = new wxRibbonPage(MainRibbon, wxID_ANY, _("File"), wxNullBitmap, 0);
-    MainRibbon->SetActivePage( m_ribbonPage340 );
-    
-    m_ribbonPanel981 = new wxRibbonPanel(m_ribbonPage340, wxID_ANY, _("My Label"), wxNullBitmap, wxDefaultPosition, wxDLG_UNIT(m_ribbonPage340, wxSize(-1,-1)), wxRIBBON_PANEL_DEFAULT_STYLE);
-    
-    m_ribbonButtonBar983 = new wxRibbonButtonBar(m_ribbonPanel981, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_ribbonPanel981, wxSize(-1,-1)), 0);
-    
-    m_ribbonButtonBar983->AddButton(wxID_OPEN, _("Open"), wxXmlResource::Get()->LoadBitmap(wxT("placeholder")), _("Help String"), wxRIBBON_BUTTON_NORMAL);
-    
-    m_ribbonButtonBar983->AddButton(wxID_SAVE, _("Save"), wxXmlResource::Get()->LoadBitmap(wxT("placeholder")), _("Help String"), wxRIBBON_BUTTON_NORMAL);
-    m_ribbonButtonBar983->Realize();
-    
-    m_ribbonPage462 = new wxRibbonPage(MainRibbon, wxID_ANY, _("Edit"), wxNullBitmap, 0);
-    MainRibbon->SetActivePage( m_ribbonPage462 );
-    
-    m_ribbonPanel1043 = new wxRibbonPanel(m_ribbonPage462, wxID_ANY, _("My Label"), wxNullBitmap, wxDefaultPosition, wxDLG_UNIT(m_ribbonPage462, wxSize(-1,-1)), wxRIBBON_PANEL_DEFAULT_STYLE);
-    
-    m_ribbonButtonBar1045 = new wxRibbonButtonBar(m_ribbonPanel1043, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_ribbonPanel1043, wxSize(-1,-1)), 0);
-    
-    m_ribbonButtonBar1045->AddButton(wxID_REFRESH, _("Structure Style"), wxXmlResource::Get()->LoadBitmap(wxT("placeholder")), _("Help String"), wxRIBBON_BUTTON_NORMAL);
-    m_ribbonButtonBar1045->Realize();
-    
-    m_ribbonPage606 = new wxRibbonPage(MainRibbon, wxID_ANY, _("Tools"), wxNullBitmap, 0);
-    MainRibbon->SetActivePage( m_ribbonPage606 );
-    
-    m_ribbonPanel608 = new wxRibbonPanel(m_ribbonPage606, wxID_ANY, _("Mouse"), wxNullBitmap, wxDefaultPosition, wxDLG_UNIT(m_ribbonPage606, wxSize(-1,-1)), wxRIBBON_PANEL_DEFAULT_STYLE);
-    
-    BtnMouse = new wxRibbonButtonBar(m_ribbonPanel608, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_ribbonPanel608, wxSize(-1,-1)), 0);
-    
-    BtnMouse->AddButton(wxID_APPLY, _("Start Page"), wxXmlResource::Get()->LoadBitmap(wxT("placeholder")), _("Help String"), wxRIBBON_BUTTON_NORMAL);
-    
-    BtnMouse->AddButton(wxID_ADD, _("Terminal"), wxXmlResource::Get()->LoadBitmap(wxT("placeholder")), _("Help String"), wxRIBBON_BUTTON_NORMAL);
-    
-    BtnMouse->AddButton(wxID_BACKWARD, _("Data Grid"), wxXmlResource::Get()->LoadBitmap(wxT("placeholder")), _("Help String"), wxRIBBON_BUTTON_NORMAL);
-    
-    BtnMouse->AddButton(wxID_SELECT_COLOR, _("Select"), wxXmlResource::Get()->LoadBitmap(wxT("placeholder")), _("Help String"), wxRIBBON_BUTTON_TOGGLE);
-    
-    BtnMouse->AddButton(wxID_MORE, _("Move"), wxXmlResource::Get()->LoadBitmap(wxT("placeholder")), _("Help String"), wxRIBBON_BUTTON_TOGGLE);
-    
-    BtnMouse->AddButton(wxID_RETRY, _("Rotate"), wxXmlResource::Get()->LoadBitmap(wxT("placeholder")), _("Help String"), wxRIBBON_BUTTON_TOGGLE);
-    
-    BtnMouse->AddButton(wxID_SEPARATOR, _("Scale"), wxXmlResource::Get()->LoadBitmap(wxT("placeholder")), _("Help String"), wxRIBBON_BUTTON_TOGGLE);
-    BtnMouse->Realize();
-    
-    m_ribbonPage548 = new wxRibbonPage(MainRibbon, wxID_ANY, _("View"), wxNullBitmap, 0);
-    m_ribbonPage548->Hide();
-    MainRibbon->SetActivePage( m_ribbonPage548 );
-    
-    m_ribbonPanel550 = new wxRibbonPanel(m_ribbonPage548, wxID_ANY, _("Voltametry"), wxNullBitmap, wxDefaultPosition, wxDLG_UNIT(m_ribbonPage548, wxSize(-1,-1)), wxRIBBON_PANEL_DEFAULT_STYLE);
-    
-    m_ribbonButtonBar582 = new wxRibbonButtonBar(m_ribbonPanel550, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_ribbonPanel550, wxSize(-1,-1)), 0);
-    
-    m_ribbonButtonBar582->AddButton(wxID_ANY, _("x"), wxXmlResource::Get()->LoadBitmap(wxT("placeholder")), _("Help String"), wxRIBBON_BUTTON_NORMAL);
-    
-    m_ribbonButtonBar582->AddButton(wxID_ANY, _("y"), wxXmlResource::Get()->LoadBitmap(wxT("placeholder")), _("Help String"), wxRIBBON_BUTTON_NORMAL);
-    
-    m_ribbonButtonBar582->AddButton(wxID_ANY, _("z"), wxXmlResource::Get()->LoadBitmap(wxT("placeholder")), _("Help String"), wxRIBBON_BUTTON_NORMAL);
-    
-    m_ribbonButtonBar582->AddButton(wxID_ANY, _("a"), wxXmlResource::Get()->LoadBitmap(wxT("placeholder")), _("Help String"), wxRIBBON_BUTTON_NORMAL);
-    
-    m_ribbonButtonBar582->AddButton(wxID_ANY, _("b"), wxXmlResource::Get()->LoadBitmap(wxT("placeholder")), _("Help String"), wxRIBBON_BUTTON_NORMAL);
-    
-    m_ribbonButtonBar582->AddButton(wxID_ANY, _("c"), wxXmlResource::Get()->LoadBitmap(wxT("placeholder")), _("Help String"), wxRIBBON_BUTTON_NORMAL);
-    m_ribbonButtonBar582->Realize();
-    
-    m_ribbonPage464 = new wxRibbonPage(MainRibbon, wxID_ANY, _("Analyze Data"), wxNullBitmap, 0);
-    m_ribbonPage464->Hide();
-    MainRibbon->SetActivePage( m_ribbonPage464 );
-    
-    m_ribbonPanel522 = new wxRibbonPanel(m_ribbonPage464, wxID_ANY, _("Panel1"), wxNullBitmap, wxDefaultPosition, wxDLG_UNIT(m_ribbonPage464, wxSize(-1,-1)), wxRIBBON_PANEL_DEFAULT_STYLE);
-    
-    m_ribbonButtonBar528 = new wxRibbonButtonBar(m_ribbonPanel522, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_ribbonPanel522, wxSize(-1,-1)), 0);
-    
-    m_ribbonButtonBar528->AddButton(wxID_EXECUTE, _("2D"), wxXmlResource::Get()->LoadBitmap(wxT("placeholder")), _("Help String"), wxRIBBON_BUTTON_NORMAL);
-    
-    m_ribbonButtonBar528->AddButton(wxID_COPY, _("3D"), wxXmlResource::Get()->LoadBitmap(wxT("placeholder")), _("Help String"), wxRIBBON_BUTTON_NORMAL);
-    
-    m_ribbonButtonBar528->AddButton(wxID_DUPLICATE, _("Glut"), wxXmlResource::Get()->LoadBitmap(wxT("placeholder")), _("Help String"), wxRIBBON_BUTTON_NORMAL);
-    
-    m_ribbonButtonBar528->AddButton(wxID_IGNORE, _("mgl1"), wxXmlResource::Get()->LoadBitmap(wxT("placeholder")), _("Help String"), wxRIBBON_BUTTON_NORMAL);
-    
-    m_ribbonButtonBar528->AddButton(wxID_ANY, _("Button"), wxXmlResource::Get()->LoadBitmap(wxT("placeholder")), _("Help String"), wxRIBBON_BUTTON_HYBRID);
-    m_ribbonButtonBar528->Realize();
     MainRibbon->Realize();
     wxBoxSizer* boxSizer544 = new wxBoxSizer(wxHORIZONTAL);
     
@@ -182,20 +98,6 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
     // Connect events
     this->Connect(wxEVT_SIZE, wxSizeEventHandler(MainFrameBaseClass::MainFrameBaseClass_Resize), NULL, this);
     this->Connect(wxEVT_MOVE, wxMoveEventHandler(MainFrameBaseClass::MainFrameBaseClass_Move), NULL, this);
-    m_ribbonButtonBar983->Connect(wxID_OPEN, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrameBaseClass::BtnOpen_OnClick), NULL, this);
-    m_ribbonButtonBar983->Connect(wxID_SAVE, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrameBaseClass::BtnSave_OnClick), NULL, this);
-    m_ribbonButtonBar1045->Connect(wxID_REFRESH, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrameBaseClass::BtnStructureStyle_OnClick), NULL, this);
-    BtnMouse->Connect(wxID_APPLY, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrameBaseClass::BtnMain_OnClick), NULL, this);
-    BtnMouse->Connect(wxID_ADD, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrameBaseClass::BtnTerminal_OnClick), NULL, this);
-    BtnMouse->Connect(wxID_BACKWARD, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrameBaseClass::BtnGrid_OnClick), NULL, this);
-    BtnMouse->Connect(wxID_SELECT_COLOR, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrameBaseClass::BtnSelect_OnClick), NULL, this);
-    BtnMouse->Connect(wxID_MORE, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrameBaseClass::BtnMove_OnClick), NULL, this);
-    BtnMouse->Connect(wxID_RETRY, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrameBaseClass::BtnRotate_OnClick), NULL, this);
-    BtnMouse->Connect(wxID_SEPARATOR, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrameBaseClass::BtnScale_OnClick), NULL, this);
-    m_ribbonButtonBar528->Connect(wxID_EXECUTE, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrameBaseClass::B2D), NULL, this);
-    m_ribbonButtonBar528->Connect(wxID_COPY, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrameBaseClass::Btn3D_OnClick), NULL, this);
-    m_ribbonButtonBar528->Connect(wxID_DUPLICATE, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrameBaseClass::B3D), NULL, this);
-    m_ribbonButtonBar528->Connect(wxID_IGNORE, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrameBaseClass::mgl_test), NULL, this);
     
 }
 
@@ -203,20 +105,6 @@ MainFrameBaseClass::~MainFrameBaseClass()
 {
     this->Disconnect(wxEVT_SIZE, wxSizeEventHandler(MainFrameBaseClass::MainFrameBaseClass_Resize), NULL, this);
     this->Disconnect(wxEVT_MOVE, wxMoveEventHandler(MainFrameBaseClass::MainFrameBaseClass_Move), NULL, this);
-    m_ribbonButtonBar983->Disconnect(wxID_OPEN, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrameBaseClass::BtnOpen_OnClick), NULL, this);
-    m_ribbonButtonBar983->Disconnect(wxID_SAVE, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrameBaseClass::BtnSave_OnClick), NULL, this);
-    m_ribbonButtonBar1045->Disconnect(wxID_REFRESH, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrameBaseClass::BtnStructureStyle_OnClick), NULL, this);
-    BtnMouse->Disconnect(wxID_APPLY, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrameBaseClass::BtnMain_OnClick), NULL, this);
-    BtnMouse->Disconnect(wxID_ADD, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrameBaseClass::BtnTerminal_OnClick), NULL, this);
-    BtnMouse->Disconnect(wxID_BACKWARD, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrameBaseClass::BtnGrid_OnClick), NULL, this);
-    BtnMouse->Disconnect(wxID_SELECT_COLOR, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrameBaseClass::BtnSelect_OnClick), NULL, this);
-    BtnMouse->Disconnect(wxID_MORE, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrameBaseClass::BtnMove_OnClick), NULL, this);
-    BtnMouse->Disconnect(wxID_RETRY, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrameBaseClass::BtnRotate_OnClick), NULL, this);
-    BtnMouse->Disconnect(wxID_SEPARATOR, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrameBaseClass::BtnScale_OnClick), NULL, this);
-    m_ribbonButtonBar528->Disconnect(wxID_EXECUTE, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrameBaseClass::B2D), NULL, this);
-    m_ribbonButtonBar528->Disconnect(wxID_COPY, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrameBaseClass::Btn3D_OnClick), NULL, this);
-    m_ribbonButtonBar528->Disconnect(wxID_DUPLICATE, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrameBaseClass::B3D), NULL, this);
-    m_ribbonButtonBar528->Disconnect(wxID_IGNORE, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrameBaseClass::mgl_test), NULL, this);
     
 }
 

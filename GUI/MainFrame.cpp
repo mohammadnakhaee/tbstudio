@@ -46,7 +46,8 @@ wxGLContext* m_context;
 MainFrame::MainFrame(wxWindow* parent)
     : MainFrameBaseClass(parent)
 {
-    BtnMouse->ToggleButton(wxID_RETRY, true);//Rotate
+    LoadIcons();
+    RButtonMouse->ToggleButton(wxID_RETRY, true);//Rotate
     //tbmodel = new TBModel();
     //tbmodel->nAtoms = 4;
     sec30=new Sec30(this);
@@ -784,21 +785,32 @@ void MainFrame::sec30_OnUpdated(wxCommandEvent& event)
     {
         EvaluateSetupPanel();
     }
-    else
-    {
-        if (redraw == 1) ClearGraph3D();
-    }
     
     if (info == _("UnitcellClass"))
+    {
+        if (redraw == 1) ClearGraph3D();
         EvaluateUnitcellPanel();
+    }
     else if (info == _("StructureClass"))
+    {
+        if (redraw == 1) ClearGraph3D();
         EvaluateStructurePanel();
+    }
     else if (info == _("OrbitalsClass"))
+    {
+        if (redraw == 1) ClearGraph3D();
         EvaluateOrbitalsPanel(redraw);
+    }
     else if (info == _("BondsClass"))
+    {
+        if (redraw == 1) ClearGraph3D();
         EvaluateBondsPanel(redraw);
+    }
     else if (info == _("ColorsClass"))
+    {
+        if (redraw == 1) ClearGraph3D();
         EvaluateColorsPanel();
+    }
 }
 /****************************************************************************************************************************************************************/
 /****************************************************************************************************************************************************************/
@@ -1396,10 +1408,12 @@ bool MainFrame::ValidateSetupPanel()
     int nMin, nMax;
     sec30->GetVar(_("DFTBandRange[0]"), nMin);
     sec30->GetVar(_("DFTBandRange[1]"), nMax);
+    
     if (nMax >= nMin)
     {
         sec30->ArraysOf0DInt[4] = nMin;//int DFTnBandMin;
         sec30->ArraysOf0DInt[5] = nMax;//int DFTnBandMax;
+        sec30->SetVar(_("nDFTBandRange[0]"), nMax - nMin + 1, false);
     }
     else
         isValid = false;
@@ -1851,37 +1865,144 @@ void MainFrame::BtnStructureStyle_OnClick(wxRibbonButtonBarEvent& event)
     if (ColorsForm->IsShown())
         ColorsForm->Hide();
     else
+    {
+        //ColorsForm->CenterOnScreen();
+        ColorsForm->CenterOnParent();
         ColorsForm->Show(true);
+    }
 }
 
 void MainFrame::BtnSelect_OnClick(wxRibbonButtonBarEvent& event)
 {
-    BtnMouse->ToggleButton(wxID_SEPARATOR, false);//BtnScale_OnClick
-    BtnMouse->ToggleButton(wxID_MORE, false);//BtnMove_OnClick
-    BtnMouse->ToggleButton(wxID_RETRY, false);//BtnRotate_OnClick
+    RButtonMouse->ToggleButton(wxID_FILE4, false);//BtnScale_OnClick
+    RButtonMouse->ToggleButton(wxID_FILE2, false);//BtnMove_OnClick
+    RButtonMouse->ToggleButton(wxID_FILE3, false);//BtnRotate_OnClick
     graph3d->SetLeftMouseMode(0);//Select
 }
 
 void MainFrame::BtnMove_OnClick(wxRibbonButtonBarEvent& event)
 {
-    BtnMouse->ToggleButton(wxID_SELECT_COLOR, false);//BtnSelect_OnClick
-    BtnMouse->ToggleButton(wxID_RETRY, false);//BtnRotate_OnClick
-    BtnMouse->ToggleButton(wxID_SEPARATOR, false);//BtnScale_OnClick
+    RButtonMouse->ToggleButton(wxID_FILE1, false);//BtnSelect_OnClick
+    RButtonMouse->ToggleButton(wxID_FILE3, false);//BtnRotate_OnClick
+    RButtonMouse->ToggleButton(wxID_FILE4, false);//BtnScale_OnClick
     graph3d->SetLeftMouseMode(1);//Move
 }
     
 void MainFrame::BtnRotate_OnClick(wxRibbonButtonBarEvent& event)
 {
-    BtnMouse->ToggleButton(wxID_SELECT_COLOR, false);//BtnSelect_OnClick
-    BtnMouse->ToggleButton(wxID_MORE, false);//BtnMove_OnClick
-    BtnMouse->ToggleButton(wxID_SEPARATOR, false);//BtnScale_OnClick
+    RButtonMouse->ToggleButton(wxID_FILE1, false);//BtnSelect_OnClick
+    RButtonMouse->ToggleButton(wxID_FILE2, false);//BtnMove_OnClick
+    RButtonMouse->ToggleButton(wxID_FILE4, false);//BtnScale_OnClick
     graph3d->SetLeftMouseMode(2);//Rotate
 }
 
 void MainFrame::BtnScale_OnClick(wxRibbonButtonBarEvent& event)
 {
-    BtnMouse->ToggleButton(wxID_SELECT_COLOR, false);//BtnSelect_OnClick
-    BtnMouse->ToggleButton(wxID_MORE, false);//BtnMove_OnClick
-    BtnMouse->ToggleButton(wxID_RETRY, false);//BtnRotate_OnClick
+    RButtonMouse->ToggleButton(wxID_FILE1, false);//BtnSelect_OnClick
+    RButtonMouse->ToggleButton(wxID_FILE2, false);//BtnMove_OnClick
+    RButtonMouse->ToggleButton(wxID_FILE3, false);//BtnRotate_OnClick
     graph3d->SetLeftMouseMode(3);//Scale
+}
+
+void MainFrame::LoadIcons()
+{
+    int myID;
+    
+    wxRibbonPage* RPageFile1 = new wxRibbonPage(MainRibbon, wxID_ANY, _("File"), wxNullBitmap, 0);
+    wxRibbonPanel* RPanelProject = new wxRibbonPanel(RPageFile1, wxID_ANY, _("Panel"), wxNullBitmap, wxDefaultPosition, wxDLG_UNIT(RPageFile1, wxSize(-1,-1)), wxRIBBON_PANEL_DEFAULT_STYLE);
+    wxRibbonButtonBar* RButtonBar1 = new wxRibbonButtonBar(RPanelProject, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(RPanelProject, wxSize(-1,-1)), 0);
+    
+    RButtonBar1->AddButton(wxID_OPEN, _("Open"), GetPng(open_png,open_png_size), _(""), wxRIBBON_BUTTON_NORMAL);
+    RButtonBar1->Connect(wxID_OPEN, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrame::BtnOpen_OnClick), NULL, this);
+    
+    RButtonBar1->AddButton(wxID_SAVE, _("Save"), GetPng(save_png,save_png_size), _(""), wxRIBBON_BUTTON_NORMAL);
+    RButtonBar1->Connect(wxID_SAVE, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrame::BtnSave_OnClick), NULL, this);
+    
+    RButtonBar1->Realize();
+    
+    
+    
+    
+    wxRibbonPage* RPageTools = new wxRibbonPage(MainRibbon, wxID_ANY, _("Tools"), wxNullBitmap, 0);
+    wxRibbonPanel* RPanelStructure = new wxRibbonPanel(RPageTools, wxID_ANY, _("Structure"), wxNullBitmap, wxDefaultPosition, wxDLG_UNIT(RPageTools, wxSize(-1,-1)), wxRIBBON_PANEL_DEFAULT_STYLE);
+    wxRibbonButtonBar* RButtonBar2 = new wxRibbonButtonBar(RPanelStructure, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(RPanelStructure, wxSize(-1,-1)), 0);
+    
+    myID = wxID_SELECT_COLOR;
+    RButtonBar2->AddButton(myID, _("Style"), GetPng(colors_png,colors_png_size), _(""), wxRIBBON_BUTTON_NORMAL);
+    RButtonBar2->Connect(myID, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrame::BtnStructureStyle_OnClick), NULL, this);
+    
+    RButtonBar2->Realize();
+    
+    
+    
+    
+    wxRibbonPanel* RPanelMouse = new wxRibbonPanel(RPageTools, wxID_ANY, _("Mouse"), wxNullBitmap, wxDefaultPosition, wxDLG_UNIT(RPageTools, wxSize(-1,-1)), wxRIBBON_PANEL_DEFAULT_STYLE);
+    RButtonMouse = new wxRibbonButtonBar(RPanelMouse, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(RPanelMouse, wxSize(-1,-1)), 0);
+    
+    myID = wxID_FILE1;
+    RButtonMouse->AddButton(myID, _("Select"), GetPng(select_png,select_png_size), _(""), wxRIBBON_BUTTON_TOGGLE);
+    RButtonMouse->Connect(myID, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrame::BtnSelect_OnClick), NULL, this);
+    
+    myID = wxID_FILE2;
+    RButtonMouse->AddButton(myID, _("Move"), GetPng(move_png,move_png_size), _(""), wxRIBBON_BUTTON_TOGGLE);
+    RButtonMouse->Connect(myID, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrame::BtnMove_OnClick), NULL, this);
+    
+    myID = wxID_FILE3;
+    RButtonMouse->AddButton(myID, _("Rotate"), GetPng(rotate_png,rotate_png_size), _(""), wxRIBBON_BUTTON_TOGGLE);
+    RButtonMouse->Connect(myID, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrame::BtnRotate_OnClick), NULL, this);
+    
+    myID = wxID_FILE4;
+    RButtonMouse->AddButton(myID, _("Zoom"), GetPng(zoom_png,zoom_png_size), _(""), wxRIBBON_BUTTON_TOGGLE);
+    RButtonMouse->Connect(myID, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrame::BtnScale_OnClick), NULL, this);
+    
+    RButtonMouse->Realize();
+    
+    
+    
+    wxRibbonPage* RPageView = new wxRibbonPage(MainRibbon, wxID_ANY, _("View"), wxNullBitmap, 0);
+    wxRibbonPanel* RPanelCart = new wxRibbonPanel(RPageView, wxID_ANY, _("Cartesian"), wxNullBitmap, wxDefaultPosition, wxDLG_UNIT(RPageView, wxSize(-1,-1)), wxRIBBON_PANEL_DEFAULT_STYLE);
+    wxRibbonButtonBar* RButtonBar3 = new wxRibbonButtonBar(RPanelCart, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(RPanelCart, wxSize(-1,-1)), 0);
+    
+    myID = wxID_FILE1;
+    RButtonBar3->AddButton(myID, _(""), GetPng(x_png,x_png_size), _(""), wxRIBBON_BUTTON_NORMAL);
+    RButtonBar3->Connect(myID, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrame::BtnScale_OnClick), NULL, this);
+    
+    myID = wxID_FILE2;
+    RButtonBar3->AddButton(myID, _(""), GetPng(y_png,y_png_size), _(""), wxRIBBON_BUTTON_NORMAL);
+    RButtonBar3->Connect(myID, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrame::BtnScale_OnClick), NULL, this);
+    
+    myID = wxID_FILE3;
+    RButtonBar3->AddButton(myID, _(""), GetPng(z_png,z_png_size), _(""), wxRIBBON_BUTTON_NORMAL);
+    RButtonBar3->Connect(myID, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrame::BtnScale_OnClick), NULL, this);
+    
+    RButtonBar3->Realize();
+    
+    wxRibbonPanel* RPanelUnitcell = new wxRibbonPanel(RPageView, wxID_ANY, _("Unit-cell"), wxNullBitmap, wxDefaultPosition, wxDLG_UNIT(RPageView, wxSize(-1,-1)), wxRIBBON_PANEL_DEFAULT_STYLE);
+    wxRibbonButtonBar* RButtonBar4 = new wxRibbonButtonBar(RPanelUnitcell, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(RPanelUnitcell, wxSize(-1,-1)), 0);
+    
+    myID = wxID_FILE1;
+    RButtonBar4->AddButton(myID, _(""), GetPng(a_png,a_png_size), _(""), wxRIBBON_BUTTON_NORMAL);
+    RButtonBar4->Connect(myID, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrame::BtnScale_OnClick), NULL, this);
+    
+    myID = wxID_FILE2;
+    RButtonBar4->AddButton(myID, _(""), GetPng(b_png,b_png_size), _(""), wxRIBBON_BUTTON_NORMAL);
+    RButtonBar4->Connect(myID, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrame::BtnScale_OnClick), NULL, this);
+    
+    myID = wxID_FILE3;
+    RButtonBar4->AddButton(myID, _(""), GetPng(c_png,c_png_size), _(""), wxRIBBON_BUTTON_NORMAL);
+    RButtonBar4->Connect(myID, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrame::BtnScale_OnClick), NULL, this);
+    
+    RButtonBar4->Realize();
+    
+    MainRibbon->SetActivePage(RPageFile1);
+    
+    MainRibbon->Realize();
+}
+
+wxBitmap MainFrame::GetPng(const void* data, size_t length)
+{
+    wxMemoryInputStream memIStream(data, length);
+    wxImage image(memIStream, wxBITMAP_TYPE_PNG );
+    wxBitmap bmp( image );
+    return bmp;
 }
