@@ -1182,6 +1182,705 @@ void Sec30::SaveToFile(wxString filepath, wxString filename)
     }
 
 }
+    
+void Sec30::LoadFromFile(wxString filepath, wxString filename)
+{
+    wxString fname1 = filepath + wxT("/") + filename;
+    std::ifstream infile(fname1, std::ios::in | std::ios::binary);
+    
+    if (infile.is_open())
+    {
+        int n = 0;
+        ///////////////////////////////////////////////////////////////
+        infile.read(reinterpret_cast<char *>(&n), sizeof n);
+        
+        for(int it=0; it != n; it++)
+        {
+            size_t ns1=0;
+            infile.read(reinterpret_cast<char *>(&ns1), sizeof ns1);
+            char* VariableNameBuf = new char[ns1];
+            for (int i = 0; i < ns1; i++)
+            {
+                char ch;
+                infile.read(&ch, sizeof ch);
+                VariableNameBuf[i] = ch;
+            }
+            wxString VariableName = wxString(VariableNameBuf,ns1);
+            
+            size_t ns2=0;
+            infile.read(reinterpret_cast<char *>(&ns2), sizeof ns2);
+            char* ValBuf = new char[ns2];
+            for (int i = 0; i < ns2; i++)
+            {
+                char ch;
+                infile.read(&ch, sizeof ch);
+                ValBuf[i] = ch;
+            }
+            wxString Val=wxString(ValBuf,ns2);
+            
+            SetVar(VariableName, Val, false);
+        }
+        ///////////////////////////////////////////////////////////////
+        infile.read(reinterpret_cast<char *>(&n), sizeof n);
+        
+        for(int it=0; it != n; it++)
+        {
+            size_t ns1=0;
+            infile.read(reinterpret_cast<char *>(&ns1), sizeof ns1);
+            char* VariableNameBuf = new char[ns1];
+            for (int i = 0; i < ns1; i++)
+            {
+                char ch;
+                infile.read(&ch, sizeof ch);
+                VariableNameBuf[i] = ch;
+            }
+            wxString VariableName = wxString(VariableNameBuf,ns1);
+            
+            myGrid* gc = GetGridObject(VariableName);
+            int n0 = gc->GetNumberRows();
+            gc->DeleteRows(0,n0,true);
+            
+            int nRow=0;
+            int nCol=0;
+            infile.read(reinterpret_cast<char *>(&nRow), sizeof nRow);
+            infile.read(reinterpret_cast<char *>(&nCol), sizeof nCol);
+            wxColour c; //Also it is possible to determine the color in this way: wxColour c=*wxGREEN;
+            c.Set(191,205,219,0);
+            gc->InsertRows(0, nRow,false);
+            
+            for (int irow=0; irow<nRow;irow++)
+                for (int icol=0; icol<nCol; icol++)
+                {
+                    size_t ns2=0;
+                    infile.read(reinterpret_cast<char *>(&ns2), sizeof ns2);
+                    char* ValBuf = new char[ns2];
+                    for (int i = 0; i < ns2; i++)
+                    {
+                        char ch;
+                        infile.read(&ch, sizeof ch);
+                        ValBuf[i] = ch;
+                    }
+                    wxString Val=wxString(ValBuf,ns2);
+                    SetVar(VariableName, irow, icol, Val, false);
+                    
+                    bool isreadonly;
+                    infile.read(reinterpret_cast<char *>(&isreadonly), sizeof isreadonly);
+                    gc->SetReadOnly(irow, icol, isreadonly);
+                    if (isreadonly)
+                        gc->SetCellBackgroundColour(irow, icol, c);
+                    else
+                        gc->SetCellBackgroundColour(irow, icol, *wxWHITE);
+                }
+        }
+        ///////////////////////////////////////////////////////////////
+        infile.read(reinterpret_cast<char *>(&n), sizeof n);
+        
+        for(int it=0; it != n; it++)
+        {
+            size_t ns1=0;
+            infile.read(reinterpret_cast<char *>(&ns1), sizeof ns1);
+            char* VariableNameBuf = new char[ns1];
+            for (int i = 0; i < ns1; i++)
+            {
+                char ch;
+                infile.read(&ch, sizeof ch);
+                VariableNameBuf[i] = ch;
+            }
+            wxString VariableName = wxString(VariableNameBuf,ns1);
+            
+            bool boolval;
+            infile.read(reinterpret_cast<char *>(&boolval), sizeof boolval);
+            SetRadioVar(VariableName, boolval, false);
+        }
+        ///////////////////////////////////////////////////////////////
+        infile.read(reinterpret_cast<char *>(&n), sizeof n);
+        
+        for(int it=0; it != n; it++)
+        {
+            size_t ns1=0;
+            infile.read(reinterpret_cast<char *>(&ns1), sizeof ns1);
+            char* VariableNameBuf = new char[ns1];
+            for (int i = 0; i < ns1; i++)
+            {
+                char ch;
+                infile.read(&ch, sizeof ch);
+                VariableNameBuf[i] = ch;
+            }
+            wxString VariableName = wxString(VariableNameBuf,ns1);
+            
+            bool boolval;
+            infile.read(reinterpret_cast<char *>(&boolval), sizeof boolval);
+            SetCheckVar(VariableName, boolval, false);
+        }
+        ///////////////////////////////////////////////////////////////
+        infile.read(reinterpret_cast<char *>(&n), sizeof n);
+        
+        for(int it=0; it != n; it++)
+        {
+            size_t ns1=0;
+            infile.read(reinterpret_cast<char *>(&ns1), sizeof ns1);
+            char* VariableNameBuf = new char[ns1];
+            for (int i = 0; i < ns1; i++)
+            {
+                char ch;
+                infile.read(&ch, sizeof ch);
+                VariableNameBuf[i] = ch;
+            }
+            wxString VariableName = wxString(VariableNameBuf,ns1);
+            
+            wxCheckTree* ctr = ((wxCheckTree*)FindWindowByName(VariableName,GetParent()));
+            ctr->DeleteAllItems();
+            
+            int nItems = 0;
+            infile.read(reinterpret_cast<char *>(&nItems), sizeof nItems);
+            
+            wxString itemname;
+            wxString diritemname;
+            int itemstate;
+            wxTreeItemId rootID;
+            
+            if (nItems>0)
+            {
+                ns1=0;
+                infile.read(reinterpret_cast<char *>(&ns1), sizeof ns1);
+                char* itemnameBuf = new char[ns1];
+                for (int i = 0; i < ns1; i++)
+                {
+                    char ch;
+                    infile.read(&ch, sizeof ch);
+                    itemnameBuf[i] = ch;
+                }
+                itemname = wxString(itemnameBuf,ns1);
+                rootID=ctr->AddRoot(itemname);
+                infile.read(reinterpret_cast<char *>(&itemstate), sizeof itemstate);
+                ctr->SetItemState(rootID,itemstate);
+            }
+            
+            for (int ii=1; ii<nItems; ii++)
+            {
+                ns1=0;
+                infile.read(reinterpret_cast<char *>(&ns1), sizeof ns1);
+                char* itemnameBuf1 = new char[ns1];
+                for (int i = 0; i < ns1; i++)
+                {
+                    char ch;
+                    infile.read(&ch, sizeof ch);
+                    itemnameBuf1[i] = ch;
+                }
+                diritemname = wxString(itemnameBuf1,ns1);
+                
+                ns1=0;
+                infile.read(reinterpret_cast<char *>(&ns1), sizeof ns1);
+                char* itemnameBuf2 = new char[ns1];
+                for (int i = 0; i < ns1; i++)
+                {
+                    char ch;
+                    infile.read(&ch, sizeof ch);
+                    itemnameBuf2[i] = ch;
+                }
+                itemname = wxString(itemnameBuf2,ns1);
+                
+                infile.read(reinterpret_cast<char *>(&itemstate), sizeof itemstate);
+                //Check for the same names
+                wxTreeItemId parID = ctr->FindItemViaDIR(diritemname);
+                bool mystate=true;
+                bool mychecked=true;
+                if (itemstate < 0) mystate = false;
+                if (itemstate == 0) mychecked = false;
+                ctr->tree_add(parID, itemname, mystate, mychecked);
+            }
+            ctr->Expand(rootID);
+        }
+        ///////////////////////////////////////////////////////////////
+        infile.read(reinterpret_cast<char *>(&n), sizeof n);
+        
+        for(int it=0; it != n; it++)
+        {
+            size_t ns1=0;
+            infile.read(reinterpret_cast<char *>(&ns1), sizeof ns1);
+            char* VariableNameBuf = new char[ns1];
+            for (int i = 0; i < ns1; i++)
+            {
+                char ch;
+                infile.read(&ch, sizeof ch);
+                VariableNameBuf[i] = ch;
+            }
+            wxString VariableName = wxString(VariableNameBuf,ns1);
+            
+            wxCheckListBox* ctr = ((wxCheckListBox*)FindWindowByName(VariableName,GetParent()));
+            ctr->Clear();
+            
+            int nItems = 0;
+            infile.read(reinterpret_cast<char *>(&nItems), sizeof nItems);
+
+            wxString itemname;
+            bool itemstate;
+            for (int ii=0; ii<nItems; ii++)
+            {
+                ns1=0;
+                infile.read(reinterpret_cast<char *>(&ns1), sizeof ns1);
+                char* itemnameBuf = new char[ns1];
+                for (int i = 0; i < ns1; i++)
+                {
+                    char ch;
+                    infile.read(&ch, sizeof ch);
+                    itemnameBuf[i] = ch;
+                }
+                itemname = wxString(itemnameBuf,ns1);
+                
+                infile.read(reinterpret_cast<char *>(&itemstate), sizeof itemstate);
+                
+                ctr->Append(itemname);
+                ctr->Check(ii,itemstate);
+            }
+        }
+        ///////////////////////////////////////////////////////////////
+        infile.read(reinterpret_cast<char *>(&n), sizeof n);
+        
+        for(int it=0; it != n; it++)
+        {
+            size_t ns1=0;
+            infile.read(reinterpret_cast<char *>(&ns1), sizeof ns1);
+            char* VariableNameBuf = new char[ns1];
+            for (int i = 0; i < ns1; i++)
+            {
+                char ch;
+                infile.read(&ch, sizeof ch);
+                VariableNameBuf[i] = ch;
+            }
+            wxString VariableName = wxString(VariableNameBuf,ns1);
+            
+            wxListBox* ctr = ((wxListBox*)FindWindowByName(VariableName,GetParent()));
+            ctr->Clear();
+            
+            int nItems = 0;
+            infile.read(reinterpret_cast<char *>(&nItems), sizeof nItems);
+            
+            wxString itemname;
+            for (int ii=0; ii<nItems; ii++)
+            {
+                ns1=0;
+                infile.read(reinterpret_cast<char *>(&ns1), sizeof ns1);
+                char* itemnameBuf = new char[ns1];
+                for (int i = 0; i < ns1; i++)
+                {
+                    char ch;
+                    infile.read(&ch, sizeof ch);
+                    itemnameBuf[i] = ch;
+                }
+                itemname = wxString(itemnameBuf,ns1);
+                
+                ctr->Append(itemname);
+            }
+        }
+        ///////////////////////////////////////////////////////////////
+        infile.read(reinterpret_cast<char *>(&n), sizeof n);
+        
+        for(int it=0; it != n; it++)
+        {
+            size_t ns1=0;
+            infile.read(reinterpret_cast<char *>(&ns1), sizeof ns1);
+            char* VariableNameBuf = new char[ns1];
+            for (int i = 0; i < ns1; i++)
+            {
+                char ch;
+                infile.read(&ch, sizeof ch);
+                VariableNameBuf[i] = ch;
+            }
+            wxString VariableName = wxString(VariableNameBuf,ns1);
+            
+            wxChoice* ctr = ((wxChoice*)FindWindowByName(VariableName,GetParent()));
+            ctr->Clear();
+            
+            int nItems = 0;
+            infile.read(reinterpret_cast<char *>(&nItems), sizeof nItems);
+            
+            wxString itemname;
+            for (int ii=0; ii<nItems; ii++)
+            {
+                ns1=0;
+                infile.read(reinterpret_cast<char *>(&ns1), sizeof ns1);
+                char* itemnameBuf = new char[ns1];
+                for (int i = 0; i < ns1; i++)
+                {
+                    char ch;
+                    infile.read(&ch, sizeof ch);
+                    itemnameBuf[i] = ch;
+                }
+                itemname = wxString(itemnameBuf,ns1);
+                
+                ctr->Append(itemname);
+            }
+            int nselect=0;
+            infile.read(reinterpret_cast<char *>(&nselect), sizeof nselect);
+            ctr->Select(nselect);
+        }
+        ///////////////////////////////////////////////////////////////
+        infile.read(reinterpret_cast<char *>(&n), sizeof n);
+        
+        for(int it=0; it != n; it++)
+        {
+            size_t ns1=0;
+            infile.read(reinterpret_cast<char *>(&ns1), sizeof ns1);
+            char* VariableNameBuf = new char[ns1];
+            for (int i = 0; i < ns1; i++)
+            {
+                char ch;
+                infile.read(&ch, sizeof ch);
+                VariableNameBuf[i] = ch;
+            }
+            wxString VariableName = wxString(VariableNameBuf,ns1);
+            
+            size_t ns2=0;
+            infile.read(reinterpret_cast<char *>(&ns2), sizeof ns2);
+            char* LabelNameBuf = new char[ns2];
+            for (int i = 0; i < ns2; i++)
+            {
+                char ch;
+                infile.read(&ch, sizeof ch);
+                LabelNameBuf[i] = ch;
+            }
+            wxString LabelName = wxString(LabelNameBuf,ns2);
+            
+            wxStaticText* labelctr = GetComboLabelObject(VariableName);
+            labelctr->SetLabel(LabelName);
+            
+            wxComboBox* ctr = ((wxComboBox*)FindWindowByName(VariableName,GetParent()));
+            ctr->Clear();
+            
+            int nItems = 0;
+            infile.read(reinterpret_cast<char *>(&nItems), sizeof nItems);
+            
+            wxString itemname;
+            for (int ii=0; ii<nItems; ii++)
+            {
+                ns1=0;
+                infile.read(reinterpret_cast<char *>(&ns1), sizeof ns1);
+                char* itemnameBuf = new char[ns1];
+                for (int i = 0; i < ns1; i++)
+                {
+                    char ch;
+                    infile.read(&ch, sizeof ch);
+                    itemnameBuf[i] = ch;
+                }
+                itemname = wxString(itemnameBuf,ns1);
+                
+                ctr->Append(itemname);
+            }
+            int nselect=0;
+            infile.read(reinterpret_cast<char *>(&nselect), sizeof nselect);
+            ctr->Select(nselect);
+        }
+        ///////////////////////////////////////////////////////////////
+        infile.read(reinterpret_cast<char *>(&n), sizeof n);
+        
+        for(int it=0; it != n; it++)
+        {
+            size_t ns1=0;
+            infile.read(reinterpret_cast<char *>(&ns1), sizeof ns1);
+            char* VariableNameBuf = new char[ns1];
+            for (int i = 0; i < ns1; i++)
+            {
+                char ch;
+                infile.read(&ch, sizeof ch);
+                VariableNameBuf[i] = ch;
+            }
+            wxString VariableName = wxString(VariableNameBuf,ns1);
+            
+            wxColourPickerCtrl* ctr = ((wxColourPickerCtrl*)FindWindowByName(VariableName,GetParent()));
+            int r,g,b,a;
+            infile.read(reinterpret_cast<char *>(&r), sizeof r);
+            infile.read(reinterpret_cast<char *>(&g), sizeof g);
+            infile.read(reinterpret_cast<char *>(&b), sizeof b);
+            infile.read(reinterpret_cast<char *>(&a), sizeof a);
+            wxColour c;
+            c.Set(r, g, b, a);
+            ctr->SetColour(c);
+        }
+        ///////////////////////////////////////////////////////////////
+        infile.read(reinterpret_cast<char *>(&n), sizeof n);
+        ArraysOf0DInt.clear();
+        
+        for(int i1=0; i1!=n; i1++)
+        {
+            int intvar;
+            infile.read(reinterpret_cast<char *>(&intvar), sizeof intvar);
+            ArraysOf0DInt.push_back(intvar);
+        }
+        
+        infile.read(reinterpret_cast<char *>(&n), sizeof n);
+        ArraysOf1DInt.clear();
+        
+        for(int i1=0; i1!=n; i1++)
+        {
+            int n2;
+            infile.read(reinterpret_cast<char *>(&n2), sizeof n2);
+            Aint0D aint0D;
+            for(int i2=0; i2!=n2; i2++)
+            {
+                int intvar;
+                infile.read(reinterpret_cast<char *>(&intvar), sizeof intvar);
+                aint0D.push_back(intvar);
+            }
+            ArraysOf1DInt.push_back(aint0D);
+        }
+        
+        infile.read(reinterpret_cast<char *>(&n), sizeof n);
+        ArraysOf2DInt.clear();
+        
+        for(int i1=0; i1!=n; i1++)
+        {
+            int n2;
+            infile.read(reinterpret_cast<char *>(&n2), sizeof n2);
+            Aint1D aint1D;
+            for(int i2=0; i2!=n2; i2++)
+            {
+                int n3;
+                infile.read(reinterpret_cast<char *>(&n3), sizeof n3);
+                Aint0D aint0D;
+                for(int i3=0; i3!=n3; i3++)
+                {
+                    int intvar;
+                    infile.read(reinterpret_cast<char *>(&intvar), sizeof intvar);
+                    aint0D.push_back(intvar);
+                }
+                aint1D.push_back(aint0D);
+            }
+            ArraysOf2DInt.push_back(aint1D);
+        }
+        
+        infile.read(reinterpret_cast<char *>(&n), sizeof n);
+        ArraysOf3DInt.clear();
+        
+        for(int i1=0; i1!=n; i1++)
+        {
+            int n2;
+            infile.read(reinterpret_cast<char *>(&n2), sizeof n2);
+            Aint2D aint2D;
+            for(int i2=0; i2!=n2; i2++)
+            {
+                int n3;
+                infile.read(reinterpret_cast<char *>(&n3), sizeof n3);
+                Aint1D aint1D;
+                for(int i3=0; i3!=n3; i3++)
+                {
+                    int n4;
+                    infile.read(reinterpret_cast<char *>(&n4), sizeof n4);
+                    Aint0D aint0D;
+                    for(int i4=0; i4!=n4; i4++)
+                    {
+                        int intvar;
+                        infile.read(reinterpret_cast<char *>(&intvar), sizeof intvar);
+                        aint0D.push_back(intvar);
+                    }
+                    aint1D.push_back(aint0D);
+                }
+                aint2D.push_back(aint1D);
+            }
+            ArraysOf3DInt.push_back(aint2D);
+        }
+        ///////////////////////////////////////////////////////////////
+        infile.read(reinterpret_cast<char *>(&n), sizeof n);
+        ArraysOf0DDouble.clear();
+        
+        for(int i1=0; i1!=n; i1++)
+        {
+            double dvar;
+            infile.read(reinterpret_cast<char *>(&dvar), sizeof dvar);
+            ArraysOf0DDouble.push_back(dvar);
+        }
+        
+        infile.read(reinterpret_cast<char *>(&n), sizeof n);
+        ArraysOf1DDouble.clear();
+        
+        for(int i1=0; i1!=n; i1++)
+        {
+            int n2;
+            infile.read(reinterpret_cast<char *>(&n2), sizeof n2);
+            Adouble0D adouble0D;
+            for(int i2=0; i2!=n2; i2++)
+            {
+                double dvar;
+                infile.read(reinterpret_cast<char *>(&dvar), sizeof dvar);
+                adouble0D.push_back(dvar);
+            }
+            ArraysOf1DDouble.push_back(adouble0D);
+        }
+        
+        infile.read(reinterpret_cast<char *>(&n), sizeof n);
+        ArraysOf2DDouble.clear();
+        
+        for(int i1=0; i1!=n; i1++)
+        {
+            int n2;
+            infile.read(reinterpret_cast<char *>(&n2), sizeof n2);
+            Adouble1D adouble1D;
+            for(int i2=0; i2!=n2; i2++)
+            {
+                int n3;
+                infile.read(reinterpret_cast<char *>(&n3), sizeof n3);
+                Adouble0D adouble0D;
+                for(int i3=0; i3!=n3; i3++)
+                {
+                    double dvar;
+                    infile.read(reinterpret_cast<char *>(&dvar), sizeof dvar);
+                    adouble0D.push_back(dvar);
+                }
+                adouble1D.push_back(adouble0D);
+            }
+            ArraysOf2DDouble.push_back(adouble1D);
+        }
+        
+        infile.read(reinterpret_cast<char *>(&n), sizeof n);
+        ArraysOf3DDouble.clear();
+        
+        for(int i1=0; i1!=n; i1++)
+        {
+            int n2;
+            infile.read(reinterpret_cast<char *>(&n2), sizeof n2);
+            Adouble2D adouble2D;
+            for(int i2=0; i2!=n2; i2++)
+            {
+                int n3;
+                infile.read(reinterpret_cast<char *>(&n3), sizeof n3);
+                Adouble1D adouble1D;
+                for(int i3=0; i3!=n3; i3++)
+                {
+                    int n4;
+                    infile.read(reinterpret_cast<char *>(&n4), sizeof n4);
+                    Adouble0D adouble0D;
+                    for(int i4=0; i4!=n4; i4++)
+                    {
+                        double dvar;
+                        infile.read(reinterpret_cast<char *>(&dvar), sizeof dvar);
+                        adouble0D.push_back(dvar);
+                    }
+                    adouble1D.push_back(adouble0D);
+                }
+                adouble2D.push_back(adouble1D);
+            }
+            ArraysOf3DDouble.push_back(adouble2D);
+        }
+        ///////////////////////////////////////////////////////////////
+        infile.read(reinterpret_cast<char *>(&n), sizeof n);
+        ArraysOf0DString.clear();
+        
+        for(int i1=0; i1!=n; i1++)
+        {
+            size_t ns1=0;
+            infile.read(reinterpret_cast<char *>(&ns1), sizeof ns1);
+            char* StrBuf = new char[ns1];
+            for (int i = 0; i < ns1; i++)
+            {
+                char ch;
+                infile.read(&ch, sizeof ch);
+                StrBuf[i] = ch;
+            }
+            wxString var = wxString(StrBuf,ns1);
+            ArraysOf0DString.push_back(var);
+        }
+        
+        infile.read(reinterpret_cast<char *>(&n), sizeof n);
+        ArraysOf1DString.clear();
+        
+        for(int i1=0; i1!=n; i1++)
+        {
+            int n2;
+            infile.read(reinterpret_cast<char *>(&n2), sizeof n2);
+            Astring0D astring0D;
+            for(int i2=0; i2!=n2; i2++)
+            {
+                size_t ns1=0;
+                infile.read(reinterpret_cast<char *>(&ns1), sizeof ns1);
+                char* StrBuf = new char[ns1];
+                for (int i = 0; i < ns1; i++)
+                {
+                    char ch;
+                    infile.read(&ch, sizeof ch);
+                    StrBuf[i] = ch;
+                }
+                wxString var = wxString(StrBuf,ns1);
+                astring0D.push_back(var);
+            }
+            ArraysOf1DString.push_back(astring0D);
+        }
+        
+        infile.read(reinterpret_cast<char *>(&n), sizeof n);
+        ArraysOf2DString.clear();
+        
+        for(int i1=0; i1!=n; i1++)
+        {
+            int n2;
+            infile.read(reinterpret_cast<char *>(&n2), sizeof n2);
+            Astring1D astring1D;
+            for(int i2=0; i2!=n2; i2++)
+            {
+                int n3;
+                infile.read(reinterpret_cast<char *>(&n3), sizeof n3);
+                Astring0D astring0D;
+                for(int i3=0; i3!=n3; i3++)
+                {
+                    size_t ns1=0;
+                    infile.read(reinterpret_cast<char *>(&ns1), sizeof ns1);
+                    char* StrBuf = new char[ns1];
+                    for (int i = 0; i < ns1; i++)
+                    {
+                        char ch;
+                        infile.read(&ch, sizeof ch);
+                        StrBuf[i] = ch;
+                    }
+                    wxString var = wxString(StrBuf,ns1);
+                    astring0D.push_back(var);
+                }
+                astring1D.push_back(astring0D);
+            }
+            ArraysOf2DString.push_back(astring1D);
+        }
+        
+        infile.read(reinterpret_cast<char *>(&n), sizeof n);
+        ArraysOf3DString.clear();
+        
+        for(int i1=0; i1!=n; i1++)
+        {
+            int n2;
+            infile.read(reinterpret_cast<char *>(&n2), sizeof n2);
+            Astring2D astring2D;
+            for(int i2=0; i2!=n2; i2++)
+            {
+                int n3;
+                infile.read(reinterpret_cast<char *>(&n3), sizeof n3);
+                Astring1D astring1D;
+                for(int i3=0; i3!=n3; i3++)
+                {
+                    int n4;
+                    infile.read(reinterpret_cast<char *>(&n4), sizeof n4);
+                    Astring0D astring0D;
+                    for(int i4=0; i4!=n4; i4++)
+                    {
+                        size_t ns1=0;
+                        infile.read(reinterpret_cast<char *>(&ns1), sizeof ns1);
+                        char* StrBuf = new char[ns1];
+                        for (int i = 0; i < ns1; i++)
+                        {
+                            char ch;
+                            infile.read(&ch, sizeof ch);
+                            StrBuf[i] = ch;
+                        }
+                        wxString var = wxString(StrBuf,ns1);
+                        astring0D.push_back(var);
+                    }
+                    astring1D.push_back(astring0D);
+                }
+                astring2D.push_back(astring1D);
+            }
+            ArraysOf3DString.push_back(astring2D);
+        }
+        ///////////////////////////////////////////////////////////////
+        
+        infile.close();
+    }
+
+}
 
 wxString Sec30::GetAtomLable(int kind)
 {

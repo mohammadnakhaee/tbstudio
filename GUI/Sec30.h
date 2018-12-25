@@ -133,6 +133,12 @@ public:
     myGrid* GetGridObject(wxString VariableName);
     sec30TextCtrl* GetTextCtrlObject(wxString VariableName);
     
+    void SaveToFile(wxString filepath, wxString filename);
+    void LoadFromFile(wxString filepath, wxString filename);
+    void SendUpdateEvent(wxString info, int MyID = 1);
+    wxString GetAtomLable(int kind);
+    int GetAtomLable(wxString Lable);
+    wxColor GetAtomColor(int kind);
     wxColor GetBondColor(int kind);
     void GetUnitcellInfo(const wxString& unitcelltextvar, int& l, int& m, int& n);
     void GetBondInfo(const wxString& bondtextvar, int& i, int& n, int& j, int& m, int& bondtype);

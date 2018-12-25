@@ -30,6 +30,18 @@ void myGrid::OnCopy(wxCommandEvent &event)
     Copy(false, false);
 }
 
+void myGrid::OnCut(wxCommandEvent &event)
+{
+    Copy(false, true);
+    UpdateGrid();
+}
+
+void myGrid::OnDelete(wxCommandEvent &event)
+{
+    Copy(true, true);
+    UpdateGrid();
+}
+
 void myGrid::Copy(bool OnlyDelete, bool cut)
 {
     const wxChar* NEWLINE_CHAR = wxTextFile::GetEOL();
