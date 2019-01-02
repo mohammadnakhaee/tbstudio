@@ -22,6 +22,8 @@ public:
     
 protected:
     virtual void Btn_Export_XYZ_OnClick(wxCommandEvent& event);
+    virtual void Btn_Import_XYZ_OnClick(wxCommandEvent& event);
+    void ExportToXYZ(wxString filepath, wxString filename);
 };
 #endif // STRUCTURECLASS_H
 

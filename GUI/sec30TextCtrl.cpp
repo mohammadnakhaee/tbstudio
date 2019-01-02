@@ -14,7 +14,7 @@ sec30TextCtrl::~sec30TextCtrl()
 {
 }
 
-
+/*
 void sec30TextCtrl::SendUpdateEvent()
 {
     wxCommandEvent* event = new wxCommandEvent(Sec30EVT_sec30TextCtrl_Updated);
@@ -23,3 +23,18 @@ void sec30TextCtrl::SendUpdateEvent()
     wxQueueEvent(this,event);
 }
 
+void sec30TextCtrl::OnCellChanged(wxGridEvent &event)
+{
+    SendUpdateEvent();
+}
+
+void sec30TextCtrl::myOnKeyDown(wxKeyEvent &event)
+{
+    switch (event.GetKeyCode())
+    {
+        case WXK_TAB:
+        case WXK_RETURN:
+            SendUpdateEvent();
+    }
+}
+*/
