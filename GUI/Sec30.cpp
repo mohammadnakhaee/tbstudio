@@ -19,17 +19,6 @@ Sec30::~Sec30()
 {
 }
 
-void Sec30::AddGroupBox(wxWindow *parent, wxString Caption, wxColour BGColor)
-{
-    wxPanel* p = new wxPanel(parent, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    p->SetBackgroundColour(BGColor);
-    parent->GetSizer()->Add(p, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
-    wxBoxSizer* vsizer = new wxBoxSizer(wxVERTICAL);
-    p->SetSizer(vsizer);
-    wxStaticText* st = new wxStaticText(p, wxID_ANY, Caption, wxDefaultPosition, wxDLG_UNIT(p, wxSize(-1,-1)), 0);
-    vsizer->Add(st, 0, wxLEFT, WXC_FROM_DIP(5));
-}
-
 void Sec30::AddButton(wxWindow *parent, int ButtonCnt, wxString* Labels, wxObjectEventFunction* Funcs)
 {
     wxBoxSizer* MySizer = new wxBoxSizer(wxHORIZONTAL);
@@ -445,30 +434,6 @@ void Sec30::SendUpdateEvent(wxString info, int MyID)
     wxQueueEvent(this,event);
 }
 
-void Sec30::SetVar(wxString VariableName, double Value, bool FireEvent)
-{
-    wxString val = wxString::Format(wxT("%1f"), Value);
-    sec30TextCtrl* ctr = (sec30TextCtrl*)FindWindowByName(VariableName,GetParent());
-    ctr->SetCellValue(0,0,val);
-    if (FireEvent)
-    {
-        wxString name = ctr->GetParent()->GetName();
-        SendUpdateEvent(name);
-    }
-}
-
-void Sec30::SetVar(wxString VariableName, int Value, bool FireEvent)
-{
-    wxString val = wxString::Format(wxT("%d"), Value);
-    sec30TextCtrl* ctr = (sec30TextCtrl*)FindWindowByName(VariableName,GetParent());
-    ctr->SetCellValue(0,0,val);
-    if (FireEvent)
-    {
-        wxString name = ctr->GetParent()->GetName();
-        SendUpdateEvent(name);
-    }
-}
-
 void Sec30::SetVar(wxString VariableName, bool Value, bool FireEvent)
 {
     int b = 0;
@@ -800,6 +765,7 @@ void Sec30::SaveToFile(wxString filepath, wxString filename)
             wxString itemname;
             wxString diritemname;
             int itemstate;
+            //int itemData;
             
             std::stack<wxTreeItemId> items;
             wxTreeItemId rootID = ctr->GetRootItem();
@@ -813,6 +779,10 @@ void Sec30::SaveToFile(wxString filepath, wxString filename)
                 
                 itemstate = ctr->GetItemState(rootID);
                 out.write((char *) &itemstate, sizeof itemstate);
+                
+                //CheckTreeItemData* data = (CheckTreeItemData*)ctr->GetItemData(rootID);
+                //itemData = data->Index;
+                //out.write((char *) &itemData, sizeof itemData);
             }
             
             while (!items.empty())
@@ -838,7 +808,11 @@ void Sec30::SaveToFile(wxString filepath, wxString filename)
                     
                     itemstate = ctr->GetItemState(nextChild);
                     out.write((char *) &itemstate, sizeof itemstate);
-        
+                    
+                    //CheckTreeItemData* data = (CheckTreeItemData*)ctr->GetItemData(nextChild);
+                    //itemData = data->Index;
+                    //out.write((char *) &itemData, sizeof itemData);
+                
                     nextChild = ctr->GetNextSibling(nextChild);
                 }
             }
@@ -1337,6 +1311,7 @@ void Sec30::LoadFromFile(wxString filepath, wxString filename)
             wxString itemname;
             wxString diritemname;
             int itemstate;
+            //int itemData;
             wxTreeItemId rootID;
             
             if (nItems>0)
@@ -1352,8 +1327,14 @@ void Sec30::LoadFromFile(wxString filepath, wxString filename)
                 }
                 itemname = wxString(itemnameBuf,ns1);
                 rootID=ctr->AddRoot(itemname);
+                
                 infile.read(reinterpret_cast<char *>(&itemstate), sizeof itemstate);
                 ctr->SetItemState(rootID,itemstate);
+                
+                //infile.read(reinterpret_cast<char *>(&itemData), sizeof itemData);
+                //CheckTreeItemData data;
+                //data.Index = itemData;
+                //ctr->SetItemData(rootID, &data);
             }
             
             for (int ii=1; ii<nItems; ii++)
@@ -1387,7 +1368,12 @@ void Sec30::LoadFromFile(wxString filepath, wxString filename)
                 bool mychecked=true;
                 if (itemstate < 0) mystate = false;
                 if (itemstate == 0) mychecked = false;
-                ctr->tree_add(parID, itemname, mystate, mychecked);
+                wxTreeItemId TheNewOneID = ctr->tree_add(parID, itemname, mystate, mychecked);
+                
+                //infile.read(reinterpret_cast<char *>(&itemData), sizeof itemData);
+                //CheckTreeItemData data;
+                //data.Index = itemData;
+                //ctr->SetItemData(TheNewOneID, &data);
             }
             ctr->Expand(rootID);
         }
@@ -2347,10 +2333,16 @@ void Sec30::GetBondInfo(const wxString& bondtextvar, int& i, int& n, int& j, int
     bondtype=b0;
 }
 
+GetBondSK(int bondtype, Adouble0D &BondSK)
+{
+    
+}
+
 void Sec30::GetOrbitalInfo(wxCheckTree* orbsTree, wxString AtomName, int ShellNumber, wxString &Orbs, int &nOrbs, bool &IsShell)
 {
     wxTreeItemId rootID = orbsTree->GetRootItem();
     wxTreeItemId atomID = orbsTree->FindItemIn(rootID,AtomName);
+    if (atomID.IsOk()) orbsTree->SetItemState(atomID, wxCheckTree::CHECKED);
     wxString ShellName = wxString::Format(wxT("Shell %d"),ShellNumber);
     wxTreeItemId shellID = orbsTree->FindItemIn(atomID,ShellName);
     nOrbs=0;
@@ -2359,11 +2351,12 @@ void Sec30::GetOrbitalInfo(wxCheckTree* orbsTree, wxString AtomName, int ShellNu
     if (shellID.IsOk())
     {
         IsShell = true;
+        orbsTree->SetItemState(shellID, wxCheckTree::CHECKED);
         wxTreeItemIdValue cookie;
         wxTreeItemId child = orbsTree->GetFirstChild(shellID, cookie);
         while( child.IsOk() )
         {
-            if (orbsTree->GetItemState(child) >= 4)
+            if (orbsTree->GetItemState(child) >= wxCheckTree::CHECKED)
             {
                 nOrbs++;
                 if (nOrbs != 1) Orbs = Orbs + _(", ");
@@ -2455,17 +2448,27 @@ wxString Sec30::CreateFilePath(wxString Path,wxString FileName)
     return file;
 }
 
+double Sec30::norm(double a[3])
+{
+    double r;
+    r = 0.0;
+    for (int i=0;i<3;i++)
+    {
+        r += a[i]*a[i];
+    }
+    return sqrt(r);  
+}
+
 double Sec30::norm(double a[3], double b[3])
 {
-  int i;
-  double r,v[3];
-  
-  r = 0.0;
-  for (i=0;i<3;i++) {
-    v[i] = b[i]-a[i];
-    r += v[i]*v[i];
-  }
-  return sqrt(r);
+    double r,v[3];
+    r = 0.0;
+    for (int i=0;i<3;i++)
+    {
+        v[i] = b[i]-a[i];
+        r += v[i]*v[i];
+    }
+    return sqrt(r);
 }
 
 void Sec30::vk_rtv(double vk[3], double rtv[3][3], double v[3])
@@ -2479,6 +2482,140 @@ void Sec30::vk_rtv(double vk[3], double rtv[3][3], double v[3])
     }
   }
 }
+
+void Sec30::GetDirectionalCosines(double x1, double y1, double z1, double x2, double y2, double z2, double &l, double &m, double &n)
+{
+    double R[3];
+    R[0] = x2 - x1;
+    R[1] = y2 - y1;
+    R[2] = z2 - z1;
+    
+    double d = norm(R);
+    if (d <= 0.0000001)
+    {
+        l = 0;
+        m = 0;
+        n = 0;
+    }
+    else
+    {
+        l = R[0]/d;
+        m = R[1]/d;
+        n = R[2]/d;
+    }
+}
+
+double Sec30::Hopspd(Adouble0D BondSK, double l, double m, double n, wxString o1, wxString o2)
+{
+    Hopspd(BondSK[0], BondSK[1], BondSK[2], BondSK[3], BondSK[4], BondSK[5], BondSK[6], BondSK[7], BondSK[8], BondSK[9], l, m, n, o1, o2);
+}
+
+double Sec30::Hopspd(double sss, double sps, double sds, double pps, double ppp,
+            double pds, double pdp, double dds, double ddp, double ddd,
+            double l, double m, double n, wxString o1, wxString o2)
+{
+    double out = 0.0;
+    
+    wxString element = o1 + _(":") + o2;
+    double nn=n;
+    if (nn>0.9999)
+    {
+        nn=0.9999;
+    }
+    else if (nn<-0.9999)
+    {
+        nn=-0.9999;
+    }
+    
+    if (element == _("s:s")) out = sss;
+    else if (element == _("s:p_y")) out = sps*m;
+    else if (element == _("p_y:s")) out = (-sps)*m;
+    else if (element == _("s:p_z")) out = sps*nn;
+    else if (element == _("p_z:s")) out = (-sps)*nn;
+    else if (element == _("s:p_x")) out = sps*l;
+    else if (element == _("p_x:s")) out = (-sps)*l;
+    else if (element == _("s:d_{xy}")) out = ((sqrt(3)*sds)*l)*m;
+    else if (element == _("d_{xy}:s")) out = ((sqrt(3)*sds)*l)*m;
+    else if (element == _("s:d_{yz}")) out = ((sqrt(3)*sds)*m)*nn;
+    else if (element == _("d_{yz}:s")) out = ((sqrt(3)*sds)*m)*nn;
+    else if (element == _("s:d_{3z^2-r^2}")) out = (sds/2)*(-1 + 3*nn*nn);
+    else if (element == _("d_{3z^2-r^2}:s")) out = (sds/2)*(-1 + 3*nn*nn);
+    else if (element == _("s:d_{xz}")) out = ((sqrt(3)*sds)*l)*nn;
+    else if (element == _("d_{xz}:s")) out = ((sqrt(3)*sds)*l)*nn;
+    else if (element == _("s:d_{x^2-y^2}")) out = ((-sqrt(3)/2)*sds)*(-1 + 2*m*m + nn*nn);
+    else if (element == _("d_{x^2-y^2}:s")) out = ((-sqrt(3)/2)*sds)*(-1 + 2*m*m + nn*nn);
+    else if (element == _("p_y:p_y")) out = ppp - ppp*m*m + pps*m*m;
+    else if (element == _("p_y:p_z")) out = ((-ppp + pps)*m)*nn;
+    else if (element == _("p_z:p_y")) out = ((-ppp + pps)*m)*nn;
+    else if (element == _("p_y:p_x")) out = ((-ppp + pps)*l)*m;
+    else if (element == _("p_x:p_y")) out = ((-ppp + pps)*l)*m;
+    else if (element == _("p_y:d_{xy}")) out = l*(pdp - (2*pdp)*m*m + (sqrt(3)*pds)*m*m);
+    else if (element == _("d_{xy}:p_y")) out = (-l)*(pdp - (2*pdp)*m*m + (sqrt(3)*pds)*m*m);
+    else if (element == _("p_y:d_{yz}")) out = (pdp - (2*pdp)*m*m + (sqrt(3)*pds)*m*m)*nn;
+    else if (element == _("d_{yz}:p_y")) out = (-(pdp - (2*pdp)*m*m + (sqrt(3)*pds)*m*m))*nn;
+    else if (element == _("p_y:d_{3z^2-r^2}")) out = (-m/2)*(pds + ((2*sqrt(3))*pdp)*nn*nn - (3*pds)*nn*nn);
+    else if (element == _("d_{3z^2-r^2}:p_y")) out = (m/2)*(pds + ((2*sqrt(3))*pdp)*nn*nn - (3*pds)*nn*nn);
+    else if (element == _("p_y:d_{xz}")) out = (((-2*pdp + sqrt(3)*pds)*l)*m)*nn;
+    else if (element == _("d_{xz}:p_y")) out = (((2*pdp - sqrt(3)*pds)*l)*m)*nn;
+    else if (element == _("p_y:d_{x^2-y^2}")) out = (pdp*m)*(-2 + 2*m*m + nn*nn) + (((-sqrt(3)/2)*pds)*m)*(-1 + 2*m*m + nn*nn);
+    else if (element == _("d_{x^2-y^2}:p_y")) out = ((-pdp)*m)*(-2 + 2*m*m + nn*nn) + (((sqrt(3)/2)*pds)*m)*(-1 + 2*m*m + nn*nn);
+    else if (element == _("p_z:p_z")) out = ppp - ppp*nn*nn + pps*nn*nn;
+    else if (element == _("p_z:p_x")) out = ((-ppp + pps)*l)*nn;
+    else if (element == _("p_x:p_z")) out = ((-ppp + pps)*l)*nn;
+    else if (element == _("p_z:d_{xy}")) out = (((-2*pdp + sqrt(3)*pds)*l)*m)*nn;
+    else if (element == _("d_{xy}:p_z")) out = (((2*pdp - sqrt(3)*pds)*l)*m)*nn;
+    else if (element == _("p_z:d_{yz}")) out = m*(pdp - (2*pdp)*nn*nn + (sqrt(3)*pds)*nn*nn);
+    else if (element == _("d_{yz}:p_z")) out = (-m)*(pdp - (2*pdp)*nn*nn + (sqrt(3)*pds)*nn*nn);
+    else if (element == _("p_z:d_{3z^2-r^2}")) out = ((pds/2)*nn)*(-1 + 3*nn*nn) + (sqrt(3)*pdp)*(nn - pow(nn,3.0));
+    else if (element == _("d_{3z^2-r^2}:p_z")) out = ((sqrt(3)*pdp)*nn)*(-1 + nn*nn) + (pds/2)*(nn - 3*pow(nn,3.0));
+    else if (element == _("p_z:d_{xz}")) out = l*(pdp - (2*pdp)*nn*nn + (sqrt(3)*pds)*nn*nn);
+    else if (element == _("d_{xz}:p_z")) out = (-l)*(pdp - (2*pdp)*nn*nn + (sqrt(3)*pds)*nn*nn);
+    else if (element == _("p_z:d_{x^2-y^2}")) out = (((2*pdp - sqrt(3)*pds)/2)*nn)*(-1 + 2*m*m + nn*nn);
+    else if (element == _("d_{x^2-y^2}:p_z")) out = ((-(2*pdp - sqrt(3)*pds)/2)*nn)*(-1 + 2*m*m + nn*nn);
+    else if (element == _("p_x:p_x")) out = (-pps)*(-1 + m*m + nn*nn) + ppp*(m*m + nn*nn);
+    else if (element == _("p_x:d_{xy}")) out = m*(((-sqrt(3))*pds)*(-1 + m*m + nn*nn) + pdp*(-1 + 2*m*m + 2*nn*nn));
+    else if (element == _("d_{xy}:p_x")) out = ((sqrt(3)*pds)*m)*(-1 + m*m + nn*nn) + pdp*(m - 2*pow(m,3.0) - (2*m)*nn*nn);
+    else if (element == _("p_x:d_{yz}")) out = (((-2*pdp + sqrt(3)*pds)*l)*m)*nn;
+    else if (element == _("d_{yz}:p_x")) out = (((2*pdp - sqrt(3)*pds)*l)*m)*nn;
+    else if (element == _("p_x:d_{3z^2-r^2}")) out = (-l/2)*(pds + ((2*sqrt(3))*pdp)*nn*nn - (3*pds)*nn*nn);
+    else if (element == _("d_{3z^2-r^2}:p_x")) out = (l/2)*(pds + ((2*sqrt(3))*pdp)*nn*nn - (3*pds)*nn*nn);
+    else if (element == _("p_x:d_{xz}")) out = nn*(pdp + (2*pdp)*(-1 + m*m + nn*nn) - (sqrt(3)*pds)*(-1 + m*m + nn*nn));
+    else if (element == _("d_{xz}:p_x")) out = (-nn)*(pdp + (2*pdp)*(-1 + m*m + nn*nn) - (sqrt(3)*pds)*(-1 + m*m + nn*nn));
+    else if (element == _("p_x:d_{x^2-y^2}")) out = (((-sqrt(3)/2)*pds)*l)*(-1 + 2*m*m + nn*nn) + (pdp*l)*(2*m*m + nn*nn);
+    else if (element == _("d_{x^2-y^2}:p_x")) out = (((sqrt(3)/2)*pds)*l)*(-1 + 2*m*m + nn*nn) - (pdp*l)*(2*m*m + nn*nn);
+    else if (element == _("d_{xy}:d_{xy}")) out = ddp - ddp*nn*nn + ((4*ddp)*m*m)*(-1 + m*m + nn*nn) - ((3*dds)*m*m)*(-1 + m*m + nn*nn) - (ddd*(-1 + m*m))*(m*m + nn*nn);
+    else if (element == _("d_{xy}:d_{yz}")) out = (l*(-ddd + ddp + (ddd - 4*ddp + 3*dds)*m*m))*nn;
+    else if (element == _("d_{yz}:d_{xy}")) out = (l*(-ddd + ddp + (ddd - 4*ddp + 3*dds)*m*m))*nn;
+    else if (element == _("d_{xy}:d_{3z^2-r^2}")) out = (((sqrt(3)/2)*l)*m)*(ddd - dds + (ddd - 4*ddp + 3*dds)*nn*nn);
+    else if (element == _("d_{3z^2-r^2}:d_{xy}")) out = (((sqrt(3)/2)*l)*m)*(ddd - dds + (ddd - 4*ddp + 3*dds)*nn*nn);
+    else if (element == _("d_{xy}:d_{xz}")) out = ((-m)*nn)*(ddp*(3 - 4*m*m - 4*nn*nn) + (3*dds)*(-1 + m*m + nn*nn) + ddd*(m*m + nn*nn));
+    else if (element == _("d_{xz}:d_{xy}")) out = ((-m)*nn)*(ddp*(3 - 4*m*m - 4*nn*nn) + (3*dds)*(-1 + m*m + nn*nn) + ddd*(m*m + nn*nn));
+    else if (element == _("d_{xy}:d_{x^2-y^2}")) out = (((-(ddd - 4*ddp + 3*dds)/2)*l)*m)*(-1 + 2*m*m + nn*nn);
+    else if (element == _("d_{x^2-y^2}:d_{xy}")) out = (((-(ddd - 4*ddp + 3*dds)/2)*l)*m)*(-1 + 2*m*m + nn*nn);
+    else if (element == _("d_{yz}:d_{yz}")) out = ddp*m*m + (ddp - (4*ddp)*m*m + (3*dds)*m*m)*nn*nn + (ddd*(-1 + m*m))*(-1 + nn*nn);
+    else if (element == _("d_{yz}:d_{3z^2-r^2}")) out = (((sqrt(3)/2)*m)*nn)*(-ddd + 2*ddp - dds + (ddd - 4*ddp + 3*dds)*nn*nn);
+    else if (element == _("d_{3z^2-r^2}:d_{yz}")) out = (((sqrt(3)/2)*m)*nn)*(-ddd + 2*ddp - dds + (ddd - 4*ddp + 3*dds)*nn*nn);
+    else if (element == _("d_{yz}:d_{xz}")) out = (l*m)*(-ddd + ddp + (ddd - 4*ddp + 3*dds)*nn*nn);
+    else if (element == _("d_{xz}:d_{yz}")) out = (l*m)*(-ddd + ddp + (ddd - 4*ddp + 3*dds)*nn*nn);
+    else if (element == _("d_{yz}:d_{x^2-y^2}")) out = ((m/2)*nn)*((-3*dds)*(-1 + 2*m*m + nn*nn) + ddp*(-6 + 8*m*m + 4*nn*nn) + (ddd/(-1 + nn*nn))*(-4 + l*l + 3*m*m + (4 + l*l - m*m)*nn*nn));
+    else if (element == _("d_{x^2-y^2}:d_{yz}")) out = ((m/2)*nn)*((-3*dds)*(-1 + 2*m*m + nn*nn) + ddp*(-6 + 8*m*m + 4*nn*nn) + (ddd/(-1 + nn*nn))*(-4 + l*l + 3*m*m + (4 + l*l - m*m)*nn*nn));
+    else if (element == _("d_{3z^2-r^2}:d_{3z^2-r^2}")) out = (3*ddd + dds - (6*(ddd - 2*ddp + dds))*nn*nn + (3*(ddd - 4*ddp + 3*dds))*pow(nn,4.0))/4;
+    else if (element == _("d_{3z^2-r^2}:d_{xz}")) out = (((sqrt(3)/2)*l)*nn)*(-ddd + 2*ddp - dds + (ddd - 4*ddp + 3*dds)*nn*nn);
+    else if (element == _("d_{xz}:d_{3z^2-r^2}")) out = (((sqrt(3)/2)*l)*nn)*(-ddd + 2*ddp - dds + (ddd - 4*ddp + 3*dds)*nn*nn);
+    else if (element == _("d_{3z^2-r^2}:d_{x^2-y^2}")) out = ((-sqrt(3)/4)*(-1 + 2*m*m + nn*nn))* (ddd - dds + (ddd - 4*ddp + 3*dds)*nn*nn);
+    else if (element == _("d_{x^2-y^2}:d_{3z^2-r^2}")) out = ((-sqrt(3)/4)*(-1 + 2*m*m + nn*nn))* (ddd - dds + (ddd - 4*ddp + 3*dds)*nn*nn);
+    else if (element == _("d_{xz}:d_{xz}")) out = ddp + ddd*m*m - ddp*m*m - ((ddd - 4*ddp + 3*dds)*(-1 + m*m))*nn*nn - (ddd - 4*ddp + 3*dds)*pow(nn,4.0);
+    else if (element == _("d_{xz}:d_{x^2-y^2}")) out = ((-l/2)*nn)*(2*ddp - 3*dds - (4*ddp - 3*dds)*(2*m*m + nn*nn) + ddd*(1 + 2*m*m + nn*nn));
+    else if (element == _("d_{x^2-y^2}:d_{xz}")) out = ((-l/2)*nn)*(2*ddp - 3*dds - (4*ddp - 3*dds)*(2*m*m + nn*nn) + ddd*(1 + 2*m*m + nn*nn));
+    else if (element == _("d_{x^2-y^2}:d_{x^2-y^2}")) out = (4*ddp)*m*m + ddd*pow(m,4.0) + ddp*nn*nn + (ddd*m*m)*(-1 + nn*nn) + (ddd/4)*pow(1 + nn*nn,2.0) + ((3*dds)/4)*pow(-1 + 2*m*m + nn*nn,2.0) - ddp*pow(2*m*m + nn*nn,2.0);
+
+    return out;
+}
+
+
+
+
+
 
 /*
 void Sec30::SetVecValue(wxWindow *parent, wxString VariableName, double* Array, int nArray)

@@ -20,6 +20,7 @@ SKClass::SKClass(wxWindow* parent, Sec30* sec30var, wxWindowID id, const wxPoint
     /**********************************************************************************************************************************************/
     sec30->AddGroupBox(this, _("Setup the Parameter Vector"),wxColour(wxT("rgb(153,180,209)")));
     sec30->AddCheckBox(this, _("SOC"), _("Take SOC into Accounts"));
+    sec30->AddCheckBox(this, _("Overlap"), _("Non-Orthogonal Basis"));
     wxString Labels1[1] = {_("Update")};
     wxObjectEventFunction Funcs1[1] = {wxCommandEventHandler(SKClass::Btn_Update_OnClick)};
     sec30->AddButton(this, 1, Labels1, Funcs1);

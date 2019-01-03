@@ -1,5 +1,11 @@
 #include "SetupClass.h"
 
+/* Parameters */
+#define N 4
+#define NRHS 2
+#define LDA N
+#define LDB NRHS
+
 SetupClass::SetupClass(wxWindow* parent, Sec30* sec30var, wxWindowID id, const wxPoint& pos, const wxSize& size, long style)
     : wxPanel(parent, id, pos, size, style)
 {
@@ -14,14 +20,6 @@ SetupClass::SetupClass(wxWindow* parent, Sec30* sec30var, wxWindowID id, const w
     /**********************************************************************************************************************************************/
     sec30->AddGroupBox(this,_("DFT Band-Structure"),wxColour(wxT("rgb(153,180,209)")));
     sec30->AddVarVector(this, 1, _("DFTPath"), _("string"), _("File DIR"), 60, 270,false,false);
-    sec30->SetVar(_("DFTPath[0]"), _(""), false);
-    sec30->AddVarVector(this, 1, _("DFTFile"), _("string"), _("File Name"), 60, 270,false,false);
-    sec30->SetVar(_("DFTFile[0]"), _(""), false);
-    wxComboBox* choicectr = sec30->AddComboCtrl(this, _("BandFileFormat"), _("Format"), 60, 270, false);
-    choicectr->Append(_("OpenMX Band-Structure"));
-    choicectr->Append(_("Vasp XML Output"));
-    choicectr->SetEditable(false);
-    choicectr->SetBackgroundColour(*wxWHITE);
     choicectr->Select(2);
     wxString Labels1[2] = {_("Open File"), _("Reload")};
     wxObjectEventFunction Funcs1[2] = { wxCommandEventHandler(SetupClass::Btn_OpenFile_OnClick), wxCommandEventHandler(SetupClass::Btn_Reload_OnClick)};
@@ -52,6 +50,9 @@ SetupClass::SetupClass(wxWindow* parent, Sec30* sec30var, wxWindowID id, const w
     wxString Labels3[1] = {_("Select")};
     wxObjectEventFunction Funcs3[1] = { wxCommandEventHandler(SetupClass::Btn_Select_OnClick)};
     sec30->AddButton(this, 1, Labels3, Funcs3);
+    wxString Labels4[1] = {_("Test")};
+    wxObjectEventFunction Funcs4[1] = { wxCommandEventHandler(SetupClass::Btn_Test_OnClick)};
+    sec30->AddButton(this, 1, Labels4, Funcs4);
     /**********************************************************************************************************************************************/
     sec30->AddGroupBox(this,_(""),wxColour(wxT("rgb(153,180,209)")));
     /**********************************************************************************************************************************************/
@@ -245,6 +246,30 @@ void SetupClass::Btn_Select_OnClick(wxCommandEvent& event)
     }
     
     sec30->SendUpdateEvent(this->GetName(),0);
+}
+
+void SetupClass::Btn_Test_OnClick(wxCommandEvent& event)
+{
+    wxMessageBox(_("LapackE Example."),_("debug"));
+    lapack_int n = N, nrhs = NRHS, lda = LDA, ldb = LDB, info;
+        /* Local arrays */
+        lapack_int ipiv[N];
+        lapack_complex_double a[LDA*N] = {
+           { 1.23, -5.50}, { 7.91, -5.38}, {-9.80, -4.86}, {-7.32,  7.57},
+           {-2.14, -1.12}, {-9.92, -0.79}, {-9.18, -1.12}, { 1.37,  0.43},
+           {-4.30, -7.10}, {-6.47,  2.52}, {-6.51, -2.67}, {-5.86,  7.38},
+           { 1.27,  7.29}, { 8.90,  6.92}, {-8.82,  1.25}, { 5.41,  5.37}
+        };
+        lapack_complex_double b[LDB*N] = {
+           { 8.33, -7.32}, {-6.11, -3.81},
+           {-6.18, -4.80}, { 0.14, -7.71},
+           {-5.71, -2.80}, { 1.41,  3.40},
+           {-1.60,  3.08}, { 8.54, -4.05}
+        };
+        
+        info = LAPACKE_zgesv( LAPACK_ROW_MAJOR, n, nrhs, a, lda, ipiv, b, ldb );
+        
+    wxMessageBox(wxString::Format("%d",info),_("debug"));
 }
 
 void SetupClass::LoadOpenMXBand(wxString file, bool &isBandLoaded, int &maxneig, int &mspin, double &ChemP, int &nKp, Adouble1D &KPoints, Adouble1D &EigVal, Adouble0D &dkLabel, Astring0D &kLabel)

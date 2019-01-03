@@ -68,7 +68,7 @@ UnitcellClass::UnitcellClass(wxWindow* parent, Sec30* sec30var, wxWindowID id, c
     sec30->SetVar(_("c[1]"),0.0, false);
     sec30->SetVar(_("c[2]"),1.0, false);
     /**********************************************************************************************************************************************/
-    sec30->AddGroupBox(this,_("Atom species and Fractional Coordinates"),wxColour(wxT("rgb(153,180,209)")));
+    sec30->AddGroupBox(this,_("Atom Species and Fractional Coordinates"),wxColour(wxT("rgb(153,180,209)")));
     wxString ColNames[4] = { _("Kind"), _("a"), _("b"), _("c")};
     wxString ColTypes[4] = { _("int"), _("double"), _("double"), _("double")};
     int ColSizes[4] = { 50, 82, 82, 82};

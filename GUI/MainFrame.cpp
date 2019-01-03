@@ -619,7 +619,7 @@ void MainFrame::InitializeSec30Arrays()
     int nArraysOf0DDouble = 9;
     int nArraysOf0DInt = 7;
     int nArraysOf1DDouble = 1;
-    int nArraysOf1DString = 1;
+    int nArraysOf1DString = 2;
     int nArraysOf2DDouble = 2;
     sec30->ArraysOf0DDouble.clear();
     sec30->ArraysOf0DInt.clear();
@@ -657,6 +657,7 @@ void MainFrame::InitializeSec30Arrays()
     
     /////////////////////////////1D String///////////////////////////////////////////////////////
     sec30->ArraysOf1DString[0] = Astring0D();//wxString* kLabel;
+    sec30->ArraysOf1DString[1] = Astring0D();//wxString* HamiltonianMap;
     
     /////////////////////////////2D Double///////////////////////////////////////////////////////
     sec30->ArraysOf2DDouble[0] = Adouble1D();//double** KPoints; [ka,kb,kc,kx,ky,kz,d_path]
@@ -1462,17 +1463,35 @@ bool MainFrame::ValidateSKPanel()
     sb2a2 = sec30->GetAtomLable(b2a2);*/
                         
                         
-    wxComboBox* bondtypes = sec30->GetComboObject(_("AtomLabel"));
+    wxComboBox* bondtypes = sec30->GetComboObject(_("BondLabel"));
     wxCheckTree* bonds = sec30->GetTreeObject(_("Bonds"));
     wxCheckTree* orbs = sec30->GetTreeObject(_("Orbitals"));
-    int nBondType = bondtypes->GetCount();
     
+    wxListBox* TBlistctr = sec30->GetListObject(_("AtomSpeciesList"));
+    int TBnspec = TBlistctr->GetCount();
+    wxTreeItemId orbsrootID = orbs->GetRootItem();
+    
+    for(int j=0; j<TBnspec; j++)
+    {
+        wxString TBAtomName = TBlistctr->GetString(j);
+        wxTreeItemId orbsatomID = orbs->FindItemIn(orbsrootID,TBAtomName);
+        orbs->SetItemState(orbsatomID, wxCheckTree::UNCHECKED);
+        wxTreeItemIdValue cookie;
+        wxTreeItemId nextChild = orbs->GetFirstChild(orbsatomID, cookie);
+        while (nextChild.IsOk())
+        {
+            orbs->SetItemState(nextChild, wxCheckTree::UNCHECKED);
+            nextChild = orbs->GetNextSibling(nextChild);
+        }
+    }
+    
+    int nBondType = bondtypes->GetCount();
     int nBonds = 0;
     for (int BondTypeIndex = 1; BondTypeIndex <= nBondType; BondTypeIndex++)
     {
         wxString bondinfotest = wxString::Format(wxT("Bond %d"), BondTypeIndex);
         wxTreeItemId rootID = bonds->GetRootItem();
-        wxTreeItemId FirstID = bonds->ContainsItemIn(rootID,bondinfotest);
+        wxTreeItemId FirstID = bonds->ActiveAndContainsItemIn(rootID,bondinfotest);
         
         if (FirstID)
         {
@@ -1518,51 +1537,56 @@ bool MainFrame::ValidateSKPanel()
                     wxString BondInfo = bonds->GetItemText(nextChild);
                     if (!BondInfo.StartsWith("("))
                     {
-                        int iAtomIndex,nShellIndex,jAtomIndex,mShellIndex,bondtype;
-                        sec30->GetBondInfo(BondInfo, iAtomIndex,nShellIndex,jAtomIndex,mShellIndex,bondtype);
-                        
-                        if (bondtype == bondtype0)
+                        wxTreeItemId ParrentOfnextChild = bonds->GetItemParent(nextChild);
+                        if (bonds->GetItemState(nextChild) >= wxCheckTree::CHECKED && bonds->GetItemState(ParrentOfnextChild) >= wxCheckTree::CHECKED)
                         {
-                            wxString natom1 = wxString::Format(wxT("AtomInd%d"),iAtomIndex + 1);
-                            wxComboBox* ncomb1 = sec30->GetComboObject(natom1);
-                            wxString nTBAtom1 = ncomb1->GetStringSelection();
-                            int nDim1 = -1;
-                            bool IsShell;
-                            wxString nOrbs1;
-                            if (nTBAtom1 != _("Not set")) sec30->GetOrbitalInfo(orbs, nTBAtom1, nShellIndex, nOrbs1, nDim1, IsShell);
-                            if (!IsShell) logfile->AppendText(wxString::Format(wxT("Shell %d"),nShellIndex) + _(" has not been defined for the TB atom ") + nTBAtom1 + _(".\n"));
-                            wxString natom2 = wxString::Format(wxT("AtomInd%d"), jAtomIndex + 1);
-                            wxComboBox* ncomb2 = sec30->GetComboObject(natom2);
-                            wxString nTBAtom2 = ncomb2->GetStringSelection();
-                            int nDim2 = -1;
-                            wxString nOrbs2;
-                            if (nTBAtom2 != _("Not set")) sec30->GetOrbitalInfo(orbs, nTBAtom2, mShellIndex, nOrbs2, nDim2, IsShell);
-                            if (!IsShell) logfile->AppendText(wxString::Format(wxT("Shell %d"),mShellIndex) + _(" has not been defined for the TB atom ") + nTBAtom2 + _(".\n"));
+                            int iAtomIndex,nShellIndex,jAtomIndex,mShellIndex,bondtype;
+                            sec30->GetBondInfo(BondInfo, iAtomIndex,nShellIndex,jAtomIndex,mShellIndex,bondtype);
                             
-                            if (!(nOrbs1 == Orbs1 && nOrbs2 == Orbs2))
+                            if (bondtype == bondtype0)
                             {
-                                ErrorIndex++;
-                                if (ErrorIndex==1) {isValid = false; logfile->AppendText(_("\nError list:\n"));}
-                                logfile->AppendText(wxString::Format(wxT("Error %d: "),ErrorIndex) + _("There is a conflict between the defined bonds.\n"));
-                                logfile->AppendText(wxString::Format(wxT("          "),ErrorIndex) + _("First defined as ") + BondInfo0 + _(" between ") + Orbs1 + _(" and ") + Orbs2 + _("\n"));
-                                logfile->AppendText(wxString::Format(wxT("          "),ErrorIndex) + _("Here defined as ") + BondInfo + _(" between ") + nOrbs1 + _(" and ") + nOrbs2 + _("\n"));
-                            }
-                            
-                            if (nDim1 == 0 || nDim2 == 0)
-                            {
-                                ErrorIndex++;
-                                if (ErrorIndex==1) {isValid = false;logfile->AppendText(_("\nError list:\n"));}
-                                logfile->AppendText(wxString::Format(wxT("Error %d: "),ErrorIndex) + _("The bond has an empty shell.\n"));
-                                logfile->AppendText(wxString::Format(wxT("          "),ErrorIndex) + _("Defined as ") + BondInfo + _(" between ") + nOrbs1 + _(" and ") + nOrbs2 + _("\n"));
-                            }
-                            
-                            if (!((TBAtom1 == nTBAtom1 && TBAtom2 == nTBAtom2) || (TBAtom1 == nTBAtom2 && TBAtom2 == nTBAtom1)))
-                            {
-                                WarningIndex++;
-                                if (WarningIndex==1) {logfile->AppendText(_("\nWarning list:\n"));}
-                                logfile->AppendText(wxString::Format(wxT("Warning %d: "),WarningIndex) + bondinfotest + _(" has been defined for different pair of atoms. It may cause wrong results.\n"));
-                                logfile->AppendText(wxString::Format(wxT("            "),WarningIndex) + _("First defined as ") + BondInfo0 + _(" between ") + TBAtom1 + _(" and ") + TBAtom2 + _("\n"));
-                                logfile->AppendText(wxString::Format(wxT("            "),WarningIndex) + _("Here defined as ") + BondInfo + _(" between ") + nTBAtom1 + _(" and ") + nTBAtom2 + _("\n"));
+                                wxString natom1 = wxString::Format(wxT("AtomInd%d"),iAtomIndex + 1);
+                                wxComboBox* ncomb1 = sec30->GetComboObject(natom1);
+                                wxString nTBAtom1 = ncomb1->GetStringSelection();
+                                int nDim1 = -1;
+                                bool IsShell;
+                                wxString nOrbs1;
+                                if (nTBAtom1 != _("Not set")) sec30->GetOrbitalInfo(orbs, nTBAtom1, nShellIndex, nOrbs1, nDim1, IsShell);
+                                if (!IsShell) logfile->AppendText(wxString::Format(wxT("Shell %d"),nShellIndex) + _(" has not been defined for the TB atom ") + nTBAtom1 + _(".\n"));
+                                wxString natom2 = wxString::Format(wxT("AtomInd%d"), jAtomIndex + 1);
+                                wxComboBox* ncomb2 = sec30->GetComboObject(natom2);
+                                wxString nTBAtom2 = ncomb2->GetStringSelection();
+                                int nDim2 = -1;
+                                wxString nOrbs2;
+                                if (nTBAtom2 != _("Not set")) sec30->GetOrbitalInfo(orbs, nTBAtom2, mShellIndex, nOrbs2, nDim2, IsShell);
+                                if (!IsShell) logfile->AppendText(wxString::Format(wxT("Shell %d"),mShellIndex) + _(" has not been defined for the TB atom ") + nTBAtom2 + _(".\n"));
+                                
+                                
+                                
+                                if (nDim1 == 0 || nDim2 == 0)
+                                {
+                                    ErrorIndex++;
+                                    if (ErrorIndex==1) {isValid = false;logfile->AppendText(_("\nError list:\n"));}
+                                    logfile->AppendText(wxString::Format(wxT("Error %d: "),ErrorIndex) + _("The bond has an empty shell.\n"));
+                                    logfile->AppendText(wxString::Format(wxT("          "),ErrorIndex) + _("Defined as ") + BondInfo + _(" between ") + nOrbs1 + _(" and ") + nOrbs2 + _("\n"));
+                                }
+                                else if (!(nOrbs1 == Orbs1 && nOrbs2 == Orbs2))
+                                {
+                                    ErrorIndex++;
+                                    if (ErrorIndex==1) {isValid = false; logfile->AppendText(_("\nError list:\n"));}
+                                    logfile->AppendText(wxString::Format(wxT("Error %d: "),ErrorIndex) + _("There is a conflict between the defined bonds.\n"));
+                                    logfile->AppendText(wxString::Format(wxT("          "),ErrorIndex) + _("First defined as ") + BondInfo0 + _(" between ") + Orbs1 + _(" and ") + Orbs2 + _("\n"));
+                                    logfile->AppendText(wxString::Format(wxT("          "),ErrorIndex) + _("Here defined as ") + BondInfo + _(" between ") + nOrbs1 + _(" and ") + nOrbs2 + _("\n"));
+                                }
+                                
+                                if (!((TBAtom1 == nTBAtom1 && TBAtom2 == nTBAtom2) || (TBAtom1 == nTBAtom2 && TBAtom2 == nTBAtom1)))
+                                {
+                                    WarningIndex++;
+                                    if (WarningIndex==1) {logfile->AppendText(_("\nWarning list:\n"));}
+                                    logfile->AppendText(wxString::Format(wxT("Warning %d: "),WarningIndex) + bondinfotest + _(" has been defined for different pair of atoms. It may cause wrong results.\n"));
+                                    logfile->AppendText(wxString::Format(wxT("            "),WarningIndex) + _("First defined as ") + BondInfo0 + _(" between ") + TBAtom1 + _(" and ") + TBAtom2 + _("\n"));
+                                    logfile->AppendText(wxString::Format(wxT("            "),WarningIndex) + _("Here defined as ") + BondInfo + _(" between ") + nTBAtom1 + _(" and ") + nTBAtom2 + _("\n"));
+                                }
                             }
                         }
                     }
@@ -1639,7 +1663,7 @@ void MainFrame::UpdateSKList()
         gc->SetCellValue(TotalIndex, 1, _("0"));
     }
     
-    wxComboBox* comboctr = sec30->GetComboObject(_("AtomLabel"));
+    wxComboBox* comboctr = sec30->GetComboObject(_("BondLabel"));
     int nBondType = comboctr->GetCount();
     wxCheckTree* bonds = sec30->GetTreeObject(_("Bonds"));
     wxCheckTree* orbs = sec30->GetTreeObject(_("Orbitals"));
@@ -1712,6 +1736,9 @@ void MainFrame::UpdateSKList()
     logfile->AppendText(_("\nThe SK parameters list has been updated ...\n"));
     logfile->AppendText(wxString::Format(wxT("The total number of parameters: %d\n"),TotalNumberOfParameters));
     
+    Astring0D HamiltonianMap;
+    GetHamiltonianMap(orbs, HamiltonianMap);
+    sec30->ArraysOf1DString[1] = HamiltonianMap;
 }
 
 bool MainFrame::IsBondContainsParameter(wxString Orbs1, wxString Orbs2, wxString sk)
@@ -2139,4 +2166,298 @@ wxBitmap MainFrame::GetPng(const void* data, size_t length)
     wxImage image(memIStream, wxBITMAP_TYPE_PNG );
     wxBitmap bmp( image );
     return bmp;
+}
+
+void MainFrame::GetCellInfo(wxString cellStr, int &icell, int &jcell, int &kcell)
+{
+    wxString str = cellStr;
+    str.Replace(wxString("("), wxString(""));
+    str.Replace(wxString(")"), wxString(""));
+    
+    wxStringTokenizer tokenizer(str, ",");
+    long i0,j0,k0;
+    tokenizer.GetNextToken().ToLong(&i0);
+    tokenizer.GetNextToken().ToLong(&j0);
+    tokenizer.GetNextToken().ToLong(&k0);
+    icell=i0;
+    jcell=j0;
+    kcell=k0;
+}
+
+void MainFrame::GetHamiltonianMap(wxCheckTree* orbs, Astring0D &HamiltonianMap)
+{
+    //Clear All labels in Projection panel after the nAtoms. It will be set later as long as the lines are valid in unitcell panel
+    int nAtom=0;
+    sec30->GetVar(_("nAtoms[0]"),nAtom);
+    HamiltonianMap.clear();
+    for (int iAtom = 0; iAtom<=nAtom; iAtom++)
+    {
+        wxString TBatomObjectName = wxString::Format(wxT("AtomInd%d"),iAtom + 1);
+        wxComboBox* comb = sec30->GetComboObject(TBatomObjectName);
+        wxString TBAtom = comb->GetStringSelection();
+        AddShellAndOrbitalInfo(orbs, TBAtom, HamiltonianMap);
+    }
+}
+
+void MainFrame::AddShellAndOrbitalInfo(wxCheckTree* orbsTree, wxString AtomName, Astring0D &HamiltonianMap)
+{
+    wxTreeItemId rootID = orbsTree->GetRootItem();
+    wxString rootname = orbsTree->GetItemText(rootID);
+    wxTreeItemId atomID = orbsTree->FindItemIn(rootID,AtomName);
+    int ShellCount = orbsTree->GetChildrenCount(atomID,false);
+    for (int ShellNumber = 1; ShellNumber <= ShellCount; ShellNumber++)
+    {
+        wxString ShellName = wxString::Format(wxT("Shell %d"),ShellNumber);
+        wxTreeItemId shellID = orbsTree->FindItemIn(atomID,ShellName);
+        if (shellID.IsOk() && orbsTree->GetItemState(shellID) >= wxCheckTree::CHECKED)
+        {
+            wxTreeItemIdValue cookie;
+            wxTreeItemId child = orbsTree->GetFirstChild(shellID, cookie);
+            while( child.IsOk() )
+            {
+                if (orbsTree->GetItemState(child) >= wxCheckTree::CHECKED)
+                {
+                    wxString Add = rootname + _("/") + AtomName + _("/") + ShellName + _("/") + orbsTree->GetItemText(child);
+                    HamiltonianMap.push_back(Add);
+                }
+                child = orbsTree->GetNextChild(shellID, cookie);
+            }
+        }
+    }
+}
+
+void MainFrame::ConstructTBHamiltonian(Adouble2D &H)
+{
+    wxListBox* listctr = sec30->GetListObject(_("EssentialUnitcellList"));
+    int nCell = listctr->GetCount();
+    if (nCell < 1) {wxMessageBox(_("There is a problem in your structure. Please check your inputs in the Unit Cell and the Structure Panels."),_("Error")); return;}
+    
+    int nUnitcellAtoms = 0;
+    sec30->GetVar(_("nAtoms[0]"),nUnitcellAtoms);
+    
+    double x, y, z;
+    Adouble1D XYZCoords;
+    for (int i0=0; i0<nUnitcellAtoms; i0++)
+    {
+        Adouble0D atomXYZ;
+        sec30->GetVar(_("XYZ_Coords"), i0, 0, x);
+        sec30->GetVar(_("XYZ_Coords"), i0, 1, y);
+        sec30->GetVar(_("XYZ_Coords"), i0, 2, z);
+        atomXYZ.push_back(x);
+        atomXYZ.push_back(y);
+        atomXYZ.push_back(z);
+        XYZCoords.push_back(atomXYZ);
+    }
+    
+    wxCheckTree* orbs = sec30->GetTreeObject(_("Orbitals"));
+    Astring0D HamiltonianMap = sec30->ArraysOf1DString[1];
+    wxCheckTree* bonds = sec30->GetTreeObject(_("Bonds"));
+    wxTreeItemId rootID = bonds->GetRootItem();
+    for (int iCell=0; iCell<nCell; iCell++)
+    {
+        wxString WorkingCell = listctr->GetString(iCell);
+        wxString ucell = _("(0,0,0)-") + WorkingCell;
+        wxTreeItemId CellID = bonds->FindItemIn(rootID, ucell);
+        Adouble1D h;
+        GetCouplingMatrix(bonds, orbs, XYZCoords, HamiltonianMap, CellID, WorkingCell, h);
+        H.push_back(h);
+    }
+}
+
+void MainFrame::GetCouplingMatrix(wxCheckTree* BondTree, wxCheckTree* orbs, Adouble1D XYZCoords, Astring0D HamiltonianMap, wxTreeItemId CellID, wxString WorkingCell, Adouble1D &h)
+{
+    if (!CellID.IsOk())
+    {
+        //Allocate h for zeros
+        return;
+    }
+    
+    int icell,jcell,kcell;
+    GetCellInfo(WorkingCell, icell, jcell, kcell);
+
+    wxTreeItemId rootID = orbs->GetRootItem();
+    wxString rootname = orbs->GetItemText(rootID);    
+    
+    wxTreeItemIdValue cookie;
+	wxTreeItemId item = BondTree->GetFirstChild(CellID, cookie);
+	while(item.IsOk())
+	{
+		wxString BondInfo = BondTree->GetItemText(item);
+        //////////////////////////////////////////////
+        int iAtomIndex,nShellIndex,jAtomIndex,mShellIndex,bondtype;
+        sec30->GetBondInfo(BondInfo, iAtomIndex,nShellIndex,jAtomIndex,mShellIndex,bondtype);
+        
+        Adouble0D iBondSK, fBondSK;
+        GetBondSK(_("Bond"), bondtype, iBondSK, fBondSK);
+        
+        int Dim1 = -1;
+        int Dim2 = -1;
+        bool IsShell1, IsShell2;
+        wxString Orbs1, Orbs2;
+        
+        wxString atom1 = wxString::Format(wxT("AtomInd%d"),iAtomIndex + 1);
+        wxComboBox* comb1 = sec30->GetComboObject(atom1);
+        wxString TBAtom1 = comb1->GetStringSelection();
+        sec30->GetOrbitalInfo(orbs, TBAtom1, nShellIndex, Orbs1, Dim1, IsShell1);
+        
+        wxString atom2 = wxString::Format(wxT("AtomInd%d"),jAtomIndex + 1);
+        wxComboBox* comb2 = sec30->GetComboObject(atom2);
+        wxString TBAtom2 = comb2->GetStringSelection();
+        sec30->GetOrbitalInfo(orbs, TBAtom2, mShellIndex, Orbs2, Dim2, IsShell2);
+        
+        //wxString ShellName1 = wxString::Format(wxT("Shell %d"),nShellIndex);
+        //wxString ShellName2 = wxString::Format(wxT("Shell %d"),mShellIndex);
+        //wxString Address1 = rootname + _("/") + TBAtom1 + _("/") + ShellName1;
+        //wxTreeItemId shellID1 = orbs->FindItemViaDIR(Address1);
+        //wxString Address2 = rootname + _("/") + TBAtom2 + _("/") + ShellName2;
+        //wxTreeItemId shellID2 = orbs->FindItemViaDIR(Address2);
+        //wxTreeItemIdValue cookie1;
+        //wxTreeItemId O1 = orbs->GetFirstChild(shellID1, cookie1);
+        //for(int i1 = 0; i1<Dim1; i1++)
+        //{
+            //wxTreeItemIdValue cookie2;
+            //wxTreeItemId O2 = orbs->GetFirstChild(shellID2, cookie2);
+            //for(int i2 = 0; i2<Dim2; i2++)
+            //{
+                //wxTreeItemData* ss;
+                //ss->SetId()
+            //}
+        //}
+        double l, m, n;
+        sec30->GetDirectionalCosines(XYZCoords[iAtomIndex][0], XYZCoords[iAtomIndex][1], XYZCoords[iAtomIndex][2], XYZCoords[jAtomIndex][0], XYZCoords[jAtomIndex][1], XYZCoords[jAtomIndex][2], l, m, n);
+        
+        wxStringTokenizer tokenizer1(Orbs1, ",");
+        while (tokenizer1.HasMoreTokens())
+        {
+            wxString o1 = tokenizer1.GetNextToken();
+            
+            wxStringTokenizer tokenizer2(Orbs2, ",");
+            while (tokenizer2.HasMoreTokens())
+            {
+                wxString o2 = tokenizer2.GetNextToken();
+                double iHij = sec30->Hopspd(iBondSK, l, m, n, o1, o2);
+                double fHij = sec30->Hopspd(fBondSK, l, m, n, o1, o2);
+            }
+        }
+        
+        //////////////////////////////////////////////
+		item = BondTree->GetNextChild(CellID, cookie);
+	}
+}
+
+void MainFrame::GetBondSK(wxString Kind, int bondtype, Adouble0D &iBondSK, Adouble0D &fBondSK)
+{
+    wxString title, istr, fstr;
+    double ival, fval;
+    wxString BondStr = Kind + wxString::Format(wxT(" %d"), bondtype);
+    myGrid* skctr = sec30->GetGridObject(_("SK"));
+    int nRow = skctr->GetNumberRows();
+    iBondSK = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    fBondSK = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    bool found = false;
+    for (int irow=0; irow<nRow;irow++)
+    {
+        title = skctr->GetCellValue(irow, 0);
+        if (!found)
+        {
+            if (title == BondStr) found = true;
+        }
+        else
+        {
+            //if (skctr->GetCellBackgroundColour(irow, 1) != *wxWHITE) return;
+            if (skctr->IsReadOnly(irow, 1)) return;
+            istr = skctr->GetCellValue(irow, 1);
+            fstr = skctr->GetCellValue(irow, 2);
+            bool isOki = istr.ToDouble(&ival);
+            bool isOkf = fstr.ToDouble(&fval);
+            SetBondSKElement(title, isOki, iBondSK, ival, isOkf, fBondSK, fval);
+        }
+    }
+}
+
+void MainFrame::SetBondSKElement(wxString skName, bool isOki, Adouble0D &iBondSK, double ival, bool isOkf, Adouble0D &fBondSK, double fval)
+{
+    int ind = GetSKInd(skName);
+    if (isOki) iBondSK[ind] = ival;
+    if (isOkf) fBondSK[ind] = fval;
+}
+
+int MainFrame::GetSKInd(wxString skName)
+{
+    if (skName == _("sss"))
+        return 0;
+    else if (skName == _("sps"))
+        return 1;
+    else if (skName == _("sds"))
+        return 2;
+    else if (skName == _("pps"))
+        return 3;
+    else if (skName == _("ppp"))
+        return 4;
+    else if (skName == _("pds"))
+        return 5;
+    else if (skName == _("pdp"))
+        return 6;
+    else if (skName == _("dds"))
+        return 7;
+    else if (skName == _("ddp"))
+        return 8;
+    else if (skName == _("ddd"))
+        return 9;
+    
+    return -1;
+}
+
+void MainFrame::ReadSK()
+{
+    long bondtype;
+    wxString val;
+    myGrid* skctr = sec30->GetGridObject(_("SK"));
+    int nRow = skctr->GetNumberRows();
+    int Case = -1;
+    for (int irow=0; irow<nRow;irow++)
+    {
+        val = skctr->GetCellValue(irow,0);
+        if (val == _("On-Sites"))
+        {
+            Case = 0;
+        }
+        else if (val == _("SOC"))
+        {
+            Case = 1;
+        }
+        else if (val.StartsWith(_("Bond")))
+        {
+            Case = 2;
+            val.Replace(_("Bond "), _(""));
+            val.ToLong(&bondtype);
+        }
+        else if (val.StartsWith(_("Overlap")))
+        {
+            Case = 3;
+            val.Replace(_("Overlap "), _(""));
+            val.ToLong(&bondtype);
+        }
+        else
+        {
+            if (Case == 0)
+            {
+                
+            }
+            else if (Case == 1)
+            {
+                
+            }
+            else if (Case == 2)
+            {
+                
+            }
+            else if (Case == 3)
+            {
+                
+            }
+        }
+    }
+    
+    if (Case == -1) {wxMessageBox(_("SK parameters were not set."),_("Error")); return;}
 }

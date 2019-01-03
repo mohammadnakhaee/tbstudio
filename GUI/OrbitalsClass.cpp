@@ -84,7 +84,7 @@ void OrbitalsClass::Btn_AddAtom_OnClick(wxCommandEvent& event)
     else
         rootID = treectr->GetRootItem();
     
-    wxTreeItemId shellID = treectr->tree_add(rootID,newtypename,false,true);
+    wxTreeItemId shellID = treectr->tree_add(rootID,newtypename,true,true);
     treectr->Expand(rootID);
     treectr->Update();
     treectr->Refresh(true);

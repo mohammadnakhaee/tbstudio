@@ -582,9 +582,7 @@ wxTreeItemId wxCheckTree::FindItemNamed(const wxString &name)
 wxTreeItemId wxCheckTree::FindItemIn(wxTreeItemId root, const wxString& sSearchFor)
 {
 	wxTreeItemIdValue cookie;
-	wxTreeItemId search;
-	wxTreeItemId item = GetFirstChild( root, cookie );
-	wxTreeItemId child;
+	wxTreeItemId item = GetFirstChild(root, cookie);
     
     wxString sDataRoot = GetItemText(GetRootItem());
     if( sSearchFor.CompareTo(sDataRoot) == 0 ) return GetRootItem();
@@ -596,15 +594,15 @@ wxTreeItemId wxCheckTree::FindItemIn(wxTreeItemId root, const wxString& sSearchF
 		{
 			return item;
 		}
-		if( ItemHasChildren( item ) )
+		if( ItemHasChildren(item) )
 		{
-			wxTreeItemId search = FindItemIn( item, sSearchFor );
+			wxTreeItemId search = FindItemIn(item, sSearchFor);
 			if( search.IsOk() )
 			{
 				return search;
 			}
 		}
-		item = GetNextChild( root, cookie);
+		item = GetNextChild(root, cookie);
 	}
 
 	/* Not found */
@@ -615,9 +613,7 @@ wxTreeItemId wxCheckTree::FindItemIn(wxTreeItemId root, const wxString& sSearchF
 wxTreeItemId wxCheckTree::ContainsItemIn(wxTreeItemId root, const wxString& sSearchFor)
 {
 	wxTreeItemIdValue cookie;
-	wxTreeItemId search;
 	wxTreeItemId item = GetFirstChild(root, cookie);
-	wxTreeItemId child;
     
     wxString sDataRoot = GetItemText(GetRootItem());
     if(sDataRoot.Contains(sSearchFor)) return GetRootItem();
@@ -629,15 +625,50 @@ wxTreeItemId wxCheckTree::ContainsItemIn(wxTreeItemId root, const wxString& sSea
 		{
 			return item;
 		}
-		if( ItemHasChildren( item ) )
+		if( ItemHasChildren(item) )
 		{
-			wxTreeItemId search = ContainsItemIn( item, sSearchFor );
+			wxTreeItemId search = ContainsItemIn(item, sSearchFor);
 			if( search.IsOk() )
 			{
 				return search;
 			}
 		}
-		item = GetNextChild( root, cookie);
+		item = GetNextChild(root, cookie);
+	}
+
+	/* Not found */
+	wxTreeItemId dummy;
+	return dummy;
+}
+
+wxTreeItemId wxCheckTree::ActiveAndContainsItemIn(wxTreeItemId root, const wxString& sSearchFor)
+{
+	wxTreeItemIdValue cookie;
+	wxTreeItemId item = GetFirstChild(root, cookie);
+    
+    wxString sDataRoot = GetItemText(GetRootItem());
+    if(sDataRoot.Contains(sSearchFor)) return GetRootItem();
+
+	while( item.IsOk() )
+	{
+        int state = GetItemState(item);
+        if (state >= CHECKED || state < 0)
+        {
+            wxString sData = GetItemText(item);
+            if(sData.Contains(sSearchFor))
+            {
+                return item;
+            }
+            if(ItemHasChildren(item))
+            {
+                wxTreeItemId search = ActiveAndContainsItemIn(item, sSearchFor);
+                if(search.IsOk())
+                {
+                    return search;
+                }
+            }
+        }
+		item = GetNextChild(root, cookie);
 	}
 
 	/* Not found */

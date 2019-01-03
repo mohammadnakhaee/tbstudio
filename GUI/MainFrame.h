@@ -94,6 +94,15 @@ protected:
     virtual void MainFrameBaseClass_Resize(wxSizeEvent& event);
     virtual void m_glCanvas17_OnPaint(wxPaintEvent& event);
     virtual void BtnTest_OnClick(wxCommandEvent& event);
+    virtual void GetCellInfo(wxString cellStr, int &icell, int &jcell, int &kcell);
+    virtual void ConstructTBHamiltonian(Adouble2D &H);
+    virtual void GetHamiltonianMap(wxCheckTree* orbs, Astring0D &HamiltonianMap);
+    virtual void AddShellAndOrbitalInfo(wxCheckTree* orbsTree, wxString AtomName, Astring0D &HamiltonianMap);
+    virtual void GetCouplingMatrix(wxCheckTree* BondTree, wxCheckTree* orbs, Adouble1D XYZCoords, Astring0D HamiltonianMap, wxTreeItemId CellID, wxString WorkingCell, Adouble1D &h);
+    virtual void GetBondSK(wxString Kind, int bondtype, Adouble0D &iBondSK, Adouble0D &fBondSK);
+    virtual void SetBondSKElement(wxString skName, bool isOki, Adouble0D &iBondSK, double ival, bool isOkf, Adouble0D &fBondSK, double fval);
+    virtual int GetSKInd(wxString skName);
+    virtual void ReadSK();
     virtual void InitializeSec30Arrays();
     virtual void Init_graph3d();
     virtual void Init_graph2d0();

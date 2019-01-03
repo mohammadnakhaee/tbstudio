@@ -42,6 +42,7 @@ class WXDLLIMPEXP_CHECKTREE wxCheckTree : public wxTreeCtrl
         wxTreeItemId FindItemNamed(const wxString &name);
         wxTreeItemId FindItemIn(wxTreeItemId root, const wxString& sSearchFor);
         wxTreeItemId ContainsItemIn(wxTreeItemId root, const wxString& sSearchFor);
+        wxTreeItemId ActiveAndContainsItemIn(wxTreeItemId root, const wxString& sSearchFor);
         int GetItemCount();
         wxTreeItemId FindItemViaDIR(const wxString& dir);
         wxString MyDIR(wxTreeItemId root, wxTreeItemId ID);

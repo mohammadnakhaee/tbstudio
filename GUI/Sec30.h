@@ -38,23 +38,17 @@
 #define WXC_FROM_DIP(x) x
 #endif
 /******************************************************************************/
-typedef std::vector<int> Aint0D;
-typedef std::vector<Aint0D> Aint1D;
-typedef std::vector<Aint1D> Aint2D;
-typedef std::vector<Aint2D> Aint3D;
-typedef std::vector<double> Adouble0D;
-typedef std::vector<Adouble0D> Adouble1D;
-typedef std::vector<Adouble1D> Adouble2D;
-typedef std::vector<Adouble2D> Adouble3D;
-typedef std::vector<wxString> Astring0D;
-typedef std::vector<Astring0D> Astring1D;
-typedef std::vector<Astring1D> Astring2D;
-typedef std::vector<Astring2D> Astring3D;
 
 // It just declares MY_EVENT event type
 /******************************************************************************/
 wxDECLARE_EVENT(Sec30EVT_OnUpdated, wxCommandEvent);
 /******************************************************************************/
+
+class CheckTreeItemData : public wxTreeItemData
+{
+public:
+    int Index;
+};
 
 class Sec30  : public wxWindow
 {
@@ -72,18 +66,6 @@ public:
     std::list<wxString> choices;
     std::list<wxString> combos;
     std::list<wxString> colors;
-    Aint0D ArraysOf0DInt;
-    Aint1D ArraysOf1DInt;
-    Aint2D ArraysOf2DInt;
-    Aint3D ArraysOf3DInt;
-    Adouble0D ArraysOf0DDouble;
-    Adouble1D ArraysOf1DDouble;
-    Adouble2D ArraysOf2DDouble;
-    Adouble3D ArraysOf3DDouble;
-    Astring0D ArraysOf0DString;
-    Astring1D ArraysOf1DString;
-    Astring2D ArraysOf2DString;
-    Astring3D ArraysOf3DString;
     
     void AddGroupBox(wxWindow *parent, wxString Caption, wxColour BGColor);
     void AddButton(wxWindow *parent, int ButtonCnt, wxString* Labels, wxObjectEventFunction* Funcs);
@@ -142,12 +124,16 @@ public:
     wxColor GetBondColor(int kind);
     void GetUnitcellInfo(const wxString& unitcelltextvar, int& l, int& m, int& n);
     void GetBondInfo(const wxString& bondtextvar, int& i, int& n, int& j, int& m, int& bondtype);
+    void GetBondSK(int bondtype, Adouble0D &BondSK);
     void GetOrbitalInfo(wxCheckTree* orbsTree, wxString AtomName, int ShellNumber, wxString &Orbs, int &nOrbs, bool &IsShell);
     void GetOrbQuantumNumbers(const wxString& OrbitalName, int& l, int& m);
     wxString CreateFilePath(wxString Path,wxString FileName);
+    double norm(double a[3]);
     double norm(double a[3], double b[3]);
     void vk_rtv(double vk[3], double rtv[3][3], double v[3]);
-
+    void GetDirectionalCosines(double x1, double y1, double z1, double x2, double y2, double z2, double &l, double &m, double &n);
+    double Hopspd(Adouble0D BondSK, double l, double m, double n, wxString o1, wxString o2);
+    double Hopspd(double sss, double sps, double sds, double pps, double ppp, double pds, double pdp, double dds, double ddp, double ddd, double l, double m, double n, wxString o1, wxString o2);
 private:
     virtual void sec30TextCtrl_OnUpdated(wxCommandEvent &event);
     virtual void TreeCtrlDeleteItem(wxTreeEvent& event);

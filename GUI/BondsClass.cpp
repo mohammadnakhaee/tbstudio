@@ -37,7 +37,7 @@ BondsClass::BondsClass(wxWindow* parent, Sec30* sec30var, wxWindowID id, const w
     sec30->SetVar(_("AtomIndex1[1]"),1,false);
     sec30->SetVar(_("AtomIndex2[0]"),1,false);
     sec30->SetVar(_("AtomIndex2[1]"),1,false);
-    wxComboBox* choicectr = sec30->AddComboCtrl(this, _("AtomLabel"), _("Bond Label"), 60, 100, false);
+    wxComboBox* choicectr = sec30->AddComboCtrl(this, _("BondLabel"), _("Bond Label"), 60, 100, false);
     for (int i=1; i<=50; i++)
     {
         //wxImage img = wxImage(wxSize(10,10),true);
@@ -90,7 +90,7 @@ void BondsClass::Btn_Set_OnClick(wxCommandEvent& event)
     wxString listucell = listctr->GetString(lmn);
     wxString ucell = _("(0,0,0)-") + listucell;
     
-    wxComboBox* bondctr =  sec30->GetComboObject(_("AtomLabel"));
+    wxComboBox* bondctr =  sec30->GetComboObject(_("BondLabel"));
     int btypind = bondctr->GetSelection();
     if (btypind < 0) {wxMessageBox(_("Please select the Bond Label."),_("Error")); return;}
     
