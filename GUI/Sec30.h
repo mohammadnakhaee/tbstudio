@@ -38,6 +38,18 @@
 #define WXC_FROM_DIP(x) x
 #endif
 /******************************************************************************/
+typedef std::vector<int> Aint0D;
+typedef std::vector<Aint0D> Aint1D;
+typedef std::vector<Aint1D> Aint2D;
+typedef std::vector<Aint2D> Aint3D;
+typedef std::vector<double> Adouble0D;
+typedef std::vector<Adouble0D> Adouble1D;
+typedef std::vector<Adouble1D> Adouble2D;
+typedef std::vector<Adouble2D> Adouble3D;
+typedef std::vector<wxString> Astring0D;
+typedef std::vector<Astring0D> Astring1D;
+typedef std::vector<Astring1D> Astring2D;
+typedef std::vector<Astring2D> Astring3D;
 
 // It just declares MY_EVENT event type
 /******************************************************************************/
@@ -66,6 +78,18 @@ public:
     std::list<wxString> choices;
     std::list<wxString> combos;
     std::list<wxString> colors;
+    Aint0D ArraysOf0DInt;
+    Aint1D ArraysOf1DInt;
+    Aint2D ArraysOf2DInt;
+    Aint3D ArraysOf3DInt;
+    Adouble0D ArraysOf0DDouble;
+    Adouble1D ArraysOf1DDouble;
+    Adouble2D ArraysOf2DDouble;
+    Adouble3D ArraysOf3DDouble;
+    Astring0D ArraysOf0DString;
+    Astring1D ArraysOf1DString;
+    Astring2D ArraysOf2DString;
+    Astring3D ArraysOf3DString;
     
     void AddGroupBox(wxWindow *parent, wxString Caption, wxColour BGColor);
     void AddButton(wxWindow *parent, int ButtonCnt, wxString* Labels, wxObjectEventFunction* Funcs);

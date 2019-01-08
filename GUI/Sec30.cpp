@@ -19,6 +19,17 @@ Sec30::~Sec30()
 {
 }
 
+void Sec30::AddGroupBox(wxWindow *parent, wxString Caption, wxColour BGColor)
+{
+    wxPanel* p = new wxPanel(parent, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    p->SetBackgroundColour(BGColor);
+    parent->GetSizer()->Add(p, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    wxBoxSizer* vsizer = new wxBoxSizer(wxVERTICAL);
+    p->SetSizer(vsizer);
+    wxStaticText* st = new wxStaticText(p, wxID_ANY, Caption, wxDefaultPosition, wxDLG_UNIT(p, wxSize(-1,-1)), 0);
+    vsizer->Add(st, 0, wxLEFT, WXC_FROM_DIP(5));
+}
+
 void Sec30::AddButton(wxWindow *parent, int ButtonCnt, wxString* Labels, wxObjectEventFunction* Funcs)
 {
     wxBoxSizer* MySizer = new wxBoxSizer(wxHORIZONTAL);
@@ -432,6 +443,30 @@ void Sec30::SendUpdateEvent(wxString info, int MyID)
     event->SetString(info);
     event->SetInt(MyID);
     wxQueueEvent(this,event);
+}
+
+void Sec30::SetVar(wxString VariableName, double Value, bool FireEvent)
+{
+    wxString val = wxString::Format(wxT("%1f"), Value);
+    sec30TextCtrl* ctr = (sec30TextCtrl*)FindWindowByName(VariableName,GetParent());
+    ctr->SetCellValue(0,0,val);
+    if (FireEvent)
+    {
+        wxString name = ctr->GetParent()->GetName();
+        SendUpdateEvent(name);
+    }
+}
+
+void Sec30::SetVar(wxString VariableName, int Value, bool FireEvent)
+{
+    wxString val = wxString::Format(wxT("%d"), Value);
+    sec30TextCtrl* ctr = (sec30TextCtrl*)FindWindowByName(VariableName,GetParent());
+    ctr->SetCellValue(0,0,val);
+    if (FireEvent)
+    {
+        wxString name = ctr->GetParent()->GetName();
+        SendUpdateEvent(name);
+    }
 }
 
 void Sec30::SetVar(wxString VariableName, bool Value, bool FireEvent)

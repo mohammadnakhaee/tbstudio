@@ -20,6 +20,14 @@ SetupClass::SetupClass(wxWindow* parent, Sec30* sec30var, wxWindowID id, const w
     /**********************************************************************************************************************************************/
     sec30->AddGroupBox(this,_("DFT Band-Structure"),wxColour(wxT("rgb(153,180,209)")));
     sec30->AddVarVector(this, 1, _("DFTPath"), _("string"), _("File DIR"), 60, 270,false,false);
+    sec30->SetVar(_("DFTPath[0]"), _(""), false);
+    sec30->AddVarVector(this, 1, _("DFTFile"), _("string"), _("File Name"), 60, 270,false,false);
+    sec30->SetVar(_("DFTFile[0]"), _(""), false);
+    wxComboBox* choicectr = sec30->AddComboCtrl(this, _("BandFileFormat"), _("Format"), 60, 270, false);
+    choicectr->Append(_("OpenMX Band-Structure"));
+    choicectr->Append(_("Vasp XML Output"));
+    choicectr->SetEditable(false);
+    choicectr->SetBackgroundColour(*wxWHITE);
     choicectr->Select(2);
     wxString Labels1[2] = {_("Open File"), _("Reload")};
     wxObjectEventFunction Funcs1[2] = { wxCommandEventHandler(SetupClass::Btn_OpenFile_OnClick), wxCommandEventHandler(SetupClass::Btn_Reload_OnClick)};
