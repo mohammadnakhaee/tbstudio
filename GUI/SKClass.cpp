@@ -38,15 +38,30 @@ SKClass::SKClass(wxWindow* parent, Sec30* sec30var, wxWindowID id, const wxPoint
     wxObjectEventFunction Funcs2[1] = { wxCommandEventHandler(SKClass::Btn_LastValues_OnClick)};
     sec30->AddButton(this, 1, Labels2, Funcs2);
     /**********************************************************************************************************************************************/
-    sec30->AddGroupBox(this,_("On-Site Energies and SK Parameters"),wxColour(wxT("rgb(153,180,209)")));
+    sec30->AddGroupBox(this,_("Information"),wxColour(wxT("rgb(153,180,209)")));
     sec30->AddVarVector(this, 1, _("nParameters"), _("int"), _("Number of Parameters"), 140, 100, false, true);
     sec30->SetVar(_("nParameters[0]"), 0, false);
-    
+    /**********************************************************************************************************************************************/
+    sec30->AddGroupBox(this,_("On-Site Energies"),wxColour(wxT("rgb(153,180,209)")));
     wxString ColNames[3] = { _("Parameter"), _("Initial Value"), _("Last Value")};
     wxString ColTypes[3] = { _("string"), _("double"), _("double")};
     int ColSizes[3] = {96, 100, 100};
     int ColPrecision[3] = { 0, 8, 8};
-    sec30->AddGrid(this, 0, 3, _("SK"), ColNames, ColTypes, ColSizes, ColPrecision, 350, 600);
+    sec30->AddGrid(this, 0, 3, _("OS"), ColNames, ColTypes, ColSizes, ColPrecision, 350, 400);
+    /**********************************************************************************************************************************************/
+    sec30->AddGroupBox(this,_("Slater-Koster Integrals"),wxColour(wxT("rgb(153,180,209)")));
+    wxString ColNames2[3] = { _("Parameter"), _("Initial Value"), _("Last Value")};
+    wxString ColTypes2[3] = { _("string"), _("double"), _("double")};
+    int ColSizes2[3] = {96, 100, 100};
+    int ColPrecision2[3] = { 0, 8, 8};
+    sec30->AddGrid(this, 0, 3, _("SK"), ColNames2, ColTypes2, ColSizes2, ColPrecision2, 350, 400);
+    /**********************************************************************************************************************************************/
+    sec30->AddGroupBox(this,_("Overlap Integrals"),wxColour(wxT("rgb(153,180,209)")));
+    wxString ColNames3[3] = { _("Parameter"), _("Initial Value"), _("Last Value")};
+    wxString ColTypes3[3] = { _("string"), _("double"), _("double")};
+    int ColSizes3[3] = {96, 100, 100};
+    int ColPrecision3[3] = { 0, 8, 8};
+    sec30->AddGrid(this, 0, 3, _("OL"), ColNames3, ColTypes3, ColSizes3, ColPrecision3, 350, 400);
     /**********************************************************************************************************************************************/
     sec30->AddGroupBox(this,_("Tools"),wxColour(wxT("rgb(153,180,209)")));
     wxString Labels5[2] = {_("Export Data"), _("Import Data")};

@@ -344,10 +344,6 @@ wxCheckListBox* Sec30::AddCheckListBox(wxWindow *parent, wxString VariableName, 
     
     wxArrayString listBoxArr;
     wxCheckListBox* ctr=new wxCheckListBox(parent, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(parent, wxSize(xCtrlSize,yCtrlSize)),listBoxArr,wxLB_SINGLE); //wxTR_HIDE_ROOT
-    MySizer->Add(ctr, 0, wxRIGHT, WXC_FROM_DIP(5));
-    ctr->SetMinSize(wxSize(xCtrlSize,yCtrlSize));
-    checklists.insert(ichecklists,VariableName);
-    ctr->SetName(VariableName);
     return ctr;
 }
 
@@ -2542,7 +2538,8 @@ void Sec30::GetDirectionalCosines(double x1, double y1, double z1, double x2, do
 
 double Sec30::Hopspd(Adouble0D BondSK, double l, double m, double n, wxString o1, wxString o2)
 {
-    Hopspd(BondSK[0], BondSK[1], BondSK[2], BondSK[3], BondSK[4], BondSK[5], BondSK[6], BondSK[7], BondSK[8], BondSK[9], l, m, n, o1, o2);
+    double out = Hopspd(BondSK[0], BondSK[1], BondSK[2], BondSK[3], BondSK[4], BondSK[5], BondSK[6], BondSK[7], BondSK[8], BondSK[9], l, m, n, o1, o2);
+    return out;
 }
 
 double Sec30::Hopspd(double sss, double sps, double sds, double pps, double ppp,
@@ -2563,7 +2560,11 @@ double Sec30::Hopspd(double sss, double sps, double sds, double pps, double ppp,
     }
     
     if (element == _("s:s")) out = sss;
-    else if (element == _("s:p_y")) out = sps*m;
+    else if (element == _("s:p_y"))
+    {
+        out = sps*m;
+        out = out*1.0;
+    }
     else if (element == _("p_y:s")) out = (-sps)*m;
     else if (element == _("s:p_z")) out = sps*nn;
     else if (element == _("p_z:s")) out = (-sps)*nn;

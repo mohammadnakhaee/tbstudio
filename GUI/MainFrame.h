@@ -62,6 +62,7 @@ protected:
     virtual void BtnDown_OnClick(wxRibbonButtonBarEvent& event);
     virtual void BtnLeft_OnClick(wxRibbonButtonBarEvent& event);
     virtual void BtnRight_OnClick(wxRibbonButtonBarEvent& event);
+    virtual void BtnStart_OnClick(wxRibbonButtonBarEvent& event);
     virtual void BtnAbout_OnClick(wxRibbonButtonBarEvent& event);
     virtual void BtnTutorials_OnClick(wxRibbonButtonBarEvent& event);
     virtual void BtnWebsite_OnClick(wxRibbonButtonBarEvent& event);
@@ -95,11 +96,11 @@ protected:
     virtual void m_glCanvas17_OnPaint(wxPaintEvent& event);
     virtual void BtnTest_OnClick(wxCommandEvent& event);
     virtual void GetCellInfo(wxString cellStr, int &icell, int &jcell, int &kcell);
-    virtual void ConstructTBHamiltonian(Adouble2D &H);
-    virtual void GetHamiltonianMap(wxCheckTree* orbs, Astring0D &HamiltonianMap);
-    virtual void AddShellAndOrbitalInfo(wxCheckTree* orbsTree, wxString AtomName, Astring0D &HamiltonianMap);
-    virtual void GetCouplingMatrix(wxCheckTree* BondTree, wxCheckTree* orbs, Adouble1D XYZCoords, Astring0D HamiltonianMap, wxTreeItemId CellID, wxString WorkingCell, Adouble1D &h);
-    virtual void GetBondSK(wxString Kind, int bondtype, Adouble0D &iBondSK, Adouble0D &fBondSK);
+    virtual void ConstructTBHamiltonian(Adouble2D &Hi, Adouble2D &Hf);
+    virtual void GetHamiltonianMap(wxCheckTree* orbs, Astring0D &HamiltonianMap, Astring0D &HamiltonianShellMap, Aint1D &HamiltonianDimMap);
+    virtual void AddShellAndOrbitalInfo(wxCheckTree* orbsTree, wxString AtomName, Astring0D &HamiltonianMap, Astring0D &HamiltonianShellMap, Aint0D &HamiltonianDimMapItem, int &LastIndex);
+    virtual void GetCouplingMatrix(myGrid* OnSiteCtr, myGrid* SKCtr, myGrid* OverlapCtr, wxCheckTree* BondTree, wxCheckTree* orbs, double a[3], double b[3], double c[3], Adouble1D XYZCoords, Aint1D HamiltonianDimMap, wxTreeItemId CellID, wxString WorkingCell, Adouble1D &hi, Adouble1D &hf);
+    virtual void GetBondSK(myGrid* GridCtrl, int bondtype, Adouble0D &iBondSK, Adouble0D &fBondSK);
     virtual void SetBondSKElement(wxString skName, bool isOki, Adouble0D &iBondSK, double ival, bool isOkf, Adouble0D &fBondSK, double fval);
     virtual int GetSKInd(wxString skName);
     virtual void ReadSK();
