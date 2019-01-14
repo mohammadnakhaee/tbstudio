@@ -344,6 +344,10 @@ wxCheckListBox* Sec30::AddCheckListBox(wxWindow *parent, wxString VariableName, 
     
     wxArrayString listBoxArr;
     wxCheckListBox* ctr=new wxCheckListBox(parent, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(parent, wxSize(xCtrlSize,yCtrlSize)),listBoxArr,wxLB_SINGLE); //wxTR_HIDE_ROOT
+    MySizer->Add(ctr, 0, wxRIGHT, WXC_FROM_DIP(5));
+    ctr->SetMinSize(wxSize(xCtrlSize,yCtrlSize));
+    checklists.insert(ichecklists,VariableName);
+    ctr->SetName(VariableName);
     return ctr;
 }
 
