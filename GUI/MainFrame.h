@@ -23,6 +23,23 @@
 #include <wx/ribbon/buttonbar.h>
 /**********************************************************************************/
 
+struct lmOptions
+{
+    int prnt;            //   3        >1 intermediate results; >2 plots
+    int MaxIter;         //   10*Npar     maximum number of iterations
+    double epsilon_1;    //   1e-3     convergence tolerance for gradient
+    double epsilon_2;    //   1e-3     convergence tolerance for parameters
+    double epsilon_3;    //   1e-1     convergence tolerance for red. Chi-square
+    double epsilon_4;    //   1e-1     determines acceptance of a L-M step
+    double lambda_0;     //   1e-2     initial value of L-M paramter
+    double lambda_UP_fac;   //   11       factor for increasing lambda
+    double lambda_DN_fac;   //   9       factor for decreasing lambda
+    int Update_Type;     //   1       1: Levenberg-Marquardt lambda update
+                         //           2: Quadratic update
+                         //           3: Nielsen's lambda update equations
+};
+
+
 class MainFrame : public MainFrameBaseClass
 {
 public:
@@ -41,6 +58,9 @@ public:
     SKClass* skPanel;
     ColorsClass* ColorsForm;
     Sec30* sec30;
+    
+    int iteration; //Global for lm
+    int func_calls; //Global for lm
     
     wxRibbonButtonBar* RButtonMouse;
     
@@ -96,11 +116,15 @@ protected:
     virtual void m_glCanvas17_OnPaint(wxPaintEvent& event);
     virtual void BtnTest_OnClick(wxCommandEvent& event);
     virtual void GetCellInfo(wxString cellStr, int &icell, int &jcell, int &kcell);
-    virtual void ConstructTBHamiltonian(Adouble2D &Hi, Adouble2D &Hf);
+    virtual void ConstructTBHamiltonian(Adouble2D &Hi, Adouble2D &Hf, int &nEssensialCells, int &nHamiltonian, Aint1D &EssCells);
     virtual void GetHamiltonianMap(wxCheckTree* orbs, Astring0D &HamiltonianMap, Astring0D &HamiltonianShellMap, Aint1D &HamiltonianDimMap);
     virtual void AddShellAndOrbitalInfo(wxCheckTree* orbsTree, wxString AtomName, Astring0D &HamiltonianMap, Astring0D &HamiltonianShellMap, Aint0D &HamiltonianDimMapItem, int &LastIndex);
-    virtual void GetCouplingMatrix(myGrid* OnSiteCtr, myGrid* SKCtr, myGrid* OverlapCtr, wxCheckTree* BondTree, wxCheckTree* orbs, double a[3], double b[3], double c[3], Adouble1D XYZCoords, Aint1D HamiltonianDimMap, wxTreeItemId CellID, wxString WorkingCell, Adouble1D &hi, Adouble1D &hf);
-    virtual void GetBondSK(myGrid* GridCtrl, int bondtype, Adouble0D &iBondSK, Adouble0D &fBondSK);
+    virtual void GetCouplingMatrix(myGrid* SKCtr, myGrid* OverlapCtr, wxCheckTree* BondTree, wxCheckTree* orbs, double a[3], double b[3], double c[3], Adouble1D XYZCoords, Aint1D HamiltonianDimMap, wxTreeItemId CellID, wxString WorkingCell, Adouble1D &hi, Adouble1D &hf);
+    virtual void AddOnSiteMatrix(myGrid* OnSiteCtr, wxCheckTree* orbs, Aint1D HamiltonianDimMap, Adouble1D &hi, Adouble1D &hf);
+    virtual void GetOnSiteSK(myGrid* GridCtrl, wxString Label, Adouble0D &iBondSK, Adouble0D &fBondSK);
+    virtual void SetOnSiteSKElement(wxString skName, bool isOki, Adouble0D &iBondSK, double ival, bool isOkf, Adouble0D &fBondSK, double fval);
+    virtual int GetOnSiteSKInd(wxString skName);
+    virtual void GetBondSK(myGrid* GridCtrl, wxString Label, Adouble0D &iBondSK, Adouble0D &fBondSK);
     virtual void SetBondSKElement(wxString skName, bool isOki, Adouble0D &iBondSK, double ival, bool isOkf, Adouble0D &fBondSK, double fval);
     virtual int GetSKInd(wxString skName);
     virtual void ReadSK();
@@ -147,8 +171,14 @@ protected:
     virtual bool ValidateColorsPanel();
     /****************************************/
     int GetBonds(int* bonds);
-    void UpdateSKList();
+    void ReArrangeSKList();
     bool IsBondContainsParameter(wxString Orbs1, wxString Orbs2, wxString sk);
+    int SymEigenValues(lapack_complex_double* UpperSymMatrix, lapack_int N, double* &eig);
+    void TestEig();
+    void TestZEig();
+    lapack_complex_double GetHk(double*** H, double kx, double ky, double kz, double a[3], double b[3], double c[3], int nEssensialCells, int** lmnEssCells, int iH, int jH);
+    void UpdateTBBand_if();
+    //void lm(Adouble0D &p, Adouble0D t, Adouble0D y_dat, double weight, Adouble0D &dp, double p_min, double p_max, Aint0D c, lmOptions opts, double &redX2, double &sigma_p, double &sigma_y, double &corr_p, double &R_sq, double &cvg_hst);
     
 private:
     wxTextCtrl* logfile;

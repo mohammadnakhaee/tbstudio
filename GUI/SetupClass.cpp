@@ -62,6 +62,13 @@ SetupClass::SetupClass(wxWindow* parent, Sec30* sec30var, wxWindowID id, const w
     wxObjectEventFunction Funcs4[1] = { wxCommandEventHandler(SetupClass::Btn_Test_OnClick)};
     sec30->AddButton(this, 1, Labels4, Funcs4);
     /**********************************************************************************************************************************************/
+    //sec30->AddGroupBox(this,_("k-Path"),wxColour(wxT("rgb(153,180,209)")));
+    //wxString ColNames1[4] = { _("Parameter"), _("Initial Value"), _("Last Value")};
+    //wxString ColTypes1[4] = { _("string"), _("double"), _("double")};
+    //int ColSizes1[4] = {96, 100, 100};
+    //int ColPrecision1[4] = { 0, 8, 8};
+    //sec30->AddGrid(this, 0, 3, _("kpath"), ColNames1, ColTypes1, ColSizes1, ColPrecision1, 350, 400);
+    /**********************************************************************************************************************************************/
     sec30->AddGroupBox(this,_(""),wxColour(wxT("rgb(153,180,209)")));
     /**********************************************************************************************************************************************/
 }

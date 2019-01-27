@@ -73,7 +73,10 @@ void OrbitalsClass::Btn_AddAtom_OnClick(wxCommandEvent& event)
         if (newtypename.CompareTo(itemname) == 0) {wxMessageBox(_("There is such an item with the name '") + newtypename + _("'."),_("Error")); return;}
     }
     
+    sec30->SetVar(_("NewType[0]"), _(""), false);
+    
     listctr->Append(newtypename);
+    listctr->SetSelection(listctr->GetCount() - 1);
     listctr->Update();
     listctr->Refresh(true);
     

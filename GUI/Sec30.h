@@ -26,6 +26,8 @@
 #include <wx/clrpicker.h>
 #include <wx/tokenzr.h>
 #include <sstream>
+#include "lapacke.h"
+//#include "lapacke_config.h"
 /******************************************************************************/
 
 /******************************************************************************/
@@ -148,12 +150,13 @@ public:
     wxColor GetBondColor(int kind);
     void GetUnitcellInfo(const wxString& unitcelltextvar, int& l, int& m, int& n);
     void GetBondInfo(const wxString& bondtextvar, int& i, int& n, int& j, int& m, int& bondtype);
-    void GetBondSK(int bondtype, Adouble0D &BondSK);
+    //void GetBondSK(int bondtype, Adouble0D &BondSK);
     void GetOrbitalInfo(wxCheckTree* orbsTree, wxString AtomName, int ShellNumber, wxString &Orbs, int &nOrbs, bool &IsShell);
     void GetOrbQuantumNumbers(const wxString& OrbitalName, int& l, int& m);
     wxString CreateFilePath(wxString Path,wxString FileName);
     double norm(double a[3]);
     double norm(double a[3], double b[3]);
+    double dot(double a[3], double b[3]);
     void vk_rtv(double vk[3], double rtv[3][3], double v[3]);
     void GetDirectionalCosines(double x1, double y1, double z1, double x2, double y2, double z2, double &l, double &m, double &n);
     double Hopspd(Adouble0D BondSK, double l, double m, double n, wxString o1, wxString o2);

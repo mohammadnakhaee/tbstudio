@@ -2368,11 +2368,6 @@ void Sec30::GetBondInfo(const wxString& bondtextvar, int& i, int& n, int& j, int
     bondtype=b0;
 }
 
-GetBondSK(int bondtype, Adouble0D &BondSK)
-{
-    
-}
-
 void Sec30::GetOrbitalInfo(wxCheckTree* orbsTree, wxString AtomName, int ShellNumber, wxString &Orbs, int &nOrbs, bool &IsShell)
 {
     wxTreeItemId rootID = orbsTree->GetRootItem();
@@ -2504,6 +2499,13 @@ double Sec30::norm(double a[3], double b[3])
         r += v[i]*v[i];
     }
     return sqrt(r);
+}
+
+double Sec30::dot(double a[3], double b[3])
+{
+    double r = 0.0;
+    for (int i=0;i<3;i++) r += a[i]*b[i];
+    return r;
 }
 
 void Sec30::vk_rtv(double vk[3], double rtv[3][3], double v[3])

@@ -10,8 +10,6 @@
 #include <exception>
 #include <wx/msgdlg.h>
 #include <Sec30.h>
-#include "lapacke.h"
-//#include "lapacke_config.h"
 /**************************************************************************************/
 class SetupClass : public wxPanel
 {
