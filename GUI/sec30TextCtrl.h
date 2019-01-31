@@ -27,13 +27,15 @@ class  sec30TextCtrl : public myGrid
 public:
 	sec30TextCtrl(wxWindow *parent, wxWindowID id, wxString Type, const wxPoint &pos=wxDefaultPosition, const wxSize &size=wxDefaultSize, const bool ReadOnly=false)
     :myGrid(parent, id, pos, size,0){
-        SetMinSize(size);
-        EnableGridLines(false);
+        //SetMinSize(size);
+        //EnableGridLines(false);
         EnableEditing(true);
         CreateGrid( 1, 1);
         SetColSize(0, size.x-1);// in pixels
         SetColLabelSize(1);
         SetRowLabelSize(1);
+        //EnableCellEditControl(false);
+        //SetCellAlignment(wxALIGN_CENTRE,0,0);
         DisableColResize(0);
         DisableRowResize(0);
         EnableScrolling(false,false);
