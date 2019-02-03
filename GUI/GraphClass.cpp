@@ -46,12 +46,58 @@ void GraphClass::CreateAtomicStructure(Sec30* sec30Var, bool IsNewAllocate)
     double YArray[nUnitcellAtoms];
     double ZArray[nUnitcellAtoms];
     
+    
+    wxComboBox* unitcellctr2 =  sec30->GetComboObject(_("TransferTo"));
+    int TransferMode = unitcellctr2->GetSelection();
+
+    double a[3],b[3],c[3];
+    sec30->GetVar(_("a[0]"), a[0]);
+    sec30->GetVar(_("a[1]"), a[1]);
+    sec30->GetVar(_("a[2]"), a[2]);
+    sec30->GetVar(_("b[0]"), b[0]);
+    sec30->GetVar(_("b[1]"), b[1]);
+    sec30->GetVar(_("b[2]"), b[2]);
+    sec30->GetVar(_("c[0]"), c[0]);
+    sec30->GetVar(_("c[1]"), c[1]);
+    sec30->GetVar(_("c[2]"), c[2]);
+    
+    double r0[3] = {0.0, 0.0, 0.0};
+    
     for (int i0=0; i0<nUnitcellAtoms; i0++)
     {
         sec30->GetVar(_("KABC_Coords"), i0, 0, kind[i0]);
         sec30->GetVar(_("XYZ_Coords"), i0, 0, XArray[i0]);
         sec30->GetVar(_("XYZ_Coords"), i0, 1, YArray[i0]);
         sec30->GetVar(_("XYZ_Coords"), i0, 2, ZArray[i0]);
+        
+        if (TransferMode == 1)
+        {
+            if (i0 == 0)
+            {
+                r0[0] = XArray[i0];
+                r0[1] = YArray[i0];
+                r0[2] = ZArray[i0];
+            }
+            else
+            {
+                if (r0[0] > XArray[i0]) r0[0] = XArray[i0];
+                if (r0[1] > YArray[i0]) r0[1] = YArray[i0];
+                if (r0[2] > ZArray[i0]) r0[2] = ZArray[i0];
+            }
+        }
+        else if (TransferMode >= 2)
+        {
+            r0[0] += XArray[i0]/nUnitcellAtoms;
+            r0[1] += YArray[i0]/nUnitcellAtoms;
+            r0[2] += ZArray[i0]/nUnitcellAtoms;
+        }
+    }
+    
+    if (TransferMode == 2)
+    {
+        r0[0] -= (a[0] + b[0] + c[0]) / 2.0;
+        r0[1] -= (a[1] + b[1] + c[1]) / 2.0;
+        r0[2] -= (a[2] + b[2] + c[2]) / 2.0;
     }
     
     int ar[nUnitcellAtoms], ag[nUnitcellAtoms], ab[nUnitcellAtoms];
@@ -66,17 +112,6 @@ void GraphClass::CreateAtomicStructure(Sec30* sec30Var, bool IsNewAllocate)
         ag[i0] = c.Green();
         ab[i0] = c.Blue();
     }
-    
-    double a[3],b[3],c[3];
-    sec30->GetVar(_("a[0]"), a[0]);
-    sec30->GetVar(_("a[1]"), a[1]);
-    sec30->GetVar(_("a[2]"), a[2]);
-    sec30->GetVar(_("b[0]"), b[0]);
-    sec30->GetVar(_("b[1]"), b[1]);
-    sec30->GetVar(_("b[2]"), b[2]);
-    sec30->GetVar(_("c[0]"), c[0]);
-    sec30->GetVar(_("c[1]"), c[1]);
-    sec30->GetVar(_("c[2]"), c[2]);
 
     int ma[2],mb[2],mc[2],TBl,TBm,TBn;
     sec30->GetVar(_("ma[0]"), ma[0]);
@@ -203,9 +238,9 @@ void GraphClass::CreateAtomicStructure(Sec30* sec30Var, bool IsNewAllocate)
                         iAtom++;
                         if (!isCountingMode)
                         {
-                            glc->DoubleArray[0][iAtom] = XArray[i0] + i*a[0] + j*b[0] + k*c[0];
-                            glc->DoubleArray[1][iAtom] = YArray[i0] + i*a[1] + j*b[1] + k*c[1];
-                            glc->DoubleArray[2][iAtom] = ZArray[i0] + i*a[2] + j*b[2] + k*c[2];
+                            glc->DoubleArray[0][iAtom] = XArray[i0] + i*a[0] + j*b[0] + k*c[0] -r0[0];
+                            glc->DoubleArray[1][iAtom] = YArray[i0] + i*a[1] + j*b[1] + k*c[1] -r0[1];
+                            glc->DoubleArray[2][iAtom] = ZArray[i0] + i*a[2] + j*b[2] + k*c[2] -r0[2];
                             glc->DoubleArray[3][iAtom] = GetAtomRadius(kind[i0]);
                             glc->IntArray[0][iAtom] = ar[i0];
                             glc->IntArray[1][iAtom] = ag[i0];
@@ -264,12 +299,12 @@ void GraphClass::CreateAtomicStructure(Sec30* sec30Var, bool IsNewAllocate)
                                         bool isBondValid = (iAtomIndex >= 0 && iAtomIndex < nUnitcellAtoms) && (jAtomIndex >= 0 && jAtomIndex < nUnitcellAtoms);
                                         if (isBondValid)
                                         {
-                                            glc->DoubleArray[4][iBond] = XArray[iAtomIndex] + i*a[0] + j*b[0] + k*c[0];
-                                            glc->DoubleArray[5][iBond] = YArray[iAtomIndex] + i*a[1] + j*b[1] + k*c[1];
-                                            glc->DoubleArray[6][iBond] = ZArray[iAtomIndex] + i*a[2] + j*b[2] + k*c[2];
-                                            glc->DoubleArray[7][iBond] = XArray[jAtomIndex] + (iMyess + i)*a[0] + (jMyess + j)*b[0] + (kMyess + k)*c[0];
-                                            glc->DoubleArray[8][iBond] = YArray[jAtomIndex] + (iMyess + i)*a[1] + (jMyess + j)*b[1] + (kMyess + k)*c[1];
-                                            glc->DoubleArray[9][iBond] = ZArray[jAtomIndex] + (iMyess + i)*a[2] + (jMyess + j)*b[2] + (kMyess + k)*c[2];
+                                            glc->DoubleArray[4][iBond] = XArray[iAtomIndex] + i*a[0] + j*b[0] + k*c[0] -r0[0];
+                                            glc->DoubleArray[5][iBond] = YArray[iAtomIndex] + i*a[1] + j*b[1] + k*c[1] -r0[1];
+                                            glc->DoubleArray[6][iBond] = ZArray[iAtomIndex] + i*a[2] + j*b[2] + k*c[2] -r0[2];
+                                            glc->DoubleArray[7][iBond] = XArray[jAtomIndex] + (iMyess + i)*a[0] + (jMyess + j)*b[0] + (kMyess + k)*c[0] -r0[0];
+                                            glc->DoubleArray[8][iBond] = YArray[jAtomIndex] + (iMyess + i)*a[1] + (jMyess + j)*b[1] + (kMyess + k)*c[1] -r0[1];
+                                            glc->DoubleArray[9][iBond] = ZArray[jAtomIndex] + (iMyess + i)*a[2] + (jMyess + j)*b[2] + (kMyess + k)*c[2] -r0[2];
                                             double radius = GetAtomRadius(kind[iAtomIndex]);
                                             double radius2 = GetAtomRadius(kind[jAtomIndex]);
                                             if (radius > radius2) radius = radius2;
@@ -346,9 +381,9 @@ void GraphClass::CreateAtomicStructure(Sec30* sec30Var, bool IsNewAllocate)
                 iAtom++;
                 if (!isCountingMode)
                 {
-                    glc->DoubleArray[0][iAtom] = XArray[i0] + i*a[0] + j*b[0] + k*c[0];
-                    glc->DoubleArray[1][iAtom] = YArray[i0] + i*a[1] + j*b[1] + k*c[1];
-                    glc->DoubleArray[2][iAtom] = ZArray[i0] + i*a[2] + j*b[2] + k*c[2];
+                    glc->DoubleArray[0][iAtom] = XArray[i0] + i*a[0] + j*b[0] + k*c[0] -r0[0];
+                    glc->DoubleArray[1][iAtom] = YArray[i0] + i*a[1] + j*b[1] + k*c[1] -r0[1];
+                    glc->DoubleArray[2][iAtom] = ZArray[i0] + i*a[2] + j*b[2] + k*c[2] -r0[2];
                     glc->DoubleArray[3][iAtom] = GetAtomRadius(kind[i0]);
                     glc->IntArray[0][iAtom] = ar[i0];
                     glc->IntArray[1][iAtom] = ag[i0];
@@ -437,12 +472,12 @@ void GraphClass::CreateAtomicStructure(Sec30* sec30Var, bool IsNewAllocate)
                                 bool isBondValid = (iAtomIndex >= 0 && iAtomIndex < nUnitcellAtoms) && (jAtomIndex >= 0 && jAtomIndex < nUnitcellAtoms);
                                 if (isBondValid)
                                 {
-                                    glc->DoubleArray[4][iBond] = XArray[iAtomIndex] + i*a[0] + j*b[0] + k*c[0];
-                                    glc->DoubleArray[5][iBond] = YArray[iAtomIndex] + i*a[1] + j*b[1] + k*c[1];
-                                    glc->DoubleArray[6][iBond] = ZArray[iAtomIndex] + i*a[2] + j*b[2] + k*c[2];
-                                    glc->DoubleArray[7][iBond] = XArray[jAtomIndex] + (iMyess + i)*a[0] + (jMyess + j)*b[0] + (kMyess + k)*c[0];
-                                    glc->DoubleArray[8][iBond] = YArray[jAtomIndex] + (iMyess + i)*a[1] + (jMyess + j)*b[1] + (kMyess + k)*c[1];
-                                    glc->DoubleArray[9][iBond] = ZArray[jAtomIndex] + (iMyess + i)*a[2] + (jMyess + j)*b[2] + (kMyess + k)*c[2];
+                                    glc->DoubleArray[4][iBond] = XArray[iAtomIndex] + i*a[0] + j*b[0] + k*c[0] -r0[0];
+                                    glc->DoubleArray[5][iBond] = YArray[iAtomIndex] + i*a[1] + j*b[1] + k*c[1] -r0[1];
+                                    glc->DoubleArray[6][iBond] = ZArray[iAtomIndex] + i*a[2] + j*b[2] + k*c[2] -r0[2];
+                                    glc->DoubleArray[7][iBond] = XArray[jAtomIndex] + (iMyess + i)*a[0] + (jMyess + j)*b[0] + (kMyess + k)*c[0] -r0[0];
+                                    glc->DoubleArray[8][iBond] = YArray[jAtomIndex] + (iMyess + i)*a[1] + (jMyess + j)*b[1] + (kMyess + k)*c[1] -r0[1];
+                                    glc->DoubleArray[9][iBond] = ZArray[jAtomIndex] + (iMyess + i)*a[2] + (jMyess + j)*b[2] + (kMyess + k)*c[2] -r0[2];
                                     double radius = GetAtomRadius(kind[iAtomIndex]);
                                     double radius2 = GetAtomRadius(kind[jAtomIndex]);
                                     if (radius > radius2) radius = radius2;
@@ -657,7 +692,7 @@ double GraphClass::GetAtomRadius(int kind)
 {
     double k=abs(kind);
     if (k < 1) k=1;
-    return (10.0 + pow(log(abs(k) + 1),2.75)/2.0 )/100.0;
+    return (10.0 + pow(log(abs(k) + 1),2.75)/2.0 )/60.0;
 }
 
 void GraphClass::SetLeftMouseMode(int mouseEventMode)

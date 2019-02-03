@@ -8,6 +8,7 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="src">
+    <File Name="Regression.cpp"/>
     <File Name="SetupClass.cpp"/>
     <File Name="SKClass.cpp"/>
     <File Name="BondsClass.cpp"/>
@@ -29,6 +30,7 @@
     <File Name="wxcrafter_bitmaps.cpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="include">
+    <File Name="Regression.h"/>
     <File Name="Embeded.h"/>
     <File Name="SetupClass.h"/>
     <File Name="SKClass.h"/>
@@ -78,7 +80,7 @@
         <IncludePath Value="$(Glut_DIR)/include"/>
         <IncludePath Value="$(LAPACKE_DIR)"/>
       </Compiler>
-      <Linker Options="-mwindows;$(shell wx-config --libs std,gl,ribbon);-mwindows;-std=gnu++11" Required="yes">
+      <Linker Options="-mwindows;$(shell wx-config --libs std,gl,ribbon);-mwindows;-std=gnu++11 -pthread" Required="yes">
         <LibraryPath Value="$(Opengl_DIR)"/>
         <LibraryPath Value="$(MathGL_DIR)\lib"/>
         <LibraryPath Value="C:\TDM-GCC-64\x86_64-w64-mingw32\lib"/>

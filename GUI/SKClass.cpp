@@ -21,26 +21,15 @@ SKClass::SKClass(wxWindow* parent, Sec30* sec30var, wxWindowID id, const wxPoint
     sec30->AddGroupBox(this, _("Setup the Parameter Vector"),wxColour(wxT("rgb(153,180,209)")));
     sec30->AddCheckBox(this, _("SOC"), _("Take SOC into Accounts"));
     sec30->AddCheckBox(this, _("Overlap"), _("Non-Orthogonal Basis"));
-    wxString Labels1[1] = {_("Update")};
+    wxString Labels1[1] = {_("Evaluate Independent Parameters")};
     wxObjectEventFunction Funcs1[1] = {wxCommandEventHandler(SKClass::Btn_Update_OnClick)};
     sec30->AddButton(this, 1, Labels1, Funcs1);
     /**********************************************************************************************************************************************/
-    sec30->AddGroupBox(this,_("Levenberg–Marquardt Algorithm"),wxColour(wxT("rgb(153,180,209)")));
-    /**********************************************************************************************************************************************/
-    sec30->AddGroupBox(this,_("Fitting Procedure"),wxColour(wxT("rgb(153,180,209)")));
-    wxString Labels3[2] = {_("Start"), _("One Step")};
-    wxObjectEventFunction Funcs3[2] = { wxCommandEventHandler(SKClass::Btn_Start_OnClick), wxCommandEventHandler(SKClass::Btn_OneStep_OnClick)};
-    sec30->AddButton(this, 2, Labels3, Funcs3);
-    wxString Labels4[2] = {_("Pause"), _("Stop")};
-    wxObjectEventFunction Funcs4[2] = { wxCommandEventHandler(SKClass::Btn_Pause_OnClick), wxCommandEventHandler(SKClass::Btn_Stop_OnClick)};
-    sec30->AddButton(this, 2, Labels4, Funcs4);
+    sec30->AddVarVector(this, 1, _("nParameters"), _("int"), _("Number of Parameters"), 140, 100, false, true);
+    sec30->SetVar(_("nParameters[0]"), 0, false);
     wxString Labels2[1] = {_("Use Last State as Initial Guess")};
     wxObjectEventFunction Funcs2[1] = { wxCommandEventHandler(SKClass::Btn_LastValues_OnClick)};
     sec30->AddButton(this, 1, Labels2, Funcs2);
-    /**********************************************************************************************************************************************/
-    sec30->AddGroupBox(this,_("Information"),wxColour(wxT("rgb(153,180,209)")));
-    sec30->AddVarVector(this, 1, _("nParameters"), _("int"), _("Number of Parameters"), 140, 100, false, true);
-    sec30->SetVar(_("nParameters[0]"), 0, false);
     /**********************************************************************************************************************************************/
     sec30->AddGroupBox(this,_("On-Site Energies"),wxColour(wxT("rgb(153,180,209)")));
     wxString ColNames[3] = { _("Parameter"), _("Initial Value"), _("Last Value")};
@@ -85,26 +74,6 @@ void SKClass::Btn_Update_OnClick(wxCommandEvent& event)
 }
 
 void SKClass::Btn_LastValues_OnClick(wxCommandEvent& event)
-{
-    
-}
-
-void SKClass::Btn_Start_OnClick(wxCommandEvent& event)
-{
-    
-}
-
-void SKClass::Btn_Pause_OnClick(wxCommandEvent& event)
-{
-    
-}
-
-void SKClass::Btn_Stop_OnClick(wxCommandEvent& event)
-{
-    
-}
-
-void SKClass::Btn_OneStep_OnClick(wxCommandEvent& event)
 {
     
 }

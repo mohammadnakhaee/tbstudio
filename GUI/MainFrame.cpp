@@ -51,9 +51,15 @@ MainFrame::MainFrame(wxWindow* parent)
     RButtonMouse->ToggleButton(wxID_RETRY, true);//Rotate
     //tbmodel = new TBModel();
     //tbmodel->nAtoms = 4;
-    sec30=new Sec30(this);
+    
+    sec30 = new Sec30(this);
+    //sec30 = std::make_shared<Sec30>(this);
+    
     sec30->Connect(Sec30EVT_OnUpdated, wxCommandEventHandler(sec30_OnUpdated), NULL, this);
     this->Connect(MyOpenGL_EVT_SelectionChanged, wxCommandEventHandler(myOpenGL_EVT_SelectionChanged), NULL, this);
+    this->Connect(RegressionEVT_OnNewData, wxCommandEventHandler(regressionEVT_OnNewData), NULL, this);
+    this->Connect(RegressionEVT_OnFinished, wxCommandEventHandler(regressionEVT_OnFinished), NULL, this);
+    
     InitializeSec30Arrays();
     
     /*
@@ -141,6 +147,7 @@ MainFrame::MainFrame(wxWindow* parent)
     Init_graph3d();
     Init_graph2d0();
     Init_graph2d();
+    regression = new Regression(sec30, this, graph2d);
     
     /////////////////////////////////////////////////////////////////////////////////////
     ///////Just to call InsertPane to push old panes (graph2d0 and graph2d) aside////////
@@ -618,7 +625,7 @@ void MainFrame::InitializeSec30Arrays()
 {
     int nArraysOf0DDouble = 9;
     int nArraysOf0DInt = 9;
-    int nArraysOf2DInt = 1;
+    int nArraysOf2DInt = 3;
     int nArraysOf1DDouble = 1;
     int nArraysOf1DString = 3;
     int nArraysOf2DDouble = 4;
@@ -650,6 +657,8 @@ void MainFrame::InitializeSec30Arrays()
     
     /////////////////////////////2D Int///////////////////////////////////////////////////////
     sec30->ArraysOf2DInt[0] = Aint1D();//int** HamiltonianDimMap;
+    sec30->ArraysOf2DInt[1] = Aint1D();//int** SKListInfo;
+    sec30->ArraysOf2DInt[2] = Aint1D();//int** FitPoints;
     
     /////////////////////////////0D Double///////////////////////////////////////////////////////
     sec30->ArraysOf0DDouble[0] = 0.0;//double ChemP;
@@ -731,6 +740,7 @@ void MainFrame::BtnOpen_OnClick(wxRibbonButtonBarEvent& event)
         wxString dgPath = OpenDialog->GetDirectory();
         wxString dgFileName = OpenDialog->GetFilename();
         sec30->LoadFromFile(dgPath, dgFileName);
+        UpdateGraph2Ds();
 	}
  
 	OpenDialog->Destroy();
@@ -1698,8 +1708,8 @@ void MainFrame::ReArrangeSKList()
     sec30->ArraysOf1DString[2] = HamiltonianShellMap;
     sec30->ArraysOf2DInt[0] = HamiltonianDimMap;
     
+    Aint1D SKIndexList;
     int TotalNumberOfParameters = 0;
-    
     ///////////////////////////////////////////////////////////On-Sites////////////////////////////////////////////////////////////////////
     int TotalIndex = -1;
     wxTreeItemId orbsRoot = orbs->GetRootItem();
@@ -1747,6 +1757,11 @@ void MainFrame::ReArrangeSKList()
                             osgc->SetCellBackgroundColour(TotalIndex, 0, c);
                             osgc->SetCellValue(TotalIndex, 1, _("0"));
                             
+                            Aint0D IndexInfo;
+                            IndexInfo.push_back(1);
+                            IndexInfo.push_back(TotalIndex);
+                            SKIndexList.push_back(IndexInfo);
+                            
                             if (!is_p)
                             {
                                 if (OnSiteLabel[0] == 'p' || OnSiteLabel[1] == 'p') is_p = true;
@@ -1772,6 +1787,11 @@ void MainFrame::ReArrangeSKList()
                             osgc->SetReadOnly(TotalIndex, 0);
                             osgc->SetCellBackgroundColour(TotalIndex, 0, c);
                             osgc->SetCellValue(TotalIndex, 1, _("0"));
+                            
+                            Aint0D IndexInfo;
+                            IndexInfo.push_back(1);
+                            IndexInfo.push_back(TotalIndex);
+                            SKIndexList.push_back(IndexInfo);
                         }
                         
                         if (is_d)
@@ -1784,6 +1804,11 @@ void MainFrame::ReArrangeSKList()
                             osgc->SetReadOnly(TotalIndex, 0);
                             osgc->SetCellBackgroundColour(TotalIndex, 0, c);
                             osgc->SetCellValue(TotalIndex, 1, _("0"));
+                            
+                            Aint0D IndexInfo;
+                            IndexInfo.push_back(1);
+                            IndexInfo.push_back(TotalIndex);
+                            SKIndexList.push_back(IndexInfo);
                         }
                     }
                 }
@@ -1805,6 +1830,7 @@ void MainFrame::ReArrangeSKList()
     osgc->SetCellBackgroundColour(TotalIndex, 2, c);
     
     ///////////////////////////////////////////////////////////Bonds////////////////////////////////////////////////////////////////////
+    Aint0D OnlyBondsIndex;
     TotalIndex = -1;
     for (int BondTypeIndex = 1; BondTypeIndex <= nBondType; BondTypeIndex++)
     {
@@ -1876,6 +1902,8 @@ void MainFrame::ReArrangeSKList()
                     skgc->SetCellBackgroundColour(TotalIndex, 0, c);
                     skgc->SetCellValue(TotalIndex, 1, _("0"));
                     
+                    OnlyBondsIndex.push_back(TotalIndex);
+                    
                     if (isOverlap)
                     {
                         TotalNumberOfParameters++;
@@ -1889,6 +1917,27 @@ void MainFrame::ReArrangeSKList()
             }
         }
     }
+    
+    for (int isk = 0; isk<OnlyBondsIndex.size(); isk++)
+    {
+        Aint0D IndexInfo;
+        IndexInfo.push_back(2);
+        IndexInfo.push_back(OnlyBondsIndex[isk]);
+        SKIndexList.push_back(IndexInfo);
+    }
+    
+    if (isOverlap)
+    {
+        for (int isk = 0; isk<OnlyBondsIndex.size(); isk++)
+        {
+            Aint0D IndexInfo;
+            IndexInfo.push_back(3);
+            IndexInfo.push_back(OnlyBondsIndex[isk]);
+            SKIndexList.push_back(IndexInfo);
+        }
+    }
+    
+    sec30->ArraysOf2DInt[1] = SKIndexList;
     
     TotalIndex++;
     skgc->InsertRows(TotalIndex, 1,true);
@@ -2160,7 +2209,7 @@ void MainFrame::BtnRight_OnClick(wxRibbonButtonBarEvent& event)
 
 void MainFrame::BtnStart_OnClick(wxRibbonButtonBarEvent& event)
 {
-    
+    StartRegression();
 }
 
 void MainFrame::BtnAbout_OnClick(wxRibbonButtonBarEvent& event)
@@ -2321,7 +2370,7 @@ void MainFrame::LoadIcons()
     
     RButtonBar5->Realize();
     
-    wxRibbonPage* RPageCalculations = new wxRibbonPage(MainRibbon, wxID_ANY, _("Calculation"), wxNullBitmap, 0);
+    wxRibbonPage* RPageCalculations = new wxRibbonPage(MainRibbon, wxID_ANY, _("Analyze"), wxNullBitmap, 0);
     wxRibbonPanel* RPanelFitting = new wxRibbonPanel(RPageCalculations, wxID_ANY, _("Fitting"), wxNullBitmap, wxDefaultPosition, wxDLG_UNIT(RPageCalculations, wxSize(-1,-1)), wxRIBBON_PANEL_DEFAULT_STYLE);
     wxRibbonButtonBar* RButtonBar7 = new wxRibbonButtonBar(RPanelFitting, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(RPanelFitting, wxSize(-1,-1)), 0);
     
@@ -2362,22 +2411,6 @@ wxBitmap MainFrame::GetPng(const void* data, size_t length)
     wxImage image(memIStream, wxBITMAP_TYPE_PNG );
     wxBitmap bmp( image );
     return bmp;
-}
-
-void MainFrame::GetCellInfo(wxString cellStr, int &icell, int &jcell, int &kcell)
-{
-    wxString str = cellStr;
-    str.Replace(wxString("("), wxString(""));
-    str.Replace(wxString(")"), wxString(""));
-    
-    wxStringTokenizer tokenizer(str, ",");
-    long i0,j0,k0;
-    tokenizer.GetNextToken().ToLong(&i0);
-    tokenizer.GetNextToken().ToLong(&j0);
-    tokenizer.GetNextToken().ToLong(&k0);
-    icell=i0;
-    jcell=j0;
-    kcell=k0;
 }
 
 void MainFrame::GetHamiltonianMap(wxCheckTree* orbs, Astring0D &HamiltonianMap, Astring0D &HamiltonianShellMap, Aint1D &HamiltonianDimMap)
@@ -2437,408 +2470,6 @@ void MainFrame::AddShellAndOrbitalInfo(wxCheckTree* orbsTree, wxString AtomName,
     }
 }
 
-void MainFrame::ConstructTBHamiltonian(Adouble2D &Hi, Adouble2D &Hf, int &nEssensialCells, int &nHamiltonian, Aint1D &EssCells)
-{
-    wxListBox* listctr = sec30->GetListObject(_("EssentialUnitcellList"));
-    int nCell = listctr->GetCount();
-    nEssensialCells = nCell;
-    if (nCell < 1) {wxMessageBox(_("There is a problem in your structure. Please check your inputs in the Unit Cell and the Structure Panels."),_("Error")); return;}
-    
-    myGrid* OnSiteCtr = sec30->GetGridObject(_("OS"));
-    myGrid* SKCtr = sec30->GetGridObject(_("SK"));
-    myGrid* OverlapCtr = sec30->GetGridObject(_("OL"));
-    
-    int nUnitcellAtoms = 0;
-    sec30->GetVar(_("nAtoms[0]"),nUnitcellAtoms);
-    
-    double x, y, z;
-    Adouble1D XYZCoords;
-    for (int i0=0; i0<nUnitcellAtoms; i0++)
-    {
-        Adouble0D atomXYZ;
-        sec30->GetVar(_("XYZ_Coords"), i0, 0, x);
-        sec30->GetVar(_("XYZ_Coords"), i0, 1, y);
-        sec30->GetVar(_("XYZ_Coords"), i0, 2, z);
-        atomXYZ.push_back(x);
-        atomXYZ.push_back(y);
-        atomXYZ.push_back(z);
-        XYZCoords.push_back(atomXYZ);
-    }
-    
-    double a[3],b[3],c[3];
-    sec30->GetVar(_("a[0]"), a[0]);
-    sec30->GetVar(_("a[1]"), a[1]);
-    sec30->GetVar(_("a[2]"), a[2]);
-    sec30->GetVar(_("b[0]"), b[0]);
-    sec30->GetVar(_("b[1]"), b[1]);
-    sec30->GetVar(_("b[2]"), b[2]);
-    sec30->GetVar(_("c[0]"), c[0]);
-    sec30->GetVar(_("c[1]"), c[1]);
-    sec30->GetVar(_("c[2]"), c[2]);
-    
-    wxCheckTree* orbs = sec30->GetTreeObject(_("Orbitals"));
-    Astring0D HamiltonianMap = sec30->ArraysOf1DString[1];
-    nHamiltonian = HamiltonianMap.size();
-    Aint1D HamiltonianDimMap = sec30->ArraysOf2DInt[0];
-    wxCheckTree* bonds = sec30->GetTreeObject(_("Bonds"));
-    wxTreeItemId rootID = bonds->GetRootItem();
-    EssCells.clear();
-    for (int iCell=0; iCell<nCell; iCell++)
-    {
-        Aint0D lmnOfCell;
-        wxString WorkingCell = listctr->GetString(iCell);
-        wxString ucell = _("(0,0,0)-") + WorkingCell;
-        int lcell,mcell,ncell;
-        GetCellInfo(WorkingCell, lcell, mcell, ncell);
-        lmnOfCell.push_back(lcell);
-        lmnOfCell.push_back(mcell);
-        lmnOfCell.push_back(ncell);
-        EssCells.push_back(lmnOfCell);
-        wxTreeItemId CellID = bonds->FindItemIn(rootID, ucell);
-        Adouble1D hi(nHamiltonian,std::vector<double>(nHamiltonian));
-        Adouble1D hf(nHamiltonian,std::vector<double>(nHamiltonian));
-        if (CellID.IsOk())
-        {
-            if (bonds->GetItemState(CellID) >= wxCheckTree::CHECKED) GetCouplingMatrix(SKCtr, OverlapCtr, bonds, orbs, a, b, c, XYZCoords, HamiltonianDimMap, CellID, WorkingCell, hi, hf);
-        }
-        
-        if (WorkingCell == _("(0,0,0)"))
-        {
-            AddOnSiteMatrix(OnSiteCtr, orbs, HamiltonianDimMap, hi, hf);
-        }
-        
-        Hi.push_back(hi);
-        Hf.push_back(hf);
-    }
-}
-
-void MainFrame::GetCouplingMatrix(myGrid* SKCtr, myGrid* OverlapCtr, wxCheckTree* BondTree, wxCheckTree* orbs, double a[3], double b[3], double c[3], Adouble1D XYZCoords, Aint1D HamiltonianDimMap, wxTreeItemId CellID, wxString WorkingCell, Adouble1D &hi, Adouble1D &hf)
-{
-    
-    if (!CellID.IsOk())
-    {
-        //Allocate h for zeros
-        return;
-    }
-    
-    int icell,jcell,kcell;
-    GetCellInfo(WorkingCell, icell, jcell, kcell);
-    
-    double CellX = icell*a[0] + jcell*b[0] + kcell*c[0];
-    double CellY = icell*a[1] + jcell*b[1] + kcell*c[1];
-    double CellZ = icell*a[2] + jcell*b[2] + kcell*c[2];
-            
-    wxTreeItemId rootID = orbs->GetRootItem();
-    wxString rootname = orbs->GetItemText(rootID);    
-    
-    wxTreeItemIdValue cookie;
-	wxTreeItemId item = BondTree->GetFirstChild(CellID, cookie);
-	while(item.IsOk())
-	{
-		wxString BondInfo = BondTree->GetItemText(item);
-        //////////////////////////////////////////////
-        if (BondTree->GetItemState(item) >= wxCheckTree::CHECKED)
-        {
-            int iAtomIndex,nShellIndex,jAtomIndex,mShellIndex,bondtype;
-            sec30->GetBondInfo(BondInfo, iAtomIndex, nShellIndex, jAtomIndex, mShellIndex, bondtype);
-            wxString BondStr = wxString::Format(wxT("Bond %d"), bondtype);
-            
-            Adouble0D iBondSK, fBondSK;
-            GetBondSK(SKCtr, BondStr, iBondSK, fBondSK);
-            
-            int Dim1 = -1;
-            int Dim2 = -1;
-            bool IsShell1, IsShell2;
-            wxString Orbs1, Orbs2;
-            
-            wxString atom1 = wxString::Format(wxT("AtomInd%d"),iAtomIndex + 1);
-            wxComboBox* comb1 = sec30->GetComboObject(atom1);
-            wxString TBAtom1 = comb1->GetStringSelection();
-            sec30->GetOrbitalInfo(orbs, TBAtom1, nShellIndex, Orbs1, Dim1, IsShell1);
-            
-            wxString atom2 = wxString::Format(wxT("AtomInd%d"),jAtomIndex + 1);
-            wxComboBox* comb2 = sec30->GetComboObject(atom2);
-            wxString TBAtom2 = comb2->GetStringSelection();
-            sec30->GetOrbitalInfo(orbs, TBAtom2, mShellIndex, Orbs2, Dim2, IsShell2);
-
-            double x2 = XYZCoords[jAtomIndex][0] + CellX;
-            double y2 = XYZCoords[jAtomIndex][1] + CellY;
-            double z2 = XYZCoords[jAtomIndex][2] + CellZ;
-            double l, m, n;
-            sec30->GetDirectionalCosines(XYZCoords[iAtomIndex][0], XYZCoords[iAtomIndex][1], XYZCoords[iAtomIndex][2], x2, y2, z2, l, m, n);
-            
-            double** iHopMat = new double*[Dim1];
-            double** fHopMat = new double*[Dim1];
-            for(int ii = 0; ii < Dim1; ii++)
-            {
-                iHopMat[ii] = new double[Dim2];
-                fHopMat[ii] = new double[Dim2];
-            }
-            
-            double** iHopMatT = new double*[Dim2];
-            double** fHopMatT = new double*[Dim2];
-            for(int ii = 0; ii < Dim2; ii++)
-            {
-                iHopMatT[ii] = new double[Dim1];
-                fHopMatT[ii] = new double[Dim1];
-            }
-            
-            Orbs1.Replace(_(" "),_(""));
-            Orbs1.Replace(_("("),_(""));
-            Orbs1.Replace(_(")"),_(""));
-            Orbs2.Replace(_(" "),_(""));
-            Orbs2.Replace(_("("),_(""));
-            Orbs2.Replace(_(")"),_(""));
-            int i=-1;
-            wxStringTokenizer tokenizer1(Orbs1, ",");
-            while (tokenizer1.HasMoreTokens())
-            {
-                i++;
-                wxString o1 = tokenizer1.GetNextToken();
-                
-                int j=-1;
-                wxStringTokenizer tokenizer2(Orbs2, ",");
-                while (tokenizer2.HasMoreTokens())
-                {
-                    j++;
-                    wxString o2 = tokenizer2.GetNextToken();
-                    iHopMat[i][j] = sec30->Hopspd(iBondSK, l, m, n, o1, o2);
-                    fHopMat[i][j] = sec30->Hopspd(fBondSK, l, m, n, o1, o2);
-                    iHopMatT[j][i] = iHopMat[i][j];
-                    fHopMatT[j][i] = fHopMat[i][j];
-                }
-            }
-            
-            int i0Ham = HamiltonianDimMap[iAtomIndex][nShellIndex - 1];
-            int j0Ham = HamiltonianDimMap[jAtomIndex][mShellIndex - 1];
-            
-            if (icell==0 && jcell==0 && kcell==0)
-            {
-                for(int ii=0; ii<Dim1; ii++)
-                    for(int jj=0; jj<Dim2; jj++)
-                    {
-                        int ih = i0Ham + ii;
-                        int jh = j0Ham + jj;
-                        hi[ih][jh] = iHopMat[ii][jj];
-                        hf[ih][jh] = fHopMat[ii][jj];
-                        hi[jh][ih] = iHopMatT[jj][ii];
-                        hf[jh][ih] = fHopMatT[jj][ii];
-                    }
-            }
-            else
-            {
-                for(int ii=0; ii<Dim1; ii++)
-                    for(int jj=0; jj<Dim2; jj++)
-                    {
-                        int ih = i0Ham + ii;
-                        int jh = j0Ham + jj;
-                        hi[ih][jh] = iHopMat[ii][jj];
-                        hf[ih][jh] = fHopMat[ii][jj];
-                    }
-            }
-            
-            for(int ii = 0; ii < Dim1; ii++)
-            {
-                if (Dim2 > 0)
-                {
-                    delete [] iHopMat[ii];
-                    delete [] fHopMat[ii];
-                }   
-            }
-            
-            for(int ii = 0; ii < Dim2; ii++)
-            {
-                if (Dim1 > 0)
-                {
-                    delete [] iHopMatT[ii];
-                    delete [] fHopMatT[ii];
-                }   
-            }
-            
-            if (Dim1>0)
-            {
-                delete [] iHopMat;
-                delete [] fHopMat;
-            }
-            
-            if (Dim2>0)
-            {
-                delete [] iHopMatT;
-                delete [] fHopMatT;
-            }
-        }
-        //////////////////////////////////////////////
-		item = BondTree->GetNextChild(CellID, cookie);
-	}
-}
-
-void MainFrame::AddOnSiteMatrix(myGrid* OnSiteCtr, wxCheckTree* orbs, Aint1D HamiltonianDimMap, Adouble1D &hi, Adouble1D &hf)
-{
-    wxTreeItemId rootID = orbs->GetRootItem();
-    wxString rootname = orbs->GetItemText(rootID);
-    
-    int nUnitcellAtoms = 0;
-    sec30->GetVar(_("nAtoms[0]"),nUnitcellAtoms);
-    
-    for (int iAtomIndex=0; iAtomIndex<nUnitcellAtoms; iAtomIndex++)
-    {
-        int Dim1 = -1;
-        bool IsShell1;
-        wxString Orbs1;
-        
-        wxString atom1 = wxString::Format(wxT("AtomInd%d"),iAtomIndex + 1);
-        wxComboBox* comb1 = sec30->GetComboObject(atom1);
-        wxString TBAtom1 = comb1->GetStringSelection();
-        
-        wxTreeItemId AtomID = orbs->ActiveAndContainsItemIn(rootID ,TBAtom1);
-        int nShell = orbs->GetChildrenCount(AtomID,false);
-        
-        for (int iShell=1; iShell<=nShell; iShell++)
-        {
-            wxString ShellName = wxString::Format(wxT("Shell %d"),iShell);
-            wxTreeItemId shellID = orbs->FindItemIn(AtomID,ShellName);
-            
-            if (shellID.IsOk() && orbs->GetItemState(shellID) >= wxCheckTree::CHECKED)
-            {
-                sec30->GetOrbitalInfo(orbs, TBAtom1, iShell, Orbs1, Dim1, IsShell1);
-                wxString Label = TBAtom1  + _(" (") + ShellName + _(")");
-
-                int i0Ham = HamiltonianDimMap[iAtomIndex][iShell - 1];
-                
-                Adouble0D iOnSiteSK, fOnSiteSK;
-                GetOnSiteSK(OnSiteCtr, Label, iOnSiteSK, fOnSiteSK);
-                    
-                for(int ii=0; ii<Dim1; ii++)
-                {
-                    int ih = i0Ham + ii;
-                    hi[ih][ih] = iOnSiteSK[ii];
-                    hf[ih][ih] = fOnSiteSK[ii];
-                }
-            }
-        }
-    }
-}
-
-void MainFrame::GetOnSiteSK(myGrid* GridCtrl, wxString Label, Adouble0D &iBondSK, Adouble0D &fBondSK)
-{
-    wxString title, istr, fstr;
-    double ival, fval;
-    int nRow = GridCtrl->GetNumberRows();
-    iBondSK = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-    fBondSK = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-    bool found = false;
-    for (int irow=0; irow<nRow;irow++)
-    {
-        title = GridCtrl->GetCellValue(irow, 0);
-        if (!found)
-        {
-            if (title == Label) found = true;
-        }
-        else
-        {
-            //if (GridCtrl->GetCellBackgroundColour(irow, 1) != *wxWHITE) return;
-            if (GridCtrl->IsReadOnly(irow, 1)) return;
-            istr = GridCtrl->GetCellValue(irow, 1);
-            fstr = GridCtrl->GetCellValue(irow, 2);
-            bool isOki = istr.ToDouble(&ival);
-            bool isOkf = fstr.ToDouble(&fval);
-            SetOnSiteSKElement(title, isOki, iBondSK, ival, isOkf, fBondSK, fval);
-        }
-    }
-}
-
-void MainFrame::SetOnSiteSKElement(wxString skName, bool isOki, Adouble0D &iBondSK, double ival, bool isOkf, Adouble0D &fBondSK, double fval)
-{
-    int ind = GetOnSiteSKInd(skName);
-    if (isOki) iBondSK[ind] = ival;
-    if (isOkf) fBondSK[ind] = fval;
-}
-
-int MainFrame::GetOnSiteSKInd(wxString skName)
-{
-    if (skName == _("s"))
-        return 0;
-    else if (skName == _("p_y"))
-        return 1;
-    else if (skName == _("p_z"))
-        return 2;
-    else if (skName == _("p_x"))
-        return 3;
-    else if (skName == _("d_{xy}"))
-        return 4;
-    else if (skName == _("d_{yz}"))
-        return 5;
-    else if (skName == _("d_{3z^2-r^2}"))
-        return 6;
-    else if (skName == _("d_{xz}"))
-        return 7;
-    else if (skName == _("d_{x^2-y^2}"))
-        return 8;
-    
-    return -1;
-}
-
-void MainFrame::GetBondSK(myGrid* GridCtrl, wxString Label, Adouble0D &iBondSK, Adouble0D &fBondSK)
-{
-    wxString title, istr, fstr;
-    double ival, fval;
-    int nRow = GridCtrl->GetNumberRows();
-    iBondSK = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-    fBondSK = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-    bool found = false;
-    for (int irow=0; irow<nRow;irow++)
-    {
-        title = GridCtrl->GetCellValue(irow, 0);
-        if (!found)
-        {
-            if (title == Label) found = true;
-        }
-        else
-        {
-            //if (GridCtrl->GetCellBackgroundColour(irow, 1) != *wxWHITE) return;
-            if (GridCtrl->IsReadOnly(irow, 1)) return;
-            istr = GridCtrl->GetCellValue(irow, 1);
-            fstr = GridCtrl->GetCellValue(irow, 2);
-            bool isOki = istr.ToDouble(&ival);
-            bool isOkf = fstr.ToDouble(&fval);
-            SetBondSKElement(title, isOki, iBondSK, ival, isOkf, fBondSK, fval);
-        }
-    }
-}
-
-void MainFrame::SetBondSKElement(wxString skName, bool isOki, Adouble0D &iBondSK, double ival, bool isOkf, Adouble0D &fBondSK, double fval)
-{
-    int ind = GetSKInd(skName);
-    if (isOki) iBondSK[ind] = ival;
-    if (isOkf) fBondSK[ind] = fval;
-}
-
-int MainFrame::GetSKInd(wxString skName)
-{
-    if (skName == _("sss"))
-        return 0;
-    else if (skName == _("sps"))
-        return 1;
-    else if (skName == _("sds"))
-        return 2;
-    else if (skName == _("pps"))
-        return 3;
-    else if (skName == _("ppp"))
-        return 4;
-    else if (skName == _("pds"))
-        return 5;
-    else if (skName == _("pdp"))
-        return 6;
-    else if (skName == _("dds"))
-        return 7;
-    else if (skName == _("ddp"))
-        return 8;
-    else if (skName == _("ddd"))
-        return 9;
-    
-    return -1;
-}
-
 void MainFrame::ReadSK()
 {
     long bondtype;
@@ -2893,12 +2524,6 @@ void MainFrame::ReadSK()
     if (Case == -1) {wxMessageBox(_("SK parameters were not set."),_("Error")); return;}
 }
 
-int MainFrame::SymEigenValues(lapack_complex_double* UpperSymMatrix, lapack_int N, double* &eig)
-{
-    //return LAPACKE_dsyev(LAPACK_ROW_MAJOR, 'N', 'U', N, UpperSymMatrix, N, eig);
-    return LAPACKE_zheev(LAPACK_ROW_MAJOR, 'N', 'U', N, UpperSymMatrix, N, eig);
-}
-
 void MainFrame::TestEig()
 {
     /* Locals */
@@ -2943,27 +2568,6 @@ void MainFrame::TestZEig()
         }
 }
 
-lapack_complex_double MainFrame::GetHk(double*** H, double kx, double ky, double kz, double a[3], double b[3], double c[3], int nEssensialCells, int** lmnEssCells, int iH, int jH)
-{
-    double K[3] = {kx, ky, kz};
-    double RealPart = 0.0;
-    double ImaginaryPart = 0.0;
-    for (int icell=0; icell < nEssensialCells; icell++)
-    {
-        double R[3];
-        R[0] = lmnEssCells[icell][0] * a[0] + lmnEssCells[icell][1] * b[0] + lmnEssCells[icell][2] * c[0];
-        R[1] = lmnEssCells[icell][0] * a[1] + lmnEssCells[icell][1] * b[1] + lmnEssCells[icell][2] * c[1];
-        R[0] = lmnEssCells[icell][0] * a[2] + lmnEssCells[icell][1] * b[2] + lmnEssCells[icell][2] * c[2];
-        double arg = sec30->dot(K, R);
-        RealPart += H[icell][iH][jH] * cos(arg);
-        ImaginaryPart -= H[icell][iH][jH] * sin(arg);
-    }
-    
-    lapack_complex_double out;
-    out = {RealPart, ImaginaryPart};
-    return out;
-}
-
 void MainFrame::UpdateTBBand_if()
 {
     bool isBandLoaded;
@@ -2971,22 +2575,6 @@ void MainFrame::UpdateTBBand_if()
     if (!isBandLoaded) return;
     int nKPoint = sec30->ArraysOf0DInt[1];
     if (nKPoint < 1)  return;
-    
-    Adouble2D Hi;
-    Adouble2D Hf;
-    int nEssensialCells;
-    int nHamiltonian;
-    Aint1D EssCells;
-    ConstructTBHamiltonian(Hi, Hf, nEssensialCells, nHamiltonian, EssCells);
-    
-    sec30->ArraysOf3DDouble[0] = Hi;
-    sec30->ArraysOf3DDouble[1] = Hf;
-    
-    if (nEssensialCells < 1) return;
-    if (nHamiltonian < 1) return;
-    
-    //double** KPoints; [ka,kb,kc,kx,ky,kz,d_path]
-    Adouble1D KPoints = sec30->ArraysOf2DDouble[0];
     
     double a[3],b[3],c[3];
     sec30->GetVar(_("a[0]"), a[0]);
@@ -2998,6 +2586,49 @@ void MainFrame::UpdateTBBand_if()
     sec30->GetVar(_("c[0]"), c[0]);
     sec30->GetVar(_("c[1]"), c[1]);
     sec30->GetVar(_("c[2]"), c[2]);
+    
+    double ak[3],bk[3],ck[3];
+    sec30->VecToReciprocal(a, b, c, ak, bk, ck);
+    
+    int natoms = 0;
+    sec30->GetVar(_("nAtoms[0]"),natoms);
+    double** XYZCoords = new double*[natoms];
+    for (int i=0; i<natoms; i++) XYZCoords[i] = new double[3];
+    
+    myGrid* xyzgc =  sec30->GetGridObject(_("XYZ_Coords"));
+    wxString val;
+    double x, y, z;
+    for (int i0=0; i0<natoms; i0++)
+    {
+        val = xyzgc->GetCellValue(i0, 0);
+        val.ToDouble(&x);
+        val = xyzgc->GetCellValue(i0, 1);
+        val.ToDouble(&y);
+        val = xyzgc->GetCellValue(i0, 2);
+        val.ToDouble(&z);
+        XYZCoords[i0][0] = x;
+        XYZCoords[i0][1] = y;
+        XYZCoords[i0][2] = z;
+    }
+    
+    Adouble2D Hi;
+    Adouble2D Hf;
+    int nEssensialCells;
+    int nHamiltonian;
+    Aint1D EssCells;
+    sec30->ConstructTBHamiltonian(a, b, c, XYZCoords, Hi, Hf, nEssensialCells, nHamiltonian, EssCells);
+    
+    for (int i=0; i<natoms; i++) delete [] XYZCoords[i];
+    if (natoms>0) delete [] XYZCoords;
+    
+    sec30->ArraysOf3DDouble[0] = Hi;
+    sec30->ArraysOf3DDouble[1] = Hf;
+    
+    if (nEssensialCells < 1) return;
+    if (nHamiltonian < 1) return;
+    
+    //double** KPoints; [ka,kb,kc,kx,ky,kz,d_path]
+    Adouble1D KPoints = sec30->ArraysOf2DDouble[0];
     
     //////////////////////////////Allocate all arrays//////////////////////////////////
     int** lmnEssCells = new int*[nEssensialCells];
@@ -3028,7 +2659,6 @@ void MainFrame::UpdateTBBand_if()
             }
     }
     
-    
     /////////////////////////Calculate the TB Band-structure////////////////////////
     Adouble1D iTBEigVal(nKPoint,std::vector<double>(nHamiltonian));
     Adouble1D fTBEigVal(nKPoint,std::vector<double>(nHamiltonian));
@@ -3040,20 +2670,23 @@ void MainFrame::UpdateTBBand_if()
     
     for (int ik=0; ik<nKPoint; ik++)
     {
-        double kx = KPoints[ik][3];
-        double ky = KPoints[ik][4];
-        double kz = KPoints[ik][5];
+        double frac[3] = {KPoints[ik][0], KPoints[ik][1], KPoints[ik][2]};
+        double absol[3];
+        sec30->FracToAbs(ak, bk, ck, frac, absol);
+        double kx = absol[0];
+        double ky = absol[1];
+        double kz = absol[2];
         
         for(int iH=0; iH<nHamiltonian; iH++)
         {
             eigHi[iH] = 0.0;
             for(int jH=iH; jH<nHamiltonian; jH++)
             {
-                UpperSymMatrixHi[iH * nHamiltonian + jH] = GetHk(Mi, kx, ky, kz, a, b, c, nEssensialCells, lmnEssCells, iH, jH);
+                UpperSymMatrixHi[iH * nHamiltonian + jH] = sec30->GetHk(Mi, kx, ky, kz, a, b, c, nEssensialCells, lmnEssCells, iH, jH);
             }
         }
-                
-        SymEigenValues(UpperSymMatrixHi, nHamiltonian, eigHi);
+        
+        int checki = sec30->SymEigenValues(UpperSymMatrixHi, nHamiltonian, eigHi);
         for(int iH=0; iH<nHamiltonian; iH++) iTBEigVal[ik][iH] = eigHi[iH];
         
         for(int iH=0; iH<nHamiltonian; iH++)
@@ -3061,11 +2694,11 @@ void MainFrame::UpdateTBBand_if()
             eigHf[iH] = 0.0;
             for(int jH=iH; jH<nHamiltonian; jH++)
             {
-                UpperSymMatrixHf[iH * nHamiltonian + jH] = GetHk(Mf, kx, ky, kz, a, b, c, nEssensialCells, lmnEssCells, iH, jH);
+                UpperSymMatrixHf[iH * nHamiltonian + jH] = sec30->GetHk(Mf, kx, ky, kz, a, b, c, nEssensialCells, lmnEssCells, iH, jH);
             }
         }
         
-        SymEigenValues(UpperSymMatrixHf, nHamiltonian, eigHf);
+        int checkf = sec30->SymEigenValues(UpperSymMatrixHf, nHamiltonian, eigHf);
         for(int iH=0; iH<nHamiltonian; iH++) fTBEigVal[ik][iH] = eigHf[iH];
     }
     
@@ -3088,452 +2721,251 @@ void MainFrame::UpdateTBBand_if()
 	if (nEssensialCells>0) delete [] Mf;
     if (nEssensialCells>0) delete [] lmnEssCells;
 }
-/*
-void MainFrame::lm(Adouble0D &p, Adouble0D t, Adouble0D y_dat, double weight, Adouble0D &dp, double p_min, double p_max, Aint0D c, lmOptions opts, double &redX2, double &sigma_p, double &sigma_y, double &corr_p, double &R_sq, double &cvg_hst)
+
+void MainFrame::StartRegression()
 {
-    //global   iteration  func_calls
-
-    int tensor_parameter = 0;                  // set to 1 of parameter is a tensor
-
-    iteration  = 0;                            // iteration counter
-    func_calls = 0;                            // running count of function evaluations
-
-    //p = p(:); y_dat = y_dat(:);              // make column vectors
-    int Npar   = p.size();                         // number of parameters
-    int Npnt   = y_dat.size();                     // number of data points
-    Adouble0D p_old  = Adouble0D(Npar);                  // previous set of parameters
-    Adouble0D y_old  = Adouble0D(Npnt);                  // previous model, y_old = y_hat(t;p_old)
-    double eps = 2.2204e-16;
-    double X2     = 1e-3/eps;                       // a really big initial Chi-sq value
-    double X2_old = 1e-3/eps;                       // a really big initial Chi-sq value
-    Adouble1D J = Adouble1D(Npnt,Adouble0D(Npar));  // Jacobian matrix
-    int DoF    = Npnt - Npar + 1;                  // statistical degrees of freedom
+    if (!ValidateSKPanel()) {wxMessageBox(_("The constructed TB model is not passable. Please fix the errors reported in the terminal and try again."),_("Error"));return;}
     
-    int length_t = t.size();
-    int length_y_dat = Npnt;
-    double cvg_hist;
-    if (length_t != Npnt)
+    int TotalNumberOfParameters;
+    sec30->GetVar(_("nParameters[0]"), TotalNumberOfParameters);
+    if (TotalNumberOfParameters<1) {wxMessageBox(_("First evaluate independent parameters."),_("Error"));return;}
+    
+    bool isBandLoaded = false;
+    if (sec30->ArraysOf0DInt[0] != 0) isBandLoaded = true;
+    if (!isBandLoaded) {wxMessageBox(_("DFT band-structure has not yet been loaded."),_("Error"));return;}
+    
+    int prnt, MaxIter, Update_Type;
+    double epsilon_1, epsilon_2, epsilon_3, epsilon_4, lambda_0, lambda_UP_fac, lambda_DN_fac;
+    double p_min, p_max, RescaleFactor;
+    
+    wxComboBox* ctrm =  sec30->GetComboObject(_("OMethod"));
+    int MethodSel = ctrm->GetSelection();
+    if (MethodSel==0)
+        Update_Type = 3;
+    else if (MethodSel==1)
+        Update_Type = 1;
+    else if (MethodSel==2)
+        Update_Type = 2;
+    
+    bool isAllvalid = true;
+    isAllvalid = isAllvalid && sec30->GetVar(_("OPrnt[0]"), prnt);
+    isAllvalid = isAllvalid && sec30->GetVar(_("OMaxIter[0]"), MaxIter);
+    isAllvalid = isAllvalid && sec30->GetVar(_("Oeps1[0]"), epsilon_1);
+    isAllvalid = isAllvalid && sec30->GetVar(_("Oeps2[0]"), epsilon_2);
+    isAllvalid = isAllvalid && sec30->GetVar(_("Oeps3[0]"), epsilon_3);
+    isAllvalid = isAllvalid && sec30->GetVar(_("Oeps4[0]"), epsilon_4);
+    isAllvalid = isAllvalid && sec30->GetVar(_("OLam0[0]"), lambda_0);
+    isAllvalid = isAllvalid && sec30->GetVar(_("OLamUp[0]"), lambda_UP_fac);
+    isAllvalid = isAllvalid && sec30->GetVar(_("OLamDn[0]"), lambda_DN_fac);
+    isAllvalid = isAllvalid && sec30->GetVar(_("OMaxP[0]"), p_max);
+    isAllvalid = isAllvalid && sec30->GetVar(_("OMinP[0]"), p_min);
+    isAllvalid = isAllvalid && sec30->GetVar(_("OReScale[0]"), RescaleFactor);
+    
+    if (!isAllvalid) {wxMessageBox(_("Invalid value in Fitting Algorithmic Parameters."),_("Error"));return;}
+    if (MaxIter<1) {wxMessageBox(_("Invalid value for Iteration Limit."),_("Error"));return;}
+    if (prnt<1) {wxMessageBox(_("Invalid value for Figure Updating Step."),_("Error"));return;}
+    if (prnt>MaxIter) {wxMessageBox(_("Figure Updating Step must be smaller than Iteration Limit."),_("Error"));return;}
+    if (epsilon_1<0.000001) {wxMessageBox(_("Invalid value for Gradient Threshold. >0.000001"),_("Error"));return;}
+    if (epsilon_2<0.000001) {wxMessageBox(_("Invalid value for Parameters Threshold. >0.000001"),_("Error"));return;}
+    if (epsilon_3<0.000001) {wxMessageBox(_("Invalid value for Reduced Chi-squared Threshold. >0.000001"),_("Error"));return;}
+    if (epsilon_4<0.000001) {wxMessageBox(_("Invalid value for L-M Acceptance. >0.000001"),_("Error"));return;}
+    if (lambda_0<0.000001) {wxMessageBox(_("Invalid value for L-M Lambda0. >0.000001"),_("Error"));return;}
+    if (lambda_UP_fac<0.000001) {wxMessageBox(_("Invalid value for Increasing Lambda. >0.000001"),_("Error"));return;}
+    if (lambda_DN_fac<0.000001) {wxMessageBox(_("Invalid value for Decreasing Lambda. >0.000001"),_("Error"));return;}
+    if (p_max<p_min) {wxMessageBox(_("Parameters Minimum Limit must be smaller than Parameters Maximum Limit."),_("Error"));return;}
+    if (RescaleFactor<0.000001) {wxMessageBox(_("Invalid value for Rescale Factor. >0.000001"),_("Error"));return;}
+    
+    int TBBandFirst, TBBandLast, DFTFirst;
+    isAllvalid = isAllvalid && sec30->GetVar(_("TBBandRange[0]"), TBBandFirst);
+    isAllvalid = isAllvalid && sec30->GetVar(_("TBBandRange[1]"), TBBandLast);
+    isAllvalid = isAllvalid && sec30->GetVar(_("DFTFirst[0]"), DFTFirst);
+    if (!isAllvalid) {wxMessageBox(_("Invalid value in Fitting Customization."),_("Error"));return;}
+    if (TBBandFirst<1) {wxMessageBox(_("Invalid value(s) for TB Bands Range."),_("Error"));return;}
+    if (TBBandLast<1) {wxMessageBox(_("Invalid value(s) for TB Bands Range."),_("Error"));return;}
+    if (TBBandFirst>TBBandLast) {wxMessageBox(_("Invalid value(s) for TB Bands Range."),_("Error"));return;}
+    if (DFTFirst<1) {wxMessageBox(_("Invalid value for DFT First Band."),_("Error"));return;}
+    
+    int nKPoint;
+    nKPoint = sec30->ArraysOf0DInt[1];
+    if (nKPoint < 1) {wxMessageBox(_("Somthing went wrong with the number of k-points."),_("Error"));return;}
+    
+    lmOptions opts;
+    opts.prnt = prnt;             // >1 intermediate results; >2 plots
+    opts.MaxIter = MaxIter;          // maximum number of iterations
+    opts.epsilon_1 = epsilon_1;        // convergence tolerance for gradient
+    opts.epsilon_2 = epsilon_2;        // convergence tolerance for parameters
+    opts.epsilon_3 = epsilon_3;        // convergence tolerance for Chi-square
+    opts.epsilon_4 = epsilon_4;        // determines acceptance of a L-M step
+    opts.lambda_0 = lambda_0;         // initial value of damping paramter, lambda
+    opts.lambda_UP_fac = lambda_UP_fac;    // factor for increasing lambda
+    opts.lambda_DN_fac = lambda_DN_fac;    // factor for decreasing lambda
+    opts.Update_Type = Update_Type;      // 1: Levenberg-Marquardt lambda update
+    
+    Aint1D FitPoints;
+    int idftBand = DFTFirst - 1;
+    for (int iband=TBBandFirst; iband<=TBBandLast; iband++)
     {
-        logfile->AppendText(_("Error: The length of t must equal the length of y ...\n"));
-        logfile->AppendText(_("Levenberg Marquardt curve-fitting is Terminated.\n"));
-        if (tensor_parameter != 1) return;
-        length_y_dat = Npnt;
-        X2 = 0.0;
-        corr_p = 0.0;
-        sigma_p = 0.0;
-        sigma_y = 0.0;
-        R_sq = 0.0;
-        cvg_hist = 0.0;
-    }
-
-    int prnt          = opts.prnt;             // >1 intermediate results; >2 plots
-    int MaxIter       = opts.MaxIter;          // maximum number of iterations
-    double epsilon_1     = opts.epsilon_1;        // convergence tolerance for gradient
-    double epsilon_2     = opts.epsilon_2;        // convergence tolerance for parameters
-    double epsilon_3     = opts.epsilon_3;        // convergence tolerance for Chi-square
-    double epsilon_4     = opts.epsilon_4;        // determines acceptance of a L-M step
-    double lambda_0      = opts.lambda_0;         // initial value of damping paramter, lambda
-    double lambda_UP_fac = opts.lambda_UP_fac;    // factor for increasing lambda
-    double lambda_DN_fac = opts.lambda_DN_fac;    // factor for decreasing lambda
-    int Update_Type   = opts.Update_Type;      // 1: Levenberg-Marquardt lambda update
-    
-    if ( tensor_parameter==1 && prnt == 3 ) prnt = 2;
-    
-    //p_min=p_min(:); p_max=p_max(:); % make column vectors
-    
-    if (dp.size() != Npar)
-    {
-        logfile->AppendText(_("Error: The length of dp must equal the length of p ...\n"));
-        logfile->AppendText(_("Levenberg Marquardt curve-fitting is Terminated.\n"));
-        return;
-    }
-    
-    Aint0D idx;                              // indices of the parameters to be fit
-    for (int i=0; i<Npar; i++)
-    {
-        if(dp[i] != 0) idx.push_back(i);
-    }
-    
-    int Nfit = idx.size();                  // number of parameters to fit
-    int stop = 0;                           // termination flag
-    
-    [JtWJ,JtWdy,X2,y_hat,J] = lm_matx(t,p_old,y_old,1,J,p,y_dat,weight,dp,c);
-    
-    if ( max(abs(JtWdy)) < epsilon_1 )
-    {
-        logfile->AppendText(_("The Initial Guess is Extremely Close to Optimal.\n"));
-        logfile->AppendText(wxString::Format(wxT("Convergence Tolerance for Gradient = %lf\n"),epsilon_1));
-        logfile->AppendText(_("********************* Convergence achieved *********************\n"));
-        stop = 1;
-    }
-    
-    double lambda  = lambda_0;
-    int nu;
-    if (Update_Type != 1)
-    {
-        lambda  = lambda_0 * max(diag(JtWJ));
-        nu=2;
-    }
-    
-    X2_old = X2;                            // previous value of X2
-    cvg_hst = ones(MaxIter,Npar+3);         // initialize convergence history
-    
-
-
-    ////////////////////////////////////////////////////////////////////////
-    while ( stop != 1 && iteration <= MaxIter )        // --- Start Main Loop
-    {
-        iteration = iteration + 1;
-        
-        // incremental change in parameters
-        if (Update_Type == 1) //Marquardt
-            h = ( JtWJ + lambda*diag(diag(JtWJ)) ) \ JtWdy;
-        else //Quadratic and Nielsen
-                h = ( JtWJ + lambda*eye(Npar) ) \ JtWdy;
-        
-        //  big = max(abs(h./p)) > 2;                      // this is a big step
-        
-        // --- Are parameters [p+h] much better than [p] ?
-        
-        p_try = p + h(idx);                            // update the [idx] elements
-        p_try = min(max(p_min,p_try),p_max);           // apply constraints
-        
-        delta_y = y_dat - func(t,p_try,c);             // residual error using p_try
-        if (~all(isfinite(delta_y))                    // floating point error; break
+        idftBand++;
+        for (int ik = 0; ik<nKPoint; ik++)
         {
-            stop = 1;
-            break;
-        }
-        
-        func_calls = func_calls + 1;
-        double X2_try = Transpose(delta_y) . ( delta_y .* weight );     // Chi-squared error criteria
-        
-        if ( Update_Type == 2 )                        // Quadratic
-        {
-            //    One step of quadratic line update in the h direction for minimum X2
-            alpha =  Transpose(JtWdy).h / ( (X2_try - X2)/2 + 2*Transpose(JtWdy).h ) ;
-            h = alpha * h;
-            
-            p_try = p + h(idx);                          // update only [idx] elements
-            p_try = min(max(p_min,p_try),p_max);         // apply constraints
-            
-            delta_y = y_dat - func(t,p_try,c);     // residual error using p_try
-            func_calls = func_calls + 1;
-            X2_try = Transpose(delta_y) . ( delta_y .* weight );   // Chi-squared error criteria
-        }
-        
-        //  switch Update_Type                             % Nielsen
-        //    case 1
-        //      rho = (X2 - X2_try) / ( h' * (lambda*diag(diag(JtWJ))*h + JtWdy) );
-        //    otherwise
-        rho = (X2 - X2_try) / ( Transpose(h) . (lambda * h + JtWdy) );
-        //  end
-        
-        if ( rho > epsilon_4 )                         // it IS significantly better
-        {
-            dX2 = X2 - X2_old;
-            X2_old = X2;
-            p_old = p;
-            y_old = y_hat;
-            p = p_try(:);                           // accept p_try
-            
-            [JtWJ,JtWdy,X2,y_hat,J] = lm_matx(t,p_old,y_old,dX2,J,p,y_dat,weight,dp,c);
-            
-            // decrease lambda ==> Gauss-Newton method
-            
-            switch (Update_Type)
+            if (IsAllowedToFit(idftBand,ik))
             {
-                case 1:                                   // Levenberg
-                    lambda = max(lambda/lambda_DN_fac,1.e-7);
-                    break;
-                case 2:                                   % Quadratic
-                    lambda = max( lambda/(1 + alpha) , 1.e-7 );
-                    break;
-                case 3:                                   % Nielsen
-                    lambda = lambda*max( 1/3, 1-(2*rho-1)^3 ); nu = 2;
-                    break;
+                Aint0D FitPoint;
+                int iReplaceddftBand = ReplaceDFTBand(idftBand,ik);
+                FitPoint.push_back(iband);
+                FitPoint.push_back(iReplaceddftBand);
+                FitPoint.push_back(ik);
+                FitPoints.push_back(FitPoint);
             }
-            
-            if ( prnt > 2 )
-            {
-                //        eval(plotcmd);
-                PlotBands(t_Complete,p,150);
-                //        PlotBandsYData(t_Complete,p,c,200);
-                //prnt;
-                lastp=p;
-            }
-        }    
-        else                                           // it IS NOT better
-        {   
-            X2 = X2_old;                             // do not accept p_try
-            
-            if ( ~rem(iteration,2*Npar) )            // rank-1 update of Jacobian
-            {
-                [JtWJ,JtWdy,dX2,y_hat,J] = lm_matx(t,p_old,y_old,-1,J,p,y_dat,weight,dp,c);
-            }
-            
-            // increase lambda  ==> gradient descent method
-            
-            switch (Update_Type)
-            {
-                case 1:                                   // Levenberg
-                    lambda = min(lambda*lambda_UP_fac,1.e7);
-                    break;
-                case 2:                                   // Quadratic
-                    lambda = lambda + abs((X2_try - X2)/2/alpha);
-                    break;
-                case 3:                                   // Nielsen
-                    lambda = lambda * nu;   nu = 2*nu;
-                    break;
-            }
-            
         }
-        
-        if ( prnt > 1 )
-        {
-            logfile->AppendText(wxString::Format(wxT(">%d:%d | chi_sq=%lf | lambda=%lf\n"),iteration,func_calls,X2/DoF,lambda));
-            logfile->AppendText(_("parameters:"));
-            PrintVector(p);
-            logfile->AppendText(_("\n"));
-            logfile->AppendText(_("dp/p:"));
-            PrintVector(h(pn) / p(pn));
-            logfile->AppendText(_("\n"));
-        }
-        
-        % update convergence history ... save _reduced_ Chi-square
-        cvg_hst(iteration,:) = [ func_calls  p'  X2/DoF lambda ];
-        
-        
-        if ( max(abs(JtWdy)) < epsilon_1  &&  iteration > 2 )
-        {
-            logfile->AppendText(wxString::Format(wxT("Convergence Tolerance for Gradient = %lf\n"),epsilon_1));
-            logfile->AppendText(_("********************* Convergence achieved *********************\n"));
-            stop = 1;
-        }
-        else if ( max(abs(h./p)) < epsilon_2  &&  iteration > 2 )
-        {
-            logfile->AppendText(wxString::Format(wxT("Convergence Tolerance for Parameters = %lf\n"),epsilon_2));
-            logfile->AppendText(_("********************* Convergence achieved *********************\n"));
-            stop = 1;
-        }
-        else if ( X2/DoF < epsilon_3 &&  iteration > 2 )
-        {
-            logfile->AppendText(wxString::Format(wxT("Convergence Tolerance for Chi-square = %lf\n"),epsilon_3));
-            logfile->AppendText(_("********************* Convergence achieved *********************\n"));
-            stop = 1;
-        }
-        else if ( iteration == MaxIter )
-        {
-            logfile->AppendText(_("Maximum Number of Iterations Reached Without Convergence !\n"));
-            stop = 1;
-        }
-    }                                        // --- End of Main Loop
-    ////////////////////////////////////////////////////////////////////////
-    
-    // --- convergence achieved, find covariance and confidence intervals
-
-    // ---- Error Analysis ----
-
-    if (var(weight) == 0)   // recompute equal weights for paramter error analysis
-    {
-        weight = DoF/(Transpose(delta_y).delta_y) * ones(Npnt,1);
     }
     
-    redX2 = X2 / DoF;
-    [JtWJ,JtWdy,X2,y_hat,J] = lm_matx(t,p_old,y_old,-1,J,p,y_dat,weight,dp,c);
+    sec30->ArraysOf2DInt[2] = FitPoints;
     
-    covar_p = inv(JtWJ);
-    sigma_p = sqrt(diag(covar_p));
-    sigma_y = zeros(Npnt,1);
-    for i=1:Npnt
-        sigma_y(i) = J(i,:) * covar_p * J(i,:)';
-    end
-    sigma_y = sqrt(sigma_y);
-    corr_p = covar_p ./ [sigma_p*sigma_p'];
-    R_sq = corr([y_dat y_hat]);
-    R_sq = R_sq(1,2).^2;
-    cvg_hst = cvg_hst(1:iteration,:); % convergence history
+    int nFitPoints = FitPoints.size();
+    if (nFitPoints < 1) {wxMessageBox(_("No reference data for regression procedure."),_("Error"));return;}
+    if (nFitPoints < TotalNumberOfParameters) {wxMessageBox(_("Non sufficient reference data for regression procedure."),_("Error"));return;}
+    
+    double a[3],b[3],c[3];
+    sec30->GetVar(_("a[0]"), a[0]);
+    sec30->GetVar(_("a[1]"), a[1]);
+    sec30->GetVar(_("a[2]"), a[2]);
+    sec30->GetVar(_("b[0]"), b[0]);
+    sec30->GetVar(_("b[1]"), b[1]);
+    sec30->GetVar(_("b[2]"), b[2]);
+    sec30->GetVar(_("c[0]"), c[0]);
+    sec30->GetVar(_("c[1]"), c[1]);
+    sec30->GetVar(_("c[2]"), c[2]);
+    
+    int natoms = 0;
+    sec30->GetVar(_("nAtoms[0]"),natoms);
+    
+    int np = TotalNumberOfParameters;
+    int ny = nFitPoints;
+    int nc = natoms + 9;
+    double* p = new double[np];
+    double* t = new double[ny];
+    double* y_dat = new double[ny];
+    double* weight = new double[ny];
+    double* dp = new double[np];
+    double* cnst = new double[nc];
 
-
-    // endfunction  # ---------------------------------------------------------- LM
-
-}
-
-void MainFrame::lm_FD_J(double* t, double* p, int np, double* y, int ny, double* dp, double* c, double** J)
-{
-    int m=ny;              // number of data points
-    int n=np;              // number of parameters
+    cnst[0] = a[0];
+    cnst[1] = a[1];
+    cnst[2] = a[2];
+    cnst[3] = b[0];
+    cnst[4] = b[1];
+    cnst[5] = b[2];
+    cnst[6] = c[0];
+    cnst[7] = c[1];
+    cnst[8] = c[2];
     
-    double* y1 = new double[ny];
-    double* y2 = new double[ny];
+    myGrid* xyzgc =  sec30->GetGridObject(_("XYZ_Coords"));
+    wxString val;
+    double x, y, z;
+    int indx=9;
+    for (int i0=0; i0<natoms; i0++)
+    {
+        val = xyzgc->GetCellValue(i0, 0);
+        val.ToDouble(&x);
+        val = xyzgc->GetCellValue(i0, 1);
+        val.ToDouble(&y);
+        val = xyzgc->GetCellValue(i0, 2);
+        val.ToDouble(&z);
+        cnst[indx++] = x;
+        cnst[indx++] = y;
+        cnst[indx++] = z;
+    }
     
-    double* ps = new double[n];
-    for (int ip=0; ip<np; ip++) ps[ip] = p[ip];
-    
-    double* del = new double[n];
-    for (int ip=0; ip<np; ip++) del[ip] = 0.0;
-    
+    double ChemP = sec30->ArraysOf0DDouble[0];
+    double shift = 0.0;
     for (int iy=0; iy<ny; iy++)
-        for (int ip=0; ip<np; ip++)
-            J[iy,ip] = 0.0;
-    
-    for(int j=0: j<n; j++)                 // START --- loop over all parameters
     {
-        del[j] = dp[j] * (1+abs(p[j]));   // parameter perturbation
-        p[j]   = ps[j] + del[j];          // perturb parameter p(j)
-        
-        if (del[j] != 0)
-        {
-            func(t, p, c, y1);
-            func_calls = func_calls + 1;
-            
-            if (dp(j) < 0)                  // backwards difference
-            {
-                for(int iy=0; iy<ny; iy++) J(iy,j) = (y1[iy]-y[iy])/del(j);
-            }
-            else                            // central difference, additional func call
-            {
-                p(j) = ps(j) - del(j);
-                func(t, p, c, y2);
-                for(int iy=0; iy<ny; iy++)
-                {
-                    J(iy,j) = (y1[iy]-y2[iy]) / (2.0 * del(j));
-                }
-                func_calls = func_calls + 1;
-            }
-        }
-        p(j)=ps(j);                       // restore p(j)
-    }                       // END --- loop over all parameters
-
-    // endfunction # -------------------------------------------------- LM_FD_J
-    delete [] del;
-    delete [] ps;
-    delete [] y1;
-    delete [] y2;
-}
-
-void MainFrame::lm_Broyden_J(double* p_old, double* y_old, double** J, double* p, int np, double* y, int ny)
-{
-    double* h = new double[np];
-    for (int ip=0; ip<np; ip++) h[ip]  = p[ip] - p_old[ip];
-    
-    double* y2 = new double[ny];
-    MatVec2Vec(J, ny, np, h, y2);
-    
-    double* y3 = new double[ny];
-    for (int iy=0; iy<ny; iy++) y3[iy]  = y[iy] - y_old[iy] - y2[iy];
-    
-    double** A = new double*[ny];
-    for (int iy=0; iy<ny; iy++) A[iy] = new double[np];
-    VecVec2Mat(y3, ny, h, np, A);
-    
-    double A0 = VecVec2Num(h, h, np);
-    
-    for (int iy=0; iy<ny; iy++)
-        for (int ip=0; ip<np; ip++)
-            J[iy][ip] = J[iy][ip] + A[iy][ip]/A0;
-    
-    //J = J + (y - y_old - J*h )*h' / (h'*h);       // Broyden rank-1 update eq'n
-    //J = J + (y - y_old - y2)*h / (h*h);       // Broyden rank-1 update eq'n
-    //J = J + y3*h / A0;       // Broyden rank-1 update eq'n
-    //J = J + A/A0;       // Broyden rank-1 update eq'n
-    // endfunction # ---------------------------------------------- LM_Broyden_J
-    delete [] h;
-    delete [] y2;
-    delete [] y3;
-    for (int iy=0; iy<ny; iy++) delete [] A[iy];
-    if (ny > 0) delete [] A;
-}
-
-void MainFrame::lm_matx(double* t,double* p_old, int np, double* y_old, int ny, double dX2, double** J, double* p, double* y_dat, double* weight, double* dp, double* c, double** JtWJ, double** JtWdy, double Chi_sq, double* y_hat)
-{
-    int Npnt = ny;               // number of data points
-    int Npar = np;               // number of parameters
-    
-    func(t, p, c, y_hat);          // evaluate model using parameters 'p'
-    func_calls = func_calls + 1;
-
-    if ( !rem(iteration,2*Npar) || dX2 > 0 )
-    {
-        lm_FD_J(t, p, np, y_hat, ny, dp, c, J);    //finite difference
-        //J = lm_FD_J(t,p,y_hat,dp,c);
-    }
-    else
-    {
-        lm_Broyden_J(p_old, y_old, J, p, np, y_hat, ny);          //rank-1 update
-        //J = lm_Broyden_J(p_old,y_old,J,p,y_hat);
+        //int tbband = FitPoints[iy][0];
+        int dftband = FitPoints[iy][1];
+        int ik = FitPoints[iy][2];
+        t[iy] = iy * 0.05;
+        shift = ShiftBand(dftband,ik);
+        y_dat[iy] = sec30->ArraysOf2DDouble[1][ik][dftband - 1] - ChemP + shift;
+        weight[iy] = 1.0;
     }
     
-    for(int iy=0; iy<ny; iy++)
-        delta_y[iy] = y_dat[iy] - y_hat[iy];            // residual error between model and data
-    
-    double* weighted_dy = new double[ny];
-    for(int iy=0; iy<ny; iy++) weighted_dy[iy] = delta_y[iy] * weight[iy];
-    Chi_sq VecVec2Num(delta_y, weighted_dy, ny);              // Chi-squared error criteria
-    //Chi_sq = delta_y' * ( delta_y .* weight );
-    
-    double** JT = new double*[np];
-    for (int iy=0; iy<np; iy++) JT[iy] = new double[ny];
-    Transpose(J, ny, np, JT);
-    
-    
-    JtWJ  = J' * ( J .* ( weight * ones(1,Npar) ) );
-
-    JtWdy = J' * ( weight .* delta_y );
-
-    // endfunction  # ------------------------------------------------------ LM_MATX
-    
-    for (int iy=0; iy<ny; iy++) delete [] A[iy];
-    if (ny > 0) delete [] A;
-}
-
-void MainFrame::MatVec2Vec(double* a, int na, int ma, double* b, double* c)
-{
-    for(int ia=0; ia<na; ia++)
+    for (int ip=0; ip<np; ip++)
     {
-        c[ia] = 0.0;
-        for(int ja=0; ja<ma; ja++)
-            c[ia] += a[ia,ja]*b[ja];
+        p[ip] = GetFitParameter(ip, 1);//Get initial values for parameters
+        dp[ip] = -0.01;
     }
+    
+    
+    //Start(double* p, int np, double* t, double* y_dat, int ny, double* weight, double* dp, double p_min, double p_max, double* c, lmOptions opts)
+    std::thread RegressionThread(&Regression::Start, regression, p, np, t, y_dat, ny, weight, dp, p_min, p_max, cnst, opts);
+    RegressionThread.detach();
+    
+    ////////////////It works well///////////////////////
+    //Regression fitting(sec30, this);                //
+    //long long num=400000000;                        //
+    //std::thread trd(&Regression::foo, &fitting, num); //
+    //trd.detach();                                     //
+    ////////////////////////////////////////////////////
+    
+    //A pointer also works but not reliable
+    //FittingThread = new std::thread(&Fitting::foo, &fitting, num);
 }
 
-void MainFrame::VecVec2Mat(double* a, int na, double* b, int nb, double* c)
+bool MainFrame::IsAllowedToFit(int idftband, int ik)
 {
-    for(int ia=0; ia<na; ia++)
-        for(int ib=0; ib<nb; ib++)
-            c[ia,ib] = a[ia]*b[ib];
+    bool is = true;
+    
+    
+    return is;
 }
 
-double MainFrame::VecVec2Num(double* a, double* b, int na)
+int MainFrame::ReplaceDFTBand(int idftband, int ik)
 {
-    double val = 0.0;
-    for(int ia=0; ia<na; ia++) val += a[ia]*b[ia];
-    return val;
+    int newband = idftband;
+    
+    
+    return newband;
 }
 
-void MainFrame::Transpose(double** a, int na, int nb, double** aT)
+double MainFrame::ShiftBand(int idftband, int ik)
 {
-    for(int ia=0; ia<na; ia++)
-        for(int ib=0; ib<nb; ib++)
-            aT[ib,ia] = a[ia,ib];
+    double shift = 0.0;
+    
+    
+    return shift;
 }
 
-*/
+double MainFrame::GetFitParameter(int ip, int icol)
+{
+    //ip is the index of the parameter in the arra p         p[ip]
+    int GridInd = sec30->ArraysOf2DInt[1][ip][0];
+    int irow = sec30->ArraysOf2DInt[1][ip][1];
+    
+    myGrid* gc;
+    if (GridInd == 1)
+        gc = sec30->GetGridObject(_("OS"));
+    else if (GridInd == 2)
+        gc = sec30->GetGridObject(_("SK"));
+    else if (GridInd == 3)
+        gc = sec30->GetGridObject(_("OL"));
+    
+    double d = 0.0;
+    wxString val = gc->GetCellValue(irow, icol);
+    bool output = val.ToDouble(&d);
+    if (!output) return 0.0;
+    return d;
+}
 
+void MainFrame::regressionEVT_OnNewData(wxCommandEvent& event)
+{
+    logfile->AppendText(event.GetString());
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+void MainFrame::regressionEVT_OnFinished(wxCommandEvent& event)
+{
+    
+}
 
 
 

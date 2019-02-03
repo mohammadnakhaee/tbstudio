@@ -48,19 +48,58 @@ SetupClass::SetupClass(wxWindow* parent, Sec30* sec30var, wxWindowID id, const w
     wxObjectEventFunction Funcs2[2] = { wxCommandEventHandler(SetupClass::Btn_OpenFileU_OnClick), wxCommandEventHandler(SetupClass::Btn_ReloadU_OnClick)};
     sec30->AddButton(this, 2, Labels2, Funcs2);
     /**********************************************************************************************************************************************/
-    sec30->AddGroupBox(this,_("DFT Parameters"),wxColour(wxT("rgb(153,180,209)")));
+    sec30->AddGroupBox(this,_("DFT Band-Structure"),wxColour(wxT("rgb(153,180,209)")));
     sec30->AddVarVector(this, 2, _("DFTBandRange"), _("int"), _("DFT Bands Range"), 105, 100);
     sec30->AddVarVector(this, 1, _("nDFTBandRange"), _("int"), _("Number of Bands"), 105, 100, false, true);
     sec30->SetVar(_("DFTBandRange[0]"), 0, false);
     sec30->SetVar(_("DFTBandRange[1]"), 0, false);
     sec30->SetVar(_("nDFTBandRange[0]"), 0, false);
     /**********************************************************************************************************************************************/
+    sec30->AddGroupBox(this,_("Fitting Customization"),wxColour(wxT("rgb(153,180,209)")));
+    sec30->AddVarVector(this, 2, _("TBBandRange"), _("int"), _("TB Bands Range"), 105, 100, false, false);
+    sec30->AddVarVector(this, 1, _("DFTFirst"), _("int"), _("DFT First Band"), 105, 100, false, false);
+    sec30->SetVar(_("TBBandRange[0]"), 0, false);
+    sec30->SetVar(_("TBBandRange[1]"), 0, false);
+    sec30->SetVar(_("DFTFirst[0]"), 0, false);
     wxString Labels3[1] = {_("Select")};
     wxObjectEventFunction Funcs3[1] = { wxCommandEventHandler(SetupClass::Btn_Select_OnClick)};
     sec30->AddButton(this, 1, Labels3, Funcs3);
     wxString Labels4[1] = {_("Test")};
     wxObjectEventFunction Funcs4[1] = { wxCommandEventHandler(SetupClass::Btn_Test_OnClick)};
     sec30->AddButton(this, 1, Labels4, Funcs4);
+    /**********************************************************************************************************************************************/
+    sec30->AddGroupBox(this,_("Fitting Algorithmic Parameters"),wxColour(wxT("rgb(153,180,209)")));
+    wxComboBox* choicectrm = sec30->AddComboCtrl(this, _("OMethod"), _("Method"), 70, 200, true);
+    choicectrm->Append(_("Nielsen's lambda"));
+    choicectrm->Append(_("Levenberg-Marquardt"));
+    choicectrm->Append(_("Quadratic"));
+    choicectrm->SetEditable(false);
+    choicectrm->SetBackgroundColour(*wxWHITE);
+    choicectrm->Select(0);
+    sec30->AddVarVector(this, 1, _("OPrnt"), _("int"), _("Figure Updating Step"), 170, 100, false, false);
+    sec30->SetVar(_("OPrnt[0]"), 3, false);
+    sec30->AddVarVector(this, 1, _("OMaxIter"), _("int"), _("Iteration Limit"), 170, 100, false, false);
+    sec30->SetVar(_("OMaxIter[0]"), 100, false);
+    sec30->AddVarVector(this, 1, _("Oeps1"), _("double"), _("Gradient Threshold"), 170, 100, false, false);
+    sec30->SetVar(_("Oeps1[0]"), 0.0001, false);
+    sec30->AddVarVector(this, 1, _("Oeps2"), _("double"), _("Parameters Threshold"), 170, 100, false, false);
+    sec30->SetVar(_("Oeps2[0]"), 0.0001, false);
+    sec30->AddVarVector(this, 1, _("Oeps3"), _("double"), _("Reduced Chi-squared Threshold"), 170, 100, false, false);
+    sec30->SetVar(_("Oeps3[0]"), 0.001, false);
+    sec30->AddVarVector(this, 1, _("Oeps4"), _("double"), _("L-M Acceptance"), 170, 100, false, false);
+    sec30->SetVar(_("Oeps4[0]"), 0.001, false);
+    sec30->AddVarVector(this, 1, _("OLam0"), _("double"), _("L-M Lambda0"), 170, 100, false, false);
+    sec30->SetVar(_("OLam0[0]"), 0.0001, false);
+    sec30->AddVarVector(this, 1, _("OLamUp"), _("double"), _("Increasing Lambda"), 170, 100, false, false);
+    sec30->SetVar(_("OLamUp[0]"), 0.001, false);
+    sec30->AddVarVector(this, 1, _("OLamDn"), _("double"), _("Decreasing Lambda"), 170, 100, false, false);
+    sec30->SetVar(_("OLamDn[0]"), 0.0001, false);
+    sec30->AddVarVector(this, 1, _("OMaxP"), _("double"), _("Parameters Maximum Limit"), 170, 100, false, false);
+    sec30->SetVar(_("OMaxP[0]"), 100.0, false);
+    sec30->AddVarVector(this, 1, _("OMinP"), _("double"), _("Parameters Minimum Limit"), 170, 100, false, false);
+    sec30->SetVar(_("OMinP[0]"), -100.0, false);
+    sec30->AddVarVector(this, 1, _("OReScale"), _("double"), _("Rescale Factor"), 170, 100, false, false);
+    sec30->SetVar(_("OReScale[0]"), 1.0, false);
     /**********************************************************************************************************************************************/
     //sec30->AddGroupBox(this,_("k-Path"),wxColour(wxT("rgb(153,180,209)")));
     //wxString ColNames1[4] = { _("Parameter"), _("Initial Value"), _("Last Value")};
@@ -282,13 +321,14 @@ void SetupClass::Btn_Test_OnClick(wxCommandEvent& event)
            {-1.60,  3.08}, { 8.54, -4.05}
         };
         
-        info = LAPACKE_zgesv( LAPACK_ROW_MAJOR, n, nrhs, a, lda, ipiv, b, ldb );
+        info = LAPACKE_zgesv(LAPACK_ROW_MAJOR, n, nrhs, a, lda, ipiv, b, ldb );
         
     wxMessageBox(wxString::Format("%d",info),_("debug"));
 }
 
 void SetupClass::LoadOpenMXBand(wxString file, bool &isBandLoaded, int &maxneig, int &mspin, double &ChemP, int &nKp, Adouble1D &KPoints, Adouble1D &EigVal, Adouble0D &dkLabel, Astring0D &kLabel)
 {
+    double Hartree2eV = 27.2113961318;
     isBandLoaded = false;
     try
     {
@@ -300,6 +340,7 @@ void SetupClass::LoadOpenMXBand(wxString file, bool &isBandLoaded, int &maxneig,
         }
         
         fscanf(fp,"%d %d  %lf", &maxneig,&mspin,&ChemP);//read maxneig,mspin,ChemP
+        ChemP = ChemP * Hartree2eV;
         double rtv[3][3];
         fscanf(fp,"%lf %lf %lf %lf %lf %lf %lf %lf %lf",
          &rtv[0][0], &rtv[0][1], &rtv[0][2],
@@ -383,6 +424,7 @@ void SetupClass::LoadOpenMXBand(wxString file, bool &isBandLoaded, int &maxneig,
             for (int l=0;l<n1;l++)
             {
                 fscanf(fp,"%lf",&eig);
+                eig = eig * Hartree2eV;
                 A1d.push_back(eig);
             }
             EigVal.push_back(A1d);

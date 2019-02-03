@@ -228,7 +228,6 @@ int PlotBand(mglGraph *gr, int w, int h, Sec30* sec30, int MyID)
         
         int nCurve = DFTnMax - DFTnMin + 1;
         int nX = nKPoint;
-        mglData Y2(nX,nCurve);
         mglData Y(nX,nCurve);
         mglData C(nX,nCurve);
         mglData X(nX);
@@ -245,40 +244,6 @@ int PlotBand(mglGraph *gr, int w, int h, Sec30* sec30, int MyID)
             {
                 //mreal x = iX/(nX-1.0);
                 Y.a[iCurve*nX + iX] = (mreal)(sec30->ArraysOf2DDouble[1][iX][iCurve + DFTnMin - 1] - ChemP);//Eigen Value - ChemP
-            }
-        }
-        
-        if (MyID == 0)
-        {
-            int isData = sec30->ArraysOf2DDouble[2].size();
-            if (isData != 0)
-            {
-                int niTBHam = sec30->ArraysOf2DDouble[2][0].size();
-                for(long iCurve=0; iCurve<niTBHam; iCurve++)
-                {
-                    for(long iX=0; iX<nX; iX++)
-                    {
-                        //mreal x = iX/(nX-1.0);
-                        Y2.a[iCurve*nX + iX] = (mreal)(sec30->ArraysOf2DDouble[2][iX][iCurve]);//Eigen Value - ChemP
-                    }
-                }
-            }
-        }
-        
-        if (MyID == 1)
-        {
-            int isData = sec30->ArraysOf2DDouble[3].size();
-            if (isData != 0)
-            {
-                int nfTBHam = sec30->ArraysOf2DDouble[3][0].size();
-                for(long iCurve=0; iCurve<nfTBHam; iCurve++)
-                {
-                    for(long iX=0; iX<nX; iX++)
-                    {
-                        //mreal x = iX/(nX-1.0);
-                        Y2.a[iCurve*nX + iX] = (mreal)(sec30->ArraysOf2DDouble[3][iX][iCurve]);//Eigen Value - ChemP
-                    }
-                }
             }
         }
         
@@ -336,9 +301,45 @@ int PlotBand(mglGraph *gr, int w, int h, Sec30* sec30, int MyID)
         else
         {
             gr->Plot(X, Y, "{x6495ED}-2");      // "b" is colour ??
-            gr->Plot(X, Y2, "{x800000}-2");      // maroon
         }
         
+        if (MyID == 0 && !SelectMode)
+        {
+            int isData = sec30->ArraysOf2DDouble[2].size();
+            if (isData != 0)
+            {
+                int niTBHam = sec30->ArraysOf2DDouble[2][0].size();
+                mglData Y2(nX,niTBHam); //Tight-binding size
+                for(long iCurve=0; iCurve<niTBHam; iCurve++)
+                {
+                    for(long iX=0; iX<nX; iX++)
+                    {
+                        //mreal x = iX/(nX-1.0);
+                        Y2.a[iCurve*nX + iX] = (mreal)(sec30->ArraysOf2DDouble[2][iX][iCurve]);//Eigen Value - ChemP
+                    }
+                }
+                gr->Plot(X, Y2, "{x800000}-2");      // maroon
+            }
+        }
+        
+        if (MyID == 1 && !SelectMode)
+        {
+            int isData = sec30->ArraysOf2DDouble[3].size();
+            if (isData != 0)
+            {
+                int nfTBHam = sec30->ArraysOf2DDouble[3][0].size();
+                mglData Y2(nX,nfTBHam); //Tight-binding size
+                for(long iCurve=0; iCurve<nfTBHam; iCurve++)
+                {
+                    for(long iX=0; iX<nX; iX++)
+                    {
+                        //mreal x = iX/(nX-1.0);
+                        Y2.a[iCurve*nX + iX] = (mreal)(sec30->ArraysOf2DDouble[3][iX][iCurve]);//Eigen Value - ChemP
+                    }
+                }
+                gr->Plot(X, Y2, "{x800000}-2");      // maroon
+            }
+        }
         //gr->Plot(X, Y, "{x800000}-2");      // maroon
         
         gr->Line(mglPoint(X.a[0],0.0), mglPoint(X.a[nX-1],0.0), "r2|");

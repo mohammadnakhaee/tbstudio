@@ -41,14 +41,22 @@ StructureClass::StructureClass(wxWindow* parent, Sec30* sec30var, wxWindowID id,
     sec30->AddCheckBox(this, _("xyzShow"), _("Show Cartesian Unit Vectors"));
     sec30->AddCheckBox(this, _("abcShow"), _("Show Primitive Unit Vectors"));
     sec30->SetCheckVar(_("xyzShow[0]"), true, false);
-    sec30->SetCheckVar(_("abcShow[0]"), true, false);
+    sec30->SetCheckVar(_("abcShow[0]"), false, false);
     wxComboBox* choicectr = sec30->AddComboCtrl(this, _("ShowUnitCellMode"), _("Unit-Cell"), 60, 110, true);
     choicectr->Append(_("Do not show"));
     choicectr->Append(_("Primitive cell"));
     choicectr->Append(_("All cells"));
     choicectr->SetEditable(false);
     choicectr->SetBackgroundColour(*wxWHITE);
-    choicectr->Select(2);
+    choicectr->Select(1);
+    wxComboBox* choicectr2 = sec30->AddComboCtrl(this, _("TransferTo"), _("Transfer"), 60, 110, true);
+    choicectr2->Append(_("Original"));
+    choicectr2->Append(_("Adjust"));
+    choicectr2->Append(_("Center"));
+    choicectr2->Append(_("Origin"));
+    choicectr2->SetEditable(false);
+    choicectr2->SetBackgroundColour(*wxWHITE);
+    choicectr2->Select(1);
     /**********************************************************************************************************************************************/
     sec30->AddGroupBox(this,_("Import and Export XYZ Coordinates in Angstrom"),wxColour(wxT("rgb(153,180,209)")));
     wxString Labels2[2] = { _("Import"), _("Export")};

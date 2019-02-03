@@ -25,10 +25,6 @@ public:
 protected:
     void Btn_Update_OnClick(wxCommandEvent& event);
     void Btn_LastValues_OnClick(wxCommandEvent& event);
-    void Btn_Start_OnClick(wxCommandEvent& event);
-    void Btn_Pause_OnClick(wxCommandEvent& event);
-    void Btn_Stop_OnClick(wxCommandEvent& event);
-    void Btn_OneStep_OnClick(wxCommandEvent& event);
     void Btn_ExportData_OnClick(wxCommandEvent& event);
     void Btn_ImportData_OnClick(wxCommandEvent& event);
     DECLARE_EVENT_TABLE()
