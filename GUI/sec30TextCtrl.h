@@ -41,6 +41,14 @@ public:
         EnableScrolling(false,false);
         //SetWindowStyle(GetWindowStyle() & ~ wxVSCROLL & ~ wxHSCROLL );
         ShowScrollbars(wxSHOW_SB_NEVER,wxSHOW_SB_NEVER);
+        if (Type=="wxString")
+        {}
+        else if (Type=="int")
+            SetColFormatNumber(0);
+        else if (Type=="double")
+            SetColFormatFloat(0);
+        else if (Type=="bool")
+            SetColFormatBool(0);
         
         SetCellAlignment (0,0, wxALIGN_LEFT,wxALIGN_BOTTOM);
         //SetDefaultCellAlignment(wxALIGN_LEFT,wxALIGN_CENTRE);
