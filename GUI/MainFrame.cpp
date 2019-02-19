@@ -2212,6 +2212,21 @@ void MainFrame::BtnStart_OnClick(wxRibbonButtonBarEvent& event)
     StartRegression();
 }
 
+void MainFrame::BtnOnestep_OnClick(wxRibbonButtonBarEvent& event)
+{
+    
+}
+
+void MainFrame::BtnPause_OnClick(wxRibbonButtonBarEvent& event)
+{
+    
+}
+
+void MainFrame::BtnStop_OnClick(wxRibbonButtonBarEvent& event)
+{
+    
+}
+    
 void MainFrame::BtnAbout_OnClick(wxRibbonButtonBarEvent& event)
 {
     
@@ -2375,8 +2390,20 @@ void MainFrame::LoadIcons()
     wxRibbonButtonBar* RButtonBar7 = new wxRibbonButtonBar(RPanelFitting, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(RPanelFitting, wxSize(-1,-1)), 0);
     
     myID = wxID_FILE1;
-    RButtonBar7->AddButton(myID, _("Start"), GetPng(colors_png,colors_png_size), _(""), wxRIBBON_BUTTON_NORMAL);
+    RButtonBar7->AddButton(myID, _("Start"), GetPng(start_png,start_png_size), _(""), wxRIBBON_BUTTON_NORMAL);
     RButtonBar7->Connect(myID, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrame::BtnStart_OnClick), NULL, this);
+    
+    myID = wxID_FILE2;
+    RButtonBar7->AddButton(myID, _("One Step"), GetPng(onestep_png,onestep_png_size), _(""), wxRIBBON_BUTTON_NORMAL);
+    RButtonBar7->Connect(myID, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrame::BtnOnestep_OnClick), NULL, this);
+    
+    myID = wxID_FILE3;
+    RButtonBar7->AddButton(myID, _("Pause"), GetPng(pause_png,pause_png_size), _(""), wxRIBBON_BUTTON_NORMAL);
+    RButtonBar7->Connect(myID, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrame::BtnPause_OnClick), NULL, this);
+    
+    myID = wxID_FILE4;
+    RButtonBar7->AddButton(myID, _("Stop"), GetPng(stop_png,stop_png_size), _(""), wxRIBBON_BUTTON_NORMAL);
+    RButtonBar7->Connect(myID, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrame::BtnStop_OnClick), NULL, this);
     
     RButtonBar7->Realize();
     

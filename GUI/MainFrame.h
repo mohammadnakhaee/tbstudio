@@ -71,6 +71,9 @@ protected:
     virtual void BtnLeft_OnClick(wxRibbonButtonBarEvent& event);
     virtual void BtnRight_OnClick(wxRibbonButtonBarEvent& event);
     virtual void BtnStart_OnClick(wxRibbonButtonBarEvent& event);
+    virtual void BtnOnestep_OnClick(wxRibbonButtonBarEvent& event);
+    virtual void BtnPause_OnClick(wxRibbonButtonBarEvent& event);
+    virtual void BtnStop_OnClick(wxRibbonButtonBarEvent& event);
     virtual void BtnAbout_OnClick(wxRibbonButtonBarEvent& event);
     virtual void BtnTutorials_OnClick(wxRibbonButtonBarEvent& event);
     virtual void BtnWebsite_OnClick(wxRibbonButtonBarEvent& event);

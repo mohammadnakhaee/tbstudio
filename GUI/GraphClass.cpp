@@ -692,7 +692,8 @@ double GraphClass::GetAtomRadius(int kind)
 {
     double k=abs(kind);
     if (k < 1) k=1;
-    return (10.0 + pow(log(abs(k) + 1),2.75)/2.0 )/60.0;
+    //return (10.0 + pow(log(abs(k) + 1),2.75)/2.0 )/60.0;
+    return (10.0 + pow(log(k + 1),2.75)/2.0 )/60.0;
 }
 
 void GraphClass::SetLeftMouseMode(int mouseEventMode)

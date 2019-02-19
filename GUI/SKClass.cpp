@@ -37,14 +37,7 @@ SKClass::SKClass(wxWindow* parent, Sec30* sec30var, wxWindowID id, const wxPoint
     int ColSizes[3] = {96, 100, 100};
     int ColPrecision[3] = { 0, 8, 8};
     sec30->AddGrid(this, 0, 3, _("OS"), ColNames, ColTypes, ColSizes, ColPrecision, 350, 400);
-    /**********************************************************************************************************************************************/
-    sec30->AddGroupBox(this,_("Slater-Koster Integrals"),wxColour(wxT("rgb(153,180,209)")));
-    wxString ColNames2[3] = { _("Parameter"), _("Initial Value"), _("Last Value")};
-    wxString ColTypes2[3] = { _("string"), _("double"), _("double")};
-    int ColSizes2[3] = {96, 100, 100};
-    int ColPrecision2[3] = { 0, 8, 8};
-    sec30->AddGrid(this, 0, 3, _("SK"), ColNames2, ColTypes2, ColSizes2, ColPrecision2, 350, 400);
-    /**********************************************************************************************************************************************/
+/**********************************************************************************************************************************************/
     sec30->AddGroupBox(this,_("Overlap Integrals"),wxColour(wxT("rgb(153,180,209)")));
     wxString ColNames3[3] = { _("Parameter"), _("Initial Value"), _("Last Value")};
     wxString ColTypes3[3] = { _("string"), _("double"), _("double")};

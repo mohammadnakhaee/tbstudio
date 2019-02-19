@@ -24,9 +24,6 @@ public:
 
 protected:
     void Btn_Update_OnClick(wxCommandEvent& event);
-    void Btn_LastValues_OnClick(wxCommandEvent& event);
-    void Btn_ExportData_OnClick(wxCommandEvent& event);
-    void Btn_ImportData_OnClick(wxCommandEvent& event);
     DECLARE_EVENT_TABLE()
 };
 #endif // BONDSCLASS_H

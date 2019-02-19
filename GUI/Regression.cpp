@@ -38,11 +38,11 @@ void Regression::foo(long long nmax)
 double Regression::maxabs(double* a, int na)
 {
     if (na<1) return 0.0;
-    double maxval = abs(a[0]);
+    double maxval = fabs(a[0]);
     double absa;
     for(int ia=1; ia<na; ia++)
     {
-        absa = abs(a[ia]);
+        absa = fabs(a[ia]);
         if(maxval < absa) maxval = absa;
     }
     return maxval;
@@ -153,14 +153,14 @@ void Regression::lm(double* p, int np, double* t, double* y_dat, int ny, double*
     
     lm_matx(t, p_old, np, y_old, ny, InitializedX2, J, p, y_dat, weight, dp, c, JtWJ, JtWdy, X2, y_hat, func_calls, iteration);
     
-    data = _("test");
+    data = _("******************** New Regression Analysis *******************\n");
     SendDataToTerminal(data);
     
     data = _("");
     if (maxabs(JtWdy, np) < epsilon_1)
     {
         data.append(_("The Initial Guess is Extremely Close to Optimal.\n"));
-        data.append(wxString::Format(wxT("Convergence Tolerance for Gradient = %lf\n"),epsilon_1));
+        data.append(wxString::Format(wxT("Convergence Tolerance for Gradient = %.8f\n"),epsilon_1));
         data.append(_("********************* Convergence achieved *********************\n"));
         SendDataToTerminal(data);
         stop = true;
@@ -426,7 +426,7 @@ void Regression::lm(double* p, int np, double* t, double* y_dat, int ny, double*
                     lambda = fmin(lambda*lambda_UP_fac,1.e7);
                     break;
                 case 2:                                   // Quadratic
-                    lambda = lambda + abs((X2_try - X2)/2.0/alpha);
+                    lambda = lambda + fabs((X2_try - X2)/2.0/alpha);
                     break;
                 case 3:                                   // Nielsen
                     lambda = lambda * nu;
@@ -439,14 +439,14 @@ void Regression::lm(double* p, int np, double* t, double* y_dat, int ny, double*
         if ( prnt > 1 )
         {
             data = _("");
-            data.append(wxString::Format(wxT(">it:%d: call num:%d | chi_sq=%lf | lambda=%lf\n"), iteration, func_calls, X2/DoF, lambda));
+            data.append(wxString::Format(wxT(">it:%d: call num:%d | chi_sq=%.8f | lambda=%.8f\n"), iteration, func_calls, X2/DoF, lambda));
             data.append(_("\n"));
             data.append(_("parameters:"));
-            for(int ip=0; ip<np; ip++) data.append(wxString::Format(wxT(" %lf,"), p[ip]));
+            for(int ip=0; ip<np; ip++) data.append(wxString::Format(wxT(" %.8f,"), p[ip]));
             data.append(_("\n"));
             data.append(_("\n"));
             data.append(_("dp/p:"));
-            for(int ip=0; ip<np; ip++) data.append(wxString::Format(wxT(" %lf,"), h[ip]/p[ip]));
+            for(int ip=0; ip<np; ip++) data.append(wxString::Format(wxT(" %.8f,"), h[ip]/p[ip]));
             data.append(_("\n"));
             data.append(_("\n"));
             SendDataToTerminal(data);
@@ -460,10 +460,11 @@ void Regression::lm(double* p, int np, double* t, double* y_dat, int ny, double*
         cvg_hst[iteration - 1][Npar + 2] = lambda;
         
         for(int ip=0; ip<np; ip++) hperP[ip] = h[ip]/p[ip];
+        
         if ( maxabs(JtWdy,np) < epsilon_1  &&  iteration > 2 )
         {
             data = _("");
-            data.append(wxString::Format(wxT("Convergence Tolerance for Gradient = %lf\n"),epsilon_1));
+            data.append(wxString::Format(wxT("Convergence Tolerance for Gradient = %.8f\n"),epsilon_1));
             data.append(_("********************* Convergence achieved *********************\n"));
             SendDataToTerminal(data);
             stop = true;
@@ -471,7 +472,7 @@ void Regression::lm(double* p, int np, double* t, double* y_dat, int ny, double*
         else if ( maxabs(hperP,np) < epsilon_2  &&  iteration > 2 )
         {
             data = _("");
-            data.append(wxString::Format(wxT("Convergence Tolerance for Parameters = %lf\n"),epsilon_2));
+            data.append(wxString::Format(wxT("Convergence Tolerance for Parameters = %.8f\n"),epsilon_2));
             data.append(_("********************* Convergence achieved *********************\n"));
             SendDataToTerminal(data);
             stop = true;
@@ -479,7 +480,7 @@ void Regression::lm(double* p, int np, double* t, double* y_dat, int ny, double*
         else if ( X2/DoF < epsilon_3 &&  iteration > 2 )
         {
             data = _("");
-            data.append(wxString::Format(wxT("Convergence Tolerance for Chi-square = %lf\n"),epsilon_3));
+            data.append(wxString::Format(wxT("Convergence Tolerance for Chi-square = %.8f\n"),epsilon_3));
             data.append(_("********************* Convergence achieved *********************\n"));
             SendDataToTerminal(data);
             stop = true;
@@ -524,7 +525,7 @@ void Regression::lm(double* p, int np, double* t, double* y_dat, int ny, double*
     
     int info2 = LAPACKE_dgesv(LAPACK_ROW_MAJOR, np, np, JtWJArr, np, ipiv2, covar_p, np);
     
-    for(int ip=0; ip<np; ip++) sigma_p[ip] = sqrt(abs(covar_p[ip * np + ip]));
+    for(int ip=0; ip<np; ip++) sigma_p[ip] = sqrt(fabs(covar_p[ip * np + ip]));
     
     // endfunction  # ---------------------------------------------------------- LM
     
@@ -573,7 +574,7 @@ void Regression::lm_FD_J(double* t, double* p, int np, double* y, int ny, double
     
     for(int j=0; j<n; j++)                 // START --- loop over all parameters
     {
-        del[j] = dp[j] * (1+abs(p[j]));   // parameter perturbation
+        del[j] = dp[j] * (1.0 + fabs(p[j]));   // parameter perturbation
         p[j]   = ps[j] + del[j];          // perturb parameter p(j)
         
         if (del[j] != 0)
@@ -756,15 +757,15 @@ void Regression::func(double* t, int ny, double* p, int np, double* cnst, double
         int GridInd = sec30->ArraysOf2DInt[1][ip][0];
         int irow = sec30->ArraysOf2DInt[1][ip][1];
         double Value = p[ip];
-        wxString val = wxString::Format(wxT("%1f"), Value);
+        wxString val = wxString::Format(wxT("%.8f"), Value);
         if (GridInd == 1)
-            osgc->SetCellValue(2,irow,val);
+            osgc->SetCellValue(irow, 2, val);
         else if (GridInd == 2)
-            skgc->SetCellValue(2,irow,val);
+            skgc->SetCellValue(irow, 2, val);
         else if (GridInd == 3)
-            olgc->SetCellValue(2,irow,val);
+            olgc->SetCellValue(irow, 2, val);
     }
-    
+
     double a[3],b[3],c[3];
     a[0] = cnst[0];
     a[1] = cnst[1];
