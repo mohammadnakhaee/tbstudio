@@ -179,6 +179,7 @@ public:
     int GetSKInd(wxString skName);
     lapack_complex_double GetHk(double*** H, double kx, double ky, double kz, double a[3], double b[3], double c[3], int nEssensialCells, int** lmnEssCells, int iH, int jH);
     int SymEigenValues(lapack_complex_double* UpperSymMatrix, lapack_int N, double* &eig);
+    bool isMatch(double x, double y, double Thereshold);
     
 private:
     virtual void sec30TextCtrl_OnUpdated(wxCommandEvent &event);

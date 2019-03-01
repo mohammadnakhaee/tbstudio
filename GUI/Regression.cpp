@@ -238,35 +238,6 @@ void Regression::lm(double* p, int np, double* t, double* y_dat, int ny, double*
             stop = true;
         }
         
-        if (stop)                       // Lapack error; break
-        {
-            ///////////////Out of While Loop///////////
-            delete [] y_hat;
-            delete [] JtWdy;
-            for (int ip=0; ip<np; ip++) delete [] JtWJ[ip];
-            if (np>0) delete [] JtWJ;
-            for (int iy=0; iy<ny; iy++) delete [] J[iy];
-            if (ny>0) delete [] J;
-            delete [] y_old;
-            delete [] p_old;
-            delete [] hperP;
-            delete [] h;
-            delete [] h2;
-            delete [] ipiv;
-            delete [] ipiv2;
-            delete [] hInv;
-            delete [] y1;
-            delete [] delta_y;
-            delete [] p_try;
-            delete [] weighted_dy;
-            delete [] weighted_dy2;
-            delete [] JtWJArr;
-            delete [] covar_p;
-            ///////////////Out of While Loop///////////
-            
-            return;
-        }
-        
         //  big = max(abs(h./p)) > 2;                      // this is a big step
         
         // --- Are parameters [p+h] much better than [p] ?
@@ -800,6 +771,7 @@ void Regression::func(double* t, int ny, double* p, int np, double* cnst, double
     
     //4. It should be arrays not a vector
     sec30->ConstructTBHamiltonianF(a, b, c, XYZCoords, Hf, nEssensialCells, nHamiltonian, EssCells);
+    sec30->ArraysOf3DDouble[1] = Hf;
     
     for (int i=0; i<natoms; i++) delete [] XYZCoords[i];
     if (natoms>0) delete [] XYZCoords;
@@ -849,6 +821,10 @@ void Regression::func(double* t, int ny, double* p, int np, double* cnst, double
         double kx = absol[0];
         double ky = absol[1];
         double kz = absol[2];
+        
+        //kx = KPoints[ik][3];
+        //ky = KPoints[ik][4];
+        //kz = KPoints[ik][5];
         
         for(int iH=0; iH<nHamiltonian; iH++)
         {

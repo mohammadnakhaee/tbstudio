@@ -62,10 +62,14 @@ void GraphClass::CreateAtomicStructure(Sec30* sec30Var, bool IsNewAllocate)
     sec30->GetVar(_("c[2]"), c[2]);
     
     double r0[3] = {0.0, 0.0, 0.0};
-    
+    double fr0[3] = {0.0, 0.0, 0.0};
     for (int i0=0; i0<nUnitcellAtoms; i0++)
     {
+        double fraca, fracb, fracc;
         sec30->GetVar(_("KABC_Coords"), i0, 0, kind[i0]);
+        sec30->GetVar(_("KABC_Coords"), i0, 1, fraca);
+        sec30->GetVar(_("KABC_Coords"), i0, 2, fracb);
+        sec30->GetVar(_("KABC_Coords"), i0, 3, fracc);
         sec30->GetVar(_("XYZ_Coords"), i0, 0, XArray[i0]);
         sec30->GetVar(_("XYZ_Coords"), i0, 1, YArray[i0]);
         sec30->GetVar(_("XYZ_Coords"), i0, 2, ZArray[i0]);
@@ -74,15 +78,15 @@ void GraphClass::CreateAtomicStructure(Sec30* sec30Var, bool IsNewAllocate)
         {
             if (i0 == 0)
             {
-                r0[0] = XArray[i0];
-                r0[1] = YArray[i0];
-                r0[2] = ZArray[i0];
+                fr0[0] = fraca;
+                fr0[1] = fracb;
+                fr0[2] = fracc;
             }
             else
             {
-                if (r0[0] > XArray[i0]) r0[0] = XArray[i0];
-                if (r0[1] > YArray[i0]) r0[1] = YArray[i0];
-                if (r0[2] > ZArray[i0]) r0[2] = ZArray[i0];
+                if (fr0[0] > fraca) fr0[0] = fraca;
+                if (fr0[1] > fracb) fr0[1] = fracb;
+                if (fr0[2] > fracc) fr0[2] = fracc;
             }
         }
         else if (TransferMode >= 2)
@@ -91,6 +95,13 @@ void GraphClass::CreateAtomicStructure(Sec30* sec30Var, bool IsNewAllocate)
             r0[1] += YArray[i0]/nUnitcellAtoms;
             r0[2] += ZArray[i0]/nUnitcellAtoms;
         }
+    }
+    
+    if (TransferMode == 1)
+    {
+        r0[0] = fr0[0]*a[0] + fr0[1]*b[0] + fr0[2]*c[0];
+        r0[1] = fr0[0]*a[1] + fr0[1]*b[1] + fr0[2]*c[1];
+        r0[2] = fr0[0]*a[2] + fr0[1]*b[2] + fr0[2]*c[2];
     }
     
     if (TransferMode == 2)

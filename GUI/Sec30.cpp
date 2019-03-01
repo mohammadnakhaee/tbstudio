@@ -3324,6 +3324,14 @@ int Sec30::SymEigenValues(lapack_complex_double* UpperSymMatrix, lapack_int N, d
     return LAPACKE_zheev(LAPACK_ROW_MAJOR, 'N', 'U', N, UpperSymMatrix, N, eig);
 }
 
+bool Sec30::isMatch(double x, double y, double Thereshold)
+{
+    if (fabs(x-y) < Thereshold)
+        return true;
+    else
+        return false;
+}
+
 /*
 void Sec30::SetVecValue(wxWindow *parent, wxString VariableName, double* Array, int nArray)
 {

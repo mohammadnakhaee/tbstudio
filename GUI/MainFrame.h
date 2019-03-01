@@ -74,6 +74,12 @@ protected:
     virtual void BtnOnestep_OnClick(wxRibbonButtonBarEvent& event);
     virtual void BtnPause_OnClick(wxRibbonButtonBarEvent& event);
     virtual void BtnStop_OnClick(wxRibbonButtonBarEvent& event);
+    virtual void BtnCppCode_OnClick(wxRibbonButtonBarEvent& event);
+    virtual void BtnCCode_OnClick(wxRibbonButtonBarEvent& event);
+    virtual void BtnFCode_OnClick(wxRibbonButtonBarEvent& event);
+    virtual void BtnMathematicaCode_OnClick(wxRibbonButtonBarEvent& event);
+    virtual void BtnMatlabCode_OnClick(wxRibbonButtonBarEvent& event);
+    virtual void BtnPythonCode_OnClick(wxRibbonButtonBarEvent& event);
     virtual void BtnAbout_OnClick(wxRibbonButtonBarEvent& event);
     virtual void BtnTutorials_OnClick(wxRibbonButtonBarEvent& event);
     virtual void BtnWebsite_OnClick(wxRibbonButtonBarEvent& event);
@@ -162,6 +168,14 @@ protected:
     int ReplaceDFTBand(int iband, int ik);
     double ShiftBand(int iband, int ik);
     double GetFitParameter(int ip, int icol);
+    void ExportMatrices(wxString filepath, wxString BaseName, int MyID_Initial0Final1);
+    void GenerateCode(wxString filepath, wxString BaseName, wxString Type, int MyID_Initial0Final1, bool OnlyDatFiles);
+    void GenerateCppCode(wxString filepath, wxString BaseName, int MyID_Initial0Final1);
+    void GenerateCCode(wxString filepath, wxString BaseName, int MyID_Initial0Final1);
+    void GenerateFCode(wxString filepath, wxString BaseName, int MyID_Initial0Final1);
+    void GenerateMathematicaCode(wxString filepath, wxString BaseName, int MyID_Initial0Final1);
+    void GenerateMatlabCode(wxString filepath, wxString BaseName, int MyID_Initial0Final1);
+    void GeneratePythonCode(wxString filepath, wxString BaseName, int MyID_Initial0Final1);
     
 private:
     wxTextCtrl* logfile;

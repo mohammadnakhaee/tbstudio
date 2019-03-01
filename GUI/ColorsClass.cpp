@@ -3,6 +3,7 @@
 ColorsClass::ColorsClass(wxWindow* parent, Sec30* sec30var)
     : ColorsBaseClass(parent)
 {
+    //153,180,209
     sec30=sec30var;
     /**********************************************************************************************************************************************/
     wxBoxSizer* BaseSizer = new wxBoxSizer(wxVERTICAL);

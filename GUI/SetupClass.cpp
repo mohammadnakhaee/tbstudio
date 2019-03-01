@@ -329,6 +329,7 @@ void SetupClass::Btn_Test_OnClick(wxCommandEvent& event)
 void SetupClass::LoadOpenMXBand(wxString file, bool &isBandLoaded, int &maxneig, int &mspin, double &ChemP, int &nKp, Adouble1D &KPoints, Adouble1D &EigVal, Adouble0D &dkLabel, Astring0D &kLabel)
 {
     double Hartree2eV = 27.2113961318;
+    double BohrToAng = 1.88973;
     isBandLoaded = false;
     try
     {
@@ -346,7 +347,17 @@ void SetupClass::LoadOpenMXBand(wxString file, bool &isBandLoaded, int &maxneig,
          &rtv[0][0], &rtv[0][1], &rtv[0][2],
          &rtv[1][0], &rtv[1][1], &rtv[1][2],
          &rtv[2][0], &rtv[2][1], &rtv[2][2]);
-         
+        
+        for(int i=0; i<3; i++)
+        {
+            for(int j=0; j<3; j++) rtv[i][j] = rtv[i][j] * BohrToAng;
+            Adouble0D A1dvecs;
+            A1dvecs.push_back(rtv[i][0]);
+            A1dvecs.push_back(rtv[i][1]);
+            A1dvecs.push_back(rtv[i][2]);
+            sec30->ArraysOf1DDouble[i + 1] = A1dvecs;
+        }
+        
         int nkpath;
         fscanf(fp,"%d",&nkpath);//read nkpath
         
@@ -386,6 +397,8 @@ void SetupClass::LoadOpenMXBand(wxString file, bool &isBandLoaded, int &maxneig,
         if (kname2 == "G" || kname2 == "g" || kname2.Contains(_("\G")) || kname2.Contains(_("\g")) || kname2.Contains(_("gamma")) || kname2.Contains(_("Gamma"))) kname2 = _("\\Gamma");
         kLabel.push_back(kname2);
         
+        int PathCounter = 0;
+        int ThisPathInd = 0;
         d = 0.0;
         for(int i=0; i<nKp; i++)
         {
@@ -398,7 +411,15 @@ void SetupClass::LoadOpenMXBand(wxString file, bool &isBandLoaded, int &maxneig,
                 oldvec[1]=vec[1];
                 oldvec[2]=vec[2];
             }
-            d += sec30->norm(vec, oldvec);
+            double deltakPath = sec30->norm(vec, oldvec);
+            if (PathCounter == n_perpath[ThisPathInd])
+            {
+                deltakPath = 0.000001;
+                PathCounter = 0;
+                ThisPathInd++;
+            }
+            PathCounter++;
+            d += deltakPath;
             oldvec[0]=vec[0];
             oldvec[1]=vec[1];
             oldvec[2]=vec[2];

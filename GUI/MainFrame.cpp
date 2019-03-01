@@ -626,7 +626,7 @@ void MainFrame::InitializeSec30Arrays()
     int nArraysOf0DDouble = 9;
     int nArraysOf0DInt = 9;
     int nArraysOf2DInt = 3;
-    int nArraysOf1DDouble = 1;
+    int nArraysOf1DDouble = 4;
     int nArraysOf1DString = 3;
     int nArraysOf2DDouble = 4;
     int nArraysOf3DDouble = 4;
@@ -673,6 +673,9 @@ void MainFrame::InitializeSec30Arrays()
     
     /////////////////////////////1D Double///////////////////////////////////////////////////////
     sec30->ArraysOf1DDouble[0] = Adouble0D();//double* dkLabel;
+    sec30->ArraysOf1DDouble[1] = Adouble0D();//double akDFT[3];
+    sec30->ArraysOf1DDouble[2] = Adouble0D();//double bkDFT[3];
+    sec30->ArraysOf1DDouble[3] = Adouble0D();//double ckDFT[3];
     
     /////////////////////////////1D String///////////////////////////////////////////////////////
     sec30->ArraysOf1DString[0] = Astring0D();//wxString* kLabel;
@@ -2226,10 +2229,162 @@ void MainFrame::BtnStop_OnClick(wxRibbonButtonBarEvent& event)
 {
     
 }
+
+void MainFrame::BtnCppCode_OnClick(wxRibbonButtonBarEvent& event)
+{
+    wxFileDialog* OpenDialog = new wxFileDialog(
+		this, _("Generate code"), wxEmptyString, wxEmptyString, 
+		_("C++ Code (*.cpp)|*.cpp")
+        ,wxFD_SAVE, wxDefaultPosition);
     
+    if (OpenDialog->ShowModal() == wxID_OK) // if the user click "Open" instead of "Cancel"
+	{
+        wxString dgPath = OpenDialog->GetDirectory();
+        wxString dgFileName = OpenDialog->GetFilename();
+        wxString BaseName = _("");
+        if (dgFileName.AfterLast('.') == _("cpp"))
+            BaseName = dgFileName.BeforeLast('.');
+        else
+            BaseName = dgFileName;
+        
+        GenerateCode(dgPath, BaseName, _("Cpp"), 1, false);
+	}
+    
+	OpenDialog->Destroy();
+}
+
+void MainFrame::BtnCCode_OnClick(wxRibbonButtonBarEvent& event)
+{
+    wxFileDialog* OpenDialog = new wxFileDialog(
+		this, _("Generate code"), wxEmptyString, wxEmptyString, 
+		_("C Code (*.c)|*.c")
+        ,wxFD_SAVE, wxDefaultPosition);
+    
+    if (OpenDialog->ShowModal() == wxID_OK) // if the user click "Open" instead of "Cancel"
+	{
+        wxString dgPath = OpenDialog->GetDirectory();
+        wxString dgFileName = OpenDialog->GetFilename();
+        wxString BaseName = _("");
+        if (dgFileName.AfterLast('.') == _("c"))
+            BaseName = dgFileName.BeforeLast('.');
+        else
+            BaseName = dgFileName;
+        
+        GenerateCode(dgPath, BaseName, _("C"), 1, false);
+	}
+    
+	OpenDialog->Destroy();
+}
+
+void MainFrame::BtnFCode_OnClick(wxRibbonButtonBarEvent& event)
+{
+    wxFileDialog* OpenDialog = new wxFileDialog(
+		this, _("Generate code"), wxEmptyString, wxEmptyString, 
+		_("Fortran Code (*.f90)|*.f90")
+        ,wxFD_SAVE, wxDefaultPosition);
+    
+    if (OpenDialog->ShowModal() == wxID_OK) // if the user click "Open" instead of "Cancel"
+	{
+        wxString dgPath = OpenDialog->GetDirectory();
+        wxString dgFileName = OpenDialog->GetFilename();
+        wxString BaseName = _("");
+        if (dgFileName.AfterLast('.') == _("f90"))
+            BaseName = dgFileName.BeforeLast('.');
+        else
+            BaseName = dgFileName;
+        
+        GenerateCode(dgPath, BaseName, _("Fortran90"), 1, false);
+	}
+    
+	OpenDialog->Destroy();
+}
+
+void MainFrame::BtnMathematicaCode_OnClick(wxRibbonButtonBarEvent& event)
+{
+    wxFileDialog* OpenDialog = new wxFileDialog(
+		this, _("Generate code"), wxEmptyString, wxEmptyString, 
+		_("Mathematica Notebook (*.nb)|*.nb")
+        ,wxFD_SAVE, wxDefaultPosition);
+    
+    if (OpenDialog->ShowModal() == wxID_OK) // if the user click "Open" instead of "Cancel"
+	{
+        wxString dgPath = OpenDialog->GetDirectory();
+        wxString dgFileName = OpenDialog->GetFilename();
+        wxString BaseName = _("");
+        if (dgFileName.AfterLast('.') == _("nb"))
+            BaseName = dgFileName.BeforeLast('.');
+        else
+            BaseName = dgFileName;
+        
+        GenerateCode(dgPath, BaseName, _("Mathematica"), 1, false);
+	}
+    
+	OpenDialog->Destroy();
+}
+
+void MainFrame::BtnMatlabCode_OnClick(wxRibbonButtonBarEvent& event)
+{
+    wxFileDialog* OpenDialog = new wxFileDialog(
+		this, _("Generate code"), wxEmptyString, wxEmptyString, 
+		_("Matlab Script File (*.m)|*.m")
+        ,wxFD_SAVE, wxDefaultPosition);
+    
+    if (OpenDialog->ShowModal() == wxID_OK) // if the user click "Open" instead of "Cancel"
+	{
+        wxString dgPath = OpenDialog->GetDirectory();
+        wxString dgFileName = OpenDialog->GetFilename();
+        wxString BaseName = _("");
+        if (dgFileName.AfterLast('.') == _("m"))
+            BaseName = dgFileName.BeforeLast('.');
+        else
+            BaseName = dgFileName;
+        
+        GenerateCode(dgPath, BaseName, _("Matlab"), 1, false);
+	}
+    
+	OpenDialog->Destroy();
+}
+
+void MainFrame::BtnPythonCode_OnClick(wxRibbonButtonBarEvent& event)
+{
+    wxFileDialog* OpenDialog = new wxFileDialog(
+		this, _("Generate code"), wxEmptyString, wxEmptyString, 
+		_("Python Script File (*.py)|*.py")
+        ,wxFD_SAVE, wxDefaultPosition);
+    
+    if (OpenDialog->ShowModal() == wxID_OK) // if the user click "Open" instead of "Cancel"
+	{
+        wxString dgPath = OpenDialog->GetDirectory();
+        wxString dgFileName = OpenDialog->GetFilename();
+        wxString BaseName = _("");
+        if (dgFileName.AfterLast('.') == _("py"))
+            BaseName = dgFileName.BeforeLast('.');
+        else
+            BaseName = dgFileName;
+        
+        GenerateCode(dgPath, BaseName, _("Python"), 1, false);
+	}
+    
+	OpenDialog->Destroy();
+}
+
 void MainFrame::BtnAbout_OnClick(wxRibbonButtonBarEvent& event)
 {
+    wxAboutDialogInfo info;
+    wxIcon icn;
+    icn.CopyFromBitmap(GetPng(icon256_png,icon256_png_size));
+    info.SetIcon(icn);
     
+    info.SetName(_("Jacuzzi"));
+    info.SetVersion(_("2019.1"));
+    info.SetDescription(_("Jacuzzi is a powerful and easy to use software package to construct Tight-Binding (TB) model for\nnano-scale materials. Starting from the simplified linear combination of atomic orbitals method in\ncombination with first-principles calculations (such as OpenMX or Vasp packages), one can construct\na TB model in the two-centre approximation. Using Slater and Koster approach we calculate the TB\nHamiltonian of the system and use a nonlinear fitting algorithm to find the best entries for both\nHamiltonian and overlap matrices to reproduce the first-principles data. We obtain expressions for\nthe Hamiltonian and overlap matrix elements between different orbitals (s, p and d orbitals with or\nwithout spin-orbit coupling) for the different atoms and present the SK coefficients in a orthogonal\nor nonorthogonal basis set. Furthermore, by using Jacuzzi one can generate a code in preferred\nprogramming language such as C++, C, Fortran, Mathematica, Matlab and Python."));
+    info.SetCopyright(_("Copyright (c) 2019 Mohammad Nakhaee"));
+
+    wxArrayString developers;
+    developers.Add(_("Mohammad Nakhaee\nPhysics department (CMT), Antwerp university, Antwerpen, Belgium.\nmohammad.nakhaee@uantwerpen.be\nmohammad.nakhaee.1@gmail.com"));
+    info.SetDevelopers(developers);
+
+    wxAboutBox(info);
 }
 
 void MainFrame::BtnTutorials_OnClick(wxRibbonButtonBarEvent& event)
@@ -2406,6 +2561,36 @@ void MainFrame::LoadIcons()
     RButtonBar7->Connect(myID, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrame::BtnStop_OnClick), NULL, this);
     
     RButtonBar7->Realize();
+
+    wxRibbonPage* RPageWizard = new wxRibbonPage(MainRibbon, wxID_ANY, _("Wizard"), wxNullBitmap, 0);
+    wxRibbonPanel* RPanelCodeGen = new wxRibbonPanel(RPageWizard, wxID_ANY, _("Code Generator"), wxNullBitmap, wxDefaultPosition, wxDLG_UNIT(RPageWizard, wxSize(-1,-1)), wxRIBBON_PANEL_DEFAULT_STYLE);
+    wxRibbonButtonBar* RButtonBarCG1 = new wxRibbonButtonBar(RPanelCodeGen, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(RPanelCodeGen, wxSize(-1,-1)), 0);
+    
+    myID = wxID_FILE1;
+    RButtonBarCG1->AddButton(myID, _("C++"), GetPng(cppcode_png,cppcode_png_size), _(""), wxRIBBON_BUTTON_NORMAL);
+    RButtonBarCG1->Connect(myID, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrame::BtnCppCode_OnClick), NULL, this);
+    
+    myID = wxID_FILE2;
+    RButtonBarCG1->AddButton(myID, _("C"), GetPng(ccode_png,ccode_png_size), _(""), wxRIBBON_BUTTON_NORMAL);
+    RButtonBarCG1->Connect(myID, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrame::BtnCCode_OnClick), NULL, this);
+    
+    myID = wxID_FILE3;
+    RButtonBarCG1->AddButton(myID, _("Fortran"), GetPng(fcode_png,fcode_png_size), _(""), wxRIBBON_BUTTON_NORMAL);
+    RButtonBarCG1->Connect(myID, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrame::BtnFCode_OnClick), NULL, this);
+    
+    myID = wxID_FILE4;
+    RButtonBarCG1->AddButton(myID, _("Mathematica"), GetPng(mathematicacode_png,mathematicacode_png_size), _(""), wxRIBBON_BUTTON_NORMAL);
+    RButtonBarCG1->Connect(myID, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrame::BtnMathematicaCode_OnClick), NULL, this);
+    
+    myID = wxID_FILE5;
+    RButtonBarCG1->AddButton(myID, _("Matlab"), GetPng(matlabcode_png,matlabcode_png_size), _(""), wxRIBBON_BUTTON_NORMAL);
+    RButtonBarCG1->Connect(myID, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrame::BtnMatlabCode_OnClick), NULL, this);
+    
+    myID = wxID_FILE6;
+    RButtonBarCG1->AddButton(myID, _("Python"), GetPng(pythoncode_png,pythoncode_png_size), _(""), wxRIBBON_BUTTON_NORMAL);
+    RButtonBarCG1->Connect(myID, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrame::BtnPythonCode_OnClick), NULL, this);
+    
+    RButtonBarCG1->Realize();
     
     wxRibbonPage* RPageHelp = new wxRibbonPage(MainRibbon, wxID_ANY, _("Help"), wxNullBitmap, 0);
     wxRibbonPanel* RPanelHelp = new wxRibbonPanel(RPageHelp, wxID_ANY, _("Help"), wxNullBitmap, wxDefaultPosition, wxDLG_UNIT(RPageHelp, wxSize(-1,-1)), wxRIBBON_PANEL_DEFAULT_STYLE);
@@ -2424,8 +2609,6 @@ void MainFrame::LoadIcons()
     RButtonBar6->Connect(myID, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrame::BtnWebsite_OnClick), NULL, this);
     
     RButtonBar6->Realize();
-    
-    
     
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     MainRibbon->SetActivePage(RPageFile1);
@@ -2704,6 +2887,10 @@ void MainFrame::UpdateTBBand_if()
         double ky = absol[1];
         double kz = absol[2];
         
+        //kx = KPoints[ik][3];
+        //ky = KPoints[ik][4];
+        //kz = KPoints[ik][5];
+        
         for(int iH=0; iH<nHamiltonian; iH++)
         {
             eigHi[iH] = 0.0;
@@ -2814,7 +3001,7 @@ void MainFrame::StartRegression()
     
     int nKPoint;
     nKPoint = sec30->ArraysOf0DInt[1];
-    if (nKPoint < 1) {wxMessageBox(_("Somthing went wrong with the number of k-points."),_("Error"));return;}
+    if (nKPoint < 1) {wxMessageBox(_("Something went wrong with the number of k-points."),_("Error"));return;}
     
     lmOptions opts;
     opts.prnt = prnt;             // >1 intermediate results; >2 plots
@@ -2863,6 +3050,33 @@ void MainFrame::StartRegression()
     sec30->GetVar(_("c[0]"), c[0]);
     sec30->GetVar(_("c[1]"), c[1]);
     sec30->GetVar(_("c[2]"), c[2]);
+    
+    double akTB[3], bkTB[3], ckTB[3];
+    sec30->VecToReciprocal(a, b, c, akTB, bkTB, ckTB);
+    double akDFT[3], bkDFT[3], ckDFT[3];
+    for(int i=0; i<3; i++) akDFT[i] = sec30->ArraysOf1DDouble[1][i];
+    for(int i=0; i<3; i++) bkDFT[i] = sec30->ArraysOf1DDouble[2][i];
+    for(int i=0; i<3; i++) ckDFT[i] = sec30->ArraysOf1DDouble[3][i];
+    
+    bool isMatchVector = true;
+    double thershold = 0.00001;
+    isMatchVector = isMatchVector && sec30->isMatch(akTB[0], akDFT[0], thershold);
+    isMatchVector = isMatchVector && sec30->isMatch(akTB[1], akDFT[1], thershold);
+    isMatchVector = isMatchVector && sec30->isMatch(akTB[2], akDFT[2], thershold);
+    isMatchVector = isMatchVector && sec30->isMatch(bkTB[0], bkDFT[0], thershold);
+    isMatchVector = isMatchVector && sec30->isMatch(bkTB[1], bkDFT[1], thershold);
+    isMatchVector = isMatchVector && sec30->isMatch(bkTB[2], bkDFT[2], thershold);
+    isMatchVector = isMatchVector && sec30->isMatch(ckTB[0], ckDFT[0], thershold);
+    isMatchVector = isMatchVector && sec30->isMatch(ckTB[1], ckDFT[1], thershold);
+    isMatchVector = isMatchVector && sec30->isMatch(ckTB[2], ckDFT[2], thershold);
+    if (!isMatchVector)
+    {
+        wxMessageDialog *dial = new wxMessageDialog(NULL, 
+          wxString::Format(wxT("Mismatch detected between lattice vectors of TB model and DFT data!\nDFT reciprocal lattice vectors:\na* = (%.8f,%.8f,%.8f)\nb* = (%.8f,%.8f,%.8f)\nc* = (%.8f,%.8f,%.8f)\nTB Model reciprocal lattice vectors:\na* = (%.8f,%.8f,%.8f)\nb* = (%.8f,%.8f,%.8f)\nc* = (%.8f,%.8f,%.8f)\nAre you sure you want to continue?"), akDFT[0], akDFT[1], akDFT[2], bkDFT[0], bkDFT[1], bkDFT[2], ckDFT[0], ckDFT[1], ckDFT[2], akTB[0], akTB[1], akTB[2], bkTB[0], bkTB[1], bkTB[2], ckTB[0], ckTB[1], ckTB[2]),
+          wxT("Warning"), 
+          wxYES_NO | wxNO_DEFAULT | wxICON_QUESTION);
+        if ( dial->ShowModal() == wxID_NO ) return;
+    }
     
     int natoms = 0;
     sec30->GetVar(_("nAtoms[0]"),natoms);
@@ -2994,12 +3208,607 @@ void MainFrame::regressionEVT_OnFinished(wxCommandEvent& event)
     
 }
 
+void MainFrame::ExportMatrices(wxString filepath, wxString BaseName, int MyID_Initial0Final1)
+{
+    int nKPoint = sec30->ArraysOf0DInt[1];
+    if (nKPoint < 1)  return;
+    
+    //double** KPoints; [ka,kb,kc,kx,ky,kz,d_path]
+    Adouble1D KPoints = sec30->ArraysOf2DDouble[0];
+    
+    FILE *fpk;
+    wxString fname = filepath + wxT("/") + BaseName + wxT("_kPath") + wxT(".dat");
+    if ((fpk = fopen(fname,"w")) != NULL)
+    {
+        for (int ik=0; ik<nKPoint; ik++)
+        {
+            double ka = KPoints[ik][0];
+            double kb = KPoints[ik][1];
+            double kc = KPoints[ik][2];
+            double dpath = KPoints[ik][6];
+            fprintf(fpk, "%.8f\t%.8f\t%.8f\t%.8f\n", ka, kb, kc, dpath);
+        }
+        fclose(fpk);
+    }
+    
+    int ID = MyID_Initial0Final1;
+    int Hind = 0;
+    int Sind = 2;
+    if (ID == 1)
+    {
+        Hind = 1;
+        Sind = 3;
+    }
+    
+    int nEss = sec30->ArraysOf3DDouble[Hind].size();
+    if (nEss < 1) return;
+    
+    int nH = sec30->ArraysOf3DDouble[Hind][0].size();
+    if (nH < 1) return;
+    
+    wxListBox* listctr = sec30->GetListObject(_("EssentialUnitcellList"));
+    int nCell = listctr->GetCount();
+    
+    for (int iCell=0; iCell<nCell; iCell++)
+    {
+        wxString WorkingCell = listctr->GetString(iCell);
+        
+        FILE *fp;
+        wxString fname1 = filepath + wxT("/") + BaseName + wxT("_H") + WorkingCell + wxT(".dat");
+        if ((fp = fopen(fname1,"w")) != NULL)
+        {
+            for (int iH=0; iH<nH; iH++)
+            {
+                fprintf(fp, "%.8f", sec30->ArraysOf3DDouble[Hind][iCell][iH][0]);
+                for (int jH=1; jH<nH; jH++) fprintf(fp, "\t%.8f", sec30->ArraysOf3DDouble[Hind][iCell][iH][jH]);
+                fprintf(fp, "\n");
+            }
+            fclose(fp);
+        }
+    }
+    
+    int nEssS = sec30->ArraysOf3DDouble[Sind].size();
+    if (nEssS < 1) return;
+    
+    int nS = sec30->ArraysOf3DDouble[Sind][0].size();
+    if (nS < 1) return;
+    
+    for (int iCell=0; iCell<nCell; iCell++)
+    {
+        wxString WorkingCell = listctr->GetString(iCell);
+        
+        FILE *fp;
+        wxString fname1 = filepath + wxT("/") + BaseName + wxT("_S") + WorkingCell + wxT(".dat");
+        if ((fp = fopen(fname1,"w")) != NULL)
+        {
+            for (int iS=0; iS<nS; iS++)
+            {
+                fprintf(fp, "%.8f", sec30->ArraysOf3DDouble[Hind][iCell][iS][0]);
+                for (int jS=1; jS<nS; jS++)
+                {
+                    fprintf(fp, "\t%.8f", sec30->ArraysOf3DDouble[Hind][iCell][iS][jS]);
+                }
+                fprintf(fp, "\n");
+            }
+            fclose(fp);
+        }
+    }
+}
 
+void MainFrame::GenerateCode(wxString filepath, wxString BaseName, wxString CodeType, int MyID_Initial0Final1, bool OnlyDatFiles)
+{
+    bool isBandLoaded;
+    if (sec30->ArraysOf0DInt[0] != 0) isBandLoaded = true;
+    if (!isBandLoaded) {wxMessageBox(_("Your DFT band is not loaded. We do not have any information about the k-path. Please load the DFT band and make sure you can see the TB band structure and try later."),_("Error"));return;}
+    int nKPoint = sec30->ArraysOf0DInt[1];
+    if (nKPoint < 1) {wxMessageBox(_("We do not have any information about the k-path. Please make sure you can see the band structure and try later."),_("Error"));return;}
+    
+    int ID = MyID_Initial0Final1;
+    int Hind = 0;
+    if (ID == 1) Hind = 1;
 
+    int nEss = sec30->ArraysOf3DDouble[Hind].size();
+    if (nEss < 1) {wxMessageBox(_("Your TB model is not completed. Please make sure you can see the band structure and try later."),_("Error"));return;}
+    
+    int nH = sec30->ArraysOf3DDouble[Hind][0].size();
+    if (nH < 1) {wxMessageBox(_("Your TB model is not completed. Please make sure you can see the band structure and try later."),_("Error"));return;}
+    
+    ExportMatrices(filepath, BaseName, MyID_Initial0Final1);
+    if (OnlyDatFiles) return;
+    if (CodeType == _("Cpp"))
+        GenerateCppCode(filepath, BaseName, MyID_Initial0Final1);
+    else if (CodeType == _("C"))
+        GenerateCCode(filepath, BaseName, MyID_Initial0Final1);
+    else if (CodeType == _("Fortran90"))
+        GenerateFCode(filepath, BaseName, MyID_Initial0Final1);
+    else if (CodeType == _("Mathematica"))
+        GenerateMathematicaCode(filepath, BaseName, MyID_Initial0Final1);
+    else if (CodeType == _("Matlab"))
+        GenerateMatlabCode(filepath, BaseName, MyID_Initial0Final1);
+    else if (CodeType == _("Python"))
+        GeneratePythonCode(filepath, BaseName, MyID_Initial0Final1);
+}
 
+void MainFrame::GenerateCppCode(wxString filepath, wxString BaseName, int MyID_Initial0Final1)
+{
+    
+}
 
+void MainFrame::GenerateCCode(wxString filepath, wxString BaseName, int MyID_Initial0Final1)
+{
+    
+}
 
+void MainFrame::GenerateFCode(wxString filepath, wxString BaseName, int MyID_Initial0Final1)
+{
+    
+}
 
+void MainFrame::GenerateMathematicaCode(wxString filepath, wxString BaseName, int MyID_Initial0Final1)
+{
+    int ID = MyID_Initial0Final1;
+    int Hind = 0;
+    int Sind = 2;
+    if (ID == 1)
+    {
+        Hind = 1;
+        Sind = 3;
+    }
+    
+    int nEss = sec30->ArraysOf3DDouble[Hind].size();
+    if (nEss < 1) return;
+    
+    int nH = sec30->ArraysOf3DDouble[Hind][0].size();
+    if (nH < 1) return;
+    
+    int nk = sec30->ArraysOf2DDouble[0].size();//double** KPoints; [ka,kb,kc,kx,ky,kz,d_path]
+    int nklabel = sec30->ArraysOf1DDouble[0].size();//double* dkLabel;
+    
+    FILE *fpk;
+    wxString fname = filepath + wxT("/") + BaseName + wxT(".nb");
+    if ((fpk = fopen(fname,"w")) != NULL)
+    {
+        fprintf(fpk,"(*Define the parameters*)\n");
+        fprintf(fpk,"nH = %d;\n", nH);
+        fprintf(fpk,"nk = %d;\n", nk);
+        fprintf(fpk,"labels = {");
+        for (int iklabel=0; iklabel<nklabel; iklabel++)
+        {
+            //sec30->ArraysOf1DDouble[0]//double* dkLabel;
+            //sec30->ArraysOf1DString[0]//wxString* kLabel;
+            if (iklabel>0) fprintf(fpk,",");
+            wxString mylabel = sec30->ArraysOf1DString[0][iklabel];
+            if (mylabel == _("\\Gamma")) mylabel = _("G");
+            fprintf(fpk,"{{%.3f, 0.0}, \"%s\"}", sec30->ArraysOf1DDouble[0][iklabel], mylabel.c_str().AsChar());
+        }
+        fprintf(fpk,"};\n");
+        fprintf(fpk,"nlabels = Length[labels];\n\n");
+        
+        fprintf(fpk,"(*Set the directory*)\n");
+        fprintf(fpk,"SetDirectory[NotebookDirectory[]];\n");
+        fprintf(fpk,"Directory[];\n\n");
+        
+        fprintf(fpk,"(*Load Hamiltonian from the files*)\n");
+        wxListBox* listctr = sec30->GetListObject(_("EssentialUnitcellList"));
+        int nCell = listctr->GetCount();        
+        for (int iCell=0; iCell<nCell; iCell++)
+        {
+            wxString WorkingCell = listctr->GetString(iCell);
+            int lcell,mcell,ncell;
+            sec30->GetCellInfo(WorkingCell, lcell, mcell, ncell);
+            wxString fname1 = wxT("./") + BaseName + wxT("_H") + WorkingCell + wxT(".dat");
+            fprintf(fpk,"h[%d, %d, %d] = Import[\"%s\"];\n", lcell, mcell, ncell, fname1.c_str().AsChar());
+        }
+        
+        for (int iCell=0; iCell<nCell; iCell++)
+        {
+            wxString WorkingCell = listctr->GetString(iCell);
+            int lcell,mcell,ncell;
+            sec30->GetCellInfo(WorkingCell, lcell, mcell, ncell);
+            if (!(lcell==0 && mcell==0 && ncell == 0))
+                fprintf(fpk,"h[%d, %d, %d] = ConjugateTranspose[h[%d, %d, %d]];\n", -lcell, -mcell, -ncell, lcell, mcell, ncell);
+        }
+        
+        fprintf(fpk,"\n");
+        for (int iCell=0; iCell<nCell; iCell++)
+        {
+            wxString WorkingCell = listctr->GetString(iCell);
+            int lcell,mcell,ncell;
+            sec30->GetCellInfo(WorkingCell, lcell, mcell, ncell);
+            fprintf(fpk,"MatrixForm[h[%d, %d, %d]]\n", lcell, mcell, ncell);
+        }
+        
+        fprintf(fpk,"\n(*Load k-points from the file*)\n");
+        fprintf(fpk,"kPath = Import[\"./%s_kPath.dat\"];\n", BaseName.c_str().AsChar());
+        
+        double a[3],b[3],c[3];
+        sec30->GetVar(_("a[0]"), a[0]);
+        sec30->GetVar(_("a[1]"), a[1]);
+        sec30->GetVar(_("a[2]"), a[2]);
+        sec30->GetVar(_("b[0]"), b[0]);
+        sec30->GetVar(_("b[1]"), b[1]);
+        sec30->GetVar(_("b[2]"), b[2]);
+        sec30->GetVar(_("c[0]"), c[0]);
+        sec30->GetVar(_("c[1]"), c[1]);
+        sec30->GetVar(_("c[2]"), c[2]);
+        
+        fprintf(fpk,"\n(*Set the unitcell vectors*)\n");
+        fprintf(fpk,"a={%.8f, %.8f, %.8f};\n", a[0], a[1], a[2]);
+        fprintf(fpk,"b={%.8f, %.8f, %.8f};\n", b[0], b[1], b[2]);
+        fprintf(fpk,"c={%.8f, %.8f, %.8f};\n", c[0], c[1], c[2]);
+        
+        fprintf(fpk,"\n(*Calculate the reciprocal space vectors*)\n");
+        fprintf(fpk,"vol = a.Cross[b, c];\n");
+        fprintf(fpk,"as = 2*Pi*Cross[b, c]/vol;\n");
+        fprintf(fpk,"bs = 2*Pi*Cross[c, a]/vol;\n");
+        fprintf(fpk,"cs = 2*Pi*Cross[a, b]/vol;\n");
+        
+        int TBl,TBm,TBn;
+        sec30->GetVar(_("TBl[0]"), TBl);
+        sec30->GetVar(_("TBm[0]"), TBm);
+        sec30->GetVar(_("TBn[0]"), TBn);
+        fprintf(fpk,"\n(*Calculate the TB Hamiltonian in resiprocal space*)\n");
+        fprintf(fpk,"HkFunc = Sum[h[l, m, n] Exp[I ((ka*as + kb*bs + kc*cs).(l*a + m*b + n*c))], {l, %d, %d}, {m, %d, %d}, {n, %d, %d}];\n", -TBl, TBl, -TBm, TBm, -TBn, TBn);
+        
+        fprintf(fpk,"\n(*Define Hk function as TB Hamiltonian*)\n");
+        fprintf(fpk,"H[{ka_, kb_, kc_}] := Evaluate[HkFunc];\n");
+        
+        fprintf(fpk,"\n(*Band-Structure Calculation*)\n");
+        fprintf(fpk,"Print[\"The number of bands is \" <> ToString[nH]];\n");
+        fprintf(fpk,"nbands = nH;\n");
+        fprintf(fpk,"bands = Table[{0.0, 0.0}, {nbands}, {nk}];\n");
+        fprintf(fpk,"dpath = 0.0;\n");
+        fprintf(fpk,"Do[\n");
+        fprintf(fpk,"  {ka0, kb0, kc0, dpath} = kPath[[ik]];\n");
+        fprintf(fpk,"  eig = Eigenvalues[H[{ka0, kb0, kc0}]];\n");
+        fprintf(fpk,"  eig = Sort[eig];(*The imaginary part is practically zero.*)\n");
+        fprintf(fpk,"  Do[\n");
+        fprintf(fpk,"   bands[[iband, ik, 1]] = dpath;\n");
+        fprintf(fpk,"   bands[[iband, ik, 2]] = eig[[iband]];\n");
+        fprintf(fpk,"   , {iband, 1, nbands}];\n");
+        fprintf(fpk,"  , {ik, 1, nk}];\n");
+        fprintf(fpk,"dmax = dpath;\n");
+        
+        fprintf(fpk,"\n(*Plot the band-structure*)\n");
+        fprintf(fpk,"Show[\n");
+        fprintf(fpk," ListLinePlot[bands, PlotRange -> {{0, dmax}, All}, PlotStyle -> RGBColor[0.65, 0, 0], Frame -> True, Axes -> False],\n");
+        fprintf(fpk," Graphics[{Directive[Thick, Dashed, Red], Line[{{0, 0}, {dmax, 0}}]}],\n");
+        fprintf(fpk," ListPlot[Table[Callout[labels[[i, 1]], labels[[i, 2]], Background -> Transparent], {i, nlabels}], PlotRange -> {{0, dmax}, All}]\n");
+        fprintf(fpk,"]\n");
+        fclose(fpk);
+    }
+}
+
+void MainFrame::GenerateMatlabCode(wxString filepath, wxString BaseName, int MyID_Initial0Final1)
+{
+    int ID = MyID_Initial0Final1;
+    int Hind = 0;
+    int Sind = 2;
+    if (ID == 1)
+    {
+        Hind = 1;
+        Sind = 3;
+    }
+    
+    int nEss = sec30->ArraysOf3DDouble[Hind].size();
+    if (nEss < 1) return;
+    
+    int nH = sec30->ArraysOf3DDouble[Hind][0].size();
+    if (nH < 1) return;
+    
+    int nk = sec30->ArraysOf2DDouble[0].size();//double** KPoints; [ka,kb,kc,kx,ky,kz,d_path]
+    int nklabel = sec30->ArraysOf1DDouble[0].size();//double* dkLabel;
+    
+    FILE *fpk;
+    wxString fname = filepath + wxT("/") + BaseName + wxT(".m");
+    if ((fpk = fopen(fname,"w")) != NULL)
+    {
+        fprintf(fpk,"%%Global parameters\n");
+        fprintf(fpk,"global nH lMax mMax nMax l0 m0 n0 a b c as bs cs\n");
+        
+        fprintf(fpk,"\n%%Define the parameters\n");
+        fprintf(fpk,"nH = %d;\n", nH);
+        fprintf(fpk,"nk = %d;\n", nk);
+        fprintf(fpk,"labels = {");
+        for (int iklabel=0; iklabel<nklabel; iklabel++)
+        {
+            //sec30->ArraysOf1DDouble[0]//double* dkLabel;
+            //sec30->ArraysOf1DString[0]//wxString* kLabel;
+            if (iklabel>0) fprintf(fpk,",");
+            wxString mylabel = sec30->ArraysOf1DString[0][iklabel];
+            if (mylabel == _("\\Gamma")) mylabel = _("G");
+            fprintf(fpk,"{%.3f, \'%s\'}", sec30->ArraysOf1DDouble[0][iklabel], mylabel.c_str().AsChar());
+        }
+        fprintf(fpk,"};\n");
+        fprintf(fpk,"nlabels = length(labels);\n");
+        
+        int TBl,TBm,TBn;
+        sec30->GetVar(_("TBl[0]"), TBl);
+        sec30->GetVar(_("TBm[0]"), TBm);
+        sec30->GetVar(_("TBn[0]"), TBn);
+        
+        fprintf(fpk,"\n%%The dimensions of the TB model\n");
+        fprintf(fpk,"lMax = %d;\n", TBl);
+        fprintf(fpk,"mMax = %d;\n", TBm);
+        fprintf(fpk,"nMax = %d;\n", TBn);
+        
+        fprintf(fpk,"\n%%We need to shift the indices, because Matlab does not accept negative index\n");
+        fprintf(fpk,"l0 = lMax+1; %%It will be added to the all i indices\n");
+        fprintf(fpk,"m0 = mMax+1; %%It will be added to the all j indices\n");
+        fprintf(fpk,"n0 = nMax+1; %%It will be added to the all k indices\n");
+        
+        fprintf(fpk,"\n%%Load Hamiltonian from the files\n");
+        fprintf(fpk,"h=cell(1,1);\n");
+        wxListBox* listctr = sec30->GetListObject(_("EssentialUnitcellList"));
+        int nCell = listctr->GetCount();        
+        for (int iCell=0; iCell<nCell; iCell++)
+        {
+            wxString WorkingCell = listctr->GetString(iCell);
+            int lcell,mcell,ncell;
+            sec30->GetCellInfo(WorkingCell, lcell, mcell, ncell);
+            wxString fname1 = wxT("./") + BaseName + wxT("_H") + WorkingCell + wxT(".dat");
+            fprintf(fpk,"h{l0 + %d, m0 + %d, n0 + %d} = load(\'%s\');\n", lcell, mcell, ncell, fname1.c_str().AsChar());
+        }
+        
+        for (int iCell=0; iCell<nCell; iCell++)
+        {
+            wxString WorkingCell = listctr->GetString(iCell);
+            int lcell,mcell,ncell;
+            sec30->GetCellInfo(WorkingCell, lcell, mcell, ncell);
+            if (!(lcell==0 && mcell==0 && ncell == 0))
+                fprintf(fpk,"h{l0 + %d, m0 + %d, n0 + %d} = h{l0 + %d, m0 + %d, n0 + %d}\';\n", -lcell, -mcell, -ncell, lcell, mcell, ncell);
+        }
+        
+        fprintf(fpk,"\n%%Load k-points from the file\n");
+        fprintf(fpk,"kPath = load(\'./%s_kPath.dat\');\n", BaseName.c_str().AsChar());
+        
+        double a[3],b[3],c[3];
+        sec30->GetVar(_("a[0]"), a[0]);
+        sec30->GetVar(_("a[1]"), a[1]);
+        sec30->GetVar(_("a[2]"), a[2]);
+        sec30->GetVar(_("b[0]"), b[0]);
+        sec30->GetVar(_("b[1]"), b[1]);
+        sec30->GetVar(_("b[2]"), b[2]);
+        sec30->GetVar(_("c[0]"), c[0]);
+        sec30->GetVar(_("c[1]"), c[1]);
+        sec30->GetVar(_("c[2]"), c[2]);
+        
+        fprintf(fpk,"\n%%Set the unitcell vectors\n");
+        fprintf(fpk,"a=[%.8f, %.8f, %.8f];\n", a[0], a[1], a[2]);
+        fprintf(fpk,"b=[%.8f, %.8f, %.8f];\n", b[0], b[1], b[2]);
+        fprintf(fpk,"c=[%.8f, %.8f, %.8f];\n", c[0], c[1], c[2]);
+        
+        fprintf(fpk,"\n%%Calculate the reciprocal space vectors\n");
+        fprintf(fpk,"vol = a*cross(b, c)\';\n");
+        fprintf(fpk,"as = 2*pi*cross(b, c)/vol;\n");
+        fprintf(fpk,"bs = 2*pi*cross(c, a)/vol;\n");
+        fprintf(fpk,"cs = 2*pi*cross(a, b)/vol;\n");
+        
+        fprintf(fpk,"\n%%Band-Structure Calculation\n");
+        fprintf(fpk,"disp(['The number of bands is ' mat2str(nH)]);\n");
+        fprintf(fpk,"nbands = nH;\n");
+        fprintf(fpk,"bands = zeros(nbands, nk, 2);\n");
+        fprintf(fpk,"dpath = 0.0;\n");
+        
+        fprintf(fpk,"for ik=1:nk\n");
+        fprintf(fpk,"\tka = kPath(ik,1);\n");
+        fprintf(fpk,"\tkb = kPath(ik,2);\n");
+        fprintf(fpk,"\tkc = kPath(ik,3);\n");
+        fprintf(fpk,"\tdpath = kPath(ik,4);\n");
+        fprintf(fpk,"\thk = GetHam(h, ka, kb, kc);\n");
+        fprintf(fpk,"\tEIG = eig(hk);\n");
+        fprintf(fpk,"\tEIG = sort(EIG); %%The imaginary part is practically zero.\n");
+        fprintf(fpk,"\tfor iband=1:nbands\n");
+        fprintf(fpk,"\t\tbands(iband,ik,1) = dpath;\n");
+        fprintf(fpk,"\t\tbands(iband,ik,2) = EIG(iband);\n");
+        fprintf(fpk,"\tend\n");
+        fprintf(fpk,"end\n");
+        
+        fprintf(fpk,"\n%%Plot the band-structure\n");
+        fprintf(fpk,"dmax = dpath;\n");
+        fprintf(fpk,"close all\n");
+        fprintf(fpk,"figure(1)\n");
+        fprintf(fpk,"for iband=1:nbands\n");
+        fprintf(fpk,"\tplot(bands(iband,:,1),bands(iband,:,2),'-r')\n");
+        fprintf(fpk,"\thold on\n");
+        fprintf(fpk,"end\n\n");
+        fprintf(fpk,"xlim([0 dmax])\n");
+        fprintf(fpk,"yrange=ylim();\n");
+        fprintf(fpk,"for i=1:nlabels\n");
+        fprintf(fpk,"\tline([labels{i}{1},labels{i}{1}],[yrange(1),yrange(2)]);\n");
+        fprintf(fpk,"end\n");
+        fclose(fpk);
+    }
+    
+    FILE *fpk2;
+    wxString fname2 = filepath + wxT("/GetHam.m");
+    if ((fpk2 = fopen(fname2,"w")) != NULL)
+    {
+        fprintf(fpk2,"function hk = GetHam(h, ka, kb, kc)\n");
+        fprintf(fpk2,"global nH lMax mMax nMax l0 m0 n0 a b c as bs cs\n");
+        fprintf(fpk2,"hk = zeros(nH, nH);\n\n");
+        fprintf(fpk2,"for i=1:nH\n");
+        fprintf(fpk2,"\tfor j=1:nH\n");
+        fprintf(fpk2,"\t\thk(i,j) = 0.0;\n");
+        fprintf(fpk2,"\t\tfor l=-lMax:lMax\n");
+        fprintf(fpk2,"\t\t\tfor m=-mMax:mMax\n");
+        fprintf(fpk2,"\t\t\t\tfor n=-nMax:nMax\n");
+        fprintf(fpk2,"\t\t\t\t\thij = h{l0 + l, m0 + m, n0 + n}(i,j);\n");
+        fprintf(fpk2,"\t\t\t\t\thk(i,j) = hk(i,j) + hij*exp(1i*(ka*as + kb*bs + kc*cs)*(l*a\' + m*b\' + n*c\'));\n");
+        fprintf(fpk2,"\t\t\t\tend\n");
+        fprintf(fpk2,"\t\t\tend\n");
+        fprintf(fpk2,"\t\tend\n");
+        fprintf(fpk2,"\tend\n");
+        fprintf(fpk2,"end\n");
+        fclose(fpk2);
+    }
+}
+
+void MainFrame::GeneratePythonCode(wxString filepath, wxString BaseName, int MyID_Initial0Final1)
+{
+    int ID = MyID_Initial0Final1;
+    int Hind = 0;
+    int Sind = 2;
+    if (ID == 1)
+    {
+        Hind = 1;
+        Sind = 3;
+    }
+    
+    int nEss = sec30->ArraysOf3DDouble[Hind].size();
+    if (nEss < 1) return;
+    
+    int nH = sec30->ArraysOf3DDouble[Hind][0].size();
+    if (nH < 1) return;
+    
+    int nk = sec30->ArraysOf2DDouble[0].size();//double** KPoints; [ka,kb,kc,kx,ky,kz,d_path]
+    int nklabel = sec30->ArraysOf1DDouble[0].size();//double* dkLabel;
+    
+    FILE *fpk;
+    wxString fname = filepath + wxT("/") + BaseName + wxT(".py");
+    if ((fpk = fopen(fname,"w")) != NULL)
+    {
+        fprintf(fpk,"#Import libraries\n");
+        fprintf(fpk,"import numpy as np\n");
+        fprintf(fpk,"from numpy import linalg as LA\n");
+        fprintf(fpk,"import matplotlib.pyplot as plt\n");
+        
+        fprintf(fpk,"\n#Function definition for Hamiltonian\n");
+        fprintf(fpk,"def GetHam(h, ka, kb, kc):\n");
+        fprintf(fpk,"   hk = np.array([[0.0 + 0.0*1j for j in xrange(nH)] for i in xrange(nH)])\n");
+        fprintf(fpk,"   for i in range(nH):\n");
+        fprintf(fpk,"      for j in range(nH):\n");
+        fprintf(fpk,"         hk[i][j] = 0.0 + 0.0*1j\n");
+        fprintf(fpk,"         for l in range(-lMax, lMax + 1):\n");
+        fprintf(fpk,"            for m in range(-mMax, mMax + 1):\n");
+        fprintf(fpk,"	       for n in range(-nMax, nMax + 1):\n");
+        fprintf(fpk,"                  hij = h[l0 + l][m0 + m][n0 + n][i][j]\n");
+        fprintf(fpk,"                  kvec = ka*astar + kb*bstar + kc*cstar\n");
+        fprintf(fpk,"                  Rvec = l*a + m*b + n*c\n");
+        fprintf(fpk,"                  hk[i][j] = hk[i][j] + hij*np.exp(1j*np.dot(kvec,Rvec))\n");
+        fprintf(fpk,"   return hk\n");
+        
+        fprintf(fpk,"\n#Define the parameters\n");
+        fprintf(fpk,"pi = 3.14159265359\n");
+        fprintf(fpk,"nH = %d\n", nH);
+        fprintf(fpk,"nk = %d\n", nk);
+        fprintf(fpk,"xlabels = [");
+        for (int iklabel=0; iklabel<nklabel; iklabel++)
+        {
+            //sec30->ArraysOf1DDouble[0]//double* dkLabel;
+            //sec30->ArraysOf1DString[0]//wxString* kLabel;
+            if (iklabel>0) fprintf(fpk,",");
+            fprintf(fpk,"%.3f", sec30->ArraysOf1DDouble[0][iklabel]);
+        }
+        fprintf(fpk,"]\n");
+        fprintf(fpk,"labels = [");
+        for (int iklabel=0; iklabel<nklabel; iklabel++)
+        {
+            //sec30->ArraysOf1DDouble[0]//double* dkLabel;
+            //sec30->ArraysOf1DString[0]//wxString* kLabel;
+            if (iklabel>0) fprintf(fpk,",");
+            wxString mylabel = sec30->ArraysOf1DString[0][iklabel];
+            if (mylabel == _("\\Gamma")) mylabel = _("G");
+            fprintf(fpk,"\"%s\"", mylabel.c_str().AsChar());
+        }
+        fprintf(fpk,"]\n");
+        fprintf(fpk,"nlabels = len(labels)\n");
+        
+        int TBl,TBm,TBn;
+        sec30->GetVar(_("TBl[0]"), TBl);
+        sec30->GetVar(_("TBm[0]"), TBm);
+        sec30->GetVar(_("TBn[0]"), TBn);
+        
+        fprintf(fpk,"\n#The dimensions of the TB model\n");
+        fprintf(fpk,"lMax = %d\n", TBl);
+        fprintf(fpk,"mMax = %d\n", TBm);
+        fprintf(fpk,"nMax = %d\n", TBn);
+        
+        fprintf(fpk,"\n#We need to shift the indices, because Python does not accept negative index\n");
+        fprintf(fpk,"l0 = lMax; #It will be added to the all i indices\n");
+        fprintf(fpk,"m0 = mMax; #It will be added to the all j indices\n");
+        fprintf(fpk,"n0 = nMax; #It will be added to the all k indices\n");
+        
+        fprintf(fpk,"\n#Load Hamiltonian from the files\n");
+        fprintf(fpk,"h = [[[0 for k in xrange(2*nMax+1)] for j in xrange(2*mMax + 1)] for i in xrange(2*lMax+1)]\n");
+        wxListBox* listctr = sec30->GetListObject(_("EssentialUnitcellList"));
+        int nCell = listctr->GetCount();        
+        for (int iCell=0; iCell<nCell; iCell++)
+        {
+            wxString WorkingCell = listctr->GetString(iCell);
+            int lcell,mcell,ncell;
+            sec30->GetCellInfo(WorkingCell, lcell, mcell, ncell);
+            wxString fname1 = wxT("./") + BaseName + wxT("_H") + WorkingCell + wxT(".dat");
+            fprintf(fpk,"h[l0 + %d][m0 + %d][n0 + %d] = np.loadtxt(\'%s\', usecols=range(nH))\n", lcell, mcell, ncell, fname1.c_str().AsChar());
+        }
+        
+        for (int iCell=0; iCell<nCell; iCell++)
+        {
+            wxString WorkingCell = listctr->GetString(iCell);
+            int lcell,mcell,ncell;
+            sec30->GetCellInfo(WorkingCell, lcell, mcell, ncell);
+            if (!(lcell==0 && mcell==0 && ncell == 0))
+                fprintf(fpk,"h[l0 + %d][m0 + %d][n0 + %d] = h[l0 + %d][m0 + %d][n0 + %d].conj().T\n", -lcell, -mcell, -ncell, lcell, mcell, ncell);
+        }
+        
+        fprintf(fpk,"\n#Load k-points from the file\n");
+        fprintf(fpk,"kPath = np.loadtxt(\'./%s_kPath.dat\', usecols=range(4))\n", BaseName.c_str().AsChar());
+        
+        double a[3],b[3],c[3];
+        sec30->GetVar(_("a[0]"), a[0]);
+        sec30->GetVar(_("a[1]"), a[1]);
+        sec30->GetVar(_("a[2]"), a[2]);
+        sec30->GetVar(_("b[0]"), b[0]);
+        sec30->GetVar(_("b[1]"), b[1]);
+        sec30->GetVar(_("b[2]"), b[2]);
+        sec30->GetVar(_("c[0]"), c[0]);
+        sec30->GetVar(_("c[1]"), c[1]);
+        sec30->GetVar(_("c[2]"), c[2]);
+        
+        fprintf(fpk,"\n#Set the unitcell vectors\n");
+        fprintf(fpk,"a = np.array([%.8f, %.8f, %.8f])\n", a[0], a[1], a[2]);
+        fprintf(fpk,"b = np.array([%.8f, %.8f, %.8f])\n", b[0], b[1], b[2]);
+        fprintf(fpk,"c = np.array([%.8f, %.8f, %.8f])\n", c[0], c[1], c[2]);
+        
+        fprintf(fpk,"\n#Calculate the reciprocal space vectors\n");
+        fprintf(fpk,"vol = np.dot(a, np.cross(b, c))\n");
+        fprintf(fpk,"astar = 2*pi*np.cross(b, c)/vol\n");
+        fprintf(fpk,"bstar = 2*pi*np.cross(c, a)/vol\n");
+        fprintf(fpk,"cstar = 2*pi*np.cross(a, b)/vol\n");
+        
+        fprintf(fpk,"\n#Band-Structure Calculation\n");
+        fprintf(fpk,"print('The number of bands is ' + str(nH))\n");
+        fprintf(fpk,"nbands = nH\n");
+        fprintf(fpk,"X = [0.0 for j in xrange(nk)]\n");
+        fprintf(fpk,"bands = [[0.0 for j in xrange(nk)] for i in xrange(nbands)]\n");
+        fprintf(fpk,"dpath = 0.0;\n");
+        
+        fprintf(fpk,"for ik in range(nk):\n");
+        fprintf(fpk,"   ka = kPath[ik][0]\n");
+        fprintf(fpk,"   kb = kPath[ik][1]\n");
+        fprintf(fpk,"   kc = kPath[ik][2]\n");
+        fprintf(fpk,"   dpath = kPath[ik][3]\n");
+        fprintf(fpk,"   hk = GetHam(h, ka, kb, kc)\n");
+        fprintf(fpk,"   EIG, VEC = LA.eig(hk)\n");
+        fprintf(fpk,"   EIG = np.real(EIG)	#The imaginary part is practically zero.\n");
+        fprintf(fpk,"   EIG = np.sort(EIG)\n");
+        fprintf(fpk,"   for iband in range(nbands):\n");
+        fprintf(fpk,"      X[ik] = dpath\n");
+        fprintf(fpk,"      bands[iband][ik] = EIG[iband]\n\n");
+        
+        fprintf(fpk,"dmax = dpath\n");
+        
+        fprintf(fpk,"\n#Plot the band-structure\n");
+        fprintf(fpk,"for i in range(nbands):\n");
+        fprintf(fpk,"   plt.plot(X, bands[i][:], 'r-')\n\n");
+        fprintf(fpk,"for i in range(nlabels):\n");
+        fprintf(fpk,"   plt.axvline(x=xlabels[i])\n\n");
+        fprintf(fpk,"plt.xlim(0.0, dmax)\n");
+        fprintf(fpk,"plt.xticks(xlabels, labels)\n");
+        fprintf(fpk,"plt.show()\n");
+        fclose(fpk);
+    }
+}
 
 
 
