@@ -53,6 +53,8 @@ public:
     double VecVec2Num(double* a, double* b, int na);
     void Transpose(double** a, int na, int nb, double** aT);
     void func(double* t,  int ny, double* p, int np, double* cnst, double* y);
+    void SendDataToTerminal(wxString data);
+    void SendEventRunFinished();
 
 };
 

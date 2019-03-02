@@ -238,6 +238,35 @@ void Regression::lm(double* p, int np, double* t, double* y_dat, int ny, double*
             stop = true;
         }
         
+        if (stop)                       // Lapack error; break
+        {
+            ///////////////Out of While Loop///////////
+            delete [] y_hat;
+            delete [] JtWdy;
+            for (int ip=0; ip<np; ip++) delete [] JtWJ[ip];
+            if (np>0) delete [] JtWJ;
+            for (int iy=0; iy<ny; iy++) delete [] J[iy];
+            if (ny>0) delete [] J;
+            delete [] y_old;
+            delete [] p_old;
+            delete [] hperP;
+            delete [] h;
+            delete [] h2;
+            delete [] ipiv;
+            delete [] ipiv2;
+            delete [] hInv;
+            delete [] y1;
+            delete [] delta_y;
+            delete [] p_try;
+            delete [] weighted_dy;
+            delete [] weighted_dy2;
+            delete [] JtWJArr;
+            delete [] covar_p;
+            ///////////////Out of While Loop///////////
+            
+            return;
+        }
+        
         //  big = max(abs(h./p)) > 2;                      // this is a big step
         
         // --- Are parameters [p+h] much better than [p] ?

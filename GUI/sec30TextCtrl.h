@@ -27,19 +27,19 @@ class  sec30TextCtrl : public myGrid
 public:
 	sec30TextCtrl(wxWindow *parent, wxWindowID id, wxString Type, const wxPoint &pos=wxDefaultPosition, const wxSize &size=wxDefaultSize, const bool ReadOnly=false)
     :myGrid(parent, id, pos, size,0){
-        SetMinSize(size);
-        EnableGridLines(false);
+        //SetMinSize(size);
+        //EnableGridLines(false);
         EnableEditing(true);
         CreateGrid( 1, 1);
         SetColSize(0, size.x-1);// in pixels
         SetColLabelSize(1);
         SetRowLabelSize(1);
-        EnableCellEditControl(false);
-        SetCellAlignment(wxALIGN_CENTRE,0,0);
+        //EnableCellEditControl(false);
+        //SetCellAlignment(wxALIGN_CENTRE,0,0);
         DisableColResize(0);
         DisableRowResize(0);
         EnableScrolling(false,false);
-        SetWindowStyle(GetWindowStyle() & ~ wxVSCROLL & ~ wxHSCROLL );
+        //SetWindowStyle(GetWindowStyle() & ~ wxVSCROLL & ~ wxHSCROLL );
         ShowScrollbars(wxSHOW_SB_NEVER,wxSHOW_SB_NEVER);
         if (Type=="wxString")
         {}
@@ -51,7 +51,7 @@ public:
             SetColFormatBool(0);
         
         SetCellAlignment (0,0, wxALIGN_LEFT,wxALIGN_BOTTOM);
-        SetDefaultCellAlignment(wxALIGN_LEFT,wxALIGN_CENTRE);
+        //SetDefaultCellAlignment(wxALIGN_LEFT,wxALIGN_CENTRE);
         SetReadOnly(0,0,ReadOnly);
         
     };
@@ -61,10 +61,10 @@ public:
 
    
 private:
-    virtual void SendUpdateEvent();
-    virtual void OnCellChanged(wxGridEvent &event); You should not use This Function Name. It seems it is connected by default without DECLARE_EVENT_TABLE()
-    virtual void myOnKeyDown(wxKeyEvent &event);
-       DECLARE_EVENT_TABLE()
+    //virtual void SendUpdateEvent();
+    // virtual void OnCellChanged(wxGridEvent &event); You should not use This Function Name. It seems it is connected by default without DECLARE_EVENT_TABLE()
+    //virtual void myOnKeyDown(wxKeyEvent &event);
+       //DECLARE_EVENT_TABLE()
 };
 /******************************************************************************/
 #endif
