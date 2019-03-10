@@ -176,6 +176,7 @@ protected:
     void GenerateMathematicaCode(wxString filepath, wxString BaseName, int MyID_Initial0Final1);
     void GenerateMatlabCode(wxString filepath, wxString BaseName, int MyID_Initial0Final1);
     void GeneratePythonCode(wxString filepath, wxString BaseName, int MyID_Initial0Final1);
+    bool IsLicensed(wxString Module);
     
 private:
     wxTextCtrl* logfile;

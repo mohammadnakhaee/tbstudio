@@ -28,6 +28,7 @@
 #include <sstream>
 #include "lapacke.h"
 //#include "lapacke_config.h"
+#include <wx/msgdlg.h>
 /******************************************************************************/
 
 /******************************************************************************/
@@ -70,12 +71,6 @@ public:
     Sec30(wxWindow* parent);
     ~Sec30();
     
-    std::list<wxString> vars;
-    std::list<wxString> grids;
-    std::list<wxString> radios;
-    std::list<wxString> checks;
-    std::list<wxString> trees;
-    std::list<wxString> checklists;
     std::list<wxString> lists;
     std::list<wxString> choices;
     std::list<wxString> combos;
@@ -101,7 +96,7 @@ public:
     void AddGrid(wxWindow *parent, int nRow, int nCol, wxString VariableName, wxString* ColNames, wxString* ColTypes, int* ColSizes, int* ColPrecision, int xCtrlSize, int yCtrlSize, bool EnableEvent=true);
     void AddGrid(wxWindow *parent, int nRow, int nCol, wxString VariableName, wxString* ColTypes, int* ColPrecision);
     void AddRadioButton(wxWindow *parent, wxString VariableName, wxString Label);
-    void AddCheckBox(wxWindow *parent, wxString VariableName, wxString Label);
+    wxCheckBox* AddCheckBox(wxWindow *parent, wxString VariableName, wxString Label);
     wxCheckTree* AddTreeCtrl(wxWindow *parent, wxString VariableName, int xCtrlSize, int yCtrlSize, bool EnableEvent);
     wxChoice* AddChoiceCtrl(wxWindow *parent, wxString VariableName, wxString MyLabel, int LabelSize, int CtrlSize, bool EnableEvent);
     wxComboBox* AddComboCtrl(wxWindow *parent, wxString VariableName, wxString MyLabel, int LabelSize, int CtrlSize, bool EnableEvent);
@@ -180,6 +175,7 @@ public:
     lapack_complex_double GetHk(double*** H, double kx, double ky, double kz, double a[3], double b[3], double c[3], int nEssensialCells, int** lmnEssCells, int iH, int jH);
     int SymEigenValues(lapack_complex_double* UpperSymMatrix, lapack_int N, double* &eig);
     bool isMatch(double x, double y, double Thereshold);
+    void CopyLastSKToInitialSK();
     
 private:
     virtual void sec30TextCtrl_OnUpdated(wxCommandEvent &event);

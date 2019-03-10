@@ -2,7 +2,7 @@
 <CodeLite_Project Name="GUI" Version="10.0.0" InternalType="GUI">
   <Plugins>
     <Plugin Name="qmake">
-      <![CDATA[00010001N0005Debug000000000000]]>
+      <![CDATA[00020001N0005Debug0000000000000001N0007Release000000000000]]>
     </Plugin>
   </Plugins>
   <Description/>
@@ -107,7 +107,9 @@
         <StartupCommands/>
       </Debugger>
       <PreBuild/>
-      <PostBuild/>
+      <PostBuild>
+        <Command Enabled="yes"/>
+      </PostBuild>
       <CustomBuild Enabled="no">
         <RebuildCommand/>
         <CleanCommand/>
@@ -130,11 +132,28 @@
       </Completion>
     </Configuration>
     <Configuration Name="Release" CompilerType="MinGW ( TDM-GCC-64 )" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-O2;-Wall;$(shell wx-config --cflags)" C_Options="-O2;-Wall" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
+      <Compiler Options="-O2;-Wall;$(shell wx-config --cxxflags --gl-libs)" C_Options="-O2;-Wall" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value="."/>
+        <IncludePath Value="$(MathGL_DIR)/include"/>
+        <IncludePath Value="$(Glut_DIR)/include"/>
+        <IncludePath Value="$(LAPACKE_DIR)"/>
         <Preprocessor Value="NDEBUG"/>
       </Compiler>
-      <Linker Options="$(shell wx-config --libs);-mwindows" Required="yes"/>
+      <Linker Options="-mwindows;$(shell wx-config --libs std,gl,ribbon);-mwindows;-std=gnu++11 -pthread" Required="yes">
+        <LibraryPath Value="$(Opengl_DIR)"/>
+        <LibraryPath Value="$(MathGL_DIR)\lib"/>
+        <LibraryPath Value="C:\TDM-GCC-64\x86_64-w64-mingw32\lib"/>
+        <LibraryPath Value="$(Glut_DIR)\lib"/>
+        <LibraryPath Value="$(LAPACKE_DIR)"/>
+        <LibraryPath Value="C:\TDM-GCC-64\gcc-5.1.0-tdm64-1-fortran\bin"/>
+        <Library Value="libmgl-glut.a"/>
+        <Library Value="libmgl.a"/>
+        <Library Value="libfreeglut.a"/>
+        <Library Value="liblapacke"/>
+        <Library Value="liblapack"/>
+        <Library Value="libblas"/>
+        <Library Value="m"/>
+      </Linker>
       <ResourceCompiler Options="$(shell wx-config --rcflags)" Required="no"/>
       <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Release" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="no" IsGUIProgram="no" IsEnabled="yes"/>
       <BuildSystem Name="Default"/>

@@ -193,7 +193,7 @@ void Sec30::AddRadioButton(wxWindow *parent, wxString VariableName, wxString Lab
     parent->Layout();
 }
 
-void Sec30::AddCheckBox(wxWindow *parent, wxString VariableName, wxString Label)
+wxCheckBox* Sec30::AddCheckBox(wxWindow *parent, wxString VariableName, wxString Label)
 {
     wxBoxSizer* MySizer = new wxBoxSizer(wxHORIZONTAL);
     parent->GetSizer()->Add(MySizer, 0, wxLEFT|wxRIGHT|wxTOP|wxEXPAND, WXC_FROM_DIP(5));
@@ -211,6 +211,7 @@ void Sec30::AddCheckBox(wxWindow *parent, wxString VariableName, wxString Label)
     
     MySizer->Layout();
     parent->Layout();
+    return ctr;
 }
 
 wxCheckTree* Sec30::AddTreeCtrl(wxWindow *parent, wxString VariableName, int xCtrlSize, int yCtrlSize, bool EnableEvent)
@@ -1270,7 +1271,7 @@ void Sec30::LoadFromFile(wxString filepath, wxString filename)
                         ValBuf[i] = ch;
                     }
                     wxString Val=wxString(ValBuf,ns2);
-                    SetVar(VariableName, irow, icol, Val, false);
+                    
                     
                     bool isreadonly;
                     infile.read(reinterpret_cast<char *>(&isreadonly), sizeof isreadonly);
@@ -1279,7 +1280,10 @@ void Sec30::LoadFromFile(wxString filepath, wxString filename)
                         gc->SetCellBackgroundColour(irow, icol, c);
                     else
                         gc->SetCellBackgroundColour(irow, icol, *wxWHITE);
+                        
+                    SetVar(VariableName, irow, icol, Val, false);
                 }
+            
         }
         ///////////////////////////////////////////////////////////////
         infile.read(reinterpret_cast<char *>(&n), sizeof n);
@@ -2936,6 +2940,8 @@ void Sec30::GetCouplingMatrixF(myGrid* SKCtr, myGrid* OverlapCtr, wxCheckTree* B
 {
     if (!CellID.IsOk())
     {
+        wxMessageBox(_("Big Bug."),_("debug"));
+        
         //Allocate h for zeros
         return;
     }
@@ -2965,6 +2971,11 @@ void Sec30::GetCouplingMatrixF(myGrid* SKCtr, myGrid* OverlapCtr, wxCheckTree* B
             Adouble0D iBondSK, fBondSK;
             GetBondSK(SKCtr, BondStr, iBondSK, fBondSK);
             
+            
+            wxString report = _("");
+            for (int ip=0; ip<4; ip++) report = report + wxString::Format(wxT("%.8f,"),fBondSK[ip]);
+            wxMessageBox(report,_("debug"));
+        
             int Dim1 = -1;
             int Dim2 = -1;
             bool IsShell1, IsShell2;
@@ -3095,7 +3106,7 @@ void Sec30::AddOnSiteMatrix(myGrid* OnSiteCtr, wxCheckTree* orbs, Aint1D Hamilto
                 
                 Adouble0D iOnSiteSK, fOnSiteSK;
                 GetOnSiteSK(OnSiteCtr, Label, iOnSiteSK, fOnSiteSK);
-                    
+                
                 for(int ii=0; ii<Dim1; ii++)
                 {
                     int ih = i0Ham + ii;
@@ -3142,7 +3153,7 @@ void Sec30::AddOnSiteMatrixF(myGrid* OnSiteCtr, wxCheckTree* orbs, Aint1D Hamilt
                 
                 Adouble0D iOnSiteSK, fOnSiteSK;
                 GetOnSiteSK(OnSiteCtr, Label, iOnSiteSK, fOnSiteSK);
-                    
+                
                 for(int ii=0; ii<Dim1; ii++)
                 {
                     int ih = i0Ham + ii;
@@ -3194,7 +3205,7 @@ void Sec30::GetBondSK(myGrid* GridCtrl, wxString Label, Adouble0D &iBondSK, Adou
             bool isOkf = fstr.ToDouble(&fval);
             SetBondSKElement(title, isOki, iBondSK, ival, isOkf, fBondSK, fval);
         }
-    }
+    }                
 }
 
 void Sec30::GetOnSiteSK(myGrid* GridCtrl, wxString Label, Adouble0D &iBondSK, Adouble0D &fBondSK)
@@ -3318,21 +3329,36 @@ lapack_complex_double Sec30::GetHk(double*** H, double kx, double ky, double kz,
     return out;
 }
 
-int Sec30::SymEigenValues(lapack_complex_double* UpperSymMatrix, lapack_int N, double* &eig)
+
+void Sec30::CopyLastSKToInitialSK()
 {
-    //return LAPACKE_dsyev(LAPACK_ROW_MAJOR, 'N', 'U', N, UpperSymMatrix, N, eig);
-    return LAPACKE_zheev(LAPACK_ROW_MAJOR, 'N', 'U', N, UpperSymMatrix, N, eig);
+    myGrid* osgc = this->GetGridObject(_("OS"));
+    int nRowsOS = osgc->GetNumberRows();
+    for (int i=0; i<nRowsOS; i++)
+    {
+        wxString val = osgc->GetCellValue(i, 2);
+        osgc->SetCellValue(i, 1, val);
+    }
+    
+    myGrid* skgc = this->GetGridObject(_("SK"));
+    int nRowsSK = skgc->GetNumberRows();
+    for (int i=0; i<nRowsSK; i++)
+    {
+        wxString val = skgc->GetCellValue(i, 2);
+        skgc->SetCellValue(i, 1, val);
+    }
+    
+    myGrid* olgc = this->GetGridObject(_("OL"));
+    int nRowsOL = olgc->GetNumberRows();
+    for (int i=0; i<nRowsOL; i++)
+    {
+        wxString val = olgc->GetCellValue(i, 2);
+        olgc->SetCellValue(i, 1, val);
+    }
+    
 }
 
-bool Sec30::isMatch(double x, double y, double Thereshold)
-{
-    if (fabs(x-y) < Thereshold)
-        return true;
-    else
-        return false;
-}
 
-/*
 void Sec30::SetVecValue(wxWindow *parent, wxString VariableName, double* Array, int nArray)
 {
     for (int i=0; i<nArray; i++)
@@ -3342,5 +3368,5 @@ void Sec30::SetVecValue(wxWindow *parent, wxString VariableName, double* Array, 
         ((wxTextCtrl*)FindWindowByName(var,parent))->SetValue(val);
     }
 }
-*/
+
 

@@ -141,8 +141,22 @@ MainFrame::MainFrame(wxWindow* parent)
     LoadSKPanel();
     LoadSetupPanel();
     
+    //////////////////////////////////////////////////////////////
+    //Strange problem in run-time out side of the codelite. We should have selected one time the SK tab and it works fine.
+    //It seems when we select the tab the objects will be opened.
+    //LeftPanel->ChangeSelection(0);
+    //LeftPanel->ChangeSelection(1);
+    //LeftPanel->ChangeSelection(2);
+    //LeftPanel->ChangeSelection(3);
+    //LeftPanel->ChangeSelection(4);
+    //LeftPanel->ChangeSelection(5);
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+    //Set initial tabs
     MainRibbon->SetActivePage((size_t)0);
     LeftPanel->ChangeSelection(0);
+    
+    
     
     Init_graph3d();
     Init_graph2d0();
@@ -718,7 +732,7 @@ void MainFrame::Init_graph2d()
 {
     graph2d = new GraphClass(mainpanel, 2, sec30, 1);
     graph2d->sec30 = sec30;
-    aui_mgr.AddPane(graph2d, wxAuiPaneInfo().Gripper(false).Floatable(true).Dockable(true).Caption("Current Band-Structure").CloseButton(false).MaximizeButton(true).MinimizeButton(true).Dock().Right());
+    aui_mgr.AddPane(graph2d, wxAuiPaneInfo().Gripper(false).Floatable(true).Dockable(true).Caption("Final Band-Structure").CloseButton(false).MaximizeButton(true).MinimizeButton(true).Dock().Right());
     aui_mgr.Update();
 }
 
@@ -2940,6 +2954,44 @@ void MainFrame::StartRegression()
 {
     if (!ValidateSKPanel()) {wxMessageBox(_("The constructed TB model is not passable. Please fix the errors reported in the terminal and try again."),_("Error"));return;}
     
+    wxCheckTree* orbs = sec30->GetTreeObject(_("Orbitals"));
+    
+    wxListBox* TBlistctr = sec30->GetListObject(_("AtomSpeciesList"));
+    int TBnspec = TBlistctr->GetCount();
+    wxTreeItemId orbsrootID = orbs->GetRootItem();
+    
+    bool isAny_d_Orbital = false;
+    for(int j=0; j<TBnspec; j++)
+    {
+        wxString TBAtomName = TBlistctr->GetString(j);
+        wxTreeItemId orbsatomID = orbs->FindItemIn(orbsrootID,TBAtomName);
+        wxTreeItemIdValue cookie;
+        wxTreeItemId nextChild = orbs->GetFirstChild(orbsatomID, cookie);
+        int shellNumber=0;
+        while (nextChild.IsOk())
+        {
+            shellNumber++;
+            wxString itemname = orbs->GetItemText(nextChild);
+            wxString Orbs;
+            int nOrbs;
+            bool IsShell;
+            sec30->GetOrbitalInfo(orbs, TBAtomName, shellNumber, Orbs, nOrbs, IsShell);
+            if (Orbs.Contains(_("d_{")))
+            {
+                isAny_d_Orbital=true;
+                break;
+            }
+            nextChild = orbs->GetNextSibling(nextChild);
+        }
+        if (isAny_d_Orbital) break;
+    }
+    
+    if (isAny_d_Orbital)
+    {
+        if (!IsLicensed(_("d-orbital regression"))) {wxMessageBox(_("In the case of fitting a TB model including d-orbitals you need to contact developer support. Please find the contact information in Help>About."),_("Error"));return;}
+    }
+    
+    //LeftPanel->ChangeSelection(4);
     int TotalNumberOfParameters;
     sec30->GetVar(_("nParameters[0]"), TotalNumberOfParameters);
     if (TotalNumberOfParameters<1) {wxMessageBox(_("First evaluate independent parameters."),_("Error"));return;}
@@ -3331,17 +3383,17 @@ void MainFrame::GenerateCode(wxString filepath, wxString BaseName, wxString Code
 
 void MainFrame::GenerateCppCode(wxString filepath, wxString BaseName, int MyID_Initial0Final1)
 {
-    
+    if (!IsLicensed(_("c++ code generator"))) {wxMessageBox(_("You need to contact developer support for C++ code generator. Please find the contact information in Help>About."));return;}
 }
 
 void MainFrame::GenerateCCode(wxString filepath, wxString BaseName, int MyID_Initial0Final1)
 {
-    
+    if (!IsLicensed(_("c code generator"))) {wxMessageBox(_("You need to contact developer support for C code generator. Please find the contact information in Help>About."));return;}
 }
 
 void MainFrame::GenerateFCode(wxString filepath, wxString BaseName, int MyID_Initial0Final1)
 {
-    
+    if (!IsLicensed(_("fortran code generator"))) {wxMessageBox(_("You need to contact developer support for Fortran code generator. Please find the contact information in Help>About."));return;}
 }
 
 void MainFrame::GenerateMathematicaCode(wxString filepath, wxString BaseName, int MyID_Initial0Final1)
@@ -3810,7 +3862,28 @@ void MainFrame::GeneratePythonCode(wxString filepath, wxString BaseName, int MyI
     }
 }
 
-
+bool MainFrame::IsLicensed(wxString Module)
+{
+    bool lic = false;
+    if (Module == _("c++ code generator"))
+        lic = false;
+    else if (Module == _("c code generator"))
+        lic = false;
+    else if (Module == _("fortran code generator"))
+        lic = false;
+    else if (Module == _("d-orbital regression"))
+        lic = false;
+    else if (Module == _("f-orbital"))
+        lic = false;
+    else if (Module == _("f-orbital regression"))
+        lic = false;
+    else if (Module == _("soc"))
+        lic = false;
+    else if (Module == _("non-orthogonal"))
+        lic = false;
+    
+    return lic;
+}
 
 
 

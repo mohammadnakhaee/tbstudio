@@ -61,12 +61,9 @@ SetupClass::SetupClass(wxWindow* parent, Sec30* sec30var, wxWindowID id, const w
     sec30->SetVar(_("TBBandRange[0]"), 0, false);
     sec30->SetVar(_("TBBandRange[1]"), 0, false);
     sec30->SetVar(_("DFTFirst[0]"), 0, false);
-    wxString Labels3[1] = {_("Select")};
+    wxString Labels3[1] = {_("Ignoring Selection")};
     wxObjectEventFunction Funcs3[1] = { wxCommandEventHandler(SetupClass::Btn_Select_OnClick)};
     sec30->AddButton(this, 1, Labels3, Funcs3);
-    wxString Labels4[1] = {_("Test")};
-    wxObjectEventFunction Funcs4[1] = { wxCommandEventHandler(SetupClass::Btn_Test_OnClick)};
-    sec30->AddButton(this, 1, Labels4, Funcs4);
     /**********************************************************************************************************************************************/
     sec30->AddGroupBox(this,_("Fitting Algorithmic Parameters"),wxColour(wxT("rgb(153,180,209)")));
     wxComboBox* choicectrm = sec30->AddComboCtrl(this, _("OMethod"), _("Method"), 70, 200, true);
