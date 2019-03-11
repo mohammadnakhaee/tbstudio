@@ -3329,6 +3329,19 @@ lapack_complex_double Sec30::GetHk(double*** H, double kx, double ky, double kz,
     return out;
 }
 
+int Sec30::SymEigenValues(lapack_complex_double* UpperSymMatrix, lapack_int N, double* &eig)
+{
+    //return LAPACKE_dsyev(LAPACK_ROW_MAJOR, 'N', 'U', N, UpperSymMatrix, N, eig);
+    return LAPACKE_zheev(LAPACK_ROW_MAJOR, 'N', 'U', N, UpperSymMatrix, N, eig);
+}
+
+bool Sec30::isMatch(double x, double y, double Thereshold)
+{
+    if (fabs(x-y) < Thereshold)
+        return true;
+    else
+        return false;
+}
 
 void Sec30::CopyLastSKToInitialSK()
 {
@@ -3358,7 +3371,7 @@ void Sec30::CopyLastSKToInitialSK()
     
 }
 
-
+/*
 void Sec30::SetVecValue(wxWindow *parent, wxString VariableName, double* Array, int nArray)
 {
     for (int i=0; i<nArray; i++)
@@ -3368,5 +3381,5 @@ void Sec30::SetVecValue(wxWindow *parent, wxString VariableName, double* Array, 
         ((wxTextCtrl*)FindWindowByName(var,parent))->SetValue(val);
     }
 }
-
+*/
 

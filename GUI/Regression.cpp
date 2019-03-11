@@ -126,7 +126,7 @@ void Regression::lm(double* p, int np, double* t, double* y_dat, int ny, double*
     double lambda_DN_fac = opts.lambda_DN_fac;    // factor for decreasing lambda
     int Update_Type   = opts.Update_Type;      // 1: Levenberg-Marquardt lambda update
     
-    p_min=p_min(:); p_max=p_max(:); % make column vectors
+    //p_min=p_min(:); p_max=p_max(:); % make column vectors
     
     Aint0D Vidx;                              // indices of the parameters to be fit
     for (int i=0; i<Npar; i++) if(dp[i] != 0) Vidx.push_back(i);
@@ -505,7 +505,7 @@ void Regression::lm(double* p, int np, double* t, double* y_dat, int ny, double*
         double dydy = VecVec2Num(delta_y, delta_y, ny);
         for(int iy=0; iy<ny; iy++)
             weight[iy] = 1.0*DoF/dydy;
-        weight = DoF/(Transpose(delta_y).delta_y) * ones(Npnt,1);
+        //weight = DoF/(Transpose(delta_y).delta_y) * ones(Npnt,1);
     }
     
     redX2 = X2 / DoF;
@@ -903,3 +903,15 @@ void Regression::func(double* t, int ny, double* p, int np, double* cnst, double
     if (nEssensialCells>0) delete [] lmnEssCells;
 }
 
+void Regression::SendDataToTerminal(wxString data)
+{
+    wxCommandEvent* event = new wxCommandEvent(RegressionEVT_OnNewData);
+    event->SetString(data);
+    wxQueueEvent(Parent,event);
+}
+
+void Regression::SendEventRunFinished()
+{
+    wxCommandEvent* event = new wxCommandEvent(RegressionEVT_OnFinished);
+    wxQueueEvent(Parent,event);
+}

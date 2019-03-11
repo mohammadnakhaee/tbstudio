@@ -71,6 +71,12 @@ public:
     Sec30(wxWindow* parent);
     ~Sec30();
     
+    std::list<wxString> vars;
+    std::list<wxString> grids;
+    std::list<wxString> radios;
+    std::list<wxString> checks;
+    std::list<wxString> trees;
+    std::list<wxString> checklists;
     std::list<wxString> lists;
     std::list<wxString> choices;
     std::list<wxString> combos;
