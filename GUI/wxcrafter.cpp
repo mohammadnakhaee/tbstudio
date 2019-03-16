@@ -201,3 +201,59 @@ ColorsBaseClass::~ColorsBaseClass()
     this->Disconnect(wxEVT_CLOSE_WINDOW, wxCloseEventHandler(ColorsBaseClass::OnClose), NULL, this);
     
 }
+
+WelcomeClassBase::WelcomeClassBase(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style)
+    : wxDialog(parent, id, title, pos, size, style)
+{
+    if ( !bBitmapLoaded ) {
+        // We need to initialise the default bitmap handler
+        wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
+        wxC9ED9InitBitmapResources();
+        bBitmapLoaded = true;
+    }
+    this->SetBackgroundColour(wxColour(wxT("rgb(255,255,255)")));
+    
+    wxBoxSizer* boxSizer1085 = new wxBoxSizer(wxVERTICAL);
+    boxSizer1085->SetMinSize(650,325);
+    this->SetSizer(boxSizer1085);
+    
+    welcomeimage = new wxStaticBitmap(this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDLG_UNIT(this, wxSize(650,325)), 0 );
+    
+    boxSizer1085->Add(welcomeimage, 1, wxEXPAND, WXC_FROM_DIP(5));
+    welcomeimage->SetMinSize(wxSize(650,325));
+    
+    m_timer1089 = new wxTimer;
+    m_timer1089->Start(1000, false);
+    
+    SetBackgroundColour(wxColour(wxT("rgb(255,255,255)")));
+    SetName(wxT("WelcomeClassBase"));
+    SetMinClientSize(wxSize(650,325));
+    SetSize(wxDLG_UNIT(this, wxSize(650,325)));
+    if (GetSizer()) {
+         GetSizer()->Fit(this);
+    }
+    if(GetParent()) {
+        CentreOnParent(wxBOTH);
+    } else {
+        CentreOnScreen(wxBOTH);
+    }
+#if wxVERSION_NUMBER >= 2900
+    if(!wxPersistenceManager::Get().Find(this)) {
+        wxPersistenceManager::Get().RegisterAndRestore(this);
+    } else {
+        wxPersistenceManager::Get().Restore(this);
+    }
+#endif
+    // Connect events
+    m_timer1089->Connect(wxEVT_TIMER, wxTimerEventHandler(WelcomeClassBase::OnTick), NULL, this);
+    
+}
+
+WelcomeClassBase::~WelcomeClassBase()
+{
+    m_timer1089->Disconnect(wxEVT_TIMER, wxTimerEventHandler(WelcomeClassBase::OnTick), NULL, this);
+    
+    m_timer1089->Stop();
+    wxDELETE( m_timer1089 );
+
+}

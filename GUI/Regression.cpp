@@ -4,7 +4,7 @@
 // this is a definition so can't be in a header
 wxDEFINE_EVENT(RegressionEVT_OnNewData, wxCommandEvent);
 wxDEFINE_EVENT(RegressionEVT_OnFinished, wxCommandEvent);
-
+wxDEFINE_EVENT(RegressionEVT_OnStarted, wxCommandEvent);
 
 Regression::Regression(Sec30* sec30Ref, wxWindow* ParentRef, GraphClass* graph2dRef)
 {
@@ -70,25 +70,64 @@ double Regression::Variance(double* a, int na)
     return var / (na - 1);
 }
 
-void Regression::Start(double* p, int np, double* t, double* y_dat, int ny, double* weight, double* dp, double p_min, double p_max, double* c, lmOptions opts)
+void Regression::Start(double* p, int np, double* t, double* y_dat, int ny, double* weight, double* dp, double p_min, double p_max, double* c, lmOptions opts, bool isOneStep)
 {
+    SendEventRunStarted();
+    myGrid* osgc = sec30->GetGridObject(_("OS"));
+    myGrid* skgc = sec30->GetGridObject(_("SK"));
+    myGrid* olgc = sec30->GetGridObject(_("OL"));
+    sec30->OSBuffer = new double[osgc->GetNumberRows()];
+    sec30->SKBuffer = new double[skgc->GetNumberRows()];
+    sec30->OLBuffer = new double[olgc->GetNumberRows()];
+    
     int MaxIter = opts.MaxIter;          // maximum number of iterations
     double redX2;
     double* sigma_p = new double[np];
     double** cvg_hst = new double*[MaxIter];                          // convergence history
     for (int i=0; i<MaxIter; i++) cvg_hst[i] = new double[np+3];
     
-    lm(p, np, t, y_dat, ny, weight, dp, p_min, p_max, c, opts, redX2, sigma_p, cvg_hst);
+    lm(p, np, t, y_dat, ny, weight, dp, p_min, p_max, c, opts, redX2, sigma_p, cvg_hst, isOneStep);
+    
+    for (int ip=0; ip<np; ip++)
+    {
+        int GridInd = sec30->ArraysOf2DInt[1][ip][0];
+        int irow = sec30->ArraysOf2DInt[1][ip][1];
+        double Value = p[ip];
+        wxString val = wxString::Format(wxT("%.8f"), Value);
+        if (GridInd == 1)
+        {
+            osgc->SetCellValue(irow, 2, val);
+            if (isOneStep) osgc->SetCellValue(irow, 1, val);
+        }
+        else if (GridInd == 2)
+        {
+            skgc->SetCellValue(irow, 2, val);
+            if (isOneStep) skgc->SetCellValue(irow, 1, val);
+        }
+        else if (GridInd == 3)
+        {
+            olgc->SetCellValue(irow, 2, val);
+            if (isOneStep) olgc->SetCellValue(irow, 1, val);
+        }
+    }
+    
+    osgc->Refresh(false);
+    skgc->Refresh(false);
+    olgc->Refresh(false);
     
     //////////////////////////////Finishing///////////////////////////////////////////
     for (int i=0; i<MaxIter; i++) delete [] cvg_hst[i];
     if (MaxIter>0) delete [] cvg_hst;
     delete [] sigma_p;
+    delete [] sec30->OSBuffer;
+    delete [] sec30->SKBuffer;
+    delete [] sec30->OLBuffer;
     /////////////////////////////////////////////////////////////////////////////////
     SendEventRunFinished();
+    return;
 }
 
-void Regression::lm(double* p, int np, double* t, double* y_dat, int ny, double* weight, double* dp, double p_min, double p_max, double* c, lmOptions opts, double &redX2, double* sigma_p, double** cvg_hst)
+void Regression::lm(double* p, int np, double* t, double* y_dat, int ny, double* weight, double* dp, double p_min, double p_max, double* c, lmOptions opts, double &redX2, double* sigma_p, double** cvg_hst, bool isOneStep)
 {
     wxString data;
     //global   iteration  func_calls
@@ -451,6 +490,8 @@ void Regression::lm(double* p, int np, double* t, double* y_dat, int ny, double*
             data.append(_("\n"));
             data.append(_("\n"));
             SendDataToTerminal(data);
+            
+            if (isOneStep) stop = true;
         }
         
         // update convergence history ... save _reduced_ Chi-square
@@ -486,7 +527,7 @@ void Regression::lm(double* p, int np, double* t, double* y_dat, int ny, double*
             SendDataToTerminal(data);
             stop = true;
         }
-        else if ( iteration == MaxIter )
+        else if ( iteration == MaxIter && !isOneStep)
         {
             data = _("");
             data.append(_("Maximum number of iterations reached without convergence!\n"));
@@ -762,22 +803,31 @@ void Regression::func(double* t, int ny, double* p, int np, double* cnst, double
     int nKPoint = sec30->ArraysOf0DInt[1];
     if (nKPoint < 1)  return;
     
-    myGrid* osgc = sec30->GetGridObject(_("OS"));
-    myGrid* skgc = sec30->GetGridObject(_("SK"));
-    myGrid* olgc = sec30->GetGridObject(_("OL"));
+    //myGrid* osgc = sec30->GetGridObject(_("OS"));
+    //myGrid* skgc = sec30->GetGridObject(_("SK"));
+    //myGrid* olgc = sec30->GetGridObject(_("OL"));
     
     for (int ip=0; ip<np; ip++)
     {
         int GridInd = sec30->ArraysOf2DInt[1][ip][0];
         int irow = sec30->ArraysOf2DInt[1][ip][1];
-        double Value = p[ip];
-        wxString val = wxString::Format(wxT("%.8f"), Value);
+        //double Value = p[ip];
+        //wxString val = wxString::Format(wxT("%.8f"), Value);
         if (GridInd == 1)
-            osgc->SetCellValue(irow, 2, val);
+        {
+            sec30->OSBuffer[irow] = p[ip];
+            //osgc->SetCellValue(irow, 2, val);
+        }
         else if (GridInd == 2)
-            skgc->SetCellValue(irow, 2, val);
+        {
+            sec30->SKBuffer[irow] = p[ip];
+            //skgc->SetCellValue(irow, 2, val);
+        }
         else if (GridInd == 3)
-            olgc->SetCellValue(irow, 2, val);
+        {
+            sec30->OLBuffer[irow] = p[ip];
+            //olgc->SetCellValue(irow, 2, val);
+        }
     }
 
     double a[3],b[3],c[3];
@@ -913,5 +963,11 @@ void Regression::SendDataToTerminal(wxString data)
 void Regression::SendEventRunFinished()
 {
     wxCommandEvent* event = new wxCommandEvent(RegressionEVT_OnFinished);
+    wxQueueEvent(Parent,event);
+}
+
+void Regression::SendEventRunStarted()
+{
+    wxCommandEvent* event = new wxCommandEvent(RegressionEVT_OnStarted);
     wxQueueEvent(Parent,event);
 }

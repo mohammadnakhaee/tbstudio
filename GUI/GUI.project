@@ -8,6 +8,7 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="src">
+    <File Name="WelcomeClass.cpp"/>
     <File Name="Regression.cpp"/>
     <File Name="SetupClass.cpp"/>
     <File Name="SKClass.cpp"/>
@@ -30,6 +31,8 @@
     <File Name="wxcrafter_bitmaps.cpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="include">
+    <File Name="welcome650325.h"/>
+    <File Name="WelcomeClass.h"/>
     <File Name="Regression.h"/>
     <File Name="Embeded.h"/>
     <File Name="SetupClass.h"/>

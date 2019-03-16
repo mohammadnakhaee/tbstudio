@@ -3,7 +3,7 @@
 GridClass::GridClass(wxWindow* parent)
     : GridBaseClass(parent)
 {
-    
+/*
 myGrid* grid = new myGrid( this,
                     -1,
                     wxPoint( 0, 0 ),
@@ -35,6 +35,7 @@ grid->SetCellBackgroundColour(3, 3, *wxLIGHT_GREY);
 // and precision of 2
 grid->SetColFormatFloat(5, 6, 2);
 grid->SetCellValue(0, 6, "3.1415");
+*/
 }
 
 GridClass::~GridClass()

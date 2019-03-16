@@ -2,12 +2,12 @@
 ## Auto Generated makefile by CodeLite IDE
 ## any manual changes will be erased      
 ##
-## Debug
+## Release
 ProjectName            :=GUI
-ConfigurationName      :=Debug
+ConfigurationName      :=Release
 WorkspacePath          :=C:/Users/mohammad/Documents/Codelite/pecsjunc
 ProjectPath            :=C:/Users/mohammad/Documents/Codelite/pecsjunc/GUI
-IntermediateDirectory  :=./Debug
+IntermediateDirectory  :=./Release
 OutDir                 := $(IntermediateDirectory)
 CurrentFileName        :=
 CurrentFilePath        :=
@@ -28,7 +28,7 @@ LibraryPathSwitch      :=-L
 PreprocessorSwitch     :=-D
 SourceSwitch           :=-c 
 OutputFile             :=$(IntermediateDirectory)/$(ProjectName)
-Preprocessors          :=
+Preprocessors          :=$(PreprocessorSwitch)NDEBUG 
 ObjectSwitch           :=-o 
 ArchiveOutputSwitch    := 
 PreprocessOnlySwitch   :=-E
@@ -52,8 +52,8 @@ LibPath                := $(LibraryPathSwitch). $(LibraryPathSwitch)$(Opengl_DIR
 AR       := C:/TDM-GCC-64/bin/ar.exe rcu
 CXX      := C:/TDM-GCC-64/bin/g++.exe
 CC       := C:/TDM-GCC-64/bin/gcc.exe
-CXXFLAGS :=  -g -O0 -Wall $(shell wx-config --cxxflags --gl-libs) $(Preprocessors)
-CFLAGS   :=  -g -O0 -Wall $(Preprocessors)
+CXXFLAGS :=  -O2 -Wall $(shell wx-config --cxxflags --gl-libs) $(Preprocessors)
+CFLAGS   :=  -O2 -Wall $(Preprocessors)
 ASFLAGS  := 
 AS       := C:/TDM-GCC-64/bin/as.exe
 
@@ -77,8 +77,8 @@ PATH:=$(Glut_DIR)\bin;$(PATH)
 PATH:=$(LAPACKE_DIR);$(PATH)
 PATH:=$(GFORTRAN_DIR)\bin;$(PATH)
 Objects0=$(IntermediateDirectory)/win_resources.rc$(ObjectSuffix) $(IntermediateDirectory)/GraphClass.cpp$(ObjectSuffix) $(IntermediateDirectory)/MyOpenGL.cpp$(ObjectSuffix) $(IntermediateDirectory)/MyMatrix.cpp$(ObjectSuffix) $(IntermediateDirectory)/BondsClass.cpp$(ObjectSuffix) $(IntermediateDirectory)/mygrid.cpp$(ObjectSuffix) $(IntermediateDirectory)/MainFrame.cpp$(ObjectSuffix) $(IntermediateDirectory)/sec30TextCtrl.cpp$(ObjectSuffix) $(IntermediateDirectory)/Sec30.cpp$(ObjectSuffix) $(IntermediateDirectory)/GridClass.cpp$(ObjectSuffix) \
-	$(IntermediateDirectory)/UnitcellClass.cpp$(ObjectSuffix) $(IntermediateDirectory)/StructureClass.cpp$(ObjectSuffix) $(IntermediateDirectory)/Regression.cpp$(ObjectSuffix) $(IntermediateDirectory)/SetupClass.cpp$(ObjectSuffix) $(IntermediateDirectory)/SKClass.cpp$(ObjectSuffix) $(IntermediateDirectory)/ColorsClass.cpp$(ObjectSuffix) $(IntermediateDirectory)/main.cpp$(ObjectSuffix) $(IntermediateDirectory)/wxcrafter_bitmaps.cpp$(ObjectSuffix) $(IntermediateDirectory)/OrbitalsClass.cpp$(ObjectSuffix) $(IntermediateDirectory)/checktree.cpp$(ObjectSuffix) \
-	$(IntermediateDirectory)/wxcrafter.cpp$(ObjectSuffix) 
+	$(IntermediateDirectory)/UnitcellClass.cpp$(ObjectSuffix) $(IntermediateDirectory)/StructureClass.cpp$(ObjectSuffix) $(IntermediateDirectory)/Regression.cpp$(ObjectSuffix) $(IntermediateDirectory)/SetupClass.cpp$(ObjectSuffix) $(IntermediateDirectory)/SKClass.cpp$(ObjectSuffix) $(IntermediateDirectory)/ColorsClass.cpp$(ObjectSuffix) $(IntermediateDirectory)/WelcomeClass.cpp$(ObjectSuffix) $(IntermediateDirectory)/main.cpp$(ObjectSuffix) $(IntermediateDirectory)/wxcrafter_bitmaps.cpp$(ObjectSuffix) $(IntermediateDirectory)/OrbitalsClass.cpp$(ObjectSuffix) \
+	$(IntermediateDirectory)/checktree.cpp$(ObjectSuffix) $(IntermediateDirectory)/wxcrafter.cpp$(ObjectSuffix) 
 
 
 
@@ -96,17 +96,12 @@ $(OutputFile): $(IntermediateDirectory)/.d $(Objects)
 	@echo $(Objects0)  > $(ObjectsFileList)
 	$(LinkerName) $(OutputSwitch)$(OutputFile) @$(ObjectsFileList) $(LibPath) $(Libs) $(LinkOptions)
 
-PostBuild:
-	@echo Executing Post Build commands ...
-	
-	@echo Done
-
 MakeIntermediateDirs:
-	@$(MakeDirCommand) "./Debug"
+	@$(MakeDirCommand) "./Release"
 
 
 $(IntermediateDirectory)/.d:
-	@$(MakeDirCommand) "./Debug"
+	@$(MakeDirCommand) "./Release"
 
 PreBuild:
 
@@ -236,6 +231,14 @@ $(IntermediateDirectory)/ColorsClass.cpp$(DependSuffix): ColorsClass.cpp
 $(IntermediateDirectory)/ColorsClass.cpp$(PreprocessSuffix): ColorsClass.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/ColorsClass.cpp$(PreprocessSuffix) ColorsClass.cpp
 
+$(IntermediateDirectory)/WelcomeClass.cpp$(ObjectSuffix): WelcomeClass.cpp $(IntermediateDirectory)/WelcomeClass.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/Users/mohammad/Documents/Codelite/pecsjunc/GUI/WelcomeClass.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/WelcomeClass.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/WelcomeClass.cpp$(DependSuffix): WelcomeClass.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/WelcomeClass.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/WelcomeClass.cpp$(DependSuffix) -MM WelcomeClass.cpp
+
+$(IntermediateDirectory)/WelcomeClass.cpp$(PreprocessSuffix): WelcomeClass.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/WelcomeClass.cpp$(PreprocessSuffix) WelcomeClass.cpp
+
 $(IntermediateDirectory)/main.cpp$(ObjectSuffix): main.cpp $(IntermediateDirectory)/main.cpp$(DependSuffix)
 	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/Users/mohammad/Documents/Codelite/pecsjunc/GUI/main.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/main.cpp$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/main.cpp$(DependSuffix): main.cpp
@@ -282,6 +285,6 @@ $(IntermediateDirectory)/wxcrafter.cpp$(PreprocessSuffix): wxcrafter.cpp
 ## Clean
 ##
 clean:
-	$(RM) -r ./Debug/
+	$(RM) -r ./Release/
 
 

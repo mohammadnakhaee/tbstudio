@@ -20,6 +20,8 @@
 #include <wx/stattext.h>
 #include <wx/notebook.h>
 #include <wx/dialog.h>
+#include <wx/statbmp.h>
+#include <wx/timer.h>
 #if wxVERSION_NUMBER >= 2900
 #include <wx/persist.h>
 #include <wx/persist/toplevel.h>
@@ -99,6 +101,23 @@ protected:
 public:
     ColorsBaseClass(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Colors"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxDEFAULT_DIALOG_STYLE|wxSTAY_ON_TOP|wxCLOSE_BOX|wxBORDER_STATIC);
     virtual ~ColorsBaseClass();
+};
+
+
+class WelcomeClassBase : public wxDialog
+{
+protected:
+    wxStaticBitmap* welcomeimage;
+    wxTimer* m_timer1089;
+
+protected:
+    virtual void OnTick(wxTimerEvent& event) { event.Skip(); }
+
+public:
+    wxStaticBitmap* GetWelcomeimage() { return welcomeimage; }
+    wxTimer* GetTimer1089() { return m_timer1089; }
+    WelcomeClassBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT(""), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(650,325), long style = wxSTAY_ON_TOP|wxBORDER_SIMPLE);
+    virtual ~WelcomeClassBase();
 };
 
 #endif

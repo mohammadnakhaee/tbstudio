@@ -13,6 +13,7 @@
 /******************************************************************************/
 wxDECLARE_EVENT(RegressionEVT_OnNewData, wxCommandEvent);
 wxDECLARE_EVENT(RegressionEVT_OnFinished, wxCommandEvent);
+wxDECLARE_EVENT(RegressionEVT_OnStarted, wxCommandEvent);
 /******************************************************************************/
 
 struct lmOptions
@@ -42,8 +43,8 @@ public:
     double maxabs(double* a, int na);
     double maxdiag(double** a, int na);
     double Variance(double* a, int na);
-    void Start(double* p, int np, double* t, double* y_dat, int ny, double* weight, double* dp, double p_min, double p_max, double* c, lmOptions opts);
-    void lm(double* p, int np, double* t, double* y_dat, int ny, double* weight, double* dp, double p_min, double p_max, double* c, lmOptions opts, double &redX2, double* sigma_p, double** cvg_hst);
+    void Start(double* p, int np, double* t, double* y_dat, int ny, double* weight, double* dp, double p_min, double p_max, double* c, lmOptions opts, bool isOneStep);
+    void lm(double* p, int np, double* t, double* y_dat, int ny, double* weight, double* dp, double p_min, double p_max, double* c, lmOptions opts, double &redX2, double* sigma_p, double** cvg_hst, bool isOneStep);
     void lm_FD_J(double* t, double* p, int np, double* y, int ny, double* dp, double* c, double** J, int &func_calls);
     void lm_Broyden_J(double* p_old, double* y_old, double** J, double* p, int np, double* y, int ny);
     void lm_matx(double* t,double* p_old, int np, double* y_old, int ny, double dX2, double** J, double* p, double* y_dat, double* weight, double* dp, double* c, double** JtWJ, double* JtWdy, double Chi_sq, double* y_hat, int &func_calls, int &iteration);
@@ -55,6 +56,7 @@ public:
     void func(double* t,  int ny, double* p, int np, double* cnst, double* y);
     void SendDataToTerminal(wxString data);
     void SendEventRunFinished();
+    void SendEventRunStarted();
 
 };
 

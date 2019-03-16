@@ -85,14 +85,11 @@ public:
     Aint1D ArraysOf1DInt;
     Aint2D ArraysOf2DInt;
     Aint3D ArraysOf3DInt;
-    Adouble0D ArraysOf0DDouble;
-    Adouble1D ArraysOf1DDouble;
-    Adouble2D ArraysOf2DDouble;
-    Adouble3D ArraysOf3DDouble;
-    Astring0D ArraysOf0DString;
-    Astring1D ArraysOf1DString;
-    Astring2D ArraysOf2DString;
     Astring3D ArraysOf3DString;
+    
+    double* OSBuffer;
+    double* SKBuffer;
+    double* OLBuffer;
     
     void AddGroupBox(wxWindow *parent, wxString Caption, wxColour BGColor);
     void AddButton(wxWindow *parent, int ButtonCnt, wxString* Labels, wxObjectEventFunction* Funcs);
@@ -173,7 +170,9 @@ public:
     void AddOnSiteMatrixF(myGrid* OnSiteCtr, wxCheckTree* orbs, Aint1D HamiltonianDimMap, Adouble1D &hf);
     void GetCellInfo(wxString cellStr, int &icell, int &jcell, int &kcell);
     void GetBondSK(myGrid* GridCtrl, wxString Label, Adouble0D &iBondSK, Adouble0D &fBondSK);
+    void GetBondSKF(myGrid* GridCtrl, double* GridBuffer, wxString Label, Adouble0D &iBondSK, Adouble0D &fBondSK);
     void GetOnSiteSK(myGrid* GridCtrl, wxString Label, Adouble0D &iBondSK, Adouble0D &fBondSK);
+    void GetOnSiteSKF(myGrid* GridCtrl, double* GridBuffer, wxString Label, Adouble0D &iBondSK, Adouble0D &fBondSK);
     void SetOnSiteSKElement(wxString skName, bool isOki, Adouble0D &iBondSK, double ival, bool isOkf, Adouble0D &fBondSK, double fval);
     int GetOnSiteSKInd(wxString skName);
     void SetBondSKElement(wxString skName, bool isOki, Adouble0D &iBondSK, double ival, bool isOkf, Adouble0D &fBondSK, double fval);

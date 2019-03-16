@@ -55,54 +55,6 @@ void Sec30::AddButton(wxWindow *parent, int ButtonCnt, wxString* ButtonNames, wx
     }
 }
 
-void Sec30::AddVarVector(wxWindow *parent, int VecCnt, wxString VariableName, wxString VariableType, wxString VecLabel, int LabelSize, int CtrlSize,bool EnableEvent, bool ReadOnly)
-{
-    wxBoxSizer* MySizer = new wxBoxSizer(wxHORIZONTAL);
-    parent->GetSizer()->Add(MySizer, 0, wxLEFT|wxRIGHT|wxTOP|wxEXPAND, WXC_FROM_DIP(5));
-    
-    wxStaticText* st = new wxStaticText(parent, wxID_ANY, VecLabel + wxT(":"), wxDefaultPosition, wxDLG_UNIT(parent, wxSize(-1,-1)), 0);
-    MySizer->Add(st, 0, wxLEFT|wxRIGHT|wxTOP, WXC_FROM_DIP(5));
-    st->SetMinSize(wxSize(LabelSize,-1));
-    
-    std::list<wxString>::iterator ivar = vars.end();
-    
-    for (int i=0; i < VecCnt; i++)
-    {
-        sec30TextCtrl* tc=new sec30TextCtrl(parent, wxID_ANY, VariableType, wxDefaultPosition, wxSize(CtrlSize,-1), ReadOnly);
-        MySizer->Add(tc, 0, wxRIGHT, WXC_FROM_DIP(5));
-        tc->SetMinSize(wxSize(CtrlSize,-1));
-        
-        wxString var = wxString::Format(wxT("%s[%d]"), VariableName, i);
-        vars.insert(ivar,var);
-        tc->SetName(var);
-        //tc->SetColLabelValue(0,VariableType);
-        if (VariableType != _("wxString")) tc->SetCellValue(0,0,_("0"));
-        if (EnableEvent) tc->Connect(Sec30EVT_Grid_Updated, wxCommandEventHandler(Sec30::sec30TextCtrl_OnUpdated), NULL, this);
-    }
-    
-    MySizer->Layout();
-    parent->Layout();
-}
-
-void Sec30::AddVarVector(wxWindow *parent, int VecCnt, wxString VariableName, wxString VariableType)
-{
-    std::list<wxString>::iterator ivar = vars.end();
-    
-    for (int i=0; i < VecCnt; i++)
-    {
-        sec30TextCtrl* tc=new sec30TextCtrl(parent, wxID_ANY, VariableType, wxDefaultPosition, wxSize(0,0));
-        tc->SetParent(parent);
-        tc->Show(false);
-        
-        wxString var = wxString::Format(wxT("%s[%d]"), VariableName, i);
-        vars.insert(ivar,var);
-        tc->SetName(var);
-        if (VariableType != _("wxString")) tc->SetCellValue(0,0,_("0"));
-        //tc->Connect(Sec30EVT_Grid_Updated, wxCommandEventHandler(Sec30::sec30TextCtrl_OnUpdated), NULL, this);
-    }
-    parent->Layout();
-}
-
 void Sec30::AddGrid(wxWindow *parent, int nRow, int nCol, wxString VariableName, wxString* ColNames, wxString* ColTypes, int* ColSizes, int* ColPrecision, int xCtrlSize, int yCtrlSize, bool EnableEvent)
 {
     wxBoxSizer* MySizer = new wxBoxSizer(wxHORIZONTAL);
@@ -2781,6 +2733,7 @@ void Sec30::GetCouplingMatrix(myGrid* SKCtr, myGrid* OverlapCtr, wxCheckTree* Bo
 {
     if (!CellID.IsOk())
     {
+        wxMessageBox(_("Fatal error occurred in thread REG01. Error code: GCMF001"),_("Error"));
         //Allocate h for zeros
         return;
     }
@@ -2940,8 +2893,7 @@ void Sec30::GetCouplingMatrixF(myGrid* SKCtr, myGrid* OverlapCtr, wxCheckTree* B
 {
     if (!CellID.IsOk())
     {
-        wxMessageBox(_("Big Bug."),_("debug"));
-        
+        wxMessageBox(_("Fatal error occurred in thread REG01. Error code: GCMF002"),_("Error"));
         //Allocate h for zeros
         return;
     }
@@ -2952,7 +2904,7 @@ void Sec30::GetCouplingMatrixF(myGrid* SKCtr, myGrid* OverlapCtr, wxCheckTree* B
     double CellX = icell*a[0] + jcell*b[0] + kcell*c[0];
     double CellY = icell*a[1] + jcell*b[1] + kcell*c[1];
     double CellZ = icell*a[2] + jcell*b[2] + kcell*c[2];
-            
+    
     wxTreeItemId rootID = orbs->GetRootItem();
     wxString rootname = orbs->GetItemText(rootID);    
     
@@ -2969,13 +2921,12 @@ void Sec30::GetCouplingMatrixF(myGrid* SKCtr, myGrid* OverlapCtr, wxCheckTree* B
             wxString BondStr = wxString::Format(wxT("Bond %d"), bondtype);
             
             Adouble0D iBondSK, fBondSK;
-            GetBondSK(SKCtr, BondStr, iBondSK, fBondSK);
+            GetBondSKF(SKCtr, SKBuffer, BondStr, iBondSK, fBondSK);
             
+            //wxString report = _("");
+            //for (int ip=0; ip<4; ip++) report = report + wxString::Format(wxT("%.8f,"),fBondSK[ip]);
+            //wxMessageBox(report,_("debug"));
             
-            wxString report = _("");
-            for (int ip=0; ip<4; ip++) report = report + wxString::Format(wxT("%.8f,"),fBondSK[ip]);
-            wxMessageBox(report,_("debug"));
-        
             int Dim1 = -1;
             int Dim2 = -1;
             bool IsShell1, IsShell2;
@@ -3152,7 +3103,7 @@ void Sec30::AddOnSiteMatrixF(myGrid* OnSiteCtr, wxCheckTree* orbs, Aint1D Hamilt
                 int i0Ham = HamiltonianDimMap[iAtomIndex][iShell - 1];
                 
                 Adouble0D iOnSiteSK, fOnSiteSK;
-                GetOnSiteSK(OnSiteCtr, Label, iOnSiteSK, fOnSiteSK);
+                GetOnSiteSKF(OnSiteCtr, OSBuffer, Label, iOnSiteSK, fOnSiteSK);
                 
                 for(int ii=0; ii<Dim1; ii++)
                 {
@@ -3208,6 +3159,35 @@ void Sec30::GetBondSK(myGrid* GridCtrl, wxString Label, Adouble0D &iBondSK, Adou
     }                
 }
 
+void Sec30::GetBondSKF(myGrid* GridCtrl, double* GridBuffer, wxString Label, Adouble0D &iBondSK, Adouble0D &fBondSK)
+{
+    wxString title, fstr;
+    double fval;
+    int nRow = GridCtrl->GetNumberRows();
+    iBondSK = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    fBondSK = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    bool found = false;
+    for (int irow=0; irow<nRow;irow++)
+    {
+        title = GridCtrl->GetCellValue(irow, 0);
+        if (!found)
+        {
+            if (title == Label) found = true;
+        }
+        else
+        {
+            //if (GridCtrl->GetCellBackgroundColour(irow, 1) != *wxWHITE) return;
+            if (GridCtrl->IsReadOnly(irow, 1)) return;
+            //istr = GridCtrl->GetCellValue(irow, 1);
+            //fstr = GridCtrl->GetCellValue(irow, 2);
+            //bool isOki = istr.ToDouble(&ival);
+            //bool isOkf = fstr.ToDouble(&fval);
+            fval = GridBuffer[irow];
+            SetBondSKElement(title, false, iBondSK, 0.0, true, fBondSK, fval);
+        }
+    }                
+}
+
 void Sec30::GetOnSiteSK(myGrid* GridCtrl, wxString Label, Adouble0D &iBondSK, Adouble0D &fBondSK)
 {
     wxString title, istr, fstr;
@@ -3232,6 +3212,35 @@ void Sec30::GetOnSiteSK(myGrid* GridCtrl, wxString Label, Adouble0D &iBondSK, Ad
             bool isOki = istr.ToDouble(&ival);
             bool isOkf = fstr.ToDouble(&fval);
             SetOnSiteSKElement(title, isOki, iBondSK, ival, isOkf, fBondSK, fval);
+        }
+    }
+}
+
+void Sec30::GetOnSiteSKF(myGrid* GridCtrl, double* GridBuffer, wxString Label, Adouble0D &iBondSK, Adouble0D &fBondSK)
+{
+    wxString title, fstr;
+    double fval;
+    int nRow = GridCtrl->GetNumberRows();
+    iBondSK = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    fBondSK = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    bool found = false;
+    for (int irow=0; irow<nRow;irow++)
+    {
+        title = GridCtrl->GetCellValue(irow, 0);
+        if (!found)
+        {
+            if (title == Label) found = true;
+        }
+        else
+        {
+            //if (GridCtrl->GetCellBackgroundColour(irow, 1) != *wxWHITE) return;
+            if (GridCtrl->IsReadOnly(irow, 1)) return;
+            //istr = GridCtrl->GetCellValue(irow, 1);
+            //fstr = GridCtrl->GetCellValue(irow, 2);
+            //bool isOki = istr.ToDouble(&ival);
+            //bool isOkf = fstr.ToDouble(&fval);
+            fval = GridBuffer[irow];
+            SetOnSiteSKElement(title, false, iBondSK, 0.0, true, fBondSK, fval);
         }
     }
 }

@@ -10,7 +10,7 @@
 #include <GL/glut.h>
 #include <WX/mdi.h>
 #include <wx/msgdlg.h>
-
+#include <WelcomeClass.h>
 
 /*
 #ifdef __WXMAC__
@@ -45,8 +45,8 @@ wxGLContext* m_context;
 
 MainFrame::MainFrame(wxWindow* parent)
     : MainFrameBaseClass(parent)
-{
-    this->SetTitle(_("Jacuzzi"));
+{   
+    this->SetTitle(SoftwareName);
     LoadIcons();
     RButtonMouse->ToggleButton(wxID_RETRY, true);//Rotate
     //tbmodel = new TBModel();
@@ -59,6 +59,8 @@ MainFrame::MainFrame(wxWindow* parent)
     this->Connect(MyOpenGL_EVT_SelectionChanged, wxCommandEventHandler(myOpenGL_EVT_SelectionChanged), NULL, this);
     this->Connect(RegressionEVT_OnNewData, wxCommandEventHandler(regressionEVT_OnNewData), NULL, this);
     this->Connect(RegressionEVT_OnFinished, wxCommandEventHandler(regressionEVT_OnFinished), NULL, this);
+    this->Connect(RegressionEVT_OnStarted, wxCommandEventHandler(regressionEVT_OnStarted), NULL, this);
+    
     
     InitializeSec30Arrays();
     
@@ -163,6 +165,11 @@ MainFrame::MainFrame(wxWindow* parent)
     Init_graph2d();
     regression = new Regression(sec30, this, graph2d);
     
+    WelcomeClass* welcome = new WelcomeClass(this);
+    //ColorsForm->CenterOnScreen();
+    welcome->CenterOnParent();
+    welcome->ShowModal();
+    
     /////////////////////////////////////////////////////////////////////////////////////
     ///////Just to call InsertPane to push old panes (graph2d0 and graph2d) aside////////
     wxPanel* dummy = new wxPanel(CenteralPanel);
@@ -177,6 +184,7 @@ MainFrame::MainFrame(wxWindow* parent)
     //SetVendorName(wxT("CMT Group, Antwerp University, Antwerpen, Belgium."));
     //const wxString perspective = _("layout2|name=0394df705cc5b7dc000000dc00000001;caption=;state=768;dir=5;layer=0;row=0;pos=0;prop=100000;bestw=20;besth=20;minw=-1;minh=-1;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=-1;floath=-1|name=072d48e05cc5b7de000006ab00000002;caption=Structure;state=12584956;dir=1;layer=0;row=0;pos=0;prop=100000;bestw=800;besth=600;minw=-1;minh=-1;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=-1;floath=-1|name=072dae405cc5b7de000007ba00000003;caption=Current Band-Structure;state=12584956;dir=2;layer=1;row=0;pos=0;prop=100000;bestw=525;besth=0;minw=-1;minh=-1;maxw=-1;maxh=-1;floatx=1426;floaty=329;floatw=541;floath=39|name=072dd1605cc5b7de000008ed00000004;caption=Initial Band-Structure;state=12601340;dir=2;layer=1;row=0;pos=1;prop=100000;bestw=525;besth=0;minw=-1;minh=-1;maxw=-1;maxh=-1;floatx=1041;floaty=477;floatw=541;floath=39|dock_size(5,0,0)=22|dock_size(1,0,0)=633|dock_size(2,1,0)=343|");
     //aui_mgr.LoadPerspective(perspective,false);
+    
     
     EvaluateUnitcellPanel();
     // Create the TB Model Class which includes all information about the system
@@ -2226,12 +2234,18 @@ void MainFrame::BtnRight_OnClick(wxRibbonButtonBarEvent& event)
 
 void MainFrame::BtnStart_OnClick(wxRibbonButtonBarEvent& event)
 {
-    StartRegression();
+    if (!isFittingThreadBusy)
+        StartRegression(false);
+    else
+        wxMessageBox(_("A procedure is running!"));
 }
 
 void MainFrame::BtnOnestep_OnClick(wxRibbonButtonBarEvent& event)
 {
-    
+    if (!isFittingThreadBusy)
+        StartRegression(true);
+    else
+        wxMessageBox(_("A procedure is running!"));
 }
 
 void MainFrame::BtnPause_OnClick(wxRibbonButtonBarEvent& event)
@@ -2389,8 +2403,8 @@ void MainFrame::BtnAbout_OnClick(wxRibbonButtonBarEvent& event)
     icn.CopyFromBitmap(GetPng(icon256_png,icon256_png_size));
     info.SetIcon(icn);
     
-    info.SetName(_("Jacuzzi"));
-    info.SetVersion(_("2019.1"));
+    info.SetName(SoftwareName);
+    info.SetVersion(wxString::Format(_("%d.%d.%d"), Ver_MAJOR, Ver_MINOR, Ver_RELEASE));
     info.SetDescription(_("Jacuzzi is a powerful and easy to use software package to construct Tight-Binding (TB) model for\nnano-scale materials. Starting from the simplified linear combination of atomic orbitals method in\ncombination with first-principles calculations (such as OpenMX or Vasp packages), one can construct\na TB model in the two-centre approximation. Using Slater and Koster approach we calculate the TB\nHamiltonian of the system and use a nonlinear fitting algorithm to find the best entries for both\nHamiltonian and overlap matrices to reproduce the first-principles data. We obtain expressions for\nthe Hamiltonian and overlap matrix elements between different orbitals (s, p and d orbitals with or\nwithout spin-orbit coupling) for the different atoms and present the SK coefficients in a orthogonal\nor nonorthogonal basis set. Furthermore, by using Jacuzzi one can generate a code in preferred\nprogramming language such as C++, C, Fortran, Mathematica, Matlab and Python."));
     info.SetCopyright(_("Copyright (c) 2019 Mohammad Nakhaee"));
 
@@ -2950,7 +2964,7 @@ void MainFrame::UpdateTBBand_if()
     if (nEssensialCells>0) delete [] lmnEssCells;
 }
 
-void MainFrame::StartRegression()
+void MainFrame::StartRegression(bool isOneStep)
 {
     if (!ValidateSKPanel()) {wxMessageBox(_("The constructed TB model is not passable. Please fix the errors reported in the terminal and try again."),_("Error"));return;}
     
@@ -2991,7 +3005,9 @@ void MainFrame::StartRegression()
         if (!IsLicensed(_("d-orbital regression"))) {wxMessageBox(_("In the case of fitting a TB model including d-orbitals you need to contact developer support. Please find the contact information in Help>About."),_("Error"));return;}
     }
     
-    //LeftPanel->ChangeSelection(4);
+    //Show the SK Tab
+    LeftPanel->ChangeSelection(4);
+    
     int TotalNumberOfParameters;
     sec30->GetVar(_("nParameters[0]"), TotalNumberOfParameters);
     if (TotalNumberOfParameters<1) {wxMessageBox(_("First evaluate independent parameters."),_("Error"));return;}
@@ -3191,7 +3207,7 @@ void MainFrame::StartRegression()
     
     
     //Start(double* p, int np, double* t, double* y_dat, int ny, double* weight, double* dp, double p_min, double p_max, double* c, lmOptions opts)
-    std::thread RegressionThread(&Regression::Start, regression, p, np, t, y_dat, ny, weight, dp, p_min, p_max, cnst, opts);
+    std::thread RegressionThread(&Regression::Start, regression, p, np, t, y_dat, ny, weight, dp, p_min, p_max, cnst, opts, isOneStep);
     RegressionThread.detach();
     
     ////////////////It works well///////////////////////
@@ -3257,7 +3273,14 @@ void MainFrame::regressionEVT_OnNewData(wxCommandEvent& event)
 
 void MainFrame::regressionEVT_OnFinished(wxCommandEvent& event)
 {
-    
+    isFittingThreadBusy = false;
+    UpdateTBBand_if();
+    UpdateGraph2Ds();
+}
+
+void MainFrame::regressionEVT_OnStarted(wxCommandEvent& event)
+{
+    isFittingThreadBusy = true;
 }
 
 void MainFrame::ExportMatrices(wxString filepath, wxString BaseName, int MyID_Initial0Final1)

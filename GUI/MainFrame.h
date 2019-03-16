@@ -29,6 +29,11 @@
 class MainFrame : public MainFrameBaseClass
 {
 public:
+    wxString SoftwareName = _("Quantum++");
+    int Ver_MAJOR = 1;
+    int Ver_MINOR = 1;
+    int Ver_RELEASE = 2;
+    
     MainFrame(wxWindow* parent);
     virtual ~MainFrame();
     
@@ -49,6 +54,7 @@ public:
     
     Regression* regression;
     std::thread* FittingThread;
+    bool isFittingThreadBusy = false;
     
     wxRibbonButtonBar* RButtonMouse;
     
@@ -163,7 +169,7 @@ protected:
     void TestEig();
     void TestZEig();
     void UpdateTBBand_if();
-    void StartRegression();
+    void StartRegression(bool isOneStep);
     bool IsAllowedToFit(int iband, int ik);
     int ReplaceDFTBand(int iband, int ik);
     double ShiftBand(int iband, int ik);
@@ -190,6 +196,7 @@ private:
     virtual void myOpenGL_EVT_SelectionChanged(wxCommandEvent& event);
     virtual void regressionEVT_OnNewData(wxCommandEvent& event);
     virtual void regressionEVT_OnFinished(wxCommandEvent& event);
+    virtual void regressionEVT_OnStarted(wxCommandEvent& event);
     virtual void LoadIcons();
     virtual wxBitmap GetPng(const void* data, size_t length);
 };

@@ -1,11 +1,12 @@
 #include <main.h>
+#include "GridClass.h"
 
 bool MainApp::OnInit()
 {
     // Add the common image handlers
     wxImage::AddHandler( new wxPNGHandler );
     wxImage::AddHandler( new wxJPEGHandler );
-
+    
     MainFrame *mainFrame = new MainFrame(NULL);
     SetTopWindow(mainFrame);
     return GetTopWindow()->Show();
