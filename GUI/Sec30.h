@@ -85,6 +85,13 @@ public:
     Aint1D ArraysOf1DInt;
     Aint2D ArraysOf2DInt;
     Aint3D ArraysOf3DInt;
+    Adouble0D ArraysOf0DDouble;
+    Adouble1D ArraysOf1DDouble;
+    Adouble2D ArraysOf2DDouble;
+    Adouble3D ArraysOf3DDouble;
+    Astring0D ArraysOf0DString;
+    Astring1D ArraysOf1DString;
+    Astring2D ArraysOf2DString;
     Astring3D ArraysOf3DString;
     
     double* OSBuffer;
