@@ -14,12 +14,12 @@ sec30TextCtrl::~sec30TextCtrl()
 {
 }
 
-/*
+
 void sec30TextCtrl::SendUpdateEvent()
 {
     wxCommandEvent* event = new wxCommandEvent(Sec30EVT_sec30TextCtrl_Updated);
     event->SetEventObject(this);
-    event->SetString("nothing");
+    event->SetString("");
     wxQueueEvent(this,event);
 }
 
@@ -37,4 +37,4 @@ void sec30TextCtrl::myOnKeyDown(wxKeyEvent &event)
             SendUpdateEvent();
     }
 }
-*/
+

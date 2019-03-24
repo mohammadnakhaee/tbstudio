@@ -3536,7 +3536,8 @@ void MainFrame::GenerateMathematicaCode(wxString filepath, wxString BaseName, in
         fprintf(fpk,"Do[\n");
         fprintf(fpk,"  {ka0, kb0, kc0, dpath} = kPath[[ik]];\n");
         fprintf(fpk,"  eig = Eigenvalues[H[{ka0, kb0, kc0}]];\n");
-        fprintf(fpk,"  eig = Sort[eig];(*The imaginary part is practically zero.*)\n");
+        fprintf(fpk,"  eig = Re[eig];(*The imaginary part is practically zero.*)\n");
+        fprintf(fpk,"  eig = Sort[eig];\n");
         fprintf(fpk,"  Do[\n");
         fprintf(fpk,"   bands[[iband, ik, 1]] = dpath;\n");
         fprintf(fpk,"   bands[[iband, ik, 2]] = eig[[iband]];\n");
@@ -3672,7 +3673,8 @@ void MainFrame::GenerateMatlabCode(wxString filepath, wxString BaseName, int MyI
         fprintf(fpk,"\tdpath = kPath(ik,4);\n");
         fprintf(fpk,"\thk = GetHam(h, ka, kb, kc);\n");
         fprintf(fpk,"\tEIG = eig(hk);\n");
-        fprintf(fpk,"\tEIG = sort(EIG); %%The imaginary part is practically zero.\n");
+        fprintf(fpk,"\tEIG = real(EIG); %%The imaginary part is practically zero.\n");
+        fprintf(fpk,"\tEIG = sort(EIG);\n");
         fprintf(fpk,"\tfor iband=1:nbands\n");
         fprintf(fpk,"\t\tbands(iband,ik,1) = dpath;\n");
         fprintf(fpk,"\t\tbands(iband,ik,2) = EIG(iband);\n");
