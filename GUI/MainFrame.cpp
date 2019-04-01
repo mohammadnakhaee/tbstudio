@@ -47,6 +47,7 @@ MainFrame::MainFrame(wxWindow* parent)
     : MainFrameBaseClass(parent)
 {   
     this->SetTitle(SoftwareName);
+    this->Maximize(true);
     LoadIcons();
     RButtonMouse->ToggleButton(wxID_RETRY, true);//Rotate
     //tbmodel = new TBModel();
@@ -166,8 +167,8 @@ MainFrame::MainFrame(wxWindow* parent)
     regression = new Regression(sec30, this, graph2d);
     
     WelcomeClass* welcome = new WelcomeClass(this);
-    //ColorsForm->CenterOnScreen();
-    welcome->CenterOnParent();
+    welcome->CenterOnScreen();
+    //welcome->CenterOnParent();
     welcome->ShowModal();
     
     /////////////////////////////////////////////////////////////////////////////////////
@@ -2943,6 +2944,11 @@ void MainFrame::UpdateTBBand_if()
         int checkf = sec30->SymEigenValues(UpperSymMatrixHf, nHamiltonian, eigHf);
         for(int iH=0; iH<nHamiltonian; iH++) fTBEigVal[ik][iH] = eigHf[iH];
     }
+    
+    delete [] UpperSymMatrixHi;
+    delete [] eigHi;
+    delete [] UpperSymMatrixHf;
+    delete [] eigHf;
     
     sec30->ArraysOf2DDouble[2] = iTBEigVal;
     sec30->ArraysOf2DDouble[3] = fTBEigVal;

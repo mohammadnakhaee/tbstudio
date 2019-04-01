@@ -30,10 +30,6 @@ public:
         //SetMinSize(size);
         //EnableGridLines(false);
         EnableEditing(true);
-        CreateGrid( 1, 1);
-        SetColSize(0, size.x-1);// in pixels
-        SetColLabelSize(1);
-        SetRowLabelSize(1);
         //EnableCellEditControl(false);
         //SetCellAlignment(wxALIGN_CENTRE,0,0);
         DisableColResize(0);
@@ -41,7 +37,7 @@ public:
         EnableScrolling(false,false);
         //SetWindowStyle(GetWindowStyle() & ~ wxVSCROLL & ~ wxHSCROLL );
         ShowScrollbars(wxSHOW_SB_NEVER,wxSHOW_SB_NEVER);
-        if (Type=="wxString")
+        if (Type=="")
         {}
         else if (Type=="int")
             SetColFormatNumber(0);

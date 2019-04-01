@@ -86,7 +86,23 @@ void Regression::Start(double* p, int np, double* t, double* y_dat, int ny, doub
     double** cvg_hst = new double*[MaxIter];                          // convergence history
     for (int i=0; i<MaxIter; i++) cvg_hst[i] = new double[np+3];
     
-    lm(p, np, t, y_dat, ny, weight, dp, p_min, p_max, c, opts, redX2, sigma_p, cvg_hst, isOneStep);
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //Allocate out side. Because func will be called a lot and it will be slow if we allocate and delete many times.
+    int nHamiltonian = sec30->ArraysOf1DString[1].size();
+    int nH2 = nHamiltonian*nHamiltonian;
+    lapack_complex_double* UpperSymMatrixHf = new lapack_complex_double[nH2];
+    for (int i=0; i<nH2; i++) UpperSymMatrixHf[i] = {0.0, 0.0};
+    double* eigHf = new double[nHamiltonian];
+    for (int i=0; i<nHamiltonian; i++) eigHf[i] = 0.0;
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+    lm(p, np, t, y_dat, ny, weight, dp, p_min, p_max, c, opts, redX2, sigma_p, cvg_hst, isOneStep, UpperSymMatrixHf, eigHf);
+    
+    //////////////////////////////
+    //Deallocate
+    delete [] eigHf;
+    delete [] UpperSymMatrixHf;
+    //////////////////////////////
     
     for (int ip=0; ip<np; ip++)
     {
@@ -127,7 +143,7 @@ void Regression::Start(double* p, int np, double* t, double* y_dat, int ny, doub
     return;
 }
 
-void Regression::lm(double* p, int np, double* t, double* y_dat, int ny, double* weight, double* dp, double p_min, double p_max, double* c, lmOptions opts, double &redX2, double* sigma_p, double** cvg_hst, bool isOneStep)
+void Regression::lm(double* p, int np, double* t, double* y_dat, int ny, double* weight, double* dp, double p_min, double p_max, double* c, lmOptions opts, double &redX2, double* sigma_p, double** cvg_hst, bool isOneStep, lapack_complex_double* UpperSymMatrixHf, double* eigHf)
 {
     wxString data;
     //global   iteration  func_calls
@@ -190,7 +206,7 @@ void Regression::lm(double* p, int np, double* t, double* y_dat, int ny, double*
     double* y_hat  = new double[ny]; 
     for (int iy=0; iy<ny; iy++) y_hat[iy] = 0.0;
     
-    lm_matx(t, p_old, np, y_old, ny, InitializedX2, J, p, y_dat, weight, dp, c, JtWJ, JtWdy, X2, y_hat, func_calls, iteration);
+    lm_matx(t, p_old, np, y_old, ny, InitializedX2, J, p, y_dat, weight, dp, c, JtWJ, JtWdy, X2, y_hat, func_calls, iteration, UpperSymMatrixHf, eigHf);
     
     data = _("******************** New Regression Analysis *******************\n");
     SendDataToTerminal(data);
@@ -236,6 +252,7 @@ void Regression::lm(double* p, int np, double* t, double* y_dat, int ny, double*
     double* JtWJArr = new double[np2];
     double* covar_p = new double[np2];
     ////////////////////////////////////////////////////////////////////////
+    bool BadCondition = false;
     while (!stop)        // --- Start Main Loop
     {
         iteration++;
@@ -274,10 +291,11 @@ void Regression::lm(double* p, int np, double* t, double* y_dat, int ny, double*
             data.append(_("The solution could not be computed.\n"));
             data.append(_("Stopped without convergence!\n"));
             SendDataToTerminal(data);
-            stop = true;
+            BadCondition=true;
+            break;
         }
         
-        if (stop)                       // Lapack error; break
+        /*if (stop)                       // Lapack error; break
         {
             //wxMessageBox(wxString("1"));
             ///////////////Out of While Loop///////////
@@ -302,10 +320,11 @@ void Regression::lm(double* p, int np, double* t, double* y_dat, int ny, double*
             delete [] weighted_dy2;
             delete [] JtWJArr;
             delete [] covar_p;
+            delete [] idx;
             ///////////////Out of While Loop///////////
             
             return;
-        }
+        }*/
         
         //  big = max(abs(h./p)) > 2;                      // this is a big step
         
@@ -327,7 +346,7 @@ void Regression::lm(double* p, int np, double* t, double* y_dat, int ny, double*
         }
         //p_try = min(max(p_min,p_try),p_max);           
         
-        func(t, ny, p_try, np, c, y1);
+        func(t, ny, p_try, np, c, y1, UpperSymMatrixHf, eigHf);
         
         for (int iy=0; iy<ny; iy++)                    // residual error using p_try
             delta_y[iy] = y_dat[iy] - y1[iy];
@@ -338,7 +357,8 @@ void Regression::lm(double* p, int np, double* t, double* y_dat, int ny, double*
         for (int iy=0; iy<ny; iy++)
             isAllFinite = isAllFinite && std::isfinite(delta_y[iy]);
         
-        if (!isAllFinite)                    // floating point error; break
+        if (!isAllFinite) {BadCondition=true; break;}                   // floating point error; break
+        /*if (!isAllFinite)                    // floating point error; break
         {
             ///////////////Out of While Loop///////////
             delete [] y_hat;
@@ -362,13 +382,13 @@ void Regression::lm(double* p, int np, double* t, double* y_dat, int ny, double*
             delete [] weighted_dy2;
             delete [] JtWJArr;
             delete [] covar_p;
+            delete [] idx;
             ///////////////Out of While Loop///////////
             
             return;
-        }
+        }*/
         
         func_calls = func_calls + 1;
-        
         
         for(int iy=0; iy<ny; iy++) weighted_dy[iy] = delta_y[iy] * weight[iy];
         double X2_try = VecVec2Num(delta_y, weighted_dy, ny);              // Chi-squared error criteria
@@ -396,7 +416,7 @@ void Regression::lm(double* p, int np, double* t, double* y_dat, int ny, double*
             }
             //p_try = min(max(p_min,p_try),p_max);         // apply constraints
             
-            func(t, ny, p_try, np, c, y1);
+            func(t, ny, p_try, np, c, y1, UpperSymMatrixHf, eigHf);
             
             for (int iy=0; iy<ny; iy++)                    // residual error using p_try
                 delta_y[iy] = y_dat[iy] - y1[iy];
@@ -419,7 +439,7 @@ void Regression::lm(double* p, int np, double* t, double* y_dat, int ny, double*
             for (int iy=0; iy<ny; iy++) y_old[iy] = y_hat[iy];
             for (int ip=0; ip<np; ip++) p[ip] = p_try[ip];
             
-            lm_matx(t, p_old, np, y_old, ny, dX2, J, p, y_dat, weight, dp, c, JtWJ, JtWdy, X2, y_hat, func_calls, iteration);
+            lm_matx(t, p_old, np, y_old, ny, dX2, J, p, y_dat, weight, dp, c, JtWJ, JtWdy, X2, y_hat, func_calls, iteration, UpperSymMatrixHf, eigHf);
             
             // decrease lambda ==> Gauss-Newton method
             switch (Update_Type)
@@ -455,7 +475,7 @@ void Regression::lm(double* p, int np, double* t, double* y_dat, int ny, double*
             {
                 double dX2Out = 0.0;
                 double minusone = -1.0;
-                lm_matx(t, p_old, np, y_old, ny, minusone, J, p, y_dat, weight, dp, c, JtWJ, JtWdy, dX2Out, y_hat, func_calls, iteration);
+                lm_matx(t, p_old, np, y_old, ny, minusone, J, p, y_dat, weight, dp, c, JtWJ, JtWdy, dX2Out, y_hat, func_calls, iteration, UpperSymMatrixHf, eigHf);
             }
             
             // increase lambda  ==> gradient descent method
@@ -538,37 +558,39 @@ void Regression::lm(double* p, int np, double* t, double* y_dat, int ny, double*
     ////////////////////////////////////////////////////////////////////////
     
     // --- convergence achieved, find covariance and confidence intervals
-
-    // ---- Error Analysis ----
-
-    if (Variance(weight, ny) == 0.0)   // recompute equal weights for paramter error analysis
+    
+    if (!BadCondition)
     {
-        double dydy = VecVec2Num(delta_y, delta_y, ny);
-        for(int iy=0; iy<ny; iy++)
-            weight[iy] = 1.0*DoF/dydy;
-        //weight = DoF/(Transpose(delta_y).delta_y) * ones(Npnt,1);
+        // ---- Error Analysis ----
+
+        if (Variance(weight, ny) == 0.0)   // recompute equal weights for paramter error analysis
+        {
+            double dydy = VecVec2Num(delta_y, delta_y, ny);
+            for(int iy=0; iy<ny; iy++)
+                weight[iy] = 1.0*DoF/dydy;
+            //weight = DoF/(Transpose(delta_y).delta_y) * ones(Npnt,1);
+        }
+        
+        redX2 = X2 / DoF;
+        
+        double minusone2 = -1.0;
+        lm_matx(t, p_old, np, y_old, ny, minusone2, J, p, y_dat, weight, dp, c, JtWJ, JtWdy, X2, y_hat, func_calls, iteration, UpperSymMatrixHf, eigHf);
+        
+        
+        for (int ip=0; ip<np; ip++)
+            for (int jp=0; jp<np; jp++)
+                JtWJArr[ip * np + jp] = JtWJ[ip][jp];
+                
+        
+        for (int ip=0; ip<np; ip++)
+            for (int jp=0; jp<np; jp++)
+                covar_p[ip * np + jp] = 0.0;
+        for (int ip=0; ip<np; ip++) covar_p[ip * np + ip] = 1.0;
+        
+        int info2 = LAPACKE_dgesv(LAPACK_ROW_MAJOR, np, np, JtWJArr, np, ipiv2, covar_p, np);
+        
+        for(int ip=0; ip<np; ip++) sigma_p[ip] = sqrt(fabs(covar_p[ip * np + ip]));
     }
-    
-    redX2 = X2 / DoF;
-    
-    double minusone2 = -1.0;
-    lm_matx(t, p_old, np, y_old, ny, minusone2, J, p, y_dat, weight, dp, c, JtWJ, JtWdy, X2, y_hat, func_calls, iteration);
-    
-    
-    for (int ip=0; ip<np; ip++)
-        for (int jp=0; jp<np; jp++)
-            JtWJArr[ip * np + jp] = JtWJ[ip][jp];
-            
-    
-    for (int ip=0; ip<np; ip++)
-        for (int jp=0; jp<np; jp++)
-            covar_p[ip * np + jp] = 0.0;
-    for (int ip=0; ip<np; ip++) covar_p[ip * np + ip] = 1.0;
-    
-    int info2 = LAPACKE_dgesv(LAPACK_ROW_MAJOR, np, np, JtWJArr, np, ipiv2, covar_p, np);
-    
-    for(int ip=0; ip<np; ip++) sigma_p[ip] = sqrt(fabs(covar_p[ip * np + ip]));
-    
     // endfunction  # ---------------------------------------------------------- LM
     
     
@@ -594,6 +616,7 @@ void Regression::lm(double* p, int np, double* t, double* y_dat, int ny, double*
     delete [] weighted_dy2;
     delete [] JtWJArr;
     delete [] covar_p;
+    delete [] idx;
     ///////////////Out of While Loop///////////
     
     //////////////////////////////////////////////////////////////////////
@@ -609,7 +632,7 @@ void Regression::lm(double* p, int np, double* t, double* y_dat, int ny, double*
     //////////////////////////////////////////////////////////////////////
 }
 
-void Regression::lm_FD_J(double* t, double* p, int np, double* y, int ny, double* dp, double* c, double** J, int &func_calls)
+void Regression::lm_FD_J(double* t, double* p, int np, double* y, int ny, double* dp, double* c, double** J, int &func_calls, lapack_complex_double* UpperSymMatrixHf, double* eigHf)
 {
     int m=ny;              // number of data points
     int n=np;              // number of parameters
@@ -634,7 +657,7 @@ void Regression::lm_FD_J(double* t, double* p, int np, double* y, int ny, double
         
         if (del[j] != 0)
         {
-            func(t, ny, p, np, c, y1);
+            func(t, ny, p, np, c, y1, UpperSymMatrixHf, eigHf);
             func_calls = func_calls + 1;
             
             if (dp[j] < 0)                  // backwards difference
@@ -644,7 +667,7 @@ void Regression::lm_FD_J(double* t, double* p, int np, double* y, int ny, double
             else                            // central difference, additional func call
             {
                 p[j] = ps[j] - del[j];
-                func(t, ny, p, np, c, y2);
+                func(t, ny, p, np, c, y2, UpperSymMatrixHf, eigHf);
                 for(int iy=0; iy<ny; iy++)
                 {
                     J[iy][j] = (y1[iy]-y2[iy]) / (2.0 * del[j]);
@@ -695,17 +718,17 @@ void Regression::lm_Broyden_J(double* p_old, double* y_old, double** J, double* 
     if (ny > 0) delete [] A;
 }
 
-void Regression::lm_matx(double* t,double* p_old, int np, double* y_old, int ny, double dX2, double** J, double* p, double* y_dat, double* weight, double* dp, double* c, double** JtWJ, double* JtWdy, double Chi_sq, double* y_hat, int &func_calls, int &iteration)
+void Regression::lm_matx(double* t,double* p_old, int np, double* y_old, int ny, double dX2, double** J, double* p, double* y_dat, double* weight, double* dp, double* c, double** JtWJ, double* JtWdy, double Chi_sq, double* y_hat, int &func_calls, int &iteration, lapack_complex_double* UpperSymMatrixHf, double* eigHf)
 {
     int Npnt = ny;               // number of data points
     int Npar = np;               // number of parameters
     
-    func(t, ny, p, np, c, y_hat);          // evaluate model using parameters 'p'
+    func(t, ny, p, np, c, y_hat, UpperSymMatrixHf, eigHf);          // evaluate model using parameters 'p'
     func_calls = func_calls + 1;
 
     if ( remainder(iteration,2*Npar) != 0 || dX2 > 0 )
     {
-        lm_FD_J(t, p, np, y_hat, ny, dp, c, J, func_calls);    //finite difference
+        lm_FD_J(t, p, np, y_hat, ny, dp, c, J, func_calls, UpperSymMatrixHf, eigHf);    //finite difference
         //J = lm_FD_J(t,p,y_hat,dp,c);
     }
     else
@@ -795,7 +818,7 @@ void Regression::Transpose(double** a, int na, int nb, double** aT)
             aT[ib][ia] = a[ia][ib];
 }
 
-void Regression::func(double* t, int ny, double* p, int np, double* cnst, double* y)
+void Regression::func(double* t, int ny, double* p, int np, double* cnst, double* y, lapack_complex_double* UpperSymMatrixHf, double* eigHf)
 {
     bool isBandLoaded;
     if (sec30->ArraysOf0DInt[0] != 0) isBandLoaded = true;
@@ -902,9 +925,6 @@ void Regression::func(double* t, int ny, double* p, int np, double* cnst, double
     
     /////////////////////////Calculate the TB Band-structure////////////////////////
     Adouble1D fTBEigVal(nKPoint,std::vector<double>(nHamiltonian));
-    int nH2 = nHamiltonian*nHamiltonian;
-    lapack_complex_double* UpperSymMatrixHf = new lapack_complex_double[nH2];
-    double* eigHf = new double[nHamiltonian];
     
     for (int ik=0; ik<nKPoint; ik++)
     {
@@ -919,6 +939,9 @@ void Regression::func(double* t, int ny, double* p, int np, double* cnst, double
         //ky = KPoints[ik][4];
         //kz = KPoints[ik][5];
         
+        //wxString data = wxString::Format(_("kx = %.8f ky = %.8f kz = %.8f \n"),kx,ky,kz);
+        //SendDataToTerminal(data);
+            
         for(int iH=0; iH<nHamiltonian; iH++)
         {
             eigHf[iH] = 0.0;

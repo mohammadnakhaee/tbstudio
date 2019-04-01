@@ -29,10 +29,10 @@
 class MainFrame : public MainFrameBaseClass
 {
 public:
-    wxString SoftwareName = _("Quantum++");
+    wxString SoftwareName = _("Quantum Lab");
     int Ver_MAJOR = 1;
     int Ver_MINOR = 1;
-    int Ver_RELEASE = 2;
+    int Ver_RELEASE = 3;
     
     MainFrame(wxWindow* parent);
     virtual ~MainFrame();

@@ -3,7 +3,7 @@
 ## any manual changes will be erased      
 ##
 ## Release
-ProjectName            :=GUI
+ProjectName            :=QuantumLab
 ConfigurationName      :=Release
 WorkspacePath          :=C:/Users/mohammad/Documents/Codelite/pecsjunc
 ProjectPath            :=C:/Users/mohammad/Documents/Codelite/pecsjunc/GUI
@@ -32,7 +32,7 @@ Preprocessors          :=$(PreprocessorSwitch)NDEBUG
 ObjectSwitch           :=-o 
 ArchiveOutputSwitch    := 
 PreprocessOnlySwitch   :=-E
-ObjectsFileList        :="GUI.txt"
+ObjectsFileList        :="QuantumLab.txt"
 PCHCompileFlags        :=
 MakeDirCommand         :=makedir
 RcCmpOptions           := $(shell wx-config --rcflags)
