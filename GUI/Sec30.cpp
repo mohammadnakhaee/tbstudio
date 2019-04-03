@@ -297,6 +297,30 @@ wxComboBox* Sec30::AddComboCtrl(wxWindow *parent, wxString VariableName, wxStrin
     return ctr;
 }
 
+wxColourPickerCtrl* Sec30::AddColorCtrl(wxWindow *parent, wxString VariableName, wxString MyLabel, wxColour color, int LabelSize, int CtrlSize)
+{
+    wxBoxSizer* MySizer = new wxBoxSizer(wxHORIZONTAL);
+    parent->GetSizer()->Add(MySizer, 0, wxEXPAND, WXC_FROM_DIP(5));
+    
+    wxStaticText* st = new wxStaticText(parent, wxID_ANY, MyLabel + wxT(":"), wxDefaultPosition, wxDLG_UNIT(parent, wxSize(-1,-1)), 0);
+    MySizer->Add(st, 0, wxLEFT|wxRIGHT|wxTOP, WXC_FROM_DIP(5));
+    st->SetMinSize(wxSize(LabelSize,-1));
+    
+    std::list<wxString>::iterator icolors = colors.end();
+    
+    wxColourPickerCtrl* ctr = new wxColourPickerCtrl(parent, wxID_ANY, color, wxDefaultPosition, wxDLG_UNIT(parent, wxSize(CtrlSize,-1)), wxCLRP_DEFAULT_STYLE);
+    MySizer->Add(ctr, 0, wxRIGHT, WXC_FROM_DIP(5));
+    ctr->SetMinSize(wxSize(CtrlSize,-1));
+    
+    colors.insert(icolors,VariableName);
+    ctr->SetName(VariableName);
+    
+    ctr->Connect(wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler(Sec30::PickerChangeColor), NULL, this);
+    
+    MySizer->Layout();
+    parent->Layout();
+    return ctr;
+}
     
 wxScrolledWindow* Sec30::AddScrolledPanel(wxWindow *parent, int xCtrlSize, int yCtrlSize, long style)
 {
