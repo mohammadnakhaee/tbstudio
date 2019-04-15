@@ -976,21 +976,3 @@ void Regression::func(double* t, int ny, double* p, int np, double* cnst, double
     if (nEssensialCells>0) delete [] lmnEssCells;
 }
 
-void Regression::SendDataToTerminal(wxString data)
-{
-    wxCommandEvent* event = new wxCommandEvent(RegressionEVT_OnNewData);
-    event->SetString(data);
-    wxQueueEvent(Parent,event);
-}
-
-void Regression::SendEventRunFinished()
-{
-    wxCommandEvent* event = new wxCommandEvent(RegressionEVT_OnFinished);
-    wxQueueEvent(Parent,event);
-}
-
-void Regression::SendEventRunStarted()
-{
-    wxCommandEvent* event = new wxCommandEvent(RegressionEVT_OnStarted);
-    wxQueueEvent(Parent,event);
-}
