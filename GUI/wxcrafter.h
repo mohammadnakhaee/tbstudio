@@ -20,7 +20,6 @@
 #include <wx/stattext.h>
 #include <wx/notebook.h>
 #include <wx/dialog.h>
-#include <wx/statbmp.h>
 #include <wx/timer.h>
 #if wxVERSION_NUMBER >= 2900
 #include <wx/persist.h>
@@ -107,16 +106,14 @@ public:
 class WelcomeClassBase : public wxDialog
 {
 protected:
-    wxStaticBitmap* welcomeimage;
     wxTimer* m_timer1089;
 
 protected:
     virtual void OnTick(wxTimerEvent& event) { event.Skip(); }
 
 public:
-    wxStaticBitmap* GetWelcomeimage() { return welcomeimage; }
     wxTimer* GetTimer1089() { return m_timer1089; }
-    WelcomeClassBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT(""), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(650,325), long style = wxSTAY_ON_TOP|wxBORDER_SIMPLE);
+    WelcomeClassBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT(""), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(200,120), long style = wxSTAY_ON_TOP|wxBORDER_STATIC);
     virtual ~WelcomeClassBase();
 };
 

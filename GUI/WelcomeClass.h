@@ -5,10 +5,11 @@
 #include <wx/mstream.h>
 #include <welcome650325.h>
 #include "wx/log.h"
+#include <wx/statbmp.h>
 class WelcomeClass : public WelcomeClassBase
 {
 public:
-    int WelcomeTime = 10;//sec
+    int WelcomeTime = 11;//sec
     int Time = 0;//ses
     WelcomeClass(wxWindow* parent);
     virtual ~WelcomeClass();

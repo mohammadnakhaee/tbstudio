@@ -5,8 +5,14 @@ WelcomeClass::WelcomeClass(wxWindow* parent)
 {
     Time=0;
     wxLog::SetLogLevel(0);
-    welcomeimage->SetBitmap(GetPng(welcome650325_png,welcome650325_png_size));
-    welcomeimage->Refresh(true);
+    
+    this->SetMinSize(wxSize(650,285));
+    this->SetSize(wxSize(650,285));
+    wxStaticBitmap* myimage = new wxStaticBitmap(this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDLG_UNIT(this, wxSize(650,275)), 0 );
+    //boxSizer1085->Add(welcomeimage, 1, wxEXPAND, WXC_FROM_DIP(5));
+    //welcomeimage->SetMinSize(wxSize(650,275));
+    myimage->SetBitmap(GetPng(welcome650325_png,welcome650325_png_size));
+    myimage->Refresh(true);
 }
 
 WelcomeClass::~WelcomeClass()
@@ -26,3 +32,6 @@ void WelcomeClass::OnTick(wxTimerEvent& event)
     Time++;
     if(Time>WelcomeTime) this->Close();
 }
+
+
+    

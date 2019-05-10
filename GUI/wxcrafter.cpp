@@ -211,24 +211,17 @@ WelcomeClassBase::WelcomeClassBase(wxWindow* parent, wxWindowID id, const wxStri
         wxC9ED9InitBitmapResources();
         bBitmapLoaded = true;
     }
-    this->SetBackgroundColour(wxColour(wxT("rgb(255,255,255)")));
-    
-    wxBoxSizer* boxSizer1085 = new wxBoxSizer(wxVERTICAL);
-    boxSizer1085->SetMinSize(650,325);
-    this->SetSizer(boxSizer1085);
-    
-    welcomeimage = new wxStaticBitmap(this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDLG_UNIT(this, wxSize(650,325)), 0 );
-    
-    boxSizer1085->Add(welcomeimage, 1, wxEXPAND, WXC_FROM_DIP(5));
-    welcomeimage->SetMinSize(wxSize(650,325));
+    this->SetBackgroundColour(wxColour(wxT("rgb(0,0,0)")));
+    this->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BACKGROUND));
     
     m_timer1089 = new wxTimer;
     m_timer1089->Start(1000, false);
     
-    SetBackgroundColour(wxColour(wxT("rgb(255,255,255)")));
+    SetBackgroundColour(wxColour(wxT("rgb(0,0,0)")));
+    SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BACKGROUND));
     SetName(wxT("WelcomeClassBase"));
-    SetMinClientSize(wxSize(650,325));
-    SetSize(wxDLG_UNIT(this, wxSize(650,325)));
+    SetMinClientSize(wxSize(200,120));
+    SetSize(wxDLG_UNIT(this, wxSize(200,120)));
     if (GetSizer()) {
          GetSizer()->Fit(this);
     }

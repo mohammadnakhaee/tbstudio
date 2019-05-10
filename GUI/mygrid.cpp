@@ -167,29 +167,6 @@ void myGrid::Paste()
     ///////////////////////////////////////////////////////////////////////////////////////////////////
 }
 /******************************************************************************/
-void myGrid::OnRightMouseDown(wxGridEvent &event)
-{
-    wxMenu *pmenuPopUp = new wxMenu;
-    wxMenuItem* pItem;
-    
-    pItem = new wxMenuItem(pmenuPopUp,wxID_COPY, wxT("Copy"));
-    pmenuPopUp->Append(pItem);
-    
-    pItem = new wxMenuItem(pmenuPopUp,wxID_CUT, wxT("Cut"));
-    pmenuPopUp->Append(pItem);
-    
-    pItem = new wxMenuItem(pmenuPopUp,wxID_PASTE, wxT("Paste"));
-    pmenuPopUp->Append(pItem);
-    
-    pItem = new wxMenuItem(pmenuPopUp,wxID_DELETE, wxT("Delete"));
-    pmenuPopUp->Append(pItem);
-    
-    if(!CanEnableCellControl()) 
-        pItem->Enable(false);   
-           
-    PopupMenu(pmenuPopUp,event.GetPosition());
-    delete pmenuPopUp;
-}
 /******************************************************************************/
 void myGrid::OnCellChanged(wxGridEvent &event)
 {

@@ -46,6 +46,8 @@ wxGLContext* m_context;
 MainFrame::MainFrame(wxWindow* parent)
     : MainFrameBaseClass(parent)
 {   
+    //LoadPlugins();
+    
     this->SetTitle(SoftwareName);
     this->Maximize(true);
     LoadIcons();
@@ -61,7 +63,6 @@ MainFrame::MainFrame(wxWindow* parent)
     this->Connect(RegressionEVT_OnNewData, wxCommandEventHandler(regressionEVT_OnNewData), NULL, this);
     this->Connect(RegressionEVT_OnFinished, wxCommandEventHandler(regressionEVT_OnFinished), NULL, this);
     this->Connect(RegressionEVT_OnStarted, wxCommandEventHandler(regressionEVT_OnStarted), NULL, this);
-    
     
     InitializeSec30Arrays();
     
@@ -216,7 +217,132 @@ MainFrame::MainFrame(wxWindow* parent)
 MainFrame::~MainFrame()
 {
     aui_mgr.UnInit();
+    if (is_p) {delete [] p; is_p=false;}
+    if (is_t) {delete [] t; is_t=false;}
+    if (is_y_dat) {delete [] y_dat; is_y_dat=false;}
+    if (is_weight) {delete [] weight; is_weight=false;}
+    if (is_dp) {delete [] dp; is_dp=false;}
+    if (is_cnst) {delete [] cnst; is_cnst=false;}
+    //if (is_UpperSymMatrixHf) {delete [] UpperSymMatrixHf; is_UpperSymMatrixHf=false;}
+    delete sec30;
 }
+
+/*void MainFrame::LoadPlugins()
+{
+    wxString m_MACAddress = wxMACAddressUtility::GetMACAddress();
+    u16 mac1;
+    u16 mac2;
+    wxFingerPrint::getMacHash(mac1, mac2);
+	u16 VolumeHash = wxFingerPrint::getVolumeHash();
+	u16 CpuHash = wxFingerPrint::getCpuHash();
+	const char* MachineName = wxFingerPrint::getMachineName();
+    //wxMessageBox(wxString::Format(_("wxMACAddressUtility MAC Address:%s\nFirst MAC Address: %d\nSecond MAC Address: %d\nVolume Hash: %d\nCPU Hash: %d\nComputer Name: %s"), m_MACAddress, mac1, mac2, VolumeHash, CpuHash, MachineName));
+    
+    wxString macadd = wxString::Format(_("%s"), m_MACAddress);
+    wxString machash1 = wxString::Format(_("%d"), mac1);
+    wxString machash2 = wxString::Format(_("%d"), mac2);
+    wxString machname = wxString::Format(_("%s"), MachineName);
+    wxString volhash = wxString::Format(_("%d"), VolumeHash);
+    wxString cpuhash = wxString::Format(_("%d"), CpuHash);
+    
+    
+    wxString BaseSN1 = volhash;
+    wxString BaseSN2 = cpuhash;
+    wxString MacAddr1 = macadd;
+    wxString MacAddr2 = machash1;
+    wxString MacAddr3 = machash2;
+    wxString MacAddr4 = cpuhash;
+    
+    std::string SN1_1;
+    std::string SN1_2;
+    std::string SN2_1;
+    std::string SN2_2;
+    std::string SN3_1;
+    std::string SN3_2;
+    std::string SN4_1;
+    std::string SN4_2;
+    std::string SN5_1;
+    std::string SN5_2;
+    std::string SN6_1;
+    std::string SN6_2;
+    std::string SN7_1;
+    std::string SN7_2;
+    std::string SN8_1;
+    std::string SN8_2;
+    
+    wxFingerPrint::smear(BaseSN1.c_str().AsChar(), MacAddr1.c_str().AsChar(), SN1_1, SN1_2);
+    wxFingerPrint::smear(BaseSN1.c_str().AsChar(), MacAddr2.c_str().AsChar(), SN2_1, SN2_2);
+    wxFingerPrint::smear(BaseSN1.c_str().AsChar(), MacAddr3.c_str().AsChar(), SN3_1, SN3_2);
+    wxFingerPrint::smear(BaseSN1.c_str().AsChar(), MacAddr4.c_str().AsChar(), SN4_1, SN4_2);
+    wxFingerPrint::smear(BaseSN2.c_str().AsChar(), MacAddr1.c_str().AsChar(), SN5_1, SN5_2);
+    wxFingerPrint::smear(BaseSN2.c_str().AsChar(), MacAddr2.c_str().AsChar(), SN6_1, SN6_2);
+    wxFingerPrint::smear(BaseSN2.c_str().AsChar(), MacAddr3.c_str().AsChar(), SN7_1, SN7_2);
+    wxFingerPrint::smear(BaseSN2.c_str().AsChar(), MacAddr4.c_str().AsChar(), SN8_1, SN8_2);
+    
+    std::string BaseSN1_1, BaseSN1_2, BaseSN1_3, BaseSN1_4;
+    std::string BaseSN2_5, BaseSN2_6, BaseSN2_7, BaseSN2_8;
+    std::string MacAddr1_1, MacAddr1_5;
+    std::string MacAddr2_2, MacAddr2_6;
+    std::string MacAddr3_3, MacAddr3_7;
+    std::string MacAddr4_4, MacAddr4_8;
+    
+    wxFingerPrint::unsmear(SN1_1, SN1_2, BaseSN1_1, MacAddr1_1);
+    wxFingerPrint::unsmear(SN2_1, SN2_2, BaseSN1_2, MacAddr2_2);
+    wxFingerPrint::unsmear(SN3_1, SN3_2, BaseSN1_3, MacAddr3_3);
+    wxFingerPrint::unsmear(SN4_1, SN4_2, BaseSN1_4, MacAddr4_4);
+    wxFingerPrint::unsmear(SN5_1, SN5_2, BaseSN2_5, MacAddr1_5);
+    wxFingerPrint::unsmear(SN6_1, SN6_2, BaseSN2_6, MacAddr2_6);
+    wxFingerPrint::unsmear(SN7_1, SN7_2, BaseSN2_7, MacAddr3_7);
+    wxFingerPrint::unsmear(SN8_1, SN8_2, BaseSN2_8, MacAddr4_8);
+    
+    wxMessageBox(wxString::Format(_("%s"), BaseSN1_1));
+    wxMessageBox(wxString::Format(_("%s"), BaseSN1_2));
+    
+    wxMessageBox(
+    _("originals:\n")+
+    BaseSN1+_("\n")+
+    BaseSN2+_("\n")+
+    MacAddr1+_("\n")+
+    MacAddr2+_("\n")+
+    MacAddr3+_("\n")+
+    MacAddr4+_("\n")+
+    _("SN:\n")+
+    SN1_1+_("\n")+
+    SN1_2+_("\n")+
+    SN2_1+_("\n")+
+    SN2_2+_("\n")+
+    SN3_1+_("\n")+
+    SN3_2+_("\n")+
+    SN4_1+_("\n")+
+    SN4_2+_("\n")+
+    SN5_1+_("\n")+
+    SN5_2+_("\n")+
+    SN6_1+_("\n")+
+    SN6_2+_("\n")+
+    SN7_1+_("\n")+
+    SN7_2+_("\n")+
+    SN8_1+_("\n")+
+    SN8_2+_("\n")+
+    _("recovery:\n")+
+    wxString(BaseSN1_1)+_("\n")+
+    wxString(BaseSN1_2)+_("\n")+
+    wxString(BaseSN1_3)+_("\n")+
+    wxString(BaseSN1_4)+_("\n")+
+    wxString(BaseSN2_5)+_("\n")+
+    wxString(BaseSN2_6)+_("\n")+
+    wxString(BaseSN2_7)+_("\n")+
+    wxString(BaseSN2_8)+_("\n")+
+    wxString(MacAddr1_1)+_("\n")+
+    wxString(MacAddr2_2)+_("\n")+
+    wxString(MacAddr3_3)+_("\n")+
+    wxString(MacAddr4_4)+_("\n")+
+    wxString(MacAddr1_5)+_("\n")+
+    wxString(MacAddr2_6)+_("\n")+
+    wxString(MacAddr3_7)+_("\n")+
+    wxString(MacAddr4_8)+_("\n")
+    );
+
+}*/
 
 void MainFrame::OnExit(wxCommandEvent& event)
 {
@@ -2243,10 +2369,7 @@ void MainFrame::BtnStart_OnClick(wxRibbonButtonBarEvent& event)
 
 void MainFrame::BtnOnestep_OnClick(wxRibbonButtonBarEvent& event)
 {
-    if (!isFittingThreadBusy)
-        StartRegression(true);
-    else
-        wxMessageBox(_("A procedure is running!"));
+    if (!isFittingThreadBusy) StartRegression(true);
 }
 
 void MainFrame::BtnPause_OnClick(wxRibbonButtonBarEvent& event)
@@ -2406,7 +2529,8 @@ void MainFrame::BtnAbout_OnClick(wxRibbonButtonBarEvent& event)
     
     info.SetName(SoftwareName);
     info.SetVersion(wxString::Format(_("%d.%d.%d"), Ver_MAJOR, Ver_MINOR, Ver_RELEASE));
-    info.SetDescription(_("Jacuzzi is a powerful and easy to use software package to construct Tight-Binding (TB) model for\nnano-scale materials. Starting from the simplified linear combination of atomic orbitals method in\ncombination with first-principles calculations (such as OpenMX or Vasp packages), one can construct\na TB model in the two-centre approximation. Using Slater and Koster approach we calculate the TB\nHamiltonian of the system and use a nonlinear fitting algorithm to find the best entries for both\nHamiltonian and overlap matrices to reproduce the first-principles data. We obtain expressions for\nthe Hamiltonian and overlap matrix elements between different orbitals (s, p and d orbitals with or\nwithout spin-orbit coupling) for the different atoms and present the SK coefficients in a orthogonal\nor nonorthogonal basis set. Furthermore, by using Jacuzzi one can generate a code in preferred\nprogramming language such as C++, C, Fortran, Mathematica, Matlab and Python."));
+    info.SetDescription(_("TBStudio is a powerful and easy to use software package to construct Tight-Binding (TB) model for\nnano-scale materials. Starting from the simplified linear combination of atomic orbitals method in\ncombination with first-principles calculations (such as OpenMX or Vasp packages), one can construct\na TB model in the two-centre approximation. Using Slater and Koster approach we calculate the TB\nHamiltonian of the system and use a nonlinear fitting algorithm to find the best entries for both\nHamiltonian and overlap matrices to reproduce the first-principles data. We obtain expressions for\nthe Hamiltonian and overlap matrix elements between different orbitals (s, p and d orbitals with or\nwithout spin-orbit coupling) for the different atoms and present the SK coefficients in a orthogonal\nor nonorthogonal basis set. Furthermore, by using TBStudio one can generate a code in preferred\nprogramming language such as C++, C, Fortran, Mathematica, Matlab and Python."));
+    
     info.SetCopyright(_("Copyright (c) 2019 Mohammad Nakhaee"));
 
     wxArrayString developers;
@@ -2980,7 +3104,7 @@ void MainFrame::StartRegression(bool isOneStep)
     int TBnspec = TBlistctr->GetCount();
     wxTreeItemId orbsrootID = orbs->GetRootItem();
     
-    bool isAny_d_Orbital = false;
+    /*bool isAny_d_Orbital = false;
     for(int j=0; j<TBnspec; j++)
     {
         wxString TBAtomName = TBlistctr->GetString(j);
@@ -3009,7 +3133,7 @@ void MainFrame::StartRegression(bool isOneStep)
     if (isAny_d_Orbital)
     {
         if (!IsLicensed(_("d-orbital regression"))) {wxMessageBox(_("In the case of fitting a TB model including d-orbitals you need to contact developer support. Please find the contact information in Help>About."),_("Error"));return;}
-    }
+    }*/
     
     //Show the SK Tab
     LeftPanel->ChangeSelection(4);
@@ -3145,11 +3269,11 @@ void MainFrame::StartRegression(bool isOneStep)
     isMatchVector = isMatchVector && sec30->isMatch(ckTB[2], ckDFT[2], thershold);
     if (!isMatchVector)
     {
-        wxMessageDialog *dial = new wxMessageDialog(NULL, 
+        wxMessageDialog dial(NULL, 
           wxString::Format(wxT("Mismatch detected between lattice vectors of TB model and DFT data!\nDFT reciprocal lattice vectors:\na* = (%.8f,%.8f,%.8f)\nb* = (%.8f,%.8f,%.8f)\nc* = (%.8f,%.8f,%.8f)\nTB Model reciprocal lattice vectors:\na* = (%.8f,%.8f,%.8f)\nb* = (%.8f,%.8f,%.8f)\nc* = (%.8f,%.8f,%.8f)\nAre you sure you want to continue?"), akDFT[0], akDFT[1], akDFT[2], bkDFT[0], bkDFT[1], bkDFT[2], ckDFT[0], ckDFT[1], ckDFT[2], akTB[0], akTB[1], akTB[2], bkTB[0], bkTB[1], bkTB[2], ckTB[0], ckTB[1], ckTB[2]),
           wxT("Warning"), 
           wxYES_NO | wxNO_DEFAULT | wxICON_QUESTION);
-        if ( dial->ShowModal() == wxID_NO ) return;
+        if ( dial.ShowModal() == wxID_NO ) return;
     }
     
     int natoms = 0;
@@ -3157,14 +3281,23 @@ void MainFrame::StartRegression(bool isOneStep)
     
     int np = TotalNumberOfParameters;
     int ny = nFitPoints;
-    int nc = natoms + 9;
-    double* p = new double[np];
-    double* t = new double[ny];
-    double* y_dat = new double[ny];
-    double* weight = new double[ny];
-    double* dp = new double[np];
-    double* cnst = new double[nc];
-
+    int nc = 3*natoms + 9;
+    
+    if (is_p) {delete [] p; is_p=false;}
+    if (is_t) {delete [] t; is_t=false;}
+    if (is_y_dat) {delete [] y_dat; is_y_dat=false;}
+    if (is_weight) {delete [] weight; is_weight=false;}
+    if (is_dp) {delete [] dp; is_dp=false;}
+    if (is_cnst) {delete [] cnst; is_cnst=false;}
+    //if (is_UpperSymMatrixHf) {delete [] UpperSymMatrixHf; is_UpperSymMatrixHf=false;}
+    
+    p = new double[np]; is_p=true;
+    t = new double[ny]; is_t=true;
+    y_dat = new double[ny]; is_y_dat=true;
+    weight = new double[ny]; is_weight=true;
+    dp = new double[np]; is_dp=true;
+    cnst = new double[nc]; is_cnst=true;
+    
     cnst[0] = a[0];
     cnst[1] = a[1];
     cnst[2] = a[2];
@@ -3211,6 +3344,13 @@ void MainFrame::StartRegression(bool isOneStep)
         dp[ip] = -0.01;
     }
     
+    
+    
+    ////////////////////////////////
+    //int nH2=64;
+    //UpperSymMatrixHf = new lapack_complex_double[nH2]; is_UpperSymMatrixHf=true;
+    //for (int i=0; i<nH2; i++) UpperSymMatrixHf[i] = {0.0,0.0};
+    ////////////////////////////////
     
     //Start(double* p, int np, double* t, double* y_dat, int ny, double* weight, double* dp, double p_min, double p_max, double* c, lmOptions opts)
     std::thread RegressionThread(&Regression::Start, regression, p, np, t, y_dat, ny, weight, dp, p_min, p_max, cnst, opts, isOneStep);
@@ -3279,6 +3419,13 @@ void MainFrame::regressionEVT_OnNewData(wxCommandEvent& event)
 
 void MainFrame::regressionEVT_OnFinished(wxCommandEvent& event)
 {
+    if (is_p) {delete [] p; is_p=false;}
+    if (is_t) {delete [] t; is_t=false;}
+    if (is_y_dat) {delete [] y_dat; is_y_dat=false;}
+    if (is_weight) {delete [] weight; is_weight=false;}
+    if (is_dp) {delete [] dp; is_dp=false;}
+    if (is_cnst) {delete [] cnst; is_cnst=false;}
+    //if (is_UpperSymMatrixHf) {delete [] UpperSymMatrixHf; is_UpperSymMatrixHf=false;}
     isFittingThreadBusy = false;
     UpdateTBBand_if();
     UpdateGraph2Ds();
@@ -3412,17 +3559,29 @@ void MainFrame::GenerateCode(wxString filepath, wxString BaseName, wxString Code
 
 void MainFrame::GenerateCppCode(wxString filepath, wxString BaseName, int MyID_Initial0Final1)
 {
-    if (!IsLicensed(_("c++ code generator"))) {wxMessageBox(_("You need to contact developer support for C++ code generator. Please find the contact information in Help>About."));return;}
+    //if (!IsLicensed(_("c++ code generator")))
+    //{
+        wxMessageBox(_("You need to contact developer support for C++ code generator. Please find the contact information in Help>About."));
+        return;
+    //}
 }
 
 void MainFrame::GenerateCCode(wxString filepath, wxString BaseName, int MyID_Initial0Final1)
 {
-    if (!IsLicensed(_("c code generator"))) {wxMessageBox(_("You need to contact developer support for C code generator. Please find the contact information in Help>About."));return;}
+    //if (!IsLicensed(_("c code generator")))
+    //{
+        wxMessageBox(_("You need to contact developer support for C code generator. Please find the contact information in Help>About."));
+        return;
+    //}
 }
 
 void MainFrame::GenerateFCode(wxString filepath, wxString BaseName, int MyID_Initial0Final1)
 {
-    if (!IsLicensed(_("fortran code generator"))) {wxMessageBox(_("You need to contact developer support for Fortran code generator. Please find the contact information in Help>About."));return;}
+    //if (!IsLicensed(_("fortran code generator")))
+    //{
+        wxMessageBox(_("You need to contact developer support for Fortran code generator. Please find the contact information in Help>About."));
+        return;
+    //}
 }
 
 void MainFrame::GenerateMathematicaCode(wxString filepath, wxString BaseName, int MyID_Initial0Final1)
@@ -3893,7 +4052,7 @@ void MainFrame::GeneratePythonCode(wxString filepath, wxString BaseName, int MyI
     }
 }
 
-bool MainFrame::IsLicensed(wxString Module)
+/*bool MainFrame::IsLicensed(wxString Module)
 {
     bool lic = false;
     if (Module == _("c++ code generator"))
@@ -3914,7 +4073,7 @@ bool MainFrame::IsLicensed(wxString Module)
         lic = false;
     
     return lic;
-}
+}*/
 
 
 

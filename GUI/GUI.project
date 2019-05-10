@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<CodeLite_Project Name="QuantumLab" Version="10.0.0" InternalType="GUI">
+<CodeLite_Project Name="TBStudio" Version="10.0.0" InternalType="GUI">
   <Plugins>
     <Plugin Name="qmake">
       <![CDATA[00020001N0005Debug0000000000000001N0007Release000000000000]]>
@@ -158,7 +158,7 @@
         <Library Value="m"/>
       </Linker>
       <ResourceCompiler Options="$(shell wx-config --rcflags)" Required="no"/>
-      <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Release" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="no" IsGUIProgram="no" IsEnabled="yes"/>
+      <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Release" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="no" IsGUIProgram="yes" IsEnabled="yes"/>
       <BuildSystem Name="Default"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[]]>
@@ -169,7 +169,17 @@
         <StartupCommands/>
       </Debugger>
       <PreBuild/>
-      <PostBuild/>
+      <PostBuild>
+        <Command Enabled="yes">rmdir TBStudio /s /q</Command>
+        <Command Enabled="yes">mkdir TBStudio</Command>
+        <Command Enabled="yes">copy .\Release\* .\TBStudio</Command>
+        <Command Enabled="yes">del .\TBStudio\*.o</Command>
+        <Command Enabled="yes">del .\TBStudio\*.d</Command>
+        <Command Enabled="yes">mkdir .\TBStudio\Examples</Command>
+        <Command Enabled="yes">xcopy .\Examples .\TBStudio\Examples /E</Command>
+        <Command Enabled="yes">copy TBStudio.ico TBStudio</Command>
+        <Command Enabled="yes">copy Readme.txt TBStudio</Command>
+      </PostBuild>
       <CustomBuild Enabled="no">
         <RebuildCommand/>
         <CleanCommand/>

@@ -23,16 +23,18 @@
 #include <wx/ribbon/buttonbar.h>
 #include <thread>
 #include <Regression.h>
+#include "wxMACAddressUtility.h"
+#include "wxFingerPrint.h"
 //#include <memory>
 /**********************************************************************************/
 
 class MainFrame : public MainFrameBaseClass
 {
 public:
-    wxString SoftwareName = _("Quantum Lab");
+    wxString SoftwareName = _("TBStudio");
     int Ver_MAJOR = 1;
     int Ver_MINOR = 1;
-    int Ver_RELEASE = 3;
+    int Ver_RELEASE = 5;
     
     MainFrame(wxWindow* parent);
     virtual ~MainFrame();
@@ -51,6 +53,21 @@ public:
     
     Sec30* sec30;
     //std::shared_ptr<Sec30> sec30;
+    double* p;
+    double* t;
+    double* y_dat;
+    double* weight;
+    double* dp;
+    double* cnst;
+    lapack_complex_double* UpperSymMatrixHf;
+    
+    bool is_p = false;
+    bool is_t = false;
+    bool is_y_dat = false;
+    bool is_weight = false;
+    bool is_dp = false;
+    bool is_cnst = false;
+    bool is_UpperSymMatrixHf = false;
     
     Regression* regression;
     std::thread* FittingThread;
@@ -61,6 +78,7 @@ public:
     void OnExit(wxCommandEvent& event);
     void OnAbout(wxCommandEvent& event);
 protected:
+    //void LoadPlugins();
     virtual void BtnMove_OnClick(wxRibbonButtonBarEvent& event);
     virtual void BtnRotate_OnClick(wxRibbonButtonBarEvent& event);
     virtual void BtnScale_OnClick(wxRibbonButtonBarEvent& event);
@@ -182,7 +200,7 @@ protected:
     void GenerateMathematicaCode(wxString filepath, wxString BaseName, int MyID_Initial0Final1);
     void GenerateMatlabCode(wxString filepath, wxString BaseName, int MyID_Initial0Final1);
     void GeneratePythonCode(wxString filepath, wxString BaseName, int MyID_Initial0Final1);
-    bool IsLicensed(wxString Module);
+    //bool IsLicensed(wxString Module);
     
 private:
     wxTextCtrl* logfile;

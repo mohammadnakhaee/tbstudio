@@ -70,6 +70,14 @@ double Regression::Variance(double* a, int na)
     return var / (na - 1);
 }
 
+/*void Regression::Start(double* p, int np, double* t, double* y_dat, int ny, double* weight, double* dp, double p_min, double p_max, double* c, lmOptions opts, bool isOneStep, lapack_complex_double* UpperSymMatrixHf)
+{
+    int nH2 = 64;
+    for (int i=0; i<nH2; i++) UpperSymMatrixHf[i] = {0.0,0.0};
+    wxMessageBox(_("yes3"));
+    return;
+}*/
+
 void Regression::Start(double* p, int np, double* t, double* y_dat, int ny, double* weight, double* dp, double p_min, double p_max, double* c, lmOptions opts, bool isOneStep)
 {
     SendEventRunStarted();
@@ -91,7 +99,9 @@ void Regression::Start(double* p, int np, double* t, double* y_dat, int ny, doub
     int nHamiltonian = sec30->ArraysOf1DString[1].size();
     int nH2 = nHamiltonian*nHamiltonian;
     lapack_complex_double* UpperSymMatrixHf = new lapack_complex_double[nH2];
-    for (int i=0; i<nH2; i++) UpperSymMatrixHf[i] = {0.0, 0.0};
+    //lapack_complex_double* UpperSymMatrixHf = (lapack_complex_double*)LAPACKE_malloc( sizeof(lapack_complex_double) * nH2 );
+    //lapack_complex_double zero= LAPACKE_make_complex_double(0.0,0.0);
+    for (int i=0; i<nH2; i++) UpperSymMatrixHf[i] = {0.0,0.0};
     double* eigHf = new double[nHamiltonian];
     for (int i=0; i<nHamiltonian; i++) eigHf[i] = 0.0;
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -102,6 +112,7 @@ void Regression::Start(double* p, int np, double* t, double* y_dat, int ny, doub
     //Deallocate
     delete [] eigHf;
     delete [] UpperSymMatrixHf;
+    //LAPACKE_free(UpperSymMatrixHf);
     //////////////////////////////
     
     for (int ip=0; ip<np; ip++)
@@ -511,7 +522,13 @@ void Regression::lm(double* p, int np, double* t, double* y_dat, int ny, double*
             data.append(_("\n"));
             SendDataToTerminal(data);
             
-            if (isOneStep) stop = true;
+            if (isOneStep)
+            {
+                data = _("");
+                data.append(_("********************* One Step Done! *********************\n"));
+                SendDataToTerminal(data);
+                break;
+            }
         }
         
         // update convergence history ... save _reduced_ Chi-square
@@ -523,29 +540,32 @@ void Regression::lm(double* p, int np, double* t, double* y_dat, int ny, double*
         
         for(int ip=0; ip<np; ip++) hperP[ip] = h[ip]/p[ip];
         
-        if ( maxabs(JtWdy,np) < epsilon_1  &&  iteration > 2 )
+        if ( maxabs(JtWdy,np) < epsilon_1  &&  iteration > 2 && !isOneStep )
         {
             data = _("");
             data.append(wxString::Format(wxT("Convergence Tolerance for Gradient = %.8f\n"),epsilon_1));
             data.append(_("********************* Convergence achieved *********************\n"));
             SendDataToTerminal(data);
             stop = true;
+            break;
         }
-        else if ( maxabs(hperP,np) < epsilon_2  &&  iteration > 2 )
+        else if ( maxabs(hperP,np) < epsilon_2  &&  iteration > 2 && !isOneStep )
         {
             data = _("");
             data.append(wxString::Format(wxT("Convergence Tolerance for Parameters = %.8f\n"),epsilon_2));
             data.append(_("********************* Convergence achieved *********************\n"));
             SendDataToTerminal(data);
             stop = true;
+            break;
         }
-        else if ( X2/DoF < epsilon_3 &&  iteration > 2 )
+        else if ( X2/DoF < epsilon_3 &&  iteration > 2 && !isOneStep )
         {
             data = _("");
             data.append(wxString::Format(wxT("Convergence Tolerance for Chi-square = %.8f\n"),epsilon_3));
             data.append(_("********************* Convergence achieved *********************\n"));
             SendDataToTerminal(data);
             stop = true;
+            break;
         }
         else if ( iteration == MaxIter && !isOneStep)
         {
@@ -553,6 +573,7 @@ void Regression::lm(double* p, int np, double* t, double* y_dat, int ny, double*
             data.append(_("Maximum number of iterations reached without convergence!\n"));
             SendDataToTerminal(data);
             stop = true;
+            break;
         }
     }                                        // --- End of Main Loop
     ////////////////////////////////////////////////////////////////////////
@@ -892,9 +913,6 @@ void Regression::func(double* t, int ny, double* p, int np, double* cnst, double
     for (int i=0; i<natoms; i++) delete [] XYZCoords[i];
     if (natoms>0) delete [] XYZCoords;
     
-    if (nEssensialCells < 1) return;
-    if (nHamiltonian < 1) return;
-    
     //double** KPoints; [ka,kb,kc,kx,ky,kz,d_path]
     Adouble1D KPoints = sec30->ArraysOf2DDouble[0];
     
@@ -925,6 +943,9 @@ void Regression::func(double* t, int ny, double* p, int np, double* cnst, double
     
     /////////////////////////Calculate the TB Band-structure////////////////////////
     Adouble1D fTBEigVal(nKPoint,std::vector<double>(nHamiltonian));
+    int nH2 = nHamiltonian*nHamiltonian;
+    for (int i=0; i<nH2; i++) UpperSymMatrixHf[i] = {0.0, 0.0};
+    for (int i=0; i<nHamiltonian; i++) eigHf[i] = 0.0;
     
     for (int ik=0; ik<nKPoint; ik++)
     {

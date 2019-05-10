@@ -4,3 +4,16 @@
 #else
 1 24 "wx/msw/wx.manifest"
 #endif
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_ICON1               ICON    DISCARDABLE     "./TBStudio256.ico"
+IDI_ICON2               ICON    DISCARDABLE     "./TBStudio128.ico"
+IDI_ICON3               ICON    DISCARDABLE     "./TBStudio64.ico"
+IDI_ICON4               ICON    DISCARDABLE     "./TBStudio32.ico"
+IDI_ICON5               ICON    DISCARDABLE     "./TBStudio16.ico"
