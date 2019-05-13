@@ -25,7 +25,7 @@ public:
 	static u16 getCpuHash();
 	static const char* getMachineName();
     static void smear(std::string BaseSN, std::string MacAddr, std::string &SN1, std::string &SN2);
-    //static void unsmear(std::string SN1, std::string SN2, std::string &BaseSN, std::string &MacAddr);
+    static void unsmear(std::string SN1, std::string SN2, std::string &BaseSN, std::string &MacAddr);
 private:
     static u16 hashMacAddress( PIP_ADAPTER_INFO info );
 };

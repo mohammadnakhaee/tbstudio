@@ -32,8 +32,8 @@ private:
         virtual void StartTyping(wxString keyString);
         virtual void OnCopy(wxCommandEvent &WXUNUSED(event));
         virtual void OnCut(wxCommandEvent &WXUNUSED(event));
-        //virtual void OnDelete(wxCommandEvent &WXUNUSED(event));
-        //virtual void OnPaste(wxCommandEvent &WXUNUSED(event));
+        virtual void OnDelete(wxCommandEvent &WXUNUSED(event));
+        virtual void OnPaste(wxCommandEvent &WXUNUSED(event));
         virtual void OnRightMouseDown(wxGridEvent &event);
         virtual void OnCellChanged(wxGridEvent &event);
         virtual void myOnKeyDown(wxKeyEvent &event);

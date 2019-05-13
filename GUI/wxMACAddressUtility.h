@@ -9,8 +9,8 @@ class wxMACAddressUtility
 public:
 	static wxString GetMACAddress()
 	{
-		unsigned char result[7];
-		if(MACAddressUtility::GetMACAddress(result) == 1)
+		unsigned char result[6];
+		if(MACAddressUtility::GetMACAddress(result) == 0)
 		{
 			return wxString::Format(wxT("%02X:%02X:%02X:%02X:%02X:%02X"),
 				(unsigned int)result[0], (unsigned int)result[1], (unsigned int)result[2],

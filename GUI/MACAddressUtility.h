@@ -11,7 +11,7 @@ private:
 #elif defined(__APPLE__)
 	static long GetMACAddressMAC(unsigned char * result);
 #elif defined(LINUX) || defined(linux)
-	//static long GetMACAddressLinux(unsigned char * result);
+	static long GetMACAddressLinux(unsigned char * result);
 #endif
 };
 
