@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<CodeLite_Project Name="TBStudio" Version="10.0.0" InternalType="GUI">
+<CodeLite_Project Name="GUI" Version="10.0.0" InternalType="GUI">
   <Plugins>
     <Plugin Name="qmake">
       <![CDATA[00020001N0005Debug0000000000000001N0007Release000000000000]]>
@@ -8,6 +8,9 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="src">
+    <File Name="UpdateClass.cpp"/>
+    <File Name="wxFingerPrint.cpp"/>
+    <File Name="MACAddressUtility.cpp"/>
     <File Name="WelcomeClass.cpp"/>
     <File Name="Regression.cpp"/>
     <File Name="SetupClass.cpp"/>
@@ -31,6 +34,10 @@
     <File Name="wxcrafter_bitmaps.cpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="include">
+    <File Name="UpdateClass.h"/>
+    <File Name="wxMACAddressUtility.h"/>
+    <File Name="wxFingerPrint.h"/>
+    <File Name="MACAddressUtility.h"/>
     <File Name="welcome650325.h"/>
     <File Name="WelcomeClass.h"/>
     <File Name="Regression.h"/>
@@ -82,8 +89,10 @@
         <IncludePath Value="$(MathGL_DIR)/include"/>
         <IncludePath Value="$(Glut_DIR)/include"/>
         <IncludePath Value="$(LAPACKE_DIR)"/>
+        <IncludePath Value="$(Gemmi_DIR)/include"/>
+        <IncludePath Value="$(RapidXML_DIR)"/>
       </Compiler>
-      <Linker Options="-mwindows;$(shell wx-config --libs std,gl,ribbon);-mwindows;-std=gnu++11 -pthread" Required="yes">
+      <Linker Options="-mwindows;$(shell wx-config --libs std,gl,ribbon);-mwindows;-std=gnu++11 -pthread -liphlpapi" Required="yes">
         <LibraryPath Value="$(Opengl_DIR)"/>
         <LibraryPath Value="$(MathGL_DIR)\lib"/>
         <LibraryPath Value="C:\TDM-GCC-64\x86_64-w64-mingw32\lib"/>
@@ -140,9 +149,11 @@
         <IncludePath Value="$(MathGL_DIR)/include"/>
         <IncludePath Value="$(Glut_DIR)/include"/>
         <IncludePath Value="$(LAPACKE_DIR)"/>
+        <IncludePath Value="$(Gemmi_DIR)/include"/>
+        <IncludePath Value="$(RapidXML_DIR)"/>
         <Preprocessor Value="NDEBUG"/>
       </Compiler>
-      <Linker Options="-mwindows;$(shell wx-config --libs std,gl,ribbon);-mwindows;-std=gnu++11 -pthread" Required="yes">
+      <Linker Options="-mwindows;$(shell wx-config --libs std,gl,ribbon);-mwindows;-std=gnu++11 -pthread -liphlpapi" Required="yes">
         <LibraryPath Value="$(Opengl_DIR)"/>
         <LibraryPath Value="$(MathGL_DIR)\lib"/>
         <LibraryPath Value="C:\TDM-GCC-64\x86_64-w64-mingw32\lib"/>

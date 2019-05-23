@@ -135,6 +135,7 @@ void Sec30::AddGrid(wxWindow *parent, int nRow, int nCol, wxString VariableName,
     }
     
     for (int i=0; i< nRow; i++) gc->DisableRowResize(i);
+    
     grids.insert(igrid,VariableName);
     
     wxColour c; //Also it is possible to determine the color in this way: wxColour c=*wxGREEN;
@@ -3426,6 +3427,184 @@ void Sec30::CopyLastSKToInitialSK()
         olgc->SetCellValue(i, 1, val);
     }
     
+}
+
+wxString Sec30::GetSN(wxString UserName)
+{
+    wxString m_MACAddress = wxMACAddressUtility::GetMACAddress();
+    u16 mac1;
+    u16 mac2;
+    wxFingerPrint::getMacHash(mac1, mac2);
+	u16 VolumeHash = wxFingerPrint::getVolumeHash();
+	u16 CpuHash = wxFingerPrint::getCpuHash();
+	const char* MachineName = wxFingerPrint::getMachineName();
+    
+    wxString macadd = wxString::Format(_("%s"), m_MACAddress);
+    wxString machash1 = wxString::Format(_("%d"), mac1);
+    wxString machash2 = wxString::Format(_("%d"), mac2);
+    wxString machname = wxString::Format(_("%s"), MachineName);
+    //wxString volhash = wxString::Format(_("%d"), VolumeHash);
+    wxString cpuhash = wxString::Format(_("%d"), CpuHash);
+    
+    wxString BaseSN = cpuhash + _(":") + machash1 + _(":") + machash2;
+    wxString MacAddr = macadd + _("|") + machname + _("|") + UserName;
+    
+    wxString TheID = BaseSN + _(":") + MacAddr;
+    
+    wxString SerialNumber = ID2SN(TheID, 0);
+    return SerialNumber;
+}
+
+wxString Sec30::ID2SN(wxString IDstr, int seed)
+{
+    wxString part1 = IDstr.BeforeFirst('|');
+    wxString part23 = IDstr.AfterFirst('|');
+    
+    wxString BaseSN = part1.BeforeLast(':');
+    wxString macadd = part1.AfterLast(':');
+    wxString MacAddr = macadd + _("|") + part23;
+    
+    std::string SN1;
+    std::string SN2;
+    wxFingerPrint::smear(BaseSN.c_str().AsChar(), MacAddr.c_str().AsChar(), SN1, SN2, seed);
+    
+    int nSN1 = SN1.length();
+    int nSN2 = SN2.length();
+    char* SN1Char = new char[nSN1];
+    char* SN2Char = new char[nSN2];
+    strcpy(SN1Char, SN1.c_str());
+    strcpy(SN2Char, SN2.c_str());
+    
+    int nSN = nSN1 + nSN2;
+    char* Serial = new char[nSN + 2];
+    int cnt = 0;
+    Serial[cnt++] = (char)nSN1;
+    Serial[cnt++] = (char)nSN2;
+    
+    int KeyKey = 0;
+    for(int i=0; i<nSN1; i++)
+    {
+        Serial[cnt++] = SN1Char[i];
+        KeyKey += SN1Char[i];
+    }
+    for(int i=0; i<nSN2; i++)
+    {
+        Serial[cnt++] = SN2Char[i];
+        KeyKey -= SN2Char[i];
+    }
+    
+    if (KeyKey < 0) KeyKey = -KeyKey;
+    KeyKey += 5 + 3*seed;
+    
+    wxString SerialNumber = _("");
+    SerialNumber += wxString::Format(_("1:%d:%d"),Serial[0] + 223,Serial[1] + 387);
+    for(int i=2; i<nSN + 2; i++)
+        SerialNumber += wxString::Format(_(":%d"),Serial[i] + 143 + i);
+    SerialNumber += wxString::Format(_(":4520:%d"),KeyKey);
+    return SerialNumber;
+}
+
+bool Sec30::SaveLicenseToFolder(wxString SNSeed1)
+{
+    FILE *fpk;
+    wxString fname = wxT("./license.dat");
+    bool isOK = false;
+    if ((fpk = fopen(fname,"w")) != NULL)
+    {
+        fprintf(fpk,"%s", SNSeed1.c_str().AsChar());
+        fclose(fpk);
+        isOK = true;
+    }
+    return isOK;
+}
+
+bool Sec30::GetSNFromLicenseFile(wxString &SNSeed1)
+{
+    FILE *fpk;
+    wxString fname = wxT("./license.dat");
+    bool isOK = false;
+    if ((fpk = fopen(fname,"r")) == NULL) return isOK;
+    fclose(fpk);
+    std::ifstream infile(fname);
+    std::string line;
+    std::getline(infile, line);
+    SNSeed1 = wxString(line);
+    isOK = true;
+    return isOK;
+}
+
+bool Sec30::IsSNSeed1MatchToThisPC(wxString SN1)
+{
+    wxString SN0 = Sec30::GetSN(_("Limited"));
+    wxString ID0 = Sec30::SN2ID(SN0, 0);
+    wxString ID1 = Sec30::SN2ID(SN1, 1);
+    wxString IDBase0 = ID0.BeforeFirst('|');
+    wxString IDBase1 = ID1.BeforeFirst('|');
+    if (IDBase0 == IDBase1)
+        return true;
+    else
+        return false;
+}
+
+wxString Sec30::SN2ID(wxString SerialNumber, int seed)
+{
+    wxString NullID = _("Invalid Serial Number!");
+    wxStringTokenizer tokenizer(SerialNumber, ":");
+    std::vector<int> code;
+    while ( tokenizer.HasMoreTokens() )
+    {
+        wxString tk = tokenizer.GetNextToken();
+        long l = 0;
+        bool output = tk.ToLong(&l);
+        if (!output) return NullID;
+        int ch = (int)l;
+        code.push_back(ch);
+    }
+    
+    int nParts = code.size();
+    if (code[0] != 1) return NullID;
+    if (code[nParts - 2] != 4520) return NullID;
+    
+    int nSN1, nSN2;
+    nSN1 = (int)code[1] - 223;
+    nSN2 = (int)code[2] - 387;
+    
+    if (nSN1 + nSN2 + 5 != nParts) return NullID;
+    
+    char* SN1 = new char[nSN1];
+    char* SN2 = new char[nSN2];
+    
+    int KeyKey = 0;
+    int nSN = nSN1 + nSN2;
+    for(int i=2; i<nSN + 2; i++)
+    {
+        int j = i - 2;
+        char chcode = (char)(code[i + 1] - 143 - i);
+        if (j < nSN1)
+        {
+            SN1[j] = chcode;
+            KeyKey += chcode;
+        }
+        else
+        {
+            SN2[j - nSN1] = chcode;
+            KeyKey -= chcode;
+        }
+    }
+    
+    if (KeyKey < 0) KeyKey = -KeyKey;
+    KeyKey += 5 + 3*seed;
+    
+    if (code[nParts - 1] != KeyKey) return NullID;
+    
+    wxString sSN1 = wxString(SN1, nSN1);
+    wxString sSN2 = wxString(SN2, nSN2);
+    
+    std::string RecBaseSN;
+    std::string RecMacAddr;
+    wxFingerPrint::unsmear(sSN1.c_str().AsChar(), sSN2.c_str().AsChar(), RecBaseSN, RecMacAddr, seed);
+    wxString ID = wxString(RecBaseSN) + _(":") + wxString(RecMacAddr);
+    return ID;
 }
 
 /*

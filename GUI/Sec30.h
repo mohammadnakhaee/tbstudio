@@ -28,7 +28,13 @@
 #include <sstream>
 #include "lapacke.h"
 //#include "lapacke_config.h"
+#include <welcome650325.h>
 #include <wx/msgdlg.h>
+#include "wxMACAddressUtility.h"
+#include "wxFingerPrint.h"
+#include <gemmi/cif.hpp>
+#include "rapidxml_utils.hpp"
+#include <bits/stdc++.h> //sort vectors
 /******************************************************************************/
 
 /******************************************************************************/
@@ -188,6 +194,12 @@ public:
     int SymEigenValues(lapack_complex_double* UpperSymMatrix, lapack_int N, double* &eig);
     bool isMatch(double x, double y, double Thereshold);
     void CopyLastSKToInitialSK();
+    static wxString GetSN(wxString UserName);
+    static wxString ID2SN(wxString IDstr, int seed);
+    static wxString SN2ID(wxString SerialNumber, int seed);
+    static bool SaveLicenseToFolder(wxString SNSeed1);
+    static bool GetSNFromLicenseFile(wxString &SNSeed1);
+    static bool IsSNSeed1MatchToThisPC(wxString SN1);
     
 private:
     virtual void sec30TextCtrl_OnUpdated(wxCommandEvent &event);

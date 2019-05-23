@@ -45,8 +45,9 @@ wxGLContext* m_context;
 
 MainFrame::MainFrame(wxWindow* parent)
     : MainFrameBaseClass(parent)
-{   
-    //LoadPlugins();
+{
+    MySerialNumber = Sec30::GetSN(_("Limited"));
+    IsLicensed = CheckLicense(LicenseOwner);
     
     this->SetTitle(SoftwareName);
     this->Maximize(true);
@@ -212,6 +213,12 @@ MainFrame::MainFrame(wxWindow* parent)
     //wxGLAttributes m_glCanvas17Attr = wxGLAttributes().PlatformDefaults().Defaults();
     //m_glCanvas17Attr.PlatformDefaults().Defaults().EndList();
     //bool accepted = wxGLCanvas::IsDisplaySupported(m_glCanvas17Attr);
+    
+    if (IsLicensed)
+    {
+        logfile->AppendText(_("\nLicensed to ") + LicenseOwner +_("\n\n"));
+        this->SetTitle(SoftwareName + _(" <") + LicenseOwner + _(">"));
+    }
 }
 
 MainFrame::~MainFrame()
@@ -224,125 +231,37 @@ MainFrame::~MainFrame()
     if (is_dp) {delete [] dp; is_dp=false;}
     if (is_cnst) {delete [] cnst; is_cnst=false;}
     //if (is_UpperSymMatrixHf) {delete [] UpperSymMatrixHf; is_UpperSymMatrixHf=false;}
+    
+    delete regression;
+    //delete FittingThread;
+    
     delete sec30;
+    
+    //if (SelectedAtoms) delete [] SelectedAtoms;
+    delete graph3d;
+    delete graph2d0;
+    delete graph2d;
+    delete unitcellPanel;
+    delete structurePanel;
+    delete orbitalsPanel;
+    delete bondsPanel;
+    delete setupPanel;
+    delete skPanel;
+    delete ColorsForm;
+    delete RButtonMouse;
 }
 
-/*void MainFrame::LoadPlugins()
-{
-    wxString m_MACAddress = wxMACAddressUtility::GetMACAddress();
-    u16 mac1;
-    u16 mac2;
-    wxFingerPrint::getMacHash(mac1, mac2);
-	u16 VolumeHash = wxFingerPrint::getVolumeHash();
-	u16 CpuHash = wxFingerPrint::getCpuHash();
-	const char* MachineName = wxFingerPrint::getMachineName();
-    //wxMessageBox(wxString::Format(_("wxMACAddressUtility MAC Address:%s\nFirst MAC Address: %d\nSecond MAC Address: %d\nVolume Hash: %d\nCPU Hash: %d\nComputer Name: %s"), m_MACAddress, mac1, mac2, VolumeHash, CpuHash, MachineName));
-    
-    wxString macadd = wxString::Format(_("%s"), m_MACAddress);
-    wxString machash1 = wxString::Format(_("%d"), mac1);
-    wxString machash2 = wxString::Format(_("%d"), mac2);
-    wxString machname = wxString::Format(_("%s"), MachineName);
-    wxString volhash = wxString::Format(_("%d"), VolumeHash);
-    wxString cpuhash = wxString::Format(_("%d"), CpuHash);
-    
-    
-    wxString BaseSN1 = volhash;
-    wxString BaseSN2 = cpuhash;
-    wxString MacAddr1 = macadd;
-    wxString MacAddr2 = machash1;
-    wxString MacAddr3 = machash2;
-    wxString MacAddr4 = cpuhash;
-    
-    std::string SN1_1;
-    std::string SN1_2;
-    std::string SN2_1;
-    std::string SN2_2;
-    std::string SN3_1;
-    std::string SN3_2;
-    std::string SN4_1;
-    std::string SN4_2;
-    std::string SN5_1;
-    std::string SN5_2;
-    std::string SN6_1;
-    std::string SN6_2;
-    std::string SN7_1;
-    std::string SN7_2;
-    std::string SN8_1;
-    std::string SN8_2;
-    
-    wxFingerPrint::smear(BaseSN1.c_str().AsChar(), MacAddr1.c_str().AsChar(), SN1_1, SN1_2);
-    wxFingerPrint::smear(BaseSN1.c_str().AsChar(), MacAddr2.c_str().AsChar(), SN2_1, SN2_2);
-    wxFingerPrint::smear(BaseSN1.c_str().AsChar(), MacAddr3.c_str().AsChar(), SN3_1, SN3_2);
-    wxFingerPrint::smear(BaseSN1.c_str().AsChar(), MacAddr4.c_str().AsChar(), SN4_1, SN4_2);
-    wxFingerPrint::smear(BaseSN2.c_str().AsChar(), MacAddr1.c_str().AsChar(), SN5_1, SN5_2);
-    wxFingerPrint::smear(BaseSN2.c_str().AsChar(), MacAddr2.c_str().AsChar(), SN6_1, SN6_2);
-    wxFingerPrint::smear(BaseSN2.c_str().AsChar(), MacAddr3.c_str().AsChar(), SN7_1, SN7_2);
-    wxFingerPrint::smear(BaseSN2.c_str().AsChar(), MacAddr4.c_str().AsChar(), SN8_1, SN8_2);
-    
-    std::string BaseSN1_1, BaseSN1_2, BaseSN1_3, BaseSN1_4;
-    std::string BaseSN2_5, BaseSN2_6, BaseSN2_7, BaseSN2_8;
-    std::string MacAddr1_1, MacAddr1_5;
-    std::string MacAddr2_2, MacAddr2_6;
-    std::string MacAddr3_3, MacAddr3_7;
-    std::string MacAddr4_4, MacAddr4_8;
-    
-    wxFingerPrint::unsmear(SN1_1, SN1_2, BaseSN1_1, MacAddr1_1);
-    wxFingerPrint::unsmear(SN2_1, SN2_2, BaseSN1_2, MacAddr2_2);
-    wxFingerPrint::unsmear(SN3_1, SN3_2, BaseSN1_3, MacAddr3_3);
-    wxFingerPrint::unsmear(SN4_1, SN4_2, BaseSN1_4, MacAddr4_4);
-    wxFingerPrint::unsmear(SN5_1, SN5_2, BaseSN2_5, MacAddr1_5);
-    wxFingerPrint::unsmear(SN6_1, SN6_2, BaseSN2_6, MacAddr2_6);
-    wxFingerPrint::unsmear(SN7_1, SN7_2, BaseSN2_7, MacAddr3_7);
-    wxFingerPrint::unsmear(SN8_1, SN8_2, BaseSN2_8, MacAddr4_8);
-    
-    wxMessageBox(wxString::Format(_("%s"), BaseSN1_1));
-    wxMessageBox(wxString::Format(_("%s"), BaseSN1_2));
-    
-    wxMessageBox(
-    _("originals:\n")+
-    BaseSN1+_("\n")+
-    BaseSN2+_("\n")+
-    MacAddr1+_("\n")+
-    MacAddr2+_("\n")+
-    MacAddr3+_("\n")+
-    MacAddr4+_("\n")+
-    _("SN:\n")+
-    SN1_1+_("\n")+
-    SN1_2+_("\n")+
-    SN2_1+_("\n")+
-    SN2_2+_("\n")+
-    SN3_1+_("\n")+
-    SN3_2+_("\n")+
-    SN4_1+_("\n")+
-    SN4_2+_("\n")+
-    SN5_1+_("\n")+
-    SN5_2+_("\n")+
-    SN6_1+_("\n")+
-    SN6_2+_("\n")+
-    SN7_1+_("\n")+
-    SN7_2+_("\n")+
-    SN8_1+_("\n")+
-    SN8_2+_("\n")+
-    _("recovery:\n")+
-    wxString(BaseSN1_1)+_("\n")+
-    wxString(BaseSN1_2)+_("\n")+
-    wxString(BaseSN1_3)+_("\n")+
-    wxString(BaseSN1_4)+_("\n")+
-    wxString(BaseSN2_5)+_("\n")+
-    wxString(BaseSN2_6)+_("\n")+
-    wxString(BaseSN2_7)+_("\n")+
-    wxString(BaseSN2_8)+_("\n")+
-    wxString(MacAddr1_1)+_("\n")+
-    wxString(MacAddr2_2)+_("\n")+
-    wxString(MacAddr3_3)+_("\n")+
-    wxString(MacAddr4_4)+_("\n")+
-    wxString(MacAddr1_5)+_("\n")+
-    wxString(MacAddr2_6)+_("\n")+
-    wxString(MacAddr3_7)+_("\n")+
-    wxString(MacAddr4_8)+_("\n")
-    );
 
-}*/
+bool MainFrame::CheckLicense(wxString &UserName)
+{
+    bool isOK = false;
+    wxString SNSeed1 = _("");
+    if (!Sec30::GetSNFromLicenseFile(SNSeed1)) return isOK;
+    if(!Sec30::IsSNSeed1MatchToThisPC(SNSeed1)) return isOK;
+    wxString ID1 = Sec30::SN2ID(SNSeed1,1);
+    UserName = ID1.AfterLast('|');
+    return true;
+}
 
 void MainFrame::OnExit(wxCommandEvent& event)
 {
@@ -352,12 +271,7 @@ void MainFrame::OnExit(wxCommandEvent& event)
 
 void MainFrame::OnAbout(wxCommandEvent& event)
 {
-    wxUnusedVar(event);
-    wxAboutDialogInfo info;
-    info.SetCopyright(_("My MainFrame"));
-    info.SetLicence(_("GPL v2 or later"));
-    info.SetDescription(_("Short description goes here"));
-    ::wxAboutBox(info);
+    ShowAbout();
 }
 
 
@@ -833,7 +747,7 @@ void MainFrame::InitializeSec30Arrays()
     
     /////////////////////////////2D Double///////////////////////////////////////////////////////
     sec30->ArraysOf2DDouble[0] = Adouble1D();//double** KPoints; [ka,kb,kc,kx,ky,kz,d_path]
-    sec30->ArraysOf2DDouble[1] = Adouble1D();//double** EigVal;
+    sec30->ArraysOf2DDouble[1] = Adouble1D();//double** DFTEigVal;
     sec30->ArraysOf2DDouble[2] = Adouble1D();//double** iTBEigVal;
     sec30->ArraysOf2DDouble[3] = Adouble1D();//double** fTBEigVal;
     
@@ -1163,6 +1077,7 @@ void MainFrame::LoadUnitcellPanel()
     scrolledwindow->FitInside();
     scrolledwindow->SetScrollRate(-1,15);
     unitcellPanel->graph3d = graph3d;
+    unitcellPanel->logfile = logfile;
 }
 
 void MainFrame::LoadStructurePanel()
@@ -2522,6 +2437,21 @@ void MainFrame::BtnPythonCode_OnClick(wxRibbonButtonBarEvent& event)
 
 void MainFrame::BtnAbout_OnClick(wxRibbonButtonBarEvent& event)
 {
+    ShowAbout();
+}
+
+void MainFrame::ShowAbout()
+{
+    if (!IsLicensed)
+    {
+        logfile->AppendText(_("\nThe free version of ") + SoftwareName + _(" has limitations in ") + FreeSoftwareLimitations + (". To eliminate all limitations you need a full featured license. To get a license you will need to supply the following serial number."));
+        logfile->AppendText(_("\n\nSerial Number:\n") + MySerialNumber +_("\n\n"));
+    }
+    else
+    {
+        
+    }
+    
     wxAboutDialogInfo info;
     wxIcon icn;
     icn.CopyFromBitmap(GetPng(icon256_png,icon256_png_size));
@@ -2536,7 +2466,8 @@ void MainFrame::BtnAbout_OnClick(wxRibbonButtonBarEvent& event)
     wxArrayString developers;
     developers.Add(_("Mohammad Nakhaee\nPhysics department (CMT), Antwerp university, Antwerpen, Belgium.\nmohammad.nakhaee@uantwerpen.be\nmohammad.nakhaee.1@gmail.com"));
     info.SetDevelopers(developers);
-
+    
+    
     wxAboutBox(info);
 }
 
@@ -2547,7 +2478,10 @@ void MainFrame::BtnTutorials_OnClick(wxRibbonButtonBarEvent& event)
 
 void MainFrame::BtnWebsite_OnClick(wxRibbonButtonBarEvent& event)
 {
-    
+    UpdateClass* update = new UpdateClass(this, MySerialNumber);
+    update->CenterOnScreen();
+    //welcome->CenterOnParent();
+    update->ShowModal();
 }
 
 void MainFrame::LoadIcons()
@@ -3104,7 +3038,7 @@ void MainFrame::StartRegression(bool isOneStep)
     int TBnspec = TBlistctr->GetCount();
     wxTreeItemId orbsrootID = orbs->GetRootItem();
     
-    /*bool isAny_d_Orbital = false;
+    bool isAny_d_Orbital = false;
     for(int j=0; j<TBnspec; j++)
     {
         wxString TBAtomName = TBlistctr->GetString(j);
@@ -3132,8 +3066,8 @@ void MainFrame::StartRegression(bool isOneStep)
     
     if (isAny_d_Orbital)
     {
-        if (!IsLicensed(_("d-orbital regression"))) {wxMessageBox(_("In the case of fitting a TB model including d-orbitals you need to contact developer support. Please find the contact information in Help>About."),_("Error"));return;}
-    }*/
+        if (!IsLicensed) {wxMessageBox(_("In the case of fitting a TB model including d-orbitals you need to contact developer support. Please find the contact information in Help>About."),_("Error"));return;}
+    }
     
     //Show the SK Tab
     LeftPanel->ChangeSelection(4);
@@ -3559,29 +3493,29 @@ void MainFrame::GenerateCode(wxString filepath, wxString BaseName, wxString Code
 
 void MainFrame::GenerateCppCode(wxString filepath, wxString BaseName, int MyID_Initial0Final1)
 {
-    //if (!IsLicensed(_("c++ code generator")))
-    //{
+    if (!IsLicensed)
+    {
         wxMessageBox(_("You need to contact developer support for C++ code generator. Please find the contact information in Help>About."));
         return;
-    //}
+    }
 }
 
 void MainFrame::GenerateCCode(wxString filepath, wxString BaseName, int MyID_Initial0Final1)
 {
-    //if (!IsLicensed(_("c code generator")))
-    //{
+    if (!IsLicensed)
+    {
         wxMessageBox(_("You need to contact developer support for C code generator. Please find the contact information in Help>About."));
         return;
-    //}
+    }
 }
 
 void MainFrame::GenerateFCode(wxString filepath, wxString BaseName, int MyID_Initial0Final1)
 {
-    //if (!IsLicensed(_("fortran code generator")))
-    //{
+    if (!IsLicensed)
+    {
         wxMessageBox(_("You need to contact developer support for Fortran code generator. Please find the contact information in Help>About."));
         return;
-    //}
+    }
 }
 
 void MainFrame::GenerateMathematicaCode(wxString filepath, wxString BaseName, int MyID_Initial0Final1)
@@ -3917,13 +3851,13 @@ void MainFrame::GeneratePythonCode(wxString filepath, wxString BaseName, int MyI
         
         fprintf(fpk,"\n#Function definition for Hamiltonian\n");
         fprintf(fpk,"def GetHam(h, ka, kb, kc):\n");
-        fprintf(fpk,"   hk = np.array([[0.0 + 0.0*1j for j in xrange(nH)] for i in xrange(nH)])\n");
+        fprintf(fpk,"   hk = np.array([[0.0 + 0.0*1j for j in range(nH)] for i in range(nH)])\n");
         fprintf(fpk,"   for i in range(nH):\n");
         fprintf(fpk,"      for j in range(nH):\n");
         fprintf(fpk,"         hk[i][j] = 0.0 + 0.0*1j\n");
         fprintf(fpk,"         for l in range(-lMax, lMax + 1):\n");
         fprintf(fpk,"            for m in range(-mMax, mMax + 1):\n");
-        fprintf(fpk,"	       for n in range(-nMax, nMax + 1):\n");
+        fprintf(fpk,"	            for n in range(-nMax, nMax + 1):\n");
         fprintf(fpk,"                  hij = h[l0 + l][m0 + m][n0 + n][i][j]\n");
         fprintf(fpk,"                  kvec = ka*astar + kb*bstar + kc*cstar\n");
         fprintf(fpk,"                  Rvec = l*a + m*b + n*c\n");
@@ -3972,7 +3906,7 @@ void MainFrame::GeneratePythonCode(wxString filepath, wxString BaseName, int MyI
         fprintf(fpk,"n0 = nMax; #It will be added to the all k indices\n");
         
         fprintf(fpk,"\n#Load Hamiltonian from the files\n");
-        fprintf(fpk,"h = [[[0 for k in xrange(2*nMax+1)] for j in xrange(2*mMax + 1)] for i in xrange(2*lMax+1)]\n");
+        fprintf(fpk,"h = [[[0 for k in range(2*nMax+1)] for j in range(2*mMax + 1)] for i in range(2*lMax+1)]\n");
         wxListBox* listctr = sec30->GetListObject(_("EssentialUnitcellList"));
         int nCell = listctr->GetCount();        
         for (int iCell=0; iCell<nCell; iCell++)
@@ -4021,8 +3955,8 @@ void MainFrame::GeneratePythonCode(wxString filepath, wxString BaseName, int MyI
         fprintf(fpk,"\n#Band-Structure Calculation\n");
         fprintf(fpk,"print('The number of bands is ' + str(nH))\n");
         fprintf(fpk,"nbands = nH\n");
-        fprintf(fpk,"X = [0.0 for j in xrange(nk)]\n");
-        fprintf(fpk,"bands = [[0.0 for j in xrange(nk)] for i in xrange(nbands)]\n");
+        fprintf(fpk,"X = [0.0 for j in range(nk)]\n");
+        fprintf(fpk,"bands = [[0.0 for j in range(nk)] for i in range(nbands)]\n");
         fprintf(fpk,"dpath = 0.0;\n");
         
         fprintf(fpk,"for ik in range(nk):\n");
@@ -4051,29 +3985,6 @@ void MainFrame::GeneratePythonCode(wxString filepath, wxString BaseName, int MyI
         fclose(fpk);
     }
 }
-
-/*bool MainFrame::IsLicensed(wxString Module)
-{
-    bool lic = false;
-    if (Module == _("c++ code generator"))
-        lic = false;
-    else if (Module == _("c code generator"))
-        lic = false;
-    else if (Module == _("fortran code generator"))
-        lic = false;
-    else if (Module == _("d-orbital regression"))
-        lic = false;
-    else if (Module == _("f-orbital"))
-        lic = false;
-    else if (Module == _("f-orbital regression"))
-        lic = false;
-    else if (Module == _("soc"))
-        lic = false;
-    else if (Module == _("non-orthogonal"))
-        lic = false;
-    
-    return lic;
-}*/
 
 
 

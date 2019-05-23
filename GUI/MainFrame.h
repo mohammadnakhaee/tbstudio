@@ -23,23 +23,24 @@
 #include <wx/ribbon/buttonbar.h>
 #include <thread>
 #include <Regression.h>
-#include "wxMACAddressUtility.h"
-#include "wxFingerPrint.h"
+#include "UpdateClass.h"
 //#include <memory>
 /**********************************************************************************/
 
 class MainFrame : public MainFrameBaseClass
 {
 public:
+    wxString MySerialNumber = _("");
     wxString SoftwareName = _("TBStudio");
+    wxString FreeSoftwareLimitations = _("fitting a TB model including d-orbitals and code generator of C++, C and Fortran and also parallel code generator for all languages and limitations in non-orthogonal TBModel and using spin-orbit coupling");
     int Ver_MAJOR = 1;
-    int Ver_MINOR = 1;
-    int Ver_RELEASE = 5;
+    int Ver_MINOR = 2;
+    int Ver_RELEASE = 1;
     
     MainFrame(wxWindow* parent);
     virtual ~MainFrame();
     
-    int* SelectedAtoms;
+    //int* SelectedAtoms;
     GraphClass* graph3d;
     GraphClass* graph2d0;
     GraphClass* graph2d;
@@ -50,6 +51,9 @@ public:
     SetupClass* setupPanel;
     SKClass* skPanel;
     ColorsClass* ColorsForm;
+    
+    bool IsLicensed = false;
+    wxString LicenseOwner = _("");
     
     Sec30* sec30;
     //std::shared_ptr<Sec30> sec30;
@@ -70,15 +74,17 @@ public:
     bool is_UpperSymMatrixHf = false;
     
     Regression* regression;
-    std::thread* FittingThread;
+    //std::thread* FittingThread;
     bool isFittingThreadBusy = false;
     
     wxRibbonButtonBar* RButtonMouse;
     
+    
+    void ShowAbout();
     void OnExit(wxCommandEvent& event);
     void OnAbout(wxCommandEvent& event);
 protected:
-    //void LoadPlugins();
+    bool CheckLicense(wxString &UserName);
     virtual void BtnMove_OnClick(wxRibbonButtonBarEvent& event);
     virtual void BtnRotate_OnClick(wxRibbonButtonBarEvent& event);
     virtual void BtnScale_OnClick(wxRibbonButtonBarEvent& event);
@@ -200,7 +206,6 @@ protected:
     void GenerateMathematicaCode(wxString filepath, wxString BaseName, int MyID_Initial0Final1);
     void GenerateMatlabCode(wxString filepath, wxString BaseName, int MyID_Initial0Final1);
     void GeneratePythonCode(wxString filepath, wxString BaseName, int MyID_Initial0Final1);
-    //bool IsLicensed(wxString Module);
     
 private:
     wxTextCtrl* logfile;

@@ -74,7 +74,7 @@ const char* wxFingerPrint::getMachineName()
    return &(computerName[0]);
 }
 
-void wxFingerPrint::smear(std::string BaseSN, std::string MacAddr, std::string &SN1, std::string &SN2)
+void wxFingerPrint::smear(std::string BaseSN, std::string MacAddr, std::string &SN1, std::string &SN2, int seed)
 {
     int n1 = BaseSN.length();
 	int n2 = MacAddr.length();
@@ -88,32 +88,32 @@ void wxFingerPrint::smear(std::string BaseSN, std::string MacAddr, std::string &
     char* Mask1 = new char[nMask1];
     char* Mask2 = new char[nMask2];
     
-    Mask1[0] = 23;
-    Mask1[1] = 3;
-    Mask1[2] = 26;
-    Mask1[3] = 230;
-    Mask1[4] = 223;
-    Mask1[5] = 221;
-    Mask1[6] = 23;
-    Mask1[7] = 3;
-    Mask1[8] = 26;
-    Mask1[9] = 130;
-    Mask1[10] = 221;
-    Mask1[11] = 222;
-    Mask1[12] = 203;
-    Mask1[13] = 30;
-    Mask1[14] = 126;
-    Mask1[15] = 210;
-    Mask1[16] = 123;
-    Mask1[17] = 189;
+    Mask1[0] = 23 + 2 * seed;
+    Mask1[1] = 3 + 6 * seed;
+    Mask1[2] = 26 +  seed;
+    Mask1[3] = 230 - seed;
+    Mask1[4] = 223 - 2 * seed;
+    Mask1[5] = 221 - 2 * seed;
+    Mask1[6] = 23 + 2 * seed;
+    Mask1[7] = 3 + 6 * seed;
+    Mask1[8] = 26 + 2 * seed;
+    Mask1[9] = 130 - 2 * seed;
+    Mask1[10] = 221 - 5 * seed;
+    Mask1[11] = 222 - 2 * seed;
+    Mask1[12] = 203 - seed;
+    Mask1[13] = 30 + 2 * seed;
+    Mask1[14] = 126 + 3 * seed;
+    Mask1[15] = 210 - 2 * seed;
+    Mask1[16] = 123 + 2 * seed;
+    Mask1[17] = 189 - 3 * seed;
     
-    Mask2[0] = 230;
-    Mask2[1] = 13;
-    Mask2[2] = 126;
-    Mask2[3] = 250;
-    Mask2[4] = 123;
-    Mask2[5] = 222;
-    Mask2[6] = 200;
+    Mask2[0] = 230 - 3 * seed;
+    Mask2[1] = 13 + 3 * seed;
+    Mask2[2] = 126 + 3 * seed;
+    Mask2[3] = 250 - 3 * seed;
+    Mask2[4] = 123 - 3 * seed;
+    Mask2[5] = 222 - seed;
+    Mask2[6] = 200 - 2 * seed;
     
     for (u32 i = 0; i < n1; i++) str1[i] ^= Mask1[i%nMask1];
     for (u32 i = 0; i < n2; i++) str2[i] ^= Mask2[i%nMask2];
@@ -122,7 +122,7 @@ void wxFingerPrint::smear(std::string BaseSN, std::string MacAddr, std::string &
     SN2 = std::string(str2);
 }
 
-void wxFingerPrint::unsmear(std::string SN1, std::string SN2, std::string &BaseSN, std::string &MacAddr)
+void wxFingerPrint::unsmear(std::string SN1, std::string SN2, std::string &BaseSN, std::string &MacAddr, int seed)
 {
     
     int n1 = SN1.length();
@@ -137,32 +137,32 @@ void wxFingerPrint::unsmear(std::string SN1, std::string SN2, std::string &BaseS
     char* Mask1 = new char[nMask1];
     char* Mask2 = new char[nMask2];
     
-    Mask1[0] = 23;
-    Mask1[1] = 3;
-    Mask1[2] = 26;
-    Mask1[3] = 230;
-    Mask1[4] = 223;
-    Mask1[5] = 221;
-    Mask1[6] = 23;
-    Mask1[7] = 3;
-    Mask1[8] = 26;
-    Mask1[9] = 130;
-    Mask1[10] = 221;
-    Mask1[11] = 222;
-    Mask1[12] = 203;
-    Mask1[13] = 30;
-    Mask1[14] = 126;
-    Mask1[15] = 210;
-    Mask1[16] = 123;
-    Mask1[17] = 189;
+    Mask1[0] = 23 + 2 * seed;
+    Mask1[1] = 3 + 6 * seed;
+    Mask1[2] = 26 +  seed;
+    Mask1[3] = 230 - seed;
+    Mask1[4] = 223 - 2 * seed;
+    Mask1[5] = 221 - 2 * seed;
+    Mask1[6] = 23 + 2 * seed;
+    Mask1[7] = 3 + 6 * seed;
+    Mask1[8] = 26 + 2 * seed;
+    Mask1[9] = 130 - 2 * seed;
+    Mask1[10] = 221 - 5 * seed;
+    Mask1[11] = 222 - 2 * seed;
+    Mask1[12] = 203 - seed;
+    Mask1[13] = 30 + 2 * seed;
+    Mask1[14] = 126 + 3 * seed;
+    Mask1[15] = 210 - 2 * seed;
+    Mask1[16] = 123 + 2 * seed;
+    Mask1[17] = 189 - 3 * seed;
     
-    Mask2[0] = 230;
-    Mask2[1] = 13;
-    Mask2[2] = 126;
-    Mask2[3] = 250;
-    Mask2[4] = 123;
-    Mask2[5] = 222;
-    Mask2[6] = 200;
+    Mask2[0] = 230 - 3 * seed;
+    Mask2[1] = 13 + 3 * seed;
+    Mask2[2] = 126 + 3 * seed;
+    Mask2[3] = 250 - 3 * seed;
+    Mask2[4] = 123 - 3 * seed;
+    Mask2[5] = 222 - seed;
+    Mask2[6] = 200 - 2 * seed;
     
     for (u32 i = 0; i < n1; i++) str1[i] ^= str2[i%n2];
     for (u32 i = 0; i < n2; i++) str2[i] ^= Mask2[i%nMask2];

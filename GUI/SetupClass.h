@@ -31,5 +31,6 @@ protected:
     void Btn_Test_OnClick(wxCommandEvent& event);
     void LoadOpenMXBand(wxString file, bool &isBandLoaded, int &maxneig, int &mspin, double &ChemP, int &nKp, Adouble1D &KPoints, Adouble1D &EigVal, Adouble0D &dkLabel, Astring0D &kLabel);
     void LoadOpenMXUnfoldedBand(wxString file);
+    void LoadVaspXMLOutput(wxString file, bool &isBandLoaded, int &maxneig, int &mspin, double &ChemP, int &nKp, Adouble1D &KPoints, Adouble1D &EigVal, Adouble0D &dkLabel, Astring0D &kLabel);
 };
 #endif // BONDSCLASS_H

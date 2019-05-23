@@ -222,7 +222,7 @@ int PlotBand(mglGraph *gr, int w, int h, Sec30* sec30, int MyID)
             xMax = (mreal)sec30->ArraysOf0DDouble[8];
         }
         //sec30->ArraysOf2DDouble[0] = Adouble1D();//double** FracKPoint;
-        //sec30->ArraysOf2DDouble[1] = Adouble1D();//double** EigVal;
+        //sec30->ArraysOf2DDouble[1] = Adouble1D();//double** DFTEigVal;
         
         if (DFTnMax < DFTnMin || DFTnMax<1 || DFTnMin<1 || DFTnMin>maxneig || DFTnMax>maxneig) return 0;
         
@@ -407,7 +407,6 @@ int sampleOK(mglGraph *gr,double w, double h)
     gr->NewFrame ();          // start frame
     gr->SubPlot(1,1,0,"<_"); 
     gr->Aspect(1.0,1.0);
-    
     
     gr->Title("Beam and ray tracing","",-1.5);
     gr->SetFontSize(4);
@@ -1332,9 +1331,9 @@ void MyGLCanvas::OnMouseWheel(wxMouseEvent& event)
     {
         float delta = (ZoomCam*0.1)*0.01f*event.GetWheelDelta(); //Zoom dependent delta (It seems better)
         if (scrldwn)
-            ZoomCam = ZoomCam + delta;
-        else
             ZoomCam = ZoomCam - delta;
+        else
+            ZoomCam = ZoomCam + delta;
         if (ZoomCam <=0.001) ZoomCam=0.001;
     }
     else if(Dim==2)

@@ -18,22 +18,6 @@ Regression::~Regression()
     
 }
 
-void Regression::foo(long long nmax)
-{ 
-    wxMessageBox(_("Call"),_("yes"));
-    long long i;
-    double s=0;
-    for(i=0; i<nmax; i++)
-    {
-        double d=sin(1.0*sin(1.0*i));
-        if(d>0) s=d;
-        if(s<10000 || s>10000)
-        {
-            if(i==0) wxMessageBox(_("started"),_("yes"));
-            if(i==nmax-1) wxMessageBox(_("Finished"),_("yes"));
-        }
-    }
-} 
 
 double Regression::maxabs(double* a, int na)
 {
