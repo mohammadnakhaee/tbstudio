@@ -39,7 +39,7 @@ public:
     
     Regression(Sec30* sec30Ref, wxWindow* ParentRef, GraphClass* graph2dRef);
     ~Regression();
-    
+    void foo(long long nmax);
     double maxabs(double* a, int na);
     double maxdiag(double** a, int na);
     double Variance(double* a, int na);
