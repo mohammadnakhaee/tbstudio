@@ -13,7 +13,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=mohammad
-Date                   :=06/07/2019
+Date                   :=14/07/2019
 CodeLitePath           :="C:/Program Files/CodeLite"
 LinkerName             :=C:/TDM-GCC-64/bin/g++.exe
 SharedObjectLinkerName :=C:/TDM-GCC-64/g++.exe -shared -fPIC
@@ -37,12 +37,12 @@ PCHCompileFlags        :=
 MakeDirCommand         :=makedir
 RcCmpOptions           := $(shell wx-config --rcflags)
 RcCompilerName         :=C:/TDM-GCC-64/bin/windres.exe
-LinkOptions            :=  -mwindows $(shell wx-config --libs std,gl,ribbon) -mwindows -std=gnu++11 -pthread -liphlpapi
+LinkOptions            :=  -mwindows $(shell wx-config --libs std,gl,ribbon) -mwindows -std=gnu++11 -pthread -liphlpapi -IC:\Users\mohammad\Documents\Codelite\pecsjunc\LAPACKE-X64 -llapacke
 IncludePath            :=  $(IncludeSwitch). $(IncludeSwitch). $(IncludeSwitch)$(MathGL_DIR)/include $(IncludeSwitch)$(Glut_DIR)/include $(IncludeSwitch)$(LAPACKE_DIR) $(IncludeSwitch)$(Gemmi_DIR)/include $(IncludeSwitch)$(RapidXML_DIR) 
 IncludePCH             := 
 RcIncludePath          := 
-Libs                   := $(LibrarySwitch)mgl-glut $(LibrarySwitch)mgl $(LibrarySwitch)freeglut $(LibrarySwitch)lapacke $(LibrarySwitch)lapack $(LibrarySwitch)blas $(LibrarySwitch)m 
-ArLibs                 :=  "libmgl-glut.a" "libmgl.a" "libfreeglut.a" "liblapacke" "liblapack" "libblas" "m" 
+Libs                   := $(LibrarySwitch)mgl-glut $(LibrarySwitch)mgl $(LibrarySwitch)freeglut 
+ArLibs                 :=  "libmgl-glut.a" "libmgl.a" "libfreeglut.a" 
 LibPath                := $(LibraryPathSwitch). $(LibraryPathSwitch)$(Opengl_DIR) $(LibraryPathSwitch)$(MathGL_DIR)\lib $(LibraryPathSwitch)C:\TDM-GCC-64\x86_64-w64-mingw32\lib $(LibraryPathSwitch)$(Glut_DIR)\lib $(LibraryPathSwitch)$(LAPACKE_DIR) $(LibraryPathSwitch)C:\TDM-GCC-64\gcc-5.1.0-tdm64-1-fortran\bin 
 
 ##
@@ -69,7 +69,7 @@ MathGL2_DIR:=C:\Users\mohammad\Documents\cppworkspace\3rdparty\Installed\MathGL2
 WXCFG:=gcc_dll\mswu
 Opengl_DIR:=$(GCC_DIR)\x86_64-w64-mingw32\lib
 MathGL_DIR:=..\MathGL64LGPL
-LAPACKE_DIR:=..\LAPACKE-X64
+LAPACKE_DIR:=C:\Users\mohammad\Documents\Codelite\pecsjunc\LAPACKE-X64
 Glut_DIR:=C:\Users\mohammad\Documents\Codelite\pecsjunc\freeglut64
 Gemmi_DIR:=C:\Users\mohammad\Documents\Codelite\pecsjunc\gemmi-master
 RapidXML_DIR:=C:\Users\mohammad\Documents\Codelite\pecsjunc\rapidxml-1.13

@@ -221,8 +221,10 @@ int PlotBand(mglGraph *gr, int w, int h, Sec30* sec30, int MyID)
             xMin = (mreal)sec30->ArraysOf0DDouble[7];
             xMax = (mreal)sec30->ArraysOf0DDouble[8];
         }
+        
         //sec30->ArraysOf2DDouble[0] = Adouble1D();//double** FracKPoint;
         //sec30->ArraysOf2DDouble[1] = Adouble1D();//double** DFTEigVal;
+        //sec30->ArraysOf2DDouble[4] = Adouble1D();//double** DFTEigValWeight;
         
         if (DFTnMax < DFTnMin || DFTnMax<1 || DFTnMin<1 || DFTnMin>maxneig || DFTnMax>maxneig) return 0;
         
@@ -254,8 +256,16 @@ int PlotBand(mglGraph *gr, int w, int h, Sec30* sec30, int MyID)
                 for(long iX=0; iX<nX; iX++)
                 {
                     //mreal x = iX/(nX-1.0);
-                    C.a[iCurve*nX + iX] = -0.5;
-                    if ( iX > (int)(nX/3.0)) C.a[iCurve*nX + iX] = 0.5;
+                    C.a[iCurve*nX + iX] = (mreal)(sec30->ArraysOf2DDouble[4][iX][iCurve + DFTnMin - 1]*2.0-1.0);//Showing fitting weight as a color. The values are between x=[0:1] but the colors are c=[-1,1], so c=2*x-1
+                    /*if ( iX > (int)(0.0*nX/9.0) && iX <= (int)(1.0*nX/9.0)) C.a[iCurve*nX + iX] = -1.0;
+                    if ( iX > (int)(1.0*nX/9.0) && iX <= (int)(2.0*nX/9.0)) C.a[iCurve*nX + iX] = -0.75;
+                    if ( iX > (int)(2.0*nX/9.0) && iX <= (int)(3.0*nX/9.0)) C.a[iCurve*nX + iX] = -0.5;
+                    if ( iX > (int)(3.0*nX/9.0) && iX <= (int)(4.0*nX/9.0)) C.a[iCurve*nX + iX] = -0.25;
+                    if ( iX > (int)(4.0*nX/9.0) && iX <= (int)(5.0*nX/9.0)) C.a[iCurve*nX + iX] = 0.0;
+                    if ( iX > (int)(5.0*nX/9.0) && iX <= (int)(6.0*nX/9.0)) C.a[iCurve*nX + iX] = 0.25;
+                    if ( iX > (int)(6.0*nX/9.0) && iX <= (int)(7.0*nX/9.0)) C.a[iCurve*nX + iX] = 0.5;
+                    if ( iX > (int)(7.0*nX/9.0) && iX <= (int)(8.0*nX/9.0)) C.a[iCurve*nX + iX] = 0.75;
+                    if ( iX > (int)(8.0*nX/9.0) && iX <= (int)(9.0*nX/9.0)) C.a[iCurve*nX + iX] = 1.0;*/
                 }
             }
         }
@@ -701,6 +711,22 @@ void MyGLContext::background()
 
 void MyGLContext::Polygons2D()
 {
+    /*double radius = 0.07;
+    double twicePi = 2.0 * 3.142;
+    float x = 0;
+    float y = 0;
+    glBegin(GL_TRIANGLE_FAN); //BEGIN CIRCLE
+    glColor3f(1.0f, 0.0f, 0.0f); // Red
+    glVertex2f(x, y); // center of circle
+    for (int i = 0; i <= 20; i++)   {
+        glVertex2f (
+            (x + (radius * cos(i * twicePi / 20))), (y + (radius * sin(i * twicePi / 20)))
+            );
+    }
+    glEnd(); //END*/
+    
+    //glutSolidSphere(0.5, 20, 20);
+    
     /*
     glBegin(GL_QUADS);              // Each set of 4 vertices form a quad
       glColor3f(1.0f, 0.0f, 0.0f); // Red
@@ -747,8 +773,8 @@ void MyGLContext::Polygons2D()
       glVertex2f(0.6f, 0.6f);
       glVertex2f(0.4f, 0.6f);
       glVertex2f(0.3f, 0.4f);
-   glEnd();
-    */
+   glEnd();*/
+    
 }
 
 void MyGLContext::Draw2D(int w, int h, Sec30* sec30, int MyID)
@@ -765,8 +791,9 @@ void MyGLContext::Draw2D(int w, int h, Sec30* sec30, int MyID)
     glEnable( GL_TEXTURE_2D );
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    background();
+    //background();
     Polygons2D();
+    background();
     glFlush();  // Render now
     glPopMatrix();
     CheckGLError();
@@ -1403,10 +1430,13 @@ void MyGLCanvas::OnMouseLeftDown(wxMouseEvent& event)
     const wxPoint cpt = event.GetPosition();
     ClientMouseX0 = cpt.x;
     ClientMouseY0 = cpt.y;
+    
     //To get mouse position relative to top-left corner of current window or canvas, add this in a mouse event handler:
     //const wxPoint pt = wxGetMousePosition();
     //int mouseX = pt.x - this->GetScreenPosition().x;
     //int mouseY = pt.y - this->GetScreenPosition().y;
+    
+    if (sec30->ArraysOf0DInt[6] != 0) PaintMode = true;
 }
 
 void MyGLCanvas::OnMouseLeftUp(wxMouseEvent& event)
@@ -1474,7 +1504,7 @@ void MyGLCanvas::OnMouseLeftUp(wxMouseEvent& event)
     }
     else //if (Dim == 2)
     {
-        
+        if (sec30->ArraysOf0DInt[6] != 0) PaintMode = false;
     }
 }
 
@@ -1503,7 +1533,25 @@ void MyGLCanvas::OnMouseMove(wxMouseEvent& event)
             else if (isRotationMode)
                 DoRotate(l,m,(float)(0.01*value));
             else if (isZoomMode)
-                DoZoom(0.0005*(m-l));
+                DoZoom(0.0005 * (m-l));
+        }
+        else
+        {
+            if (sec30->ArraysOf0DInt[6] != 0 && PaintMode)
+            {
+                const wxSize ClientSize = GetClientSize();
+                int w,h;
+                w=ClientSize.x;
+                h=ClientSize.y;
+                
+                if (event.CmdDown() || event.AltDown())
+                    SetWeight(ClientMouseX, ClientMouseY, w, h, -1.0);
+                else
+                    SetWeight(ClientMouseX, ClientMouseY, w, h, 1.0);
+            }
+            
+            isPaintCursur = true;
+            Refresh(false);
         }
     }
     else if (isMouseRightDown)
@@ -1637,6 +1685,61 @@ void MyGLCanvas::DoSelect(float x1, float y1, float x2, float y2)
     DoubleArray1[14][1] = fmin(SelectionFramY1,SelectionFramY2);
     DoubleArray1[14][2] = fmax(SelectionFramX1,SelectionFramX2);
     DoubleArray1[14][3] = fmax(SelectionFramY1,SelectionFramY2);
+    
+    Refresh(true);
+}
+
+void MyGLCanvas::SetWeight(float x, float y, float w, float h, float coef)
+{
+    if (sec30->ArraysOf0DInt[0] == 0) return; //if (isBandLoaded = false) rturn;
+    int nX = sec30->ArraysOf0DInt[1];
+    int DFTnMin = sec30->ArraysOf0DInt[4];
+    int DFTnMax = sec30->ArraysOf0DInt[5];
+    
+    double Xmax = sec30->ArraysOf2DDouble[0][nX-1][6];
+    double X = Xmax*x/w;
+    
+    int iX = 0;
+    for(long ix=0; ix<nX; ix++)
+    {
+        if ( sec30->ArraysOf2DDouble[0][ix][6] >= X)
+        {
+            iX=ix;
+            break;
+        }
+    }
+    
+    double y1, y2;
+    if (ObjectID == 0)
+    {
+        y1 = sec30->ArraysOf0DDouble[1];
+        y2 = sec30->ArraysOf0DDouble[2];
+    }
+    else if (ObjectID == 1)
+    {
+        y1 = sec30->ArraysOf0DDouble[3];
+        y2 = sec30->ArraysOf0DDouble[4];
+    }
+    
+    double clickedY = y1 + (y2-y1)*(h - y)/h;
+    double dy = (y2-y1)/60;
+    for(int iband=DFTnMin; iband<=DFTnMax; iband++)
+    {
+        double y = sec30->ArraysOf2DDouble[1][iX][iband-1] - sec30->ArraysOf0DDouble[0]; //EIG - ChemP
+        if(y > clickedY-dy && y < clickedY+dy)
+        {
+            int ix1 = iX-7;
+            int ix2 = iX+7;
+            if (ix1 < 0) ix1=0;
+            if (ix2 > nX-1) ix2=nX-1;
+            for(long ix=ix1; ix<=ix2; ix++)
+            {
+                sec30->ArraysOf2DDouble[4][ix][iband-1] += coef*0.1;
+                if (sec30->ArraysOf2DDouble[4][ix][iband-1] < 0.0) sec30->ArraysOf2DDouble[4][ix][iband-1]=0.0;
+                if (sec30->ArraysOf2DDouble[4][ix][iband-1] > 1.0) sec30->ArraysOf2DDouble[4][ix][iband-1]=1.0;
+            }
+        }
+    }
     
     Refresh(true);
 }

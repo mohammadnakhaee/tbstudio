@@ -142,6 +142,7 @@ public:
     void SetCheckVar(wxString VariableName, bool Value, bool FireEvent);
     void GetCheckVar(wxString VariableName, bool& Value);
     wxButton* GetButtonObject(wxString VariableName);
+    wxCheckBox* GetCheckObject(wxString VariableName);
     wxCheckTree* GetTreeObject(wxString VariableName);
     wxCheckListBox* GetCheckListObject(wxString VariableName);
     wxListBox* GetListObject(wxString VariableName);
@@ -176,11 +177,17 @@ public:
     double Hopspd(Adouble0D BondSK, double l, double m, double n, wxString o1, wxString o2);
     double Hopspd(double sss, double sps, double sds, double pps, double ppp, double pds, double pdp, double dds, double ddp, double ddd, double l, double m, double n, wxString o1, wxString o2);
     void ConstructTBHamiltonian(double a[3], double b[3], double c[3], double** XYZCoords, Adouble2D &Hi, Adouble2D &Hf, int &nEssensialCells, int &nHamiltonian, Aint1D &EssCells);
+    void ConstructTBHamiltonian(double a[3], double b[3], double c[3], double** XYZCoords, Adouble2D &Hi, Adouble2D &Hf, Adouble2D &Si, Adouble2D &Sf, int &nEssensialCells, int &nHamiltonian, Aint1D &EssCells);
     void ConstructTBHamiltonianF(double a[3], double b[3], double c[3], double** XYZCoords, Adouble2D &Hf, int &nEssensialCells, int &nHamiltonian, Aint1D &EssCells);
+    void ConstructTBHamiltonianF(double a[3], double b[3], double c[3], double** XYZCoords, Adouble2D &Hf, Adouble2D &Sf, int &nEssensialCells, int &nHamiltonian, Aint1D &EssCells);
     void GetCouplingMatrix(myGrid* SKCtr, myGrid* OverlapCtr, wxCheckTree* BondTree, wxCheckTree* orbs, double a[3], double b[3], double c[3], double** XYZCoords, Aint1D HamiltonianDimMap, wxTreeItemId CellID, wxString WorkingCell, Adouble1D &hi, Adouble1D &hf);
+    void GetCouplingMatrix(myGrid* SKCtr, myGrid* OverlapCtr, wxCheckTree* BondTree, wxCheckTree* orbs, double a[3], double b[3], double c[3], double** XYZCoords, Aint1D HamiltonianDimMap, wxTreeItemId CellID, wxString WorkingCell, Adouble1D &hi, Adouble1D &hf, Adouble1D &si, Adouble1D &sf);
     void GetCouplingMatrixF(myGrid* SKCtr, myGrid* OverlapCtr, wxCheckTree* BondTree, wxCheckTree* orbs, double a[3], double b[3], double c[3], double** XYZCoords, Aint1D HamiltonianDimMap, wxTreeItemId CellID, wxString WorkingCell, Adouble1D &hf);
+    void GetCouplingMatrixF(myGrid* SKCtr, myGrid* OverlapCtr, wxCheckTree* BondTree, wxCheckTree* orbs, double a[3], double b[3], double c[3], double** XYZCoords, Aint1D HamiltonianDimMap, wxTreeItemId CellID, wxString WorkingCell, Adouble1D &hf, Adouble1D &sf);
     void AddOnSiteMatrix(myGrid* OnSiteCtr, wxCheckTree* orbs, Aint1D HamiltonianDimMap, Adouble1D &hi, Adouble1D &hf);
+    void AddOnSiteMatrix(myGrid* OnSiteCtr, wxCheckTree* orbs, Aint1D HamiltonianDimMap, Adouble1D &hi, Adouble1D &hf, Adouble1D &si, Adouble1D &sf);
     void AddOnSiteMatrixF(myGrid* OnSiteCtr, wxCheckTree* orbs, Aint1D HamiltonianDimMap, Adouble1D &hf);
+    void AddOnSiteMatrixF(myGrid* OnSiteCtr, wxCheckTree* orbs, Aint1D HamiltonianDimMap, Adouble1D &hf, Adouble1D &sf);
     void GetCellInfo(wxString cellStr, int &icell, int &jcell, int &kcell);
     void GetBondSK(myGrid* GridCtrl, wxString Label, Adouble0D &iBondSK, Adouble0D &fBondSK);
     void GetBondSKF(myGrid* GridCtrl, double* GridBuffer, wxString Label, Adouble0D &iBondSK, Adouble0D &fBondSK);
@@ -192,6 +199,7 @@ public:
     int GetSKInd(wxString skName);
     lapack_complex_double GetHk(double*** H, double kx, double ky, double kz, double a[3], double b[3], double c[3], int nEssensialCells, int** lmnEssCells, int iH, int jH);
     int SymEigenValues(lapack_complex_double* UpperSymMatrix, lapack_int N, double* &eig);
+    int SymEigenValues(lapack_complex_double* UpperSymMatrixA, lapack_complex_double* UpperSymMatrixB, lapack_int N, double* &eig);
     bool isMatch(double x, double y, double Thereshold);
     void CopyLastSKToInitialSK();
     static wxString GetSN(wxString UserName);

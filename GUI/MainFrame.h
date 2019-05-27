@@ -27,12 +27,14 @@
 //#include <memory>
 /**********************************************************************************/
 
+
+
 class MainFrame : public MainFrameBaseClass
 {
 public:
     wxString MySerialNumber = _("");
     wxString SoftwareName = _("TBStudio");
-    wxString FreeSoftwareLimitations = _("fitting a TB model including d-orbitals and code generator of C++, C and Fortran and also parallel code generator for all languages and limitations in non-orthogonal TBModel and using spin-orbit coupling");
+    wxString FreeSoftwareLimitations = _("fitting a TB model including d-orbitals");
     int Ver_MAJOR = 1;
     int Ver_MINOR = 2;
     int Ver_RELEASE = 1;
@@ -174,7 +176,7 @@ protected:
     virtual void FillBondsPanel();
     /****************************************/
     virtual void LoadSetupPanel();
-    virtual void EvaluateSetupPanel();
+    virtual void EvaluateSetupPanel(int SetWeight);
     virtual bool ValidateSetupPanel();
     virtual void FillSetupPanel();
     /****************************************/
@@ -194,7 +196,6 @@ protected:
     void TestZEig();
     void UpdateTBBand_if();
     void StartRegression(bool isOneStep);
-    bool IsAllowedToFit(int iband, int ik);
     int ReplaceDFTBand(int iband, int ik);
     double ShiftBand(int iband, int ik);
     double GetFitParameter(int ip, int icol);

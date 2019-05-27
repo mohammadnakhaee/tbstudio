@@ -61,9 +61,16 @@ SetupClass::SetupClass(wxWindow* parent, Sec30* sec30var, wxWindowID id, const w
     sec30->SetVar(_("TBBandRange[0]"), 0, false);
     sec30->SetVar(_("TBBandRange[1]"), 0, false);
     sec30->SetVar(_("DFTFirst[0]"), 0, false);
-    wxString Labels3[1] = {_("Ignoring Selection")};
+    /**********************************************************************************************************************************************/
+    sec30->AddGroupBox(this,_("Weight Function"),wxColour(wxT("rgb(153,180,209)")));
+    wxString Labels11[2] = {_("Clear all"), _("Set all to one")};
+    wxObjectEventFunction Funcs11[2] = { wxCommandEventHandler(SetupClass::Btn_SetZero_OnClick), wxCommandEventHandler(SetupClass::Btn_SetOne_OnClick)};
+    sec30->AddButton(this, 2, Labels11, Funcs11);
+    wxString Labels3[1] = {_("Brush")};
     wxObjectEventFunction Funcs3[1] = { wxCommandEventHandler(SetupClass::Btn_Select_OnClick)};
     sec30->AddButton(this, 1, Labels3, Funcs3);
+    sec30->AddGroupBox(this,_("To increase the weight function paint on bands."),wxColour(wxT("rgb(255,255,255)")));
+    sec30->AddGroupBox(this,_("To decrease, hold Ctrl or Alt key and paint."),wxColour(wxT("rgb(255,255,255)")));
     /**********************************************************************************************************************************************/
     sec30->AddGroupBox(this,_("Fitting Algorithmic Parameters"),wxColour(wxT("rgb(153,180,209)")));
     wxComboBox* choicectrm = sec30->AddComboCtrl(this, _("OMethod"), _("Method"), 70, 200, true);
@@ -123,8 +130,10 @@ void SetupClass::Btn_OpenFile_OnClick(wxCommandEvent& event)
                                 _("OpenMX Band-Structure (*.Band)|*.Band|Vasp XML Output (*.xml)|*.xml"),
                                 wxFD_OPEN, wxDefaultPosition);
     
+    bool isOK=false;
     if (OpenDialog->ShowModal() == wxID_OK) // if the user click "Open" instead of "Cancel"
 	{
+        isOK = true;
         int dgFileKind = OpenDialog->GetFilterIndex();
         wxString dgPath = OpenDialog->GetDirectory();
         wxString dgFileName = OpenDialog->GetFilename();
@@ -136,8 +145,11 @@ void SetupClass::Btn_OpenFile_OnClick(wxCommandEvent& event)
 	}
  
 	OpenDialog->Destroy();
-    ReloadBand();
-    sec30->SendUpdateEvent(this->GetName());
+    if (isOK)
+    {
+        ReloadBand();
+        sec30->SendUpdateEvent(this->GetName());
+    }
 }
 
 void SetupClass::Btn_Reload_OnClick(wxCommandEvent& event)
@@ -167,6 +179,7 @@ void SetupClass::ReloadBand()
         bool isBandLoaded;
         Adouble1D KPoints;
         Adouble1D EigVal;
+        
         Adouble0D dkLabel;
         Astring0D kLabel;
         
@@ -177,6 +190,10 @@ void SetupClass::ReloadBand()
         
         if (isBandLoaded)
         {
+            int nk0 = EigVal.size();
+            int nband0 = EigVal[0].size();
+            Adouble1D EigValWeights(nk0,std::vector<double>(nband0,1.0));
+            
             sec30->ArraysOf0DInt[0] = 1;
             sec30->ArraysOf0DInt[1] = nKPoint;
             sec30->ArraysOf0DInt[2] = maxneig;
@@ -187,6 +204,7 @@ void SetupClass::ReloadBand()
             sec30->ArraysOf1DString[0] = kLabel;
             sec30->ArraysOf2DDouble[0] = KPoints;
             sec30->ArraysOf2DDouble[1] = EigVal;
+            sec30->ArraysOf2DDouble[4] = EigValWeights;
     
             bool isMinOK, isMaxOK;
             IsRangeOK(maxneig, isMinOK, isMaxOK);
@@ -227,6 +245,7 @@ void SetupClass::ReloadBand()
             sec30->ArraysOf1DString[0] = Astring0D();
             sec30->ArraysOf2DDouble[0] = Adouble1D();
             sec30->ArraysOf2DDouble[1] = Adouble1D();
+            sec30->ArraysOf2DDouble[4] = Adouble1D();
             sec30->ArraysOf0DDouble[1] = 0.0;
             sec30->ArraysOf0DDouble[2] = 0.0;
             sec30->ArraysOf0DDouble[3] = 0.0;
@@ -414,14 +433,8 @@ void SetupClass::LoadOpenMXBand(wxString file, bool &isBandLoaded, int &maxneig,
                   _("Which spin do you like to load?"),
                   wxT("Which spin?"), 
                   wxYES_NO | wxNO_DEFAULT | wxICON_QUESTION);
-                  
-                //find "OK" button
-                wxButton *button=wxDynamicCast(dial.FindWindow(wxID_YES), wxButton);
-                if(button) button->SetLabel(wxT("spin-up"));
-
-                //find "CANCEL" button
-                button=wxDynamicCast(dial.FindWindow(wxID_NO), wxButton);
-                if(button) button->SetLabel(wxT("spin-down"));
+                
+                dial.SetYesNoLabels(wxT("spin-up"), wxT("spin-down"));
                 
                 spin1=true;
                 if ( dial.ShowModal() == wxID_NO )
@@ -565,7 +578,7 @@ void SetupClass::LoadVaspXMLOutput(wxString file, bool &isBandLoaded, int &maxne
             }
         }
         
-        double rtv[3][3];         
+        double rtv[3][3];
         rapidxml::xml_node<>* v_node = rec_basis_node->first_node("v");
         if (!v_node) return;
         sscanf(v_node->value(), "%lf %lf %lf", &rtv[0][0], &rtv[0][1], &rtv[0][2]);
@@ -773,14 +786,8 @@ void SetupClass::LoadVaspXMLOutput(wxString file, bool &isBandLoaded, int &maxne
                   _("Which spin do you like to load?"),
                   wxT("Which spin?"), 
                   wxYES_NO | wxNO_DEFAULT | wxICON_QUESTION);
-                  
-                //find "OK" button
-                wxButton *button=wxDynamicCast(dial.FindWindow(wxID_YES), wxButton);
-                if(button) button->SetLabel(wxT("spin-up"));
-
-                //find "CANCEL" button
-                button=wxDynamicCast(dial.FindWindow(wxID_NO), wxButton);
-                if(button) button->SetLabel(wxT("spin-down"));
+                
+                dial.SetYesNoLabels(wxT("spin-up"), wxT("spin-down"));
                 
                 spin1=true;
                 if ( dial.ShowModal() == wxID_NO )
@@ -835,4 +842,14 @@ void SetupClass::LoadVaspXMLOutput(wxString file, bool &isBandLoaded, int &maxne
         isBandLoaded = true;
     }
     catch (...) { }
+}
+
+void SetupClass::Btn_SetZero_OnClick(wxCommandEvent& event)
+{
+    sec30->SendUpdateEvent(this->GetName(),2);
+}
+
+void SetupClass::Btn_SetOne_OnClick(wxCommandEvent& event)
+{
+    sec30->SendUpdateEvent(this->GetName(),3);
 }
