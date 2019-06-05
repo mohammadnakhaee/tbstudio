@@ -54,6 +54,9 @@ public:
     double VecVec2Num(double* a, double* b, int na);
     void Transpose(double** a, int na, int nb, double** aT);
     void func(double* t,  int ny, double* p, int np, double* cnst, double* y, lapack_complex_double* UpperSymMatrixHf, lapack_complex_double* UpperSymMatrixSf, double* eigHf, int natoms, bool isSOC, bool isOverlap);
+    void SendDataToTerminal(wxString data);
+    void SendEventRunFinished();
+    void SendEventRunStarted();
 
 };
 

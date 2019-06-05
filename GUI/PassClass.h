@@ -5,7 +5,7 @@
 class PassClass : public PassClassBase
 {
 public:
-    PassClass(wxWindow* parent, int mode);
+    PassClass(wxWindow* parent);
     virtual ~PassClass();
 };
 #endif // PASSCLASS_H

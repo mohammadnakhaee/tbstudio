@@ -381,7 +381,7 @@ void Regression::lm(double* p, int np, double* t, double* y_dat, int ny, double*
             isAllFinite = isAllFinite && std::isfinite(delta_y[iy]);
         
         if (!isAllFinite) {BadCondition=true; break;}                   // floating point error; break
-        if (!isAllFinite)                    // floating point error; break
+        /*if (!isAllFinite)                    // floating point error; break
         {
             ///////////////Out of While Loop///////////
             delete [] y_hat;
@@ -409,7 +409,7 @@ void Regression::lm(double* p, int np, double* t, double* y_dat, int ny, double*
             ///////////////Out of While Loop///////////
             
             return;
-        }
+        }*/
         
         func_calls = func_calls + 1;
         
@@ -1050,7 +1050,38 @@ void Regression::func(double* t, int ny, double* p, int np, double* cnst, double
         
         for(int iH=0; iH<nHamiltonian; iH++) fTBEigVal[ik][iH] = eigHf[iH];
     }
- }
+    
+    sec30->ArraysOf2DDouble[3] = fTBEigVal;
+    
+    //////////////////////////////Fill the y array for fitting//////////////////////////////////
+    for (int iy=0; iy<ny; iy++)
+    {
+        int tbband = sec30->ArraysOf2DInt[2][iy][0]; //FitPoints[iy][0]
+        //int dftband = FitPoints[iy][1]; //FitPoints[iy][1]
+        int ik = sec30->ArraysOf2DInt[2][iy][2]; //FitPoints[iy][2]
+        y[iy] = fTBEigVal[ik][tbband - 1];
+    }
+    
+    //////////////////////////////Deallocate all arrays//////////////////////////////////
+    for(int iECell = 0; iECell < nEssensialCells; iECell++)
+    {
+        for(int i = 0; i < nHamiltonian; i++) delete [] Mf[iECell][i];
+        delete [] Mf[iECell];
+        delete [] lmnEssCells[iECell];
+    }
+	if (nEssensialCells>0) delete [] Mf;
+    if (nEssensialCells>0) delete [] lmnEssCells;
+    
+    if(isOverlap)
+    {
+        for(int iECell = 0; iECell < nEssensialCells; iECell++)
+        {
+            for(int i = 0; i < nHamiltonian; i++) delete [] sMf[iECell][i];
+            delete [] sMf[iECell];
+        }
+        if (nEssensialCells>0) delete [] sMf;
+    }
+}
 
 void Regression::SendDataToTerminal(wxString data)
 {

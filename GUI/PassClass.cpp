@@ -1,9 +1,8 @@
 #include "PassClass.h"
 
-PassClass::PassClass(wxWindow* parent, int mode)
+PassClass::PassClass(wxWindow* parent)
     : PassClassBase(parent)
 {
-    MyMode=mode;
 }
 
 PassClass::~PassClass()
