@@ -692,7 +692,7 @@ void MainFrame::InitializeSec30Arrays()
     int nArraysOf1DDouble = 4;
     int nArraysOf1DString = 3;
     int nArraysOf2DDouble = 5;
-    int nArraysOf3DDouble = 4;
+    int nArraysOf3DDouble = 6;
     sec30->ArraysOf0DDouble.clear();
     sec30->ArraysOf0DInt.clear();
     sec30->ArraysOf2DInt.clear();
@@ -758,6 +758,8 @@ void MainFrame::InitializeSec30Arrays()
     sec30->ArraysOf3DDouble[1] = Adouble2D();//double*** Hf; Vf_{0,0,0}, Vf_{1,0,0}, Vf_{0,1,0}, Vf_{1,1,0}, Vf_{1,-1,0}
     sec30->ArraysOf3DDouble[2] = Adouble2D();//double*** Si; Si_{0,0,0}, Si_{1,0,0}, Si_{0,1,0}, Si_{1,1,0}, Si_{1,-1,0}
     sec30->ArraysOf3DDouble[3] = Adouble2D();//double*** Sf; Sf_{0,0,0}, Sf_{1,0,0}, Sf_{0,1,0}, Sf_{1,1,0}, Sf_{1,-1,0}
+    sec30->ArraysOf3DDouble[4] = Adouble2D();//double*** SOCi; SOCi_Re, SOCi_Im
+    sec30->ArraysOf3DDouble[5] = Adouble2D();//double*** SOCf; SOCf_Re, SOCf_Im
 }
 
 void MainFrame::Init_graph3d()
@@ -2984,10 +2986,7 @@ void MainFrame::UpdateTBBand_if()
         XYZCoords[i0][2] = z;
     }
     
-    Adouble2D Hi;
-    Adouble2D Hf;
-    Adouble2D Si;
-    Adouble2D Sf;
+    Adouble2D Hi, Si, Hf, Sf, SOC_i, SOC_f;
     int nEssensialCells;
     int nHamiltonian;
     Aint1D EssCells;
@@ -2997,10 +2996,13 @@ void MainFrame::UpdateTBBand_if()
     bool isOverlap;
     sec30->GetCheckVar(_("Overlap[0]"), isOverlap);
     
+    bool isSpin = false;
+    if (isSOC) isSpin = true;
+    
     if(isOverlap)
-        sec30->ConstructTBHamiltonian(a, b, c, XYZCoords, Hi, Hf, Si, Sf, nEssensialCells, nHamiltonian, EssCells);
+        sec30->ConstructTBHamiltonian(a, b, c, XYZCoords, Hi, Hf, Si, Sf, nEssensialCells, nHamiltonian, EssCells, isSOC, SOC_i, SOC_f);
     else
-        sec30->ConstructTBHamiltonian(a, b, c, XYZCoords, Hi, Hf, nEssensialCells, nHamiltonian, EssCells);
+        sec30->ConstructTBHamiltonian(a, b, c, XYZCoords, Hi, Hf, nEssensialCells, nHamiltonian, EssCells, isSOC, SOC_i, SOC_f);
         
     
     for (int i=0; i<natoms; i++) delete [] XYZCoords[i];
@@ -3010,6 +3012,11 @@ void MainFrame::UpdateTBBand_if()
     sec30->ArraysOf3DDouble[1] = Hf;
     sec30->ArraysOf3DDouble[2] = Si;
     sec30->ArraysOf3DDouble[3] = Sf;
+    if (isSOC)
+    {
+        sec30->ArraysOf3DDouble[4] = SOC_i;
+        sec30->ArraysOf3DDouble[5] = SOC_f;
+    }
     
     if (nEssensialCells < 1) return;
     if (nHamiltonian < 1) return;
@@ -3079,41 +3086,51 @@ void MainFrame::UpdateTBBand_if()
         }
     }
     /////////////////////////Calculate the TB Band-structure////////////////////////
-    Adouble1D iTBEigVal(nKPoint,std::vector<double>(nHamiltonian));
-    Adouble1D fTBEigVal(nKPoint,std::vector<double>(nHamiltonian));
-    int nH2 = nHamiltonian*nHamiltonian;
-    lapack_complex_double* UpperSymMatrixHi;
-    lapack_complex_double* UpperSymMatrixHf;
-    lapack_complex_double* UpperSymMatrixSi;
-    lapack_complex_double* UpperSymMatrixSf;
-    double* eigHi = new double[nHamiltonian];
-    double* eigHf = new double[nHamiltonian];
+    lapack_complex_double* LowerSymMatrixHi;
+    lapack_complex_double* LowerSymMatrixHf;
+    lapack_complex_double* LowerSymMatrixSi;
+    lapack_complex_double* LowerSymMatrixSf;
+    double* eigHi;
+    double* eigHf;
+    
+    int nHamiltonianTot;
+    if (isSpin)
+        nHamiltonianTot = 2*nHamiltonian;
+    else
+        nHamiltonianTot = nHamiltonian;
+    
+    int nH2 = nHamiltonianTot*nHamiltonianTot;
+    eigHi = new double[nHamiltonianTot];
+    eigHf = new double[nHamiltonianTot];
+    
+    Adouble1D iTBEigVal(nKPoint,std::vector<double>(nHamiltonianTot));
+    Adouble1D fTBEigVal(nKPoint,std::vector<double>(nHamiltonianTot));
     
     lapack_complex_double lzerocomplex = {0.0, 0.0};
     
+    int nOverlapMat = (nHamiltonianTot+nH2) + 1;
     if(isOverlap)
     {
-        int nAB2 = (nHamiltonian+nH2) + 1;
-        UpperSymMatrixHi = new lapack_complex_double[nAB2];
-        UpperSymMatrixHf = new lapack_complex_double[nAB2];
-        UpperSymMatrixSi = new lapack_complex_double[nAB2];
-        UpperSymMatrixSf = new lapack_complex_double[nAB2];
-        for(int i=0; i<nAB2; i++)
+        LowerSymMatrixHi = new lapack_complex_double[nOverlapMat];
+        LowerSymMatrixHf = new lapack_complex_double[nOverlapMat];
+        LowerSymMatrixSi = new lapack_complex_double[nOverlapMat];
+        LowerSymMatrixSf = new lapack_complex_double[nOverlapMat];
+        for(int i=0; i<nOverlapMat; i++)
         {
-            UpperSymMatrixHi[i] = lzerocomplex;
-            UpperSymMatrixHf[i] = lzerocomplex;
-            UpperSymMatrixSi[i] = lzerocomplex;
-            UpperSymMatrixSf[i] = lzerocomplex;
+            LowerSymMatrixHi[i] = lzerocomplex;
+            LowerSymMatrixHf[i] = lzerocomplex;
+            LowerSymMatrixSi[i] = lzerocomplex;
+            LowerSymMatrixSf[i] = lzerocomplex;
         }
     }
     else
     {
-        UpperSymMatrixHi = new lapack_complex_double[nH2];
-        UpperSymMatrixHf = new lapack_complex_double[nH2];
+        LowerSymMatrixHi = new lapack_complex_double[nH2];
+        LowerSymMatrixHf = new lapack_complex_double[nH2];
         for(int i=0; i<nH2; i++)
         {
-            UpperSymMatrixHi[i] = lzerocomplex;
-            UpperSymMatrixHf[i] = lzerocomplex;
+            LowerSymMatrixHi[i] = lzerocomplex;
+            LowerSymMatrixHf[i] = lzerocomplex;
         }
     }
     
@@ -3130,27 +3147,96 @@ void MainFrame::UpdateTBBand_if()
         //ky = KPoints[ik][4];
         //kz = KPoints[ik][5];
         
-        if(isOverlap)
+        if (isSpin)
         {
-            for(int iH=0; iH<nHamiltonian; iH++)
+            lapack_complex_double cmlx;
+            if(isOverlap)
             {
-                eigHi[iH] = 0.0;
-                for(int jH=iH; jH>=0; jH--)
+                for(int i=0; i<nOverlapMat; i++)
                 {
-                    int i1 = iH - jH;
-                    UpperSymMatrixHi[i1 * nHamiltonian + iH] = sec30->GetHk(Mi, kx, ky, kz, a, b, c, nEssensialCells, lmnEssCells, iH, jH);
-                    UpperSymMatrixSi[i1 * nHamiltonian + iH] = sec30->GetHk(sMi, kx, ky, kz, a, b, c, nEssensialCells, lmnEssCells, iH, jH);
+                    LowerSymMatrixHi[i] = lzerocomplex;
+                    LowerSymMatrixSi[i] = lzerocomplex;
+                }
+                
+                for(int iH=0; iH<nHamiltonian; iH++)
+                {
+                    for(int jH=iH; jH>=0; jH--)
+                    {
+                        int i1 = 2*(iH - jH); // i1 = (2*iH) - (2*jH);
+                        LowerSymMatrixHi[i1 * nHamiltonianTot + 2*iH] = sec30->GetHk(Mi, kx, ky, kz, a, b, c, nEssensialCells, lmnEssCells, iH, jH);
+                        LowerSymMatrixSi[i1 * nHamiltonianTot + 2*iH] = sec30->GetHk(sMi, kx, ky, kz, a, b, c, nEssensialCells, lmnEssCells, iH, jH);
+                        LowerSymMatrixHi[i1 * nHamiltonianTot + 2*iH + 1] = LowerSymMatrixHi[i1 * nHamiltonianTot + 2*iH];
+                        LowerSymMatrixSi[i1 * nHamiltonianTot + 2*iH + 1] = LowerSymMatrixSi[i1 * nHamiltonianTot + 2*iH];
+                    }
+                }
+                
+                //Add SOC to Hk
+                for(int iH=0; iH<nHamiltonianTot; iH++)
+                {
+                    eigHi[iH] = 0.0;
+                    for(int jH=iH; jH>=0; jH--)
+                    {
+                        int i1 = iH - jH;
+                        cmlx = {SOC_i[0][iH][jH], SOC_i[1][iH][jH]}; // Real and Imaginary parts of SOC are [0] and [1]
+                        LowerSymMatrixHi[i1 * nHamiltonianTot + iH] += cmlx;
+                    }
+                }
+            }
+            else
+            {
+                for(int iH=0; iH<nHamiltonian; iH++)
+                {
+                    for(int jH=0; jH<=iH; jH++)
+                    {
+                        LowerSymMatrixHi[2*iH * nHamiltonianTot + 2*jH] = sec30->GetHk(Mi, kx, ky, kz, a, b, c, nEssensialCells, lmnEssCells, iH, jH);
+                        LowerSymMatrixHi[2*iH * nHamiltonianTot + 2*jH + 1] = lzerocomplex;
+                        LowerSymMatrixHi[(2*iH + 1) * nHamiltonianTot + 2*jH + 1] = LowerSymMatrixHi[2*iH * nHamiltonianTot + 2*jH];
+                        LowerSymMatrixHi[(2*iH + 1) * nHamiltonianTot + 2*jH] = lzerocomplex;
+                    }
+                }
+
+                //Add SOC to Hk
+                for(int iH=0; iH<nHamiltonianTot; iH++)
+                {
+                    eigHi[iH] = 0.0;
+                    for(int jH=0; jH<=iH; jH++)
+                    {
+                        cmlx = {SOC_i[0][iH][jH], SOC_i[1][iH][jH]}; // Real and Imaginary parts of SOC are [0] and [1]
+                        LowerSymMatrixHi[iH * nHamiltonianTot + jH] += cmlx;
+                    }
                 }
             }
         }
         else
         {
-            for(int iH=0; iH<nHamiltonian; iH++)
+            if(isOverlap)
             {
-                eigHi[iH] = 0.0;
-                for(int jH=iH; jH<nHamiltonian; jH++)
+                for(int i=0; i<nOverlapMat; i++)
                 {
-                    UpperSymMatrixHi[iH * nHamiltonian + jH] = sec30->GetHk(Mi, kx, ky, kz, a, b, c, nEssensialCells, lmnEssCells, iH, jH);
+                    LowerSymMatrixHi[i] = lzerocomplex;
+                    LowerSymMatrixSi[i] = lzerocomplex;
+                }
+                
+                for(int iH=0; iH<nHamiltonian; iH++)
+                {
+                    eigHi[iH] = 0.0;
+                    for(int jH=iH; jH>=0; jH--)
+                    {
+                        int i1 = iH - jH;
+                        LowerSymMatrixHi[i1 * nHamiltonianTot + iH] = sec30->GetHk(Mi, kx, ky, kz, a, b, c, nEssensialCells, lmnEssCells, iH, jH);
+                        LowerSymMatrixSi[i1 * nHamiltonianTot + iH] = sec30->GetHk(sMi, kx, ky, kz, a, b, c, nEssensialCells, lmnEssCells, iH, jH);
+                    }
+                }
+            }
+            else
+            {
+                for(int iH=0; iH<nHamiltonian; iH++)
+                {
+                    eigHi[iH] = 0.0;
+                    for(int jH=0; jH<=iH; jH++)
+                    {
+                        LowerSymMatrixHi[iH * nHamiltonianTot + jH] = sec30->GetHk(Mi, kx, ky, kz, a, b, c, nEssensialCells, lmnEssCells, iH, jH);
+                    }
                 }
             }
         }
@@ -3158,33 +3244,102 @@ void MainFrame::UpdateTBBand_if()
         int checki;
         
         if(isOverlap)
-            checki = sec30->SymEigenValues(UpperSymMatrixHi, UpperSymMatrixSi, nHamiltonian, eigHi);
+            checki = sec30->SymEigenValues(LowerSymMatrixHi, LowerSymMatrixSi, nHamiltonianTot, eigHi);
         else
-            checki = sec30->SymEigenValues(UpperSymMatrixHi, nHamiltonian, eigHi);
+            checki = sec30->SymEigenValues(LowerSymMatrixHi, nHamiltonianTot, eigHi);
         
-        for(int iH=0; iH<nHamiltonian; iH++) iTBEigVal[ik][iH] = eigHi[iH];
+        for(int iH=0; iH<nHamiltonianTot; iH++) iTBEigVal[ik][iH] = eigHi[iH];
         
-        if(isOverlap)
+        if (isSpin)
         {
-            for(int iH=0; iH<nHamiltonian; iH++)
+            lapack_complex_double cmlx;
+            if(isOverlap)
             {
-                eigHf[iH] = 0.0;
-                for(int jH=iH; jH>=0; jH--)
+                for(int i=0; i<nOverlapMat; i++)
                 {
-                    int i1 = iH - jH;
-                    UpperSymMatrixHf[i1 * nHamiltonian + iH] = sec30->GetHk(Mf, kx, ky, kz, a, b, c, nEssensialCells, lmnEssCells, iH, jH);
-                    UpperSymMatrixSf[i1 * nHamiltonian + iH] = sec30->GetHk(sMf, kx, ky, kz, a, b, c, nEssensialCells, lmnEssCells, iH, jH);
+                    LowerSymMatrixHf[i] = lzerocomplex;
+                    LowerSymMatrixSf[i] = lzerocomplex;
+                }
+                
+                for(int iH=0; iH<nHamiltonian; iH++)
+                {
+                    for(int jH=iH; jH>=0; jH--)
+                    {
+                        int i1 = 2*(iH - jH); // i1 = (2*iH) - (2*jH);
+                        LowerSymMatrixHf[i1 * nHamiltonianTot + 2*iH] = sec30->GetHk(Mf, kx, ky, kz, a, b, c, nEssensialCells, lmnEssCells, iH, jH);
+                        LowerSymMatrixSf[i1 * nHamiltonianTot + 2*iH] = sec30->GetHk(sMf, kx, ky, kz, a, b, c, nEssensialCells, lmnEssCells, iH, jH);
+                        LowerSymMatrixHf[i1 * nHamiltonianTot + 2*iH + 1] = LowerSymMatrixHf[i1 * nHamiltonianTot + 2*iH];
+                        LowerSymMatrixSf[i1 * nHamiltonianTot + 2*iH + 1] = LowerSymMatrixSf[i1 * nHamiltonianTot + 2*iH];
+                    }
+                }
+                
+                //Add SOC to Hk
+                for(int iH=0; iH<nHamiltonianTot; iH++)
+                {
+                    eigHf[iH] = 0.0;
+                    for(int jH=iH; jH>=0; jH--)
+                    {
+                        int i1 = iH - jH;
+                        cmlx = {SOC_f[0][iH][jH], SOC_f[1][iH][jH]};// Real and Imaginary parts of SOC are [0] and [1]
+                        LowerSymMatrixHf[i1 * nHamiltonianTot + iH] += cmlx;
+                    }
+                }
+            }
+            else
+            {
+                for(int iH=0; iH<nHamiltonian; iH++)
+                {
+                    for(int jH=0; jH<=iH; jH++)
+                    {
+                        LowerSymMatrixHf[2*iH * nHamiltonianTot + 2*jH] = sec30->GetHk(Mf, kx, ky, kz, a, b, c, nEssensialCells, lmnEssCells, iH, jH);
+                        LowerSymMatrixHf[2*iH * nHamiltonianTot + 2*jH + 1] = lzerocomplex;
+                        LowerSymMatrixHf[(2*iH + 1) * nHamiltonianTot + 2*jH + 1] = LowerSymMatrixHf[2*iH * nHamiltonianTot + 2*jH];
+                        LowerSymMatrixHf[(2*iH + 1) * nHamiltonianTot + 2*jH] = lzerocomplex;
+                    }
+                }
+                
+                //Add SOC to Hk
+                for(int iH=0; iH<nHamiltonianTot; iH++)
+                {
+                    eigHf[iH] = 0.0;
+                    for(int jH=0; jH<=iH; jH++)
+                    {
+                        cmlx = {SOC_f[0][iH][jH], SOC_f[1][iH][jH]};// Real and Imaginary parts of SOC are [0] and [1]
+                        LowerSymMatrixHf[iH * nHamiltonianTot + jH] += cmlx;
+                    }
                 }
             }
         }
         else
         {
-            for(int iH=0; iH<nHamiltonian; iH++)
+            if(isOverlap)
             {
-                eigHf[iH] = 0.0;
-                for(int jH=iH; jH<nHamiltonian; jH++)
+                for(int i=0; i<nOverlapMat; i++)
                 {
-                    UpperSymMatrixHf[iH * nHamiltonian + jH] = sec30->GetHk(Mf, kx, ky, kz, a, b, c, nEssensialCells, lmnEssCells, iH, jH);
+                    LowerSymMatrixHf[i] = lzerocomplex;
+                    LowerSymMatrixSf[i] = lzerocomplex;
+                }
+                
+                for(int iH=0; iH<nHamiltonian; iH++)
+                {
+                    eigHf[iH] = 0.0;
+                    for(int jH=iH; jH>=0; jH--)
+                    {
+                        int i1 = iH - jH;
+                        LowerSymMatrixHf[i1 * nHamiltonianTot + iH] = sec30->GetHk(Mf, kx, ky, kz, a, b, c, nEssensialCells, lmnEssCells, iH, jH);
+                        LowerSymMatrixSf[i1 * nHamiltonianTot + iH] = sec30->GetHk(sMf, kx, ky, kz, a, b, c, nEssensialCells, lmnEssCells, iH, jH);
+                    }
+                }
+            }
+            else
+            {
+                for(int iH=0; iH<nHamiltonian; iH++)
+                {
+                    eigHf[iH] = 0.0;
+                    for(int jH=0; jH<=iH; jH++)
+                    {
+                        LowerSymMatrixHf[iH * nHamiltonianTot + jH] = sec30->GetHk(Mf, kx, ky, kz, a, b, c, nEssensialCells, lmnEssCells, iH, jH);
+                    }
                 }
             }
         }
@@ -3192,19 +3347,19 @@ void MainFrame::UpdateTBBand_if()
         int checkf;
         
         if(isOverlap)
-            checkf = sec30->SymEigenValues(UpperSymMatrixHf, UpperSymMatrixSf, nHamiltonian, eigHf);
+            checkf = sec30->SymEigenValues(LowerSymMatrixHf, LowerSymMatrixSf, nHamiltonianTot, eigHf);
         else
-            checkf = sec30->SymEigenValues(UpperSymMatrixHf, nHamiltonian, eigHf);
+            checkf = sec30->SymEigenValues(LowerSymMatrixHf, nHamiltonianTot, eigHf);
         
-        for(int iH=0; iH<nHamiltonian; iH++) fTBEigVal[ik][iH] = eigHf[iH];
+        for(int iH=0; iH<nHamiltonianTot; iH++) fTBEigVal[ik][iH] = eigHf[iH];
     }
     
-    delete [] UpperSymMatrixHi;
-    delete [] UpperSymMatrixHf;
+    delete [] LowerSymMatrixHi;
+    delete [] LowerSymMatrixHf;
     if(isOverlap)
     {
-        delete [] UpperSymMatrixSi;
-        delete [] UpperSymMatrixSf;
+        delete [] LowerSymMatrixSi;
+        delete [] LowerSymMatrixSf;
     }
     delete [] eigHi;
     delete [] eigHf;
