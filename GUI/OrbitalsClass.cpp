@@ -95,6 +95,29 @@ void OrbitalsClass::Btn_AddAtom_OnClick(wxCommandEvent& event)
     sec30->SendUpdateEvent(this->GetName(),0);
 }
 
+void OrbitalsClass::Btn_RemoveAtom_OnClick(wxCommandEvent& event)
+{
+    wxListBox* listctr = sec30->GetListObject(_("AtomSpeciesList"));
+    int item = listctr->GetSelection();
+    if (item<0) {wxMessageBox(_("Select one of the species from the list."),_("Error")); return;}
+    wxString SelectedAtomSpecies = listctr->GetString(item);
+    listctr->Delete(item);
+    listctr->Update();
+    listctr->Refresh(true);
+    
+    wxCheckTree* treectr = sec30->GetTreeObject(_("Orbitals"));
+    wxTreeItemId rootID;
+    rootID = treectr->GetRootItem();
+    wxTreeItemId selectedID = treectr->FindItemIn(rootID,SelectedAtomSpecies);
+    treectr->Delete(selectedID);
+    //if (treectr->GetItemCount() == 1) treectr->DeleteAllItems();
+    treectr->Expand(rootID);
+    treectr->Update();
+    treectr->Refresh(true);
+    
+    sec30->SendUpdateEvent(this->GetName(),0);
+}
+
 void OrbitalsClass::Btn_AddShell_OnClick(wxCommandEvent& event)
 {
     wxListBox* listctr = sec30->GetListObject(_("AtomSpeciesList"));
