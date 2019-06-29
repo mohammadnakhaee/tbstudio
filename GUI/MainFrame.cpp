@@ -3762,10 +3762,12 @@ void MainFrame::ExportMatrices(wxString filepath, wxString BaseName, int MyID_In
     int ID = MyID_Initial0Final1;
     int Hind = 0;
     int Sind = 2;
+    int SOCind = 4;
     if (ID == 1)
     {
         Hind = 1;
         Sind = 3;
+        SOCind = 5;
     }
     
     int nEss = sec30->ArraysOf3DDouble[Hind].size();
@@ -3796,31 +3798,80 @@ void MainFrame::ExportMatrices(wxString filepath, wxString BaseName, int MyID_In
     }
     
     int nEssS = sec30->ArraysOf3DDouble[Sind].size();
-    if (nEssS < 1) return;
-    
-    int nS = sec30->ArraysOf3DDouble[Sind][0].size();
-    if (nS < 1) return;
-    
-    for (int iCell=0; iCell<nCell; iCell++)
+    if (nEssS > 0)
     {
-        wxString WorkingCell = listctr->GetString(iCell);
-        
-        FILE *fp;
-        wxString fname1 = filepath + wxT("/") + BaseName + wxT("_S") + WorkingCell + wxT(".dat");
-        if ((fp = fopen(fname1,"w")) != NULL)
+        int nS = sec30->ArraysOf3DDouble[Sind][0].size();
+        if (nS > 0)
         {
-            for (int iS=0; iS<nS; iS++)
+            for (int iCell=0; iCell<nCell; iCell++)
             {
-                fprintf(fp, "%.8f", sec30->ArraysOf3DDouble[Sind][iCell][iS][0]);
-                for (int jS=1; jS<nS; jS++)
+                wxString WorkingCell = listctr->GetString(iCell);
+                
+                FILE *fp;
+                wxString fname1 = filepath + wxT("/") + BaseName + wxT("_S") + WorkingCell + wxT(".dat");
+                if ((fp = fopen(fname1,"w")) != NULL)
                 {
-                    fprintf(fp, "\t%.8f", sec30->ArraysOf3DDouble[Sind][iCell][iS][jS]);
+                    for (int iS=0; iS<nS; iS++)
+                    {
+                        fprintf(fp, "%.8f", sec30->ArraysOf3DDouble[Sind][iCell][iS][0]);
+                        for (int jS=1; jS<nS; jS++)
+                        {
+                            fprintf(fp, "\t%.8f", sec30->ArraysOf3DDouble[Sind][iCell][iS][jS]);
+                        }
+                        fprintf(fp, "\n");
+                    }
+                    fclose(fp);
                 }
-                fprintf(fp, "\n");
             }
-            fclose(fp);
         }
     }
+    
+    
+    int nSOCBuf = sec30->ArraysOf3DDouble[SOCind].size();
+    if (nSOCBuf == 2)
+    {
+        int nSOCReal = sec30->ArraysOf3DDouble[SOCind][0].size();
+        int nSOCImage = sec30->ArraysOf3DDouble[SOCind][1].size();
+        if (nSOCReal > 1 && nSOCImage == nSOCReal) //We have spin. so at least should be 2
+        {
+            int nH_SOC = sec30->ArraysOf3DDouble[SOCind][0][0].size();
+            if (nH_SOC > 1) //We have spin. so at least should be 2
+            {
+                FILE *fpsocre;
+                wxString fnamesocre = filepath + wxT("/") + BaseName + wxT("_SOC_Re.dat");
+                if ((fpsocre = fopen(fnamesocre,"w")) != NULL)
+                {
+                    for (int iH=0; iH<nSOCReal; iH++)
+                    {
+                        fprintf(fpsocre, "%.8f", sec30->ArraysOf3DDouble[SOCind][0][iH][0]);
+                        for (int jH=1; jH<nSOCReal; jH++)
+                        {
+                            fprintf(fpsocre, "\t%.8f", sec30->ArraysOf3DDouble[SOCind][0][iH][jH]);
+                        }
+                        fprintf(fpsocre, "\n");
+                    }
+                    fclose(fpsocre);
+                }
+                
+                FILE *fpsocim;
+                wxString fnamesocim = filepath + wxT("/") + BaseName + wxT("_SOC_Im.dat");
+                if ((fpsocim = fopen(fnamesocim,"w")) != NULL)
+                {
+                    for (int iH=0; iH<nSOCImage; iH++)
+                    {
+                        fprintf(fpsocim, "%.8f", sec30->ArraysOf3DDouble[SOCind][1][iH][0]);
+                        for (int jH=1; jH<nSOCImage; jH++)
+                        {
+                            fprintf(fpsocim, "\t%.8f", sec30->ArraysOf3DDouble[SOCind][1][iH][jH]);
+                        }
+                        fprintf(fpsocim, "\n");
+                    }
+                    fclose(fpsocim);
+                }
+            }
+        }
+    }
+    
 }
 
 void MainFrame::GenerateCode(wxString filepath, wxString BaseName, wxString CodeType, int MyID_Initial0Final1, bool OnlyDatFiles)
@@ -3862,10 +3913,12 @@ void MainFrame::GenerateCppCode(wxString filepath, wxString BaseName, int MyID_I
     int ID = MyID_Initial0Final1;
     int Hind = 0;
     int Sind = 2;
+    int SOCind = 4;
     if (ID == 1)
     {
         Hind = 1;
         Sind = 3;
+        SOCind = 5;
     }
     
     int nEss = sec30->ArraysOf3DDouble[Hind].size();
@@ -3878,6 +3931,9 @@ void MainFrame::GenerateCppCode(wxString filepath, wxString BaseName, int MyID_I
     int nEssS = sec30->ArraysOf3DDouble[Sind].size();
     if (nEssS > 0) isS = true;
     
+    bool isSOC = false;
+    int nSOCBuf = sec30->ArraysOf3DDouble[SOCind].size();
+    if (nSOCBuf > 1) isSOC = true;
     //int nk = sec30->ArraysOf2DDouble[0].size();//double** KPoints; [ka,kb,kc,kx,ky,kz,d_path]
     //int nklabel = sec30->ArraysOf1DDouble[0].size();//double* dkLabel;
     
@@ -4189,10 +4245,12 @@ void MainFrame::GenerateCCode(wxString filepath, wxString BaseName, int MyID_Ini
     int ID = MyID_Initial0Final1;
     int Hind = 0;
     int Sind = 2;
+    int SOCind = 4;
     if (ID == 1)
     {
         Hind = 1;
         Sind = 3;
+        SOCind = 5;
     }
     
     int nEss = sec30->ArraysOf3DDouble[Hind].size();
@@ -4204,6 +4262,10 @@ void MainFrame::GenerateCCode(wxString filepath, wxString BaseName, int MyID_Ini
     bool isS = false;
     int nEssS = sec30->ArraysOf3DDouble[Sind].size();
     if (nEssS > 0) isS = true;
+    
+    bool isSOC = false;
+    int nSOCBuf = sec30->ArraysOf3DDouble[SOCind].size();
+    if (nSOCBuf > 1) isSOC = true;
     
     //int nk = sec30->ArraysOf2DDouble[0].size();//double** KPoints; [ka,kb,kc,kx,ky,kz,d_path]
     //int nklabel = sec30->ArraysOf1DDouble[0].size();//double* dkLabel;
@@ -4552,10 +4614,12 @@ void MainFrame::GenerateFCode(wxString filepath, wxString BaseName, int MyID_Ini
     int ID = MyID_Initial0Final1;
     int Hind = 0;
     int Sind = 2;
+    int SOCind = 4;
     if (ID == 1)
     {
         Hind = 1;
         Sind = 3;
+        SOCind = 5;
     }
     
     int nEss = sec30->ArraysOf3DDouble[Hind].size();
@@ -4567,6 +4631,10 @@ void MainFrame::GenerateFCode(wxString filepath, wxString BaseName, int MyID_Ini
     bool isS = false;
     int nEssS = sec30->ArraysOf3DDouble[Sind].size();
     if (nEssS > 0) isS = true;
+    
+    bool isSOC = false;
+    int nSOCBuf = sec30->ArraysOf3DDouble[SOCind].size();
+    if (nSOCBuf > 1) isSOC = true;
     
     //int nk = sec30->ArraysOf2DDouble[0].size();//double** KPoints; [ka,kb,kc,kx,ky,kz,d_path]
     //int nklabel = sec30->ArraysOf1DDouble[0].size();//double* dkLabel;
@@ -4847,10 +4915,12 @@ void MainFrame::GenerateMathematicaCode(wxString filepath, wxString BaseName, in
     int ID = MyID_Initial0Final1;
     int Hind = 0;
     int Sind = 2;
+    int SOCind = 4;
     if (ID == 1)
     {
         Hind = 1;
         Sind = 3;
+        SOCind = 5;
     }
     
     int nEss = sec30->ArraysOf3DDouble[Hind].size();
@@ -4862,6 +4932,10 @@ void MainFrame::GenerateMathematicaCode(wxString filepath, wxString BaseName, in
     bool isS = false;
     int nEssS = sec30->ArraysOf3DDouble[Sind].size();
     if (nEssS > 0) isS = true;
+    
+    bool isSOC = false;
+    int nSOCBuf = sec30->ArraysOf3DDouble[SOCind].size();
+    if (nSOCBuf > 1) isSOC = true;
     
     int nk = sec30->ArraysOf2DDouble[0].size();//double** KPoints; [ka,kb,kc,kx,ky,kz,d_path]
     int nklabel = sec30->ArraysOf1DDouble[0].size();//double* dkLabel;
@@ -5034,10 +5108,12 @@ void MainFrame::GenerateMatlabCode(wxString filepath, wxString BaseName, int MyI
     int ID = MyID_Initial0Final1;
     int Hind = 0;
     int Sind = 2;
+    int SOCind = 4;
     if (ID == 1)
     {
         Hind = 1;
         Sind = 3;
+        SOCind = 5;
     }
     
     int nEss = sec30->ArraysOf3DDouble[Hind].size();
@@ -5050,6 +5126,10 @@ void MainFrame::GenerateMatlabCode(wxString filepath, wxString BaseName, int MyI
     int nEssS = sec30->ArraysOf3DDouble[Sind].size();
     if (nEssS > 0) isS = true;
     
+    bool isSOC = false;
+    int nSOCBuf = sec30->ArraysOf3DDouble[SOCind].size();
+    if (nSOCBuf > 1) isSOC = true;
+    
     int nk = sec30->ArraysOf2DDouble[0].size();//double** KPoints; [ka,kb,kc,kx,ky,kz,d_path]
     int nklabel = sec30->ArraysOf1DDouble[0].size();//double* dkLabel;
     
@@ -5057,11 +5137,18 @@ void MainFrame::GenerateMatlabCode(wxString filepath, wxString BaseName, int MyI
     wxString fname = filepath + wxT("/") + BaseName + wxT(".m");
     if ((fpk = fopen(fname,"w")) != NULL)
     {
-        fprintf(fpk,"%%Global parameters\n");
+        fprintf(fpk,"%%Clear global parameters\n");
+        fprintf(fpk,"clear all\n");
+        fprintf(fpk,"clc\n");
+        
+        fprintf(fpk,"\n%%Global parameters\n");
         fprintf(fpk,"global nH lMax mMax nMax l0 m0 n0 a b c as bs cs\n");
         
         fprintf(fpk,"\n%%Define the parameters\n");
-        fprintf(fpk,"nH = %d;\n", nH);
+        if (isSOC)
+            fprintf(fpk,"nH = %d;\n", 2*nH);
+        else
+            fprintf(fpk,"nH = %d;\n", nH);
         fprintf(fpk,"nk = %d;\n", nk);
         fprintf(fpk,"labels = {");
         for (int iklabel=0; iklabel<nklabel; iklabel++)
@@ -5138,6 +5225,51 @@ void MainFrame::GenerateMatlabCode(wxString filepath, wxString BaseName, int MyI
             }
         }
         
+        if (isSOC)
+        {
+            fprintf(fpk,"%%Load real and imaginary parts of Hsoc from the files\n");
+            wxString fnamere = wxT("./") + BaseName + wxT("_SOC_Re.dat");
+            fprintf(fpk,"ReSOC = load(\'%s\');\n", fnamere.c_str().AsChar());
+            wxString fnameim = wxT("./") + BaseName + wxT("_SOC_Im.dat");
+            fprintf(fpk,"ImSOC = load(\'%s\');\n", fnameim.c_str().AsChar());
+            fprintf(fpk,"Hsoc = ReSOC + 1i * ImSOC;\n");
+            
+            fprintf(fpk,"\n%%Evaluate H*I_{2x2}\n");
+            for (int iCell=0; iCell<nCell; iCell++)
+            {
+                wxString WorkingCell = listctr->GetString(iCell);
+                int lcell,mcell,ncell;
+                sec30->GetCellInfo(WorkingCell, lcell, mcell, ncell);
+                if (!(lcell==0 && mcell==0 && ncell == 0))
+                {
+                    fprintf(fpk,"h{l0 + %d, m0 + %d, n0 + %d} = kron(h{l0 + %d, m0 + %d, n0 + %d},[1 0;0 1]);\n", lcell, mcell, ncell, lcell, mcell, ncell);
+                    fprintf(fpk,"h{l0 + %d, m0 + %d, n0 + %d} = kron(h{l0 + %d, m0 + %d, n0 + %d},[1 0;0 1]);\n", -lcell, -mcell, -ncell, -lcell, -mcell, -ncell);
+                }
+                else
+                    fprintf(fpk,"h{l0 + %d, m0 + %d, n0 + %d} = kron(h{l0 + %d, m0 + %d, n0 + %d},[1 0;0 1]);\n", lcell, mcell, ncell, lcell, mcell, ncell);
+            }
+            
+            if (isS)
+            {
+                for (int iCell=0; iCell<nCell; iCell++)
+                {
+                    wxString WorkingCell = listctr->GetString(iCell);
+                    int lcell,mcell,ncell;
+                    sec30->GetCellInfo(WorkingCell, lcell, mcell, ncell);
+                    if (!(lcell==0 && mcell==0 && ncell == 0))
+                    {
+                        fprintf(fpk,"s{l0 + %d, m0 + %d, n0 + %d} = kron(s{l0 + %d, m0 + %d, n0 + %d},[1 0;0 1]);\n", lcell, mcell, ncell, lcell, mcell, ncell);
+                        fprintf(fpk,"s{l0 + %d, m0 + %d, n0 + %d} = kron(s{l0 + %d, m0 + %d, n0 + %d},[1 0;0 1]);\n", -lcell, -mcell, -ncell, -lcell, -mcell, -ncell);
+                    }
+                    else
+                        fprintf(fpk,"s{l0 + %d, m0 + %d, n0 + %d} = kron(s{l0 + %d, m0 + %d, n0 + %d},[1 0;0 1]);\n", lcell, mcell, ncell, lcell, mcell, ncell);
+                }
+            }
+            
+            fprintf(fpk,"\n%%Add SOC to the total Hamiltonian: HTot = H*I_{2x2} + Hsoc\n");
+            fprintf(fpk,"h{l0 + %d, m0 + %d, n0 + %d} = h{l0 + %d, m0 + %d, n0 + %d} + Hsoc;\n", 0, 0, 0, 0, 0, 0);
+        }
+        
         fprintf(fpk,"\n%%Load k-points from the file\n");
         fprintf(fpk,"kPath = load(\'./%s_kPath.dat\');\n", BaseName.c_str().AsChar());
         
@@ -5164,8 +5296,8 @@ void MainFrame::GenerateMatlabCode(wxString filepath, wxString BaseName, int MyI
         fprintf(fpk,"cs = 2*pi*cross(a, b)/vol;\n");
         
         fprintf(fpk,"\n%%Band-Structure Calculation\n");
-        fprintf(fpk,"disp(['The number of bands is ' mat2str(nH)]);\n");
         fprintf(fpk,"nbands = nH;\n");
+        fprintf(fpk,"disp(['The number of bands is ' mat2str(nbands)]);\n");
         fprintf(fpk,"bands = zeros(nbands, nk, 2);\n");
         fprintf(fpk,"dpath = 0.0;\n");
         
@@ -5233,10 +5365,12 @@ void MainFrame::GeneratePythonCode(wxString filepath, wxString BaseName, int MyI
     int ID = MyID_Initial0Final1;
     int Hind = 0;
     int Sind = 2;
+    int SOCind = 4;
     if (ID == 1)
     {
         Hind = 1;
         Sind = 3;
+        SOCind = 5;
     }
     
     int nEss = sec30->ArraysOf3DDouble[Hind].size();
@@ -5248,6 +5382,10 @@ void MainFrame::GeneratePythonCode(wxString filepath, wxString BaseName, int MyI
     bool isS = false;
     int nEssS = sec30->ArraysOf3DDouble[Sind].size();
     if (nEssS > 0) isS = true;
+    
+    bool isSOC = false;
+    int nSOCBuf = sec30->ArraysOf3DDouble[SOCind].size();
+    if (nSOCBuf > 1) isSOC = true;
     
     int nk = sec30->ArraysOf2DDouble[0].size();//double** KPoints; [ka,kb,kc,kx,ky,kz,d_path]
     int nklabel = sec30->ArraysOf1DDouble[0].size();//double* dkLabel;

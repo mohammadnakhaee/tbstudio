@@ -26,6 +26,7 @@ protected:
     virtual void Btn_Save_OnClick(wxCommandEvent& event);
     void ExportToCIF(wxString filepath, wxString filename);
     void ImportFromCIF0(wxString filepath, wxString filename);
+    void ClearAtoms();
     void ImportFromCIF(wxString filepath, wxString filename);
     void ImportUnitCellFromVaspXML(wxString filepath, wxString filename);
     void GetValueFromLine(wxString str, double &val);

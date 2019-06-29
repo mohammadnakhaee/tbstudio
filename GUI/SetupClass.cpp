@@ -595,7 +595,7 @@ void SetupClass::LoadVaspXMLOutput(wxString file, bool &isBandLoaded, int &maxne
         
         for(int i=0; i<3; i++)
         {
-            for(int j=0; j<3; j++) rtv[i][j] = rtv[i][j];// * BohrToAng;
+            for(int j=0; j<3; j++) rtv[i][j] = 2.0*3.1415926535897932384626*rtv[i][j];// Vasp does not have a 2pi factor in its calculations
             Adouble0D A1dvecs;
             A1dvecs.push_back(rtv[i][0]);
             A1dvecs.push_back(rtv[i][1]);
@@ -670,18 +670,18 @@ void SetupClass::LoadVaspXMLOutput(wxString file, bool &isBandLoaded, int &maxne
         int PathCounter = 0;
         int ThisPathInd = 0;
         d = 0.0;
-        int ind=0;
+        bool isFirst = true;
         for (rapidxml::xml_node<>* nd = kpointlist->first_node("v"); nd; nd = nd->next_sibling("v"))   //for(int i=0; i<nKp; i++)
         {
-            ind++;
             sscanf(nd->value(), "%lf %lf %lf", &vk[0], &vk[1], &vk[2]);
             
             sec30->vk_rtv(vk,rtv,vec);
-            if (ind==0)
+            if (isFirst)
             {
                 oldvec[0]=vec[0];
                 oldvec[1]=vec[1];
                 oldvec[2]=vec[2];
+                isFirst = false;
             }
             double deltakPath = sec30->norm(vec, oldvec);
             if (PathCounter == n_perpath[ThisPathInd])
