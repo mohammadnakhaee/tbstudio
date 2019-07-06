@@ -896,6 +896,44 @@ void Regression::func(double* t, int ny, double* p, int np, double* cnst, double
             //olgc->SetCellValue(irow, 2, val);
         }
     }
+
+    double a[3],b[3],c[3];
+    a[0] = cnst[0];
+    a[1] = cnst[1];
+    a[2] = cnst[2];
+    b[0] = cnst[3];
+    b[1] = cnst[4];
+    b[2] = cnst[5];
+    c[0] = cnst[6];
+    c[1] = cnst[7];
+    c[2] = cnst[8];
+    
+    double ak[3],bk[3],ck[3];
+    sec30->VecToReciprocal(a, b, c, ak, bk, ck);
+    
+    //int natoms = 0;
+    //sec30->GetVar(_("nAtoms[0]"),natoms);
+    //bool isSOC;
+    //sec30->GetCheckVar(_("SOC[0]"), isSOC);
+    //bool isOverlap;
+    //sec30->GetCheckVar(_("Overlap[0]"), isOverlap);
+    
+    double** XYZCoords = new double*[natoms];
+    for (int i=0; i<natoms; i++) XYZCoords[i] = new double[3];
+    
+    int ind=9;
+    for (int i=0; i<natoms; i++)
+    {
+        XYZCoords[i][0] = cnst[ind++];
+        XYZCoords[i][1] = cnst[ind++];
+        XYZCoords[i][2] = cnst[ind++];
+    }
+    
+    Adouble2D Hf, Sf, SOC_f;
+    int nEssensialCells;
+    int nHamiltonian;
+    Aint1D EssCells;
+
     //4. It should be arrays not a vector
     if(isOverlap)
         sec30->ConstructTBHamiltonianF(a, b, c, XYZCoords, Hf, Sf, nEssensialCells, nHamiltonian, EssCells, isSOC, SOC_f);
@@ -1146,3 +1184,21 @@ void Regression::func(double* t, int ny, double* p, int np, double* cnst, double
     }
 }
 
+void Regression::SendDataToTerminal(wxString data)
+{
+    wxCommandEvent* event = new wxCommandEvent(RegressionEVT_OnNewData);
+    event->SetString(data);
+    wxQueueEvent(Parent,event);
+}
+
+void Regression::SendEventRunFinished()
+{
+    wxCommandEvent* event = new wxCommandEvent(RegressionEVT_OnFinished);
+    wxQueueEvent(Parent,event);
+}
+
+void Regression::SendEventRunStarted()
+{
+    wxCommandEvent* event = new wxCommandEvent(RegressionEVT_OnStarted);
+    wxQueueEvent(Parent,event);
+}

@@ -25,6 +25,9 @@ struct lmOptions
     double epsilon_3;    //   1e-1     convergence tolerance for red. Chi-square
     double epsilon_4;    //   1e-1     determines acceptance of a L-M step
     double lambda_0;     //   1e-2     initial value of L-M paramter
+    double lambda_UP_fac;   //   11       factor for increasing lambda
+    double lambda_DN_fac;   //   9       factor for decreasing lambda
+    int Update_Type;     //   1       1: Levenberg-Marquardt lambda update      2: Quadratic update           3: Nielsen's lambda update equations
 };
 
 class Regression
@@ -50,7 +53,10 @@ public:
     void MatMat2Mat(double** a, double** b, int na, int manb, int mb, double** c);
     double VecVec2Num(double* a, double* b, int na);
     void Transpose(double** a, int na, int nb, double** aT);
-
+    void func(double* t,  int ny, double* p, int np, double* cnst, double* y, lapack_complex_double* LowerSymMatrixHf, lapack_complex_double* LowerSymMatrixSf, double* eigHf, int natoms, bool isSOC, bool isOverlap);
+    void SendDataToTerminal(wxString data);
+    void SendEventRunFinished();
+    void SendEventRunStarted();
 
 };
 
