@@ -35,9 +35,9 @@ public:
     wxString MySerialNumber = _("");
     wxString SoftwareName = _("TBStudio");
     wxString FreeSoftwareLimitations = _("fitting a TB model including d-orbitals");
-    int Ver_MAJOR = 1;
-    int Ver_MINOR = 2;
-    int Ver_RELEASE = 1;
+    int Ver_MAJOR = 2;
+    int Ver_MINOR = 0;
+    int Ver_RELEASE = 0;
     
     MainFrame(wxWindow* parent);
     virtual ~MainFrame();

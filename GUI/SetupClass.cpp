@@ -83,7 +83,7 @@ SetupClass::SetupClass(wxWindow* parent, Sec30* sec30var, wxWindowID id, const w
     sec30->AddVarVector(this, 1, _("OPrnt"), _("int"), _("Figure Updating Step"), 170, 100, false, false);
     sec30->SetVar(_("OPrnt[0]"), 3, false);
     sec30->AddVarVector(this, 1, _("OMaxIter"), _("int"), _("Iteration Limit"), 170, 100, false, false);
-    sec30->SetVar(_("OMaxIter[0]"), 100, false);
+    sec30->SetVar(_("OMaxIter[0]"), 50, false);
     sec30->AddVarVector(this, 1, _("Oeps1"), _("double"), _("Gradient Threshold"), 170, 100, false, false);
     sec30->SetVar(_("Oeps1[0]"), 0.0001, false);
     sec30->AddVarVector(this, 1, _("Oeps2"), _("double"), _("Parameters Threshold"), 170, 100, false, false);
@@ -99,9 +99,11 @@ SetupClass::SetupClass(wxWindow* parent, Sec30* sec30var, wxWindowID id, const w
     sec30->AddVarVector(this, 1, _("OLamDn"), _("double"), _("Decreasing Lambda"), 170, 100, false, false);
     sec30->SetVar(_("OLamDn[0]"), 0.0001, false);
     sec30->AddVarVector(this, 1, _("OMaxP"), _("double"), _("Parameters Maximum Limit"), 170, 100, false, false);
-    sec30->SetVar(_("OMaxP[0]"), 100.0, false);
+    sec30->SetVar(_("OMaxP[0]"), 1000.0, false);
     sec30->AddVarVector(this, 1, _("OMinP"), _("double"), _("Parameters Minimum Limit"), 170, 100, false, false);
-    sec30->SetVar(_("OMinP[0]"), -100.0, false);
+    sec30->SetVar(_("OMinP[0]"), -1000.0, false);
+    sec30->AddVarVector(this, 1, _("OMixing"), _("double"), _("Mixing"), 170, 100, false, false);
+    sec30->SetVar(_("OMixing[0]"), 1.0, false);
     sec30->AddVarVector(this, 1, _("OReScale"), _("double"), _("Rescale Factor"), 170, 100, false, false);
     sec30->SetVar(_("OReScale[0]"), 1.0, false);
     /**********************************************************************************************************************************************/
@@ -736,7 +738,6 @@ void SetupClass::LoadVaspXMLOutput(wxString file, bool &isBandLoaded, int &maxne
                 break;
             }
         }
-        
         
         //Loading Eigenvalues
         rapidxml::xml_node<>* calculation = modeling_node->first_node("calculation");

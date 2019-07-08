@@ -70,7 +70,7 @@ double Regression::Variance(double* a, int na)
     return var / (na - 1);
 }
 
-void Regression::Start(double* p, int np, double* t, double* y_dat, int ny, double* weight, double* dp, double p_min, double p_max, double* c, lmOptions opts, bool isOneStep)
+void Regression::Start(double* p, int np, double* t, double* y_dat, int ny, double* weight, double* dp, double p_min, double p_max, double Mixing, double* c, lmOptions opts, bool isOneStep)
 {
     SendEventRunStarted();
     myGrid* osgc = sec30->GetGridObject(_("OS"));
@@ -125,7 +125,7 @@ void Regression::Start(double* p, int np, double* t, double* y_dat, int ny, doub
     for (int i=0; i<nHamiltonianTot; i++) eigHf[i] = 0.0;
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     
-    lm(p, np, t, y_dat, ny, weight, dp, p_min, p_max, c, opts, redX2, sigma_p, cvg_hst, isOneStep, LowerSymMatrixHf, LowerSymMatrixSf, eigHf, natoms, isSOC, isOverlap);
+    lm(p, np, t, y_dat, ny, weight, dp, p_min, p_max, Mixing, c, opts, redX2, sigma_p, cvg_hst, isOneStep, LowerSymMatrixHf, LowerSymMatrixSf, eigHf, natoms, isSOC, isOverlap);
     
     //////////////////////////////
     //Deallocate
@@ -134,30 +134,7 @@ void Regression::Start(double* p, int np, double* t, double* y_dat, int ny, doub
     if (isOverlap) delete [] LowerSymMatrixSf;
     //LAPACKE_free(LowerSymMatrixHf);
     //////////////////////////////
-    
-    for (int ip=0; ip<np; ip++)
-    {
-        int GridInd = sec30->ArraysOf2DInt[1][ip][0];
-        int irow = sec30->ArraysOf2DInt[1][ip][1];
-        double Value = p[ip];
-        wxString val = wxString::Format(wxT("%.8f"), Value);
-        if (GridInd == 1)
-        {
-            osgc->SetCellValue(irow, 2, val);
-            if (isOneStep) osgc->SetCellValue(irow, 1, val);
-        }
-        else if (GridInd == 2)
-        {
-            skgc->SetCellValue(irow, 2, val);
-            if (isOneStep) skgc->SetCellValue(irow, 1, val);
-        }
-        else if (GridInd == 3)
-        {
-            olgc->SetCellValue(irow, 2, val);
-            if (isOneStep) olgc->SetCellValue(irow, 1, val);
-        }
-    }
-    
+
     osgc->Refresh(false);
     skgc->Refresh(false);
     olgc->Refresh(false);
@@ -174,7 +151,7 @@ void Regression::Start(double* p, int np, double* t, double* y_dat, int ny, doub
     return;
 }
 
-void Regression::lm(double* p, int np, double* t, double* y_dat, int ny, double* weight, double* dp, double p_min, double p_max, double* c, lmOptions opts, double &redX2, double* sigma_p, double** cvg_hst, bool isOneStep, lapack_complex_double* LowerSymMatrixHf, lapack_complex_double* LowerSymMatrixSf, double* eigHf, int natoms, bool isSOC, bool isOverlap)
+void Regression::lm(double* p, int np, double* t, double* y_dat, int ny, double* weight, double* dp, double p_min, double p_max, double Mixing, double* c, lmOptions opts, double &redX2, double* sigma_p, double** cvg_hst, bool isOneStep, lapack_complex_double* LowerSymMatrixHf, lapack_complex_double* LowerSymMatrixSf, double* eigHf, int natoms, bool isSOC, bool isOverlap)
 {
     wxString data;
     //global   iteration  func_calls
@@ -389,35 +366,6 @@ void Regression::lm(double* p, int np, double* t, double* y_dat, int ny, double*
             isAllFinite = isAllFinite && std::isfinite(delta_y[iy]);
         
         if (!isAllFinite) {BadCondition=true; break;}                   // floating point error; break
-        /*if (!isAllFinite)                    // floating point error; break
-        {
-            ///////////////Out of While Loop///////////
-            delete [] y_hat;
-            delete [] JtWdy;
-            for (int ip=0; ip<np; ip++) delete [] JtWJ[ip];
-            if (np>0) delete [] JtWJ;
-            for (int iy=0; iy<ny; iy++) delete [] J[iy];
-            if (ny>0) delete [] J;
-            delete [] y_old;
-            delete [] p_old;
-            delete [] hperP;
-            delete [] h;
-            delete [] h2;
-            delete [] ipiv;
-            delete [] ipiv2;
-            delete [] hInv;
-            delete [] y1;
-            delete [] delta_y;
-            delete [] p_try;
-            delete [] weighted_dy;
-            delete [] weighted_dy2;
-            delete [] JtWJArr;
-            delete [] covar_p;
-            delete [] idx;
-            ///////////////Out of While Loop///////////
-            
-            return;
-        }*/
         
         func_calls = func_calls + 1;
         
@@ -436,7 +384,7 @@ void Regression::lm(double* p, int np, double* t, double* y_dat, int ny, double*
             //h = alpha * h;
             for (int ip=0; ip<np; ip++) h[ip] = alpha * h[ip];
             
-            for (int ip=0; ip<np; ip++) p_try[ip] = p[ip] + h[idx[ip]];           // update only [idx] elements
+            for (int ip=0; ip<np; ip++) p_try[ip] = p[ip] + Mixing * h[idx[ip]];           // update only [idx] elements
             
             for (int ip=0; ip<np; ip++)                              // apply constraints
             {
@@ -462,7 +410,7 @@ void Regression::lm(double* p, int np, double* t, double* y_dat, int ny, double*
         for (int ip=0; ip<np; ip++) h2[ip] = lambda*h[ip] + JtWdy[ip];
         double rho = VecVec2Num(h, h2, np);
         
-        if ( rho > epsilon_4 )                         // it IS significantly better
+        if ( rho > epsilon_4 )                         // it is significantly better
         {
             double dX2 = X2 - X2_old;
             X2_old = X2;
@@ -487,7 +435,7 @@ void Regression::lm(double* p, int np, double* t, double* y_dat, int ny, double*
                     break;
             }
             
-            if ( prnt > 2 )
+            if ( prnt > 1 )
             {
                 graph2d->Update2d();
                 graph2d->Refresh(true);
