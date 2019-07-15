@@ -2688,7 +2688,7 @@ double Sec30::Hopspd(double sss, double sps, double sds, double pps, double ppp,
     return out;
 }
 
-void Sec30::ConstructTBHamiltonian(double a[3], double b[3], double c[3], double** XYZCoords, Adouble2D &Hi, Adouble2D &Hf, int &nEssensialCells, int &nHamiltonian, Aint1D &EssCells, bool isSOC, Adouble2D &SOC_i, Adouble2D &SOC_f)
+void Sec30::ConstructTBHamiltonian(double a[3], double b[3], double c[3], double** XYZCoords, Adouble2D &Hi, Adouble2D &Hf, int &nEssensialCells, int &nHamiltonian, Aint1D &EssCells)
 {
     wxListBox* listctr = this->GetListObject(_("EssentialUnitcellList"));
     int nCell = listctr->GetCount();
@@ -2722,11 +2722,6 @@ void Sec30::ConstructTBHamiltonian(double a[3], double b[3], double c[3], double
         wxTreeItemId CellID = bonds->FindItemIn(rootID, ucell);
         Adouble1D hi(nHamiltonian,std::vector<double>(nHamiltonian));
         Adouble1D hf(nHamiltonian,std::vector<double>(nHamiltonian));
-        if (isSOC)
-        {
-            SOC_i = Adouble2D(2, Adouble1D(2*nHamiltonian, Adouble0D(2*nHamiltonian, 0.0 ) ) );
-            SOC_f = Adouble2D(2, Adouble1D(2*nHamiltonian, Adouble0D(2*nHamiltonian, 0.0 ) ) );
-        }
         if (CellID.IsOk())
         {
             if (bonds->GetItemState(CellID) >= wxCheckTree::CHECKED) GetCouplingMatrix(SKCtr, OverlapCtr, bonds, orbs, a, b, c, XYZCoords, HamiltonianDimMap, CellID, WorkingCell, hi, hf);
@@ -2734,7 +2729,7 @@ void Sec30::ConstructTBHamiltonian(double a[3], double b[3], double c[3], double
         
         if (WorkingCell == _("(0,0,0)"))
         {
-            AddOnSiteMatrix(OnSiteCtr, orbs, HamiltonianDimMap, hi, hf, isSOC, SOC_i, SOC_f);
+            AddOnSiteMatrix(OnSiteCtr, orbs, HamiltonianDimMap, hi, hf);
         }
         
         Hi.push_back(hi);
@@ -2742,7 +2737,7 @@ void Sec30::ConstructTBHamiltonian(double a[3], double b[3], double c[3], double
     }
 }
 
-void Sec30::ConstructTBHamiltonian(double a[3], double b[3], double c[3], double** XYZCoords, Adouble2D &Hi, Adouble2D &Hf, Adouble2D &Si, Adouble2D &Sf, int &nEssensialCells, int &nHamiltonian, Aint1D &EssCells, bool isSOC, Adouble2D &SOC_i, Adouble2D &SOC_f)
+void Sec30::ConstructTBHamiltonian(double a[3], double b[3], double c[3], double** XYZCoords, Adouble2D &Hi, Adouble2D &Hf, Adouble2D &Si, Adouble2D &Sf, int &nEssensialCells, int &nHamiltonian, Aint1D &EssCells)
 {
     wxListBox* listctr = this->GetListObject(_("EssentialUnitcellList"));
     int nCell = listctr->GetCount();
@@ -2778,11 +2773,6 @@ void Sec30::ConstructTBHamiltonian(double a[3], double b[3], double c[3], double
         Adouble1D hf(nHamiltonian,std::vector<double>(nHamiltonian));
         Adouble1D si(nHamiltonian,std::vector<double>(nHamiltonian));
         Adouble1D sf(nHamiltonian,std::vector<double>(nHamiltonian));
-        if (isSOC)
-        {
-            SOC_i = Adouble2D(2, Adouble1D(2*nHamiltonian, Adouble0D(2*nHamiltonian, 0.0 ) ) );
-            SOC_f = Adouble2D(2, Adouble1D(2*nHamiltonian, Adouble0D(2*nHamiltonian, 0.0 ) ) );
-        }
         if (CellID.IsOk())
         {
             if (bonds->GetItemState(CellID) >= wxCheckTree::CHECKED) GetCouplingMatrix(SKCtr, OverlapCtr, bonds, orbs, a, b, c, XYZCoords, HamiltonianDimMap, CellID, WorkingCell, hi, hf, si, sf);
@@ -2790,7 +2780,7 @@ void Sec30::ConstructTBHamiltonian(double a[3], double b[3], double c[3], double
         
         if (WorkingCell == _("(0,0,0)"))
         {
-            AddOnSiteMatrix(OnSiteCtr, orbs, HamiltonianDimMap, hi, hf, si, sf, isSOC, SOC_i, SOC_f);
+            AddOnSiteMatrix(OnSiteCtr, orbs, HamiltonianDimMap, hi, hf, si, sf);
         }
         
         Hi.push_back(hi);
@@ -2800,7 +2790,7 @@ void Sec30::ConstructTBHamiltonian(double a[3], double b[3], double c[3], double
     }
 }
 
-void Sec30::ConstructTBHamiltonianF(double a[3], double b[3], double c[3], double** XYZCoords, Adouble2D &Hf, int &nEssensialCells, int &nHamiltonian, Aint1D &EssCells, bool isSOC, Adouble2D &SOC_f)
+void Sec30::ConstructTBHamiltonianF(double a[3], double b[3], double c[3], double** XYZCoords, Adouble2D &Hf, int &nEssensialCells, int &nHamiltonian, Aint1D &EssCells)
 {
     wxListBox* listctr = this->GetListObject(_("EssentialUnitcellList"));
     int nCell = listctr->GetCount();
@@ -2833,7 +2823,6 @@ void Sec30::ConstructTBHamiltonianF(double a[3], double b[3], double c[3], doubl
         EssCells.push_back(lmnOfCell);
         wxTreeItemId CellID = bonds->FindItemIn(rootID, ucell);
         Adouble1D hf(nHamiltonian,std::vector<double>(nHamiltonian));
-        if (isSOC) SOC_f = Adouble2D(2, Adouble1D(2*nHamiltonian, Adouble0D(2*nHamiltonian, 0.0 ) ) );
         if (CellID.IsOk())
         {
             if (bonds->GetItemState(CellID) >= wxCheckTree::CHECKED) GetCouplingMatrixF(SKCtr, OverlapCtr, bonds, orbs, a, b, c, XYZCoords, HamiltonianDimMap, CellID, WorkingCell, hf);
@@ -2841,14 +2830,14 @@ void Sec30::ConstructTBHamiltonianF(double a[3], double b[3], double c[3], doubl
         
         if (WorkingCell == _("(0,0,0)"))
         {
-            AddOnSiteMatrixF(OnSiteCtr, orbs, HamiltonianDimMap, hf, isSOC, SOC_f);
+            AddOnSiteMatrixF(OnSiteCtr, orbs, HamiltonianDimMap, hf);
         }
         
         Hf.push_back(hf);
     }
 }
 
-void Sec30::ConstructTBHamiltonianF(double a[3], double b[3], double c[3], double** XYZCoords, Adouble2D &Hf, Adouble2D &Sf, int &nEssensialCells, int &nHamiltonian, Aint1D &EssCells, bool isSOC, Adouble2D &SOC_f)
+void Sec30::ConstructTBHamiltonianF(double a[3], double b[3], double c[3], double** XYZCoords, Adouble2D &Hf, Adouble2D &Sf, int &nEssensialCells, int &nHamiltonian, Aint1D &EssCells)
 {
     wxListBox* listctr = this->GetListObject(_("EssentialUnitcellList"));
     int nCell = listctr->GetCount();
@@ -2882,7 +2871,6 @@ void Sec30::ConstructTBHamiltonianF(double a[3], double b[3], double c[3], doubl
         wxTreeItemId CellID = bonds->FindItemIn(rootID, ucell);
         Adouble1D hf(nHamiltonian,std::vector<double>(nHamiltonian));
         Adouble1D sf(nHamiltonian,std::vector<double>(nHamiltonian));
-        if (isSOC) SOC_f = Adouble2D(2, Adouble1D(2*nHamiltonian, Adouble0D(2*nHamiltonian, 0.0 ) ) );
         if (CellID.IsOk())
         {
             if (bonds->GetItemState(CellID) >= wxCheckTree::CHECKED) GetCouplingMatrixF(SKCtr, OverlapCtr, bonds, orbs, a, b, c, XYZCoords, HamiltonianDimMap, CellID, WorkingCell, hf, sf);
@@ -2890,7 +2878,7 @@ void Sec30::ConstructTBHamiltonianF(double a[3], double b[3], double c[3], doubl
         
         if (WorkingCell == _("(0,0,0)"))
         {
-            AddOnSiteMatrixF(OnSiteCtr, orbs, HamiltonianDimMap, hf, sf, isSOC, SOC_f);
+            AddOnSiteMatrixF(OnSiteCtr, orbs, HamiltonianDimMap, hf, sf);
         }
         
         Hf.push_back(hf);
@@ -3552,7 +3540,7 @@ void Sec30::GetCouplingMatrixF(myGrid* SKCtr, myGrid* OverlapCtr, wxCheckTree* B
 	}
 }
 
-void Sec30::AddOnSiteMatrix(myGrid* OnSiteCtr, wxCheckTree* orbs, Aint1D HamiltonianDimMap, Adouble1D &hi, Adouble1D &hf, bool isSOC, Adouble2D &SOC_i, Adouble2D &SOC_f)
+void Sec30::AddOnSiteMatrix(myGrid* OnSiteCtr, wxCheckTree* orbs, Aint1D HamiltonianDimMap, Adouble1D &hi, Adouble1D &hf)
 {
     wxTreeItemId rootID = orbs->GetRootItem();
     wxString rootname = orbs->GetItemText(rootID);
@@ -3582,13 +3570,11 @@ void Sec30::AddOnSiteMatrix(myGrid* OnSiteCtr, wxCheckTree* orbs, Aint1D Hamilto
             {
                 this->GetOrbitalInfo(orbs, TBAtom1, iShell, Orbs1, Dim1, IsShell1);
                 wxString Label = TBAtom1  + _(" (") + ShellName + _(")");
-                
+
                 int i0Ham = HamiltonianDimMap[iAtomIndex][iShell - 1];
                 
                 Adouble0D iOnSiteSK, fOnSiteSK;
-                double i_p_soc, i_d_soc, f_p_soc, f_d_soc;
-                Aint0D Orbital_Patern = Aint0D();
-                GetOnSiteSK(OnSiteCtr, Label, iOnSiteSK, fOnSiteSK, i_p_soc, i_d_soc, f_p_soc, f_d_soc, Orbital_Patern);
+                GetOnSiteSK(OnSiteCtr, Label, iOnSiteSK, fOnSiteSK);
                 
                 for(int ii=0; ii<Dim1; ii++)
                 {
@@ -3596,61 +3582,12 @@ void Sec30::AddOnSiteMatrix(myGrid* OnSiteCtr, wxCheckTree* orbs, Aint1D Hamilto
                     hi[ih][ih] = iOnSiteSK[ii];
                     hf[ih][ih] = fOnSiteSK[ii];
                 }
-                
-                ///////////////Add SOC////////////////////////////////////////
-                if (isSOC)
-                {
-                    int nMSpin = 2*Dim1;
-                    double** iReSOC = new double*[nMSpin];
-                    double** iImSOC = new double*[nMSpin];
-                    double** fReSOC = new double*[nMSpin];
-                    double** fImSOC = new double*[nMSpin];
-                    for (int i=0; i<nMSpin; i++)
-                    {
-                        iReSOC[i] = new double[nMSpin];
-                        iImSOC[i] = new double[nMSpin];
-                        fReSOC[i] = new double[nMSpin];
-                        fImSOC[i] = new double[nMSpin];
-                    }
-                    
-                    GetSOC(i_p_soc, i_d_soc, Orbital_Patern, iReSOC, iImSOC);
-                    GetSOC(f_p_soc, f_d_soc, Orbital_Patern, fReSOC, fImSOC);
-                    for(int ii=0; ii<nMSpin; ii++)
-                    {
-                        int ih = 2*i0Ham + ii;
-                        for(int jj=0; jj<nMSpin; jj++)
-                        {
-                            int jh = 2*i0Ham + jj;
-                            SOC_i[0][ih][jh] = iReSOC[ii][jj]; //SOC_i[0] is Real part
-                            SOC_i[1][ih][jh] = iImSOC[ii][jj]; //SOC_i[1] is Imaginary part
-                            SOC_f[0][ih][jh] = fReSOC[ii][jj]; //SOC_f[0] is Real part
-                            SOC_f[1][ih][jh] = fImSOC[ii][jj]; //SOC_f[1] is Imaginary part
-                        }
-                    }
-                    
-                    for (int i=0; i<nMSpin; i++)
-                    {
-                        delete [] iReSOC[i];
-                        delete [] iImSOC[i];
-                        delete [] fReSOC[i];
-                        delete [] fImSOC[i];
-                    }
-                    if (nMSpin>0)
-                    {
-                        delete [] iReSOC;
-                        delete [] iImSOC;
-                        delete [] fReSOC;
-                        delete [] fImSOC;
-                    }
-                }
-                ///////////////////////////////////////////////////////////////
-                
             }
         }
     }
 }
 
-void Sec30::AddOnSiteMatrix(myGrid* OnSiteCtr, wxCheckTree* orbs, Aint1D HamiltonianDimMap, Adouble1D &hi, Adouble1D &hf, Adouble1D &si, Adouble1D &sf, bool isSOC, Adouble2D &SOC_i, Adouble2D &SOC_f)
+void Sec30::AddOnSiteMatrix(myGrid* OnSiteCtr, wxCheckTree* orbs, Aint1D HamiltonianDimMap, Adouble1D &hi, Adouble1D &hf, Adouble1D &si, Adouble1D &sf)
 {
     wxTreeItemId rootID = orbs->GetRootItem();
     wxString rootname = orbs->GetItemText(rootID);
@@ -3684,9 +3621,7 @@ void Sec30::AddOnSiteMatrix(myGrid* OnSiteCtr, wxCheckTree* orbs, Aint1D Hamilto
                 int i0Ham = HamiltonianDimMap[iAtomIndex][iShell - 1];
                 
                 Adouble0D iOnSiteSK, fOnSiteSK;
-                double i_p_soc, i_d_soc, f_p_soc, f_d_soc;
-                Aint0D Orbital_Patern = Aint0D();
-                GetOnSiteSK(OnSiteCtr, Label, iOnSiteSK, fOnSiteSK, i_p_soc, i_d_soc, f_p_soc, f_d_soc, Orbital_Patern);
+                GetOnSiteSK(OnSiteCtr, Label, iOnSiteSK, fOnSiteSK);
                 
                 for(int ii=0; ii<Dim1; ii++)
                 {
@@ -3697,61 +3632,12 @@ void Sec30::AddOnSiteMatrix(myGrid* OnSiteCtr, wxCheckTree* orbs, Aint1D Hamilto
                     si[ih][ih] = 1.0;
                     sf[ih][ih] = 1.0;
                 }
-                
-                ///////////////Add SOC////////////////////////////////////////
-                if (isSOC)
-                {
-                    int nMSpin = 2*Dim1;
-                    double** iReSOC = new double*[nMSpin];
-                    double** iImSOC = new double*[nMSpin];
-                    double** fReSOC = new double*[nMSpin];
-                    double** fImSOC = new double*[nMSpin];
-                    for (int i=0; i<2*Dim1; i++)
-                    {
-                        iReSOC[i] = new double[nMSpin];
-                        iImSOC[i] = new double[nMSpin];
-                        fReSOC[i] = new double[nMSpin];
-                        fImSOC[i] = new double[nMSpin];
-                    }
-                    
-                    GetSOC(i_p_soc, i_d_soc, Orbital_Patern, iReSOC, iImSOC);
-                    GetSOC(f_p_soc, f_d_soc, Orbital_Patern, fReSOC, fImSOC);
-                    for(int ii=0; ii<nMSpin; ii++)
-                    {
-                        int ih = 2*i0Ham + ii;
-                        for(int jj=0; jj<nMSpin; jj++)
-                        {
-                            int jh = 2*i0Ham + jj;
-                            SOC_i[0][ih][jh] = iReSOC[ii][jj]; //SOC_i[0] is Real part
-                            SOC_i[1][ih][jh] = iImSOC[ii][jj]; //SOC_i[1] is Imaginary part
-                            SOC_f[0][ih][jh] = fReSOC[ii][jj]; //SOC_f[0] is Real part
-                            SOC_f[1][ih][jh] = fImSOC[ii][jj]; //SOC_f[1] is Imaginary part
-                        }
-                    }
-                    
-                    for (int i=0; i<nMSpin; i++)
-                    {
-                        delete [] iReSOC[i];
-                        delete [] iImSOC[i];
-                        delete [] fReSOC[i];
-                        delete [] fImSOC[i];
-                    }
-                    if (nMSpin>0)
-                    {
-                        delete [] iReSOC;
-                        delete [] iImSOC;
-                        delete [] fReSOC;
-                        delete [] fImSOC;
-                    }
-                }
-                ///////////////////////////////////////////////////////////////
-                
             }
         }
     }
 }
 
-void Sec30::AddOnSiteMatrixF(myGrid* OnSiteCtr, wxCheckTree* orbs, Aint1D HamiltonianDimMap, Adouble1D &hf, bool isSOC, Adouble2D &SOC_f)
+void Sec30::AddOnSiteMatrixF(myGrid* OnSiteCtr, wxCheckTree* orbs, Aint1D HamiltonianDimMap, Adouble1D &hf)
 {
     wxTreeItemId rootID = orbs->GetRootItem();
     wxString rootname = orbs->GetItemText(rootID);
@@ -3785,59 +3671,19 @@ void Sec30::AddOnSiteMatrixF(myGrid* OnSiteCtr, wxCheckTree* orbs, Aint1D Hamilt
                 int i0Ham = HamiltonianDimMap[iAtomIndex][iShell - 1];
                 
                 Adouble0D iOnSiteSK, fOnSiteSK;
-                double f_p_soc, f_d_soc;
-                Aint0D Orbital_Patern = Aint0D();
-                GetOnSiteSKF(OnSiteCtr, OSBuffer, Label, iOnSiteSK, fOnSiteSK, f_p_soc, f_d_soc, Orbital_Patern);
+                GetOnSiteSKF(OnSiteCtr, OSBuffer, Label, iOnSiteSK, fOnSiteSK);
                 
                 for(int ii=0; ii<Dim1; ii++)
                 {
                     int ih = i0Ham + ii;
                     hf[ih][ih] = fOnSiteSK[ii];
                 }
-                
-                ///////////////Add SOC////////////////////////////////////////
-                if (isSOC)
-                {
-                    int nMSpin = 2*Dim1;
-                    double** fReSOC = new double*[nMSpin];
-                    double** fImSOC = new double*[nMSpin];
-                    for (int i=0; i<2*Dim1; i++)
-                    {
-                        fReSOC[i] = new double[nMSpin];
-                        fImSOC[i] = new double[nMSpin];
-                    }
-                    
-                    GetSOC(f_p_soc, f_d_soc, Orbital_Patern, fReSOC, fImSOC);
-                    
-                    for(int ii=0; ii<nMSpin; ii++)
-                    {
-                        int ih = 2*i0Ham + ii;
-                        for(int jj=0; jj<nMSpin; jj++)
-                        {
-                            int jh = 2*i0Ham + jj;
-                            SOC_f[0][ih][jh] = fReSOC[ii][jj]; //SOC_f[0] is Real part
-                            SOC_f[1][ih][jh] = fImSOC[ii][jj]; //SOC_f[1] is Imaginary part
-                        }
-                    }
-                    
-                    for (int i=0; i<nMSpin; i++)
-                    {
-                        delete [] fReSOC[i];
-                        delete [] fImSOC[i];
-                    }
-                    if (nMSpin>0)
-                    {
-                        delete [] fReSOC;
-                        delete [] fImSOC;
-                    }
-                }
-                ///////////////////////////////////////////////////////////////
             }
         }
     }
 }
 
-void Sec30::AddOnSiteMatrixF(myGrid* OnSiteCtr, wxCheckTree* orbs, Aint1D HamiltonianDimMap, Adouble1D &hf, Adouble1D &sf, bool isSOC, Adouble2D &SOC_f)
+void Sec30::AddOnSiteMatrixF(myGrid* OnSiteCtr, wxCheckTree* orbs, Aint1D HamiltonianDimMap, Adouble1D &hf, Adouble1D &sf)
 {
     wxTreeItemId rootID = orbs->GetRootItem();
     wxString rootname = orbs->GetItemText(rootID);
@@ -3871,9 +3717,7 @@ void Sec30::AddOnSiteMatrixF(myGrid* OnSiteCtr, wxCheckTree* orbs, Aint1D Hamilt
                 int i0Ham = HamiltonianDimMap[iAtomIndex][iShell - 1];
                 
                 Adouble0D iOnSiteSK, fOnSiteSK;
-                double f_p_soc, f_d_soc;
-                Aint0D Orbital_Patern = Aint0D();
-                GetOnSiteSKF(OnSiteCtr, OSBuffer, Label, iOnSiteSK, fOnSiteSK, f_p_soc, f_d_soc, Orbital_Patern);
+                GetOnSiteSKF(OnSiteCtr, OSBuffer, Label, iOnSiteSK, fOnSiteSK);
                 
                 for(int ii=0; ii<Dim1; ii++)
                 {
@@ -3882,45 +3726,6 @@ void Sec30::AddOnSiteMatrixF(myGrid* OnSiteCtr, wxCheckTree* orbs, Aint1D Hamilt
                     
                     sf[ih][ih] = 1.0;
                 }
-                
-                ///////////////Add SOC////////////////////////////////////////
-                if (isSOC)
-                {
-                    int nMSpin = 2*Dim1;
-                    double** fReSOC = new double*[nMSpin];
-                    double** fImSOC = new double*[nMSpin];
-                    for (int i=0; i<2*Dim1; i++)
-                    {
-                        fReSOC[i] = new double[nMSpin];
-                        fImSOC[i] = new double[nMSpin];
-                    }
-                    
-                    GetSOC(f_p_soc, f_d_soc, Orbital_Patern, fReSOC, fImSOC);
-                    
-                    for(int ii=0; ii<nMSpin; ii++)
-                    {
-                        int ih = 2*i0Ham + ii;
-                        for(int jj=0; jj<nMSpin; jj++)
-                        {
-                            int jh = 2*i0Ham + jj;
-                            SOC_f[0][ih][jh] = fReSOC[ii][jj]; //SOC_f[0] is Real part
-                            SOC_f[1][ih][jh] = fImSOC[ii][jj]; //SOC_f[1] is Imaginary part
-                        }
-                    }
-                    
-                    for (int i=0; i<nMSpin; i++)
-                    {
-                        delete [] fReSOC[i];
-                        delete [] fImSOC[i];
-                    }
-                    if (nMSpin>0)
-                    {
-                        delete [] fReSOC;
-                        delete [] fImSOC;
-                    }
-                }
-                ///////////////////////////////////////////////////////////////
-                
             }
         }
     }
@@ -3967,7 +3772,7 @@ void Sec30::GetBondSK(myGrid* GridCtrl, wxString Label, Adouble0D &iBondSK, Adou
             bool isOkf = fstr.ToDouble(&fval);
             SetBondSKElement(title, isOki, iBondSK, ival, isOkf, fBondSK, fval);
         }
-    }
+    }                
 }
 
 void Sec30::GetBondSKF(myGrid* GridCtrl, double* GridBuffer, wxString Label, Adouble0D &iBondSK, Adouble0D &fBondSK)
@@ -3996,30 +3801,23 @@ void Sec30::GetBondSKF(myGrid* GridCtrl, double* GridBuffer, wxString Label, Ado
             fval = GridBuffer[irow];
             SetBondSKElement(title, false, iBondSK, 0.0, true, fBondSK, fval);
         }
-    }
+    }                
 }
 
-void Sec30::GetOnSiteSK(myGrid* GridCtrl, wxString Label, Adouble0D &iBondSK, Adouble0D &fBondSK, double &i_p_soc, double &i_d_soc, double &f_p_soc, double &f_d_soc, Aint0D &Orbital_Patern)
+void Sec30::GetOnSiteSK(myGrid* GridCtrl, wxString Label, Adouble0D &iBondSK, Adouble0D &fBondSK)
 {
     wxString title, istr, fstr;
     double ival, fval;
     int nRow = GridCtrl->GetNumberRows();
     iBondSK = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
     fBondSK = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-    i_p_soc=0.0;
-    f_p_soc=0.0;
-    i_d_soc=0.0;
-    f_d_soc=0.0;
-    Orbital_Patern.clear();
     bool found = false;
-    int ind=0;
     for (int irow=0; irow<nRow;irow++)
     {
         title = GridCtrl->GetCellValue(irow, 0);
         if (!found)
         {
             if (title == Label) found = true;
-            ind=0;
         }
         else
         {
@@ -4029,58 +3827,25 @@ void Sec30::GetOnSiteSK(myGrid* GridCtrl, wxString Label, Adouble0D &iBondSK, Ad
             fstr = GridCtrl->GetCellValue(irow, 2);
             bool isOki = istr.ToDouble(&ival);
             bool isOkf = fstr.ToDouble(&fval);
-            if (title == _("p_{soc}"))
-            {
-                if (isOki)
-                    i_p_soc = ival;
-                else
-                    i_p_soc = 0.0;
-                
-                if (isOkf)
-                    f_p_soc = fval;
-                else
-                    f_p_soc = 0.0;
-            }
-            else if (title == _("d_{soc}"))
-            {
-                if (isOki)
-                    i_d_soc = ival;
-                else
-                    i_d_soc = 0.0;
-                
-                if (isOkf)
-                    f_d_soc = fval;
-                else
-                    f_d_soc = 0.0;
-            }    
-            else
-            {
-                int OrbitalIndex = SetOnSiteSKElement(ind++, title, isOki, iBondSK, ival, isOkf, fBondSK, fval);
-                Orbital_Patern.push_back(OrbitalIndex);
-            }
+            SetOnSiteSKElement(title, isOki, iBondSK, ival, isOkf, fBondSK, fval);
         }
     }
 }
 
-void Sec30::GetOnSiteSKF(myGrid* GridCtrl, double* GridBuffer, wxString Label, Adouble0D &iBondSK, Adouble0D &fBondSK, double &f_p_soc, double &f_d_soc, Aint0D &Orbital_Patern)
+void Sec30::GetOnSiteSKF(myGrid* GridCtrl, double* GridBuffer, wxString Label, Adouble0D &iBondSK, Adouble0D &fBondSK)
 {
     wxString title, fstr;
     double fval;
     int nRow = GridCtrl->GetNumberRows();
     iBondSK = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
     fBondSK = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-    f_p_soc=0.0;
-    f_d_soc=0.0;
-    Orbital_Patern.clear();
     bool found = false;
-    int ind=0;
     for (int irow=0; irow<nRow;irow++)
     {
         title = GridCtrl->GetCellValue(irow, 0);
         if (!found)
         {
             if (title == Label) found = true;
-            ind=0;
         }
         else
         {
@@ -4091,129 +3856,16 @@ void Sec30::GetOnSiteSKF(myGrid* GridCtrl, double* GridBuffer, wxString Label, A
             //bool isOki = istr.ToDouble(&ival);
             //bool isOkf = fstr.ToDouble(&fval);
             fval = GridBuffer[irow];
-            if (title == _("p_{soc}"))
-                f_p_soc = fval;
-            else if (title == _("d_{soc}"))
-                f_d_soc = fval;
-            else
-            {
-                int OrbitalIndex = SetOnSiteSKElement(ind++, title, false, iBondSK, 0.0, true, fBondSK, fval);
-                Orbital_Patern.push_back(OrbitalIndex);
-            }
+            SetOnSiteSKElement(title, false, iBondSK, 0.0, true, fBondSK, fval);
         }
     }
 }
 
-void Sec30::GetSOC(double p_soc, double d_soc, Aint0D Orbital_Patern, double** ReSOC, double** ImSOC)
+void Sec30::SetOnSiteSKElement(wxString skName, bool isOki, Adouble0D &iBondSK, double ival, bool isOkf, Adouble0D &fBondSK, double fval)
 {
-    double resoc[18][18] = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 
-                              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0, 0, 0, 
-                              0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-                              0, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0, 0, 0.5, 0, 0, 0, 0, 0, 0, 0, 
-                              0, 0, 0}, {0, 0, 0, 0, 0, 0, -0.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-                              0}, {0, 0, 0, 0, 0, -0.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, {0, 
-                              0, 0, 0, 0.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 
-                              0, 0, 0, 0, 0, 0, 0, -0.5, 0, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0, 0, 
-                              0, 0, 0, 0.5, 0, 0, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0.5,
-                               0, 0, 0, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0, 0, 0, -0.5, 0, 0, 0, 0,
-                               0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-                              0.86602540378443864676372317075294, 0, 0}, {0, 0, 0, 0, 0, 0, 0, 0, 
-                              0, 0, 0, 0, 0, 0, -0.86602540378443864676372317075294, 0, 0, 0}, {0,
-                               0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-                              0, -0.86602540378443864676372317075294, 0, 0, 0, 0.5}, {0, 0, 0, 0, 
-                              0, 0, 0, 0, 0, 0, 0, 0, 0.86602540378443864676372317075294, 0, 0, 
-                              0, -0.5, 0}, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -0.5, 0, 
-                              0}, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.5, 0, 0, 0}};
-     
-    double imsoc[18][18] = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 
-                              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 
-                              0.5, -0.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0.5, 0, 0,
-                               0.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, {0, 0, 0, -0.5, 0, 0, 0, 0, 0, 
-                              0, 0, 0, 0, 0, 0, 0, 0, 0}, {0, 0, -0.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-                              0, 0, 0, 0, 0, 0}, {0, 0, 0.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-                              0, 0, 0}, {0, 0, 0, -0.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-                              0}, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.5, -1.0, 0}, {0,
-                               0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.5, 0, 0, 1.0}, {0, 0, 0, 
-                              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-                              0.86602540378443864676372317075294, -0.5, 0, 0, 0.5}, {0, 0, 0, 0, 
-                              0, 0, 0, 0, 0, 0, 0, 0, 0.86602540378443864676372317075294, 0, 0, 
-                              0.5, 0.5, 0}, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-                              0, -0.86602540378443864676372317075294, 0, 0, 0, 0, 0, 0}, {0, 0, 0,
-                               0, 0, 0, 0, 0, 0, 0, -0.86602540378443864676372317075294, 0, 0, 0, 
-                              0, 0, 0, 0}, {0, 0, 0, 0, 0, 0, 0, 0, 0, -0.5, 0.5, 0, 0, 0, 0, 0, 
-                              0, 0}, {0, 0, 0, 0, 0, 0, 0, 0, -0.5, 0, 0, -0.5, 0, 0, 0, 0, 0, 
-                              0}, {0, 0, 0, 0, 0, 0, 0, 0, 1.0, 0, 0, -0.5, 0, 0, 0, 0, 0, 0}, {0,
-                               0, 0, 0, 0, 0, 0, 0, 0, -1.0, -0.5, 0, 0, 0, 0, 0, 0, 0}};
-    
-    int np_real = 4;
-    int nd_real = 12;
-    int np_imag = 8;
-    int nd_imag = 20;
-    int p_realNonZero[np_real][2] = {{4, 7},{5, 6},{6, 5},{7, 4}};
-    int d_realNonZero[nd_real][2] = {{8, 11},{9, 10},{10, 9},{11, 8},{12, 15},{13, 14},{14, 13},{14, 17},{15, 12},{15, 16},{16, 15},{17, 14}};
-    int p_imagNonZero[np_imag][2] = {{2, 5},{2, 6},{3, 4},{3, 7},{4, 3},{5, 2},{6, 2},{7, 3}};
-    int d_imagNonZero[nd_imag][2] = {{8, 15},{8, 16},{9, 14},{9, 17},{10, 13},{10, 14},{10, 17},{11, 12},{11, 15},{11, 16},{12, 11},{13, 10},{14, 9},{14, 10},{15, 8},{15, 11},{16, 8},{16, 11},{17, 9},{17, 10}};
-    
-    for(int ind=0; ind<np_real; ind++)
-    {
-        int i = p_realNonZero[ind][0];
-        int j = p_realNonZero[ind][1];
-        resoc[i][j] = p_soc*resoc[i][j];
-    }
-    
-    for(int ind=0; ind<nd_real; ind++)
-    {
-        int i = d_realNonZero[ind][0];
-        int j = d_realNonZero[ind][1];
-        resoc[i][j] = d_soc*resoc[i][j];
-    }
-    
-    for(int ind=0; ind<np_imag; ind++)
-    {
-        int i = p_imagNonZero[ind][0];
-        int j = p_imagNonZero[ind][1];
-        imsoc[i][j] = p_soc*imsoc[i][j];
-    }
-    
-    for(int ind=0; ind<nd_imag; ind++)
-    {
-        int i = d_imagNonZero[ind][0];
-        int j = d_imagNonZero[ind][1];
-        imsoc[i][j] = d_soc*imsoc[i][j];
-    }
-    
-    int nM = Orbital_Patern.size();
-    int nM2 = 2*nM;
-    int* SpinOrbital_Patern = new int[nM2];
-    int ind0 = 0;
-    for (int i=0; i<nM; i++)
-    {
-        int i_up = 2*Orbital_Patern[i];
-        int i_dn = 2*Orbital_Patern[i] + 1;
-        SpinOrbital_Patern[ind0++] = i_up;
-        SpinOrbital_Patern[ind0++] = i_dn;
-    }
-    
-    for(int iM=0; iM<nM2; iM++)
-    {
-        int i = SpinOrbital_Patern[iM];
-        for(int jM=0; jM<nM2; jM++)
-        {
-            int j = SpinOrbital_Patern[jM];
-            ReSOC[iM][jM] = resoc[i][j];
-            ImSOC[iM][jM] = imsoc[i][j];
-        }
-    }
-    
-    delete [] SpinOrbital_Patern;
-}
-
-int Sec30::SetOnSiteSKElement(int ind, wxString skName, bool isOki, Adouble0D &iBondSK, double ival, bool isOkf, Adouble0D &fBondSK, double fval)
-{
-    int ind0 = GetOnSiteSKInd(skName);
+    int ind = GetOnSiteSKInd(skName);
     if (isOki) iBondSK[ind] = ival;
     if (isOkf) fBondSK[ind] = fval;
-    return ind0;
 }
 
 int Sec30::GetOnSiteSKInd(wxString skName)
@@ -4302,16 +3954,16 @@ lapack_complex_double Sec30::GetHk(double*** H, double kx, double ky, double kz,
     return out;
 }
 
-int Sec30::SymEigenValues(lapack_complex_double* LowerSymMatrix, lapack_int N, double* &eig)
+int Sec30::SymEigenValues(lapack_complex_double* UpperSymMatrix, lapack_int N, double* &eig)
 {
     //return LAPACKE_dsyev(LAPACK_ROW_MAJOR, 'N', 'U', N, UpperSymMatrix, N, eig);
     
     //lapack_int LAPACKE_zheev( int matrix_layout, char jobz, char uplo, lapack_int n,
     //                      lapack_complex_double* a, lapack_int lda, double* w );
-    return LAPACKE_zheev(LAPACK_ROW_MAJOR, 'N', 'L', N, LowerSymMatrix, N, eig);
+    return LAPACKE_zheev(LAPACK_ROW_MAJOR, 'N', 'U', N, UpperSymMatrix, N, eig);
 }
 
-int Sec30::SymEigenValues(lapack_complex_double* LowerSymMatrixA, lapack_complex_double* LowerSymMatrixB, lapack_int N, double* &eig)
+int Sec30::SymEigenValues(lapack_complex_double* UpperSymMatrixA, lapack_complex_double* UpperSymMatrixB, lapack_int N, double* &eig)
 {
     //lapack_int LAPACKE_zhbgv( int matrix_layout, char jobz, char uplo, lapack_int n,
     //                      lapack_int ka, lapack_int kb,
@@ -4325,11 +3977,13 @@ int Sec30::SymEigenValues(lapack_complex_double* LowerSymMatrixA, lapack_complex
     z[0] = {0.0, 0.0};
     int info = LAPACKE_zhbgv(LAPACK_ROW_MAJOR, 'N', 'L', N,
                          N, N,
-                         LowerSymMatrixA, nab,
-                         LowerSymMatrixB, nab,
+                         UpperSymMatrixA, nab,
+                         UpperSymMatrixB, nab,
                          eig,
                          z, nz);
     /*
+    
+    
         lapack_int n = 3, lda = 3, info;
         lapack_int na = n+1;
         lapack_int nb = n+1;

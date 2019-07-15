@@ -121,7 +121,6 @@ void UnitcellClass::Btn_Load_OnClick(wxCommandEvent& event)
         wxString dgFileName = OpenDialog->GetFilename();
         wxString dgPath = OpenDialog->GetDirectory();
         wxString fl = dgPath + wxT("\\") + dgFileName;
-        ClearAtoms();
         if (dgFileKind==0)
             ImportFromCIF(dgPath, dgFileName);
         else
@@ -318,14 +317,6 @@ void UnitcellClass::ImportFromCIF0(wxString filepath, wxString filename)
             logfile->AppendText(wxString::Format(_("%s, %.8f, %.8f, %.8f"), c[0], c[1], c[2], c[3]) + _("\n"));
         }
     }
-}
-
-void UnitcellClass::ClearAtoms()
-{
-    myGrid* abcgrid = sec30->GetGridObject(_("KABC_Coords"));
-    myGrid* xyzgrid = sec30->GetGridObject(_("XYZ_Coords"));
-    abcgrid->ClearGrid();
-    xyzgrid->ClearGrid();
 }
 
 void UnitcellClass::ImportFromCIF(wxString filepath, wxString filename)
