@@ -62,6 +62,13 @@ SetupClass::SetupClass(wxWindow* parent, Sec30* sec30var, wxWindowID id, const w
     sec30->SetVar(_("TBBandRange[1]"), 0, false);
     sec30->SetVar(_("DFTFirst[0]"), 0, false);
     /**********************************************************************************************************************************************/
+    sec30->AddGroupBox(this,_("Weight Function"),wxColour(wxT("rgb(153,180,209)")));
+    wxString Labels11[2] = {_("Clear all"), _("Set all to one")};
+    wxObjectEventFunction Funcs11[2] = { wxCommandEventHandler(SetupClass::Btn_SetZero_OnClick), wxCommandEventHandler(SetupClass::Btn_SetOne_OnClick)};
+    sec30->AddButton(this, 2, Labels11, Funcs11);
+    wxString Labels3[1] = {_("Brush")};
+    wxObjectEventFunction Funcs3[1] = { wxCommandEventHandler(SetupClass::Btn_Select_OnClick)};
+    sec30->AddButton(this, 1, Labels3, Funcs3);
     sec30->AddGroupBox(this,_("To increase the weight function paint on bands."),wxColour(wxT("rgb(255,255,255)")));
     sec30->AddGroupBox(this,_("To decrease, hold Ctrl or Alt key and paint."),wxColour(wxT("rgb(255,255,255)")));
     /**********************************************************************************************************************************************/
