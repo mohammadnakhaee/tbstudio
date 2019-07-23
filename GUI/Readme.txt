@@ -28,12 +28,3 @@ and Python? It does not matter. We generate for you the Hamiltonian in your pref
 and generate your own code as C++, C, Fortran, Mathematica, Matlab and Python.
 
 6. Hope you enjoy TBStudio ...
-
-
-
-New in Version 1.2.1
-1) In this version, one can also load both Unit-cell and Band structure from Vasp XML.
-2) CIF output was added.
-3) Weight function was added in the setup panel. One can paint on band structure to
-   increase or decrease the weight function for input data.
-4) Code generator supports now non-orthogonal TB-Model.

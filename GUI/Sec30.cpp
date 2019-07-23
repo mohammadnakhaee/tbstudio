@@ -645,12 +645,6 @@ wxButton* Sec30::GetButtonObject(wxString VariableName)
     return ctr;
 }
 
-wxCheckBox* Sec30::GetCheckObject(wxString VariableName)
-{
-    wxCheckBox* ctr= (wxCheckBox*)FindWindowByName(VariableName,GetParent());
-    return ctr;
-}
-
 wxCheckTree* Sec30::GetTreeObject(wxString VariableName)
 {
     wxCheckTree* ctr= (wxCheckTree*)FindWindowByName(VariableName,GetParent());
@@ -2043,123 +2037,123 @@ wxString Sec30::GetAtomLable(int kind)
 
 int Sec30::GetAtomLable(wxString Lable)
 {
-    if(Lable.Contains(wxT("He"))) return 2;
-    else if(Lable.Contains(wxT("Li"))) return 3;
-    else if(Lable.Contains(wxT("Be"))) return 4;
-    else if(Lable.Contains(wxT("B"))) return 5;
-    else if(Lable.Contains(wxT("C"))) return 6;
-    else if(Lable.Contains(wxT("N"))) return 7;
-    else if(Lable.Contains(wxT("O"))) return 8;
-    else if(Lable.Contains(wxT("F"))) return 9;
-    else if(Lable.Contains(wxT("Ne"))) return 10;
-    else if(Lable.Contains(wxT("Na"))) return 11;
-    else if(Lable.Contains(wxT("Mg"))) return 12;
-    else if(Lable.Contains(wxT("Al"))) return 13;
-    else if(Lable.Contains(wxT("Si"))) return 14;
-    else if(Lable.Contains(wxT("P"))) return 15;
-    else if(Lable.Contains(wxT("S"))) return 16;
-    else if(Lable.Contains(wxT("Cl"))) return 17;
-    else if(Lable.Contains(wxT("Ar"))) return 18;
-    else if(Lable.Contains(wxT("K"))) return 19;
-    else if(Lable.Contains(wxT("Ca"))) return 20;
-    else if(Lable.Contains(wxT("Sc"))) return 21;
-    else if(Lable.Contains(wxT("Ti"))) return 22;
-    else if(Lable.Contains(wxT("V"))) return 23;
-    else if(Lable.Contains(wxT("Cr"))) return 24;
-    else if(Lable.Contains(wxT("Mn"))) return 25;
-    else if(Lable.Contains(wxT("Fe"))) return 26;
-    else if(Lable.Contains(wxT("Co"))) return 27;
-    else if(Lable.Contains(wxT("Ni"))) return 28;
-    else if(Lable.Contains(wxT("Cu"))) return 29;
-    else if(Lable.Contains(wxT("Zn"))) return 30;
-    else if(Lable.Contains(wxT("Ga"))) return 31;
-    else if(Lable.Contains(wxT("Ge"))) return 32;
-    else if(Lable.Contains(wxT("As"))) return 33;
-    else if(Lable.Contains(wxT("Se"))) return 34;
-    else if(Lable.Contains(wxT("Br"))) return 35;
-    else if(Lable.Contains(wxT("Kr"))) return 36;
-    else if(Lable.Contains(wxT("Rb"))) return 37;
-    else if(Lable.Contains(wxT("Sr"))) return 38;
-    else if(Lable.Contains(wxT("Y"))) return 39;
-    else if(Lable.Contains(wxT("Zr"))) return 40;
-    else if(Lable.Contains(wxT("Nb"))) return 41;
-    else if(Lable.Contains(wxT("Mo"))) return 42;
-    else if(Lable.Contains(wxT("Tc"))) return 43;
-    else if(Lable.Contains(wxT("Ru"))) return 44;
-    else if(Lable.Contains(wxT("Rh"))) return 45;
-    else if(Lable.Contains(wxT("Pd"))) return 46;
-    else if(Lable.Contains(wxT("Ag"))) return 47;
-    else if(Lable.Contains(wxT("Cd"))) return 48;
-    else if(Lable.Contains(wxT("In"))) return 49;
-    else if(Lable.Contains(wxT("Sn"))) return 50;
-    else if(Lable.Contains(wxT("Sb"))) return 51;
-    else if(Lable.Contains(wxT("Te"))) return 52;
-    else if(Lable.Contains(wxT("I"))) return 53;
-    else if(Lable.Contains(wxT("Xe"))) return 54;
-    else if(Lable.Contains(wxT("Cs"))) return 55;
-    else if(Lable.Contains(wxT("Ba"))) return 56;
-    else if(Lable.Contains(wxT("La"))) return 57;
-    else if(Lable.Contains(wxT("Ce"))) return 58;
-    else if(Lable.Contains(wxT("Pr"))) return 59;
-    else if(Lable.Contains(wxT("Nd"))) return 60;
-    else if(Lable.Contains(wxT("Pm"))) return 61;
-    else if(Lable.Contains(wxT("Sm"))) return 62;
-    else if(Lable.Contains(wxT("Eu"))) return 63;
-    else if(Lable.Contains(wxT("Gd"))) return 64;
-    else if(Lable.Contains(wxT("Tb"))) return 65;
-    else if(Lable.Contains(wxT("Dy"))) return 66;
-    else if(Lable.Contains(wxT("Ho"))) return 67;
-    else if(Lable.Contains(wxT("Er"))) return 68;
-    else if(Lable.Contains(wxT("Tm"))) return 69;
-    else if(Lable.Contains(wxT("Yb"))) return 70;
-    else if(Lable.Contains(wxT("Lu"))) return 71;
-    else if(Lable.Contains(wxT("Hf"))) return 72;
-    else if(Lable.Contains(wxT("Ta"))) return 73;
-    else if(Lable.Contains(wxT("W"))) return 74;
-    else if(Lable.Contains(wxT("Re"))) return 75;
-    else if(Lable.Contains(wxT("Os"))) return 76;
-    else if(Lable.Contains(wxT("Ir"))) return 77;
-    else if(Lable.Contains(wxT("Pt"))) return 78;
-    else if(Lable.Contains(wxT("Au"))) return 79;
-    else if(Lable.Contains(wxT("Hg"))) return 80;
-    else if(Lable.Contains(wxT("Tl"))) return 81;
-    else if(Lable.Contains(wxT("Pb"))) return 82;
-    else if(Lable.Contains(wxT("Bi"))) return 83;
-    else if(Lable.Contains(wxT("Po"))) return 84;
-    else if(Lable.Contains(wxT("At"))) return 85;
-    else if(Lable.Contains(wxT("Rn"))) return 86;
-    else if(Lable.Contains(wxT("Fr"))) return 87;
-    else if(Lable.Contains(wxT("Ra"))) return 88;
-    else if(Lable.Contains(wxT("Ac"))) return 89;
-    else if(Lable.Contains(wxT("Th"))) return 90;
-    else if(Lable.Contains(wxT("Pa"))) return 91;
-    else if(Lable.Contains(wxT("U"))) return 92;
-    else if(Lable.Contains(wxT("Np"))) return 93;
-    else if(Lable.Contains(wxT("Pu"))) return 94;
-    else if(Lable.Contains(wxT("Am"))) return 95;
-    else if(Lable.Contains(wxT("Cm"))) return 96;
-    else if(Lable.Contains(wxT("Bk"))) return 97;
-    else if(Lable.Contains(wxT("Cf"))) return 98;
-    else if(Lable.Contains(wxT("Es"))) return 99;
-    else if(Lable.Contains(wxT("Fm"))) return 100;
-    else if(Lable.Contains(wxT("Md"))) return 101;
-    else if(Lable.Contains(wxT("No"))) return 102;
-    else if(Lable.Contains(wxT("Lr"))) return 103;
-    else if(Lable.Contains(wxT("Rf"))) return 104;
-    else if(Lable.Contains(wxT("Db"))) return 105;
-    else if(Lable.Contains(wxT("Sg"))) return 106;
-    else if(Lable.Contains(wxT("Bh"))) return 107;
-    else if(Lable.Contains(wxT("Hs"))) return 108;
-    else if(Lable.Contains(wxT("Mt"))) return 109;
-    else if(Lable.Contains(wxT("Ds"))) return 110;
-    else if(Lable.Contains(wxT("Rg"))) return 111;
-    else if(Lable.Contains(wxT("Cn"))) return 112;
-    else if(Lable.Contains(wxT("Uut"))) return 113;
-    else if(Lable.Contains(wxT("Fl"))) return 114;
-    else if(Lable.Contains(wxT("Uup"))) return 115;
-    else if(Lable.Contains(wxT("Lv"))) return 116;
-    else if(Lable.Contains(wxT("Uus"))) return 117;
-    else if(Lable.Contains(wxT("Uuo"))) return 118;
+    if(Lable==wxT("He")) return 2;
+    else if(Lable==wxT("Li")) return 3;
+    else if(Lable==wxT("Be")) return 4;
+    else if(Lable==wxT("B")) return 5;
+    else if(Lable==wxT("C")) return 6;
+    else if(Lable==wxT("N")) return 7;
+    else if(Lable==wxT("O")) return 8;
+    else if(Lable==wxT("F")) return 9;
+    else if(Lable==wxT("Ne")) return 10;
+    else if(Lable==wxT("Na")) return 11;
+    else if(Lable==wxT("Mg")) return 12;
+    else if(Lable==wxT("Al")) return 13;
+    else if(Lable==wxT("Si")) return 14;
+    else if(Lable==wxT("P")) return 15;
+    else if(Lable==wxT("S")) return 16;
+    else if(Lable==wxT("Cl")) return 17;
+    else if(Lable==wxT("Ar")) return 18;
+    else if(Lable==wxT("K")) return 19;
+    else if(Lable==wxT("Ca")) return 20;
+    else if(Lable==wxT("Sc")) return 21;
+    else if(Lable==wxT("Ti")) return 22;
+    else if(Lable==wxT("V")) return 23;
+    else if(Lable==wxT("Cr")) return 24;
+    else if(Lable==wxT("Mn")) return 25;
+    else if(Lable==wxT("Fe")) return 26;
+    else if(Lable==wxT("Co")) return 27;
+    else if(Lable==wxT("Ni")) return 28;
+    else if(Lable==wxT("Cu")) return 29;
+    else if(Lable==wxT("Zn")) return 30;
+    else if(Lable==wxT("Ga")) return 31;
+    else if(Lable==wxT("Ge")) return 32;
+    else if(Lable==wxT("As")) return 33;
+    else if(Lable==wxT("Se")) return 34;
+    else if(Lable==wxT("Br")) return 35;
+    else if(Lable==wxT("Kr")) return 36;
+    else if(Lable==wxT("Rb")) return 37;
+    else if(Lable==wxT("Sr")) return 38;
+    else if(Lable==wxT("Y")) return 39;
+    else if(Lable==wxT("Zr")) return 40;
+    else if(Lable==wxT("Nb")) return 41;
+    else if(Lable==wxT("Mo")) return 42;
+    else if(Lable==wxT("Tc")) return 43;
+    else if(Lable==wxT("Ru")) return 44;
+    else if(Lable==wxT("Rh")) return 45;
+    else if(Lable==wxT("Pd")) return 46;
+    else if(Lable==wxT("Ag")) return 47;
+    else if(Lable==wxT("Cd")) return 48;
+    else if(Lable==wxT("In")) return 49;
+    else if(Lable==wxT("Sn")) return 50;
+    else if(Lable==wxT("Sb")) return 51;
+    else if(Lable==wxT("Te")) return 52;
+    else if(Lable==wxT("I")) return 53;
+    else if(Lable==wxT("Xe")) return 54;
+    else if(Lable==wxT("Cs")) return 55;
+    else if(Lable==wxT("Ba")) return 56;
+    else if(Lable==wxT("La")) return 57;
+    else if(Lable==wxT("Ce")) return 58;
+    else if(Lable==wxT("Pr")) return 59;
+    else if(Lable==wxT("Nd")) return 60;
+    else if(Lable==wxT("Pm")) return 61;
+    else if(Lable==wxT("Sm")) return 62;
+    else if(Lable==wxT("Eu")) return 63;
+    else if(Lable==wxT("Gd")) return 64;
+    else if(Lable==wxT("Tb")) return 65;
+    else if(Lable==wxT("Dy")) return 66;
+    else if(Lable==wxT("Ho")) return 67;
+    else if(Lable==wxT("Er")) return 68;
+    else if(Lable==wxT("Tm")) return 69;
+    else if(Lable==wxT("Yb")) return 70;
+    else if(Lable==wxT("Lu")) return 71;
+    else if(Lable==wxT("Hf")) return 72;
+    else if(Lable==wxT("Ta")) return 73;
+    else if(Lable==wxT("W")) return 74;
+    else if(Lable==wxT("Re")) return 75;
+    else if(Lable==wxT("Os")) return 76;
+    else if(Lable==wxT("Ir")) return 77;
+    else if(Lable==wxT("Pt")) return 78;
+    else if(Lable==wxT("Au")) return 79;
+    else if(Lable==wxT("Hg")) return 80;
+    else if(Lable==wxT("Tl")) return 81;
+    else if(Lable==wxT("Pb")) return 82;
+    else if(Lable==wxT("Bi")) return 83;
+    else if(Lable==wxT("Po")) return 84;
+    else if(Lable==wxT("At")) return 85;
+    else if(Lable==wxT("Rn")) return 86;
+    else if(Lable==wxT("Fr")) return 87;
+    else if(Lable==wxT("Ra")) return 88;
+    else if(Lable==wxT("Ac")) return 89;
+    else if(Lable==wxT("Th")) return 90;
+    else if(Lable==wxT("Pa")) return 91;
+    else if(Lable==wxT("U")) return 92;
+    else if(Lable==wxT("Np")) return 93;
+    else if(Lable==wxT("Pu")) return 94;
+    else if(Lable==wxT("Am")) return 95;
+    else if(Lable==wxT("Cm")) return 96;
+    else if(Lable==wxT("Bk")) return 97;
+    else if(Lable==wxT("Cf")) return 98;
+    else if(Lable==wxT("Es")) return 99;
+    else if(Lable==wxT("Fm")) return 100;
+    else if(Lable==wxT("Md")) return 101;
+    else if(Lable==wxT("No")) return 102;
+    else if(Lable==wxT("Lr")) return 103;
+    else if(Lable==wxT("Rf")) return 104;
+    else if(Lable==wxT("Db")) return 105;
+    else if(Lable==wxT("Sg")) return 106;
+    else if(Lable==wxT("Bh")) return 107;
+    else if(Lable==wxT("Hs")) return 108;
+    else if(Lable==wxT("Mt")) return 109;
+    else if(Lable==wxT("Ds")) return 110;
+    else if(Lable==wxT("Rg")) return 111;
+    else if(Lable==wxT("Cn")) return 112;
+    else if(Lable==wxT("Uut")) return 113;
+    else if(Lable==wxT("Fl")) return 114;
+    else if(Lable==wxT("Uup")) return 115;
+    else if(Lable==wxT("Lv")) return 116;
+    else if(Lable==wxT("Uus")) return 117;
+    else if(Lable==wxT("Uuo")) return 118;
     
     return 1;
 }
@@ -2737,59 +2731,6 @@ void Sec30::ConstructTBHamiltonian(double a[3], double b[3], double c[3], double
     }
 }
 
-void Sec30::ConstructTBHamiltonian(double a[3], double b[3], double c[3], double** XYZCoords, Adouble2D &Hi, Adouble2D &Hf, Adouble2D &Si, Adouble2D &Sf, int &nEssensialCells, int &nHamiltonian, Aint1D &EssCells)
-{
-    wxListBox* listctr = this->GetListObject(_("EssentialUnitcellList"));
-    int nCell = listctr->GetCount();
-    nEssensialCells = nCell;
-    
-    myGrid* OnSiteCtr = this->GetGridObject(_("OS"));
-    myGrid* SKCtr = this->GetGridObject(_("SK"));
-    myGrid* OverlapCtr = this->GetGridObject(_("OL"));
-    
-    int nUnitcellAtoms = 0;
-    this->GetVar(_("nAtoms[0]"),nUnitcellAtoms);
-    
-    wxCheckTree* orbs = this->GetTreeObject(_("Orbitals"));
-    Astring0D HamiltonianMap = this->ArraysOf1DString[1];
-    nHamiltonian = HamiltonianMap.size();
-    Aint1D HamiltonianDimMap = this->ArraysOf2DInt[0];
-    wxCheckTree* bonds = this->GetTreeObject(_("Bonds"));
-    wxTreeItemId rootID = bonds->GetRootItem();
-    EssCells.clear();
-    for (int iCell=0; iCell<nCell; iCell++)
-    {
-        Aint0D lmnOfCell;
-        wxString WorkingCell = listctr->GetString(iCell);
-        wxString ucell = _("(0,0,0)-") + WorkingCell;
-        int lcell,mcell,ncell;
-        GetCellInfo(WorkingCell, lcell, mcell, ncell);
-        lmnOfCell.push_back(lcell);
-        lmnOfCell.push_back(mcell);
-        lmnOfCell.push_back(ncell);
-        EssCells.push_back(lmnOfCell);
-        wxTreeItemId CellID = bonds->FindItemIn(rootID, ucell);
-        Adouble1D hi(nHamiltonian,std::vector<double>(nHamiltonian));
-        Adouble1D hf(nHamiltonian,std::vector<double>(nHamiltonian));
-        Adouble1D si(nHamiltonian,std::vector<double>(nHamiltonian));
-        Adouble1D sf(nHamiltonian,std::vector<double>(nHamiltonian));
-        if (CellID.IsOk())
-        {
-            if (bonds->GetItemState(CellID) >= wxCheckTree::CHECKED) GetCouplingMatrix(SKCtr, OverlapCtr, bonds, orbs, a, b, c, XYZCoords, HamiltonianDimMap, CellID, WorkingCell, hi, hf, si, sf);
-        }
-        
-        if (WorkingCell == _("(0,0,0)"))
-        {
-            AddOnSiteMatrix(OnSiteCtr, orbs, HamiltonianDimMap, hi, hf, si, sf);
-        }
-        
-        Hi.push_back(hi);
-        Hf.push_back(hf);
-        Si.push_back(si);
-        Sf.push_back(sf);
-    }
-}
-
 void Sec30::ConstructTBHamiltonianF(double a[3], double b[3], double c[3], double** XYZCoords, Adouble2D &Hf, int &nEssensialCells, int &nHamiltonian, Aint1D &EssCells)
 {
     wxListBox* listctr = this->GetListObject(_("EssentialUnitcellList"));
@@ -2834,55 +2775,6 @@ void Sec30::ConstructTBHamiltonianF(double a[3], double b[3], double c[3], doubl
         }
         
         Hf.push_back(hf);
-    }
-}
-
-void Sec30::ConstructTBHamiltonianF(double a[3], double b[3], double c[3], double** XYZCoords, Adouble2D &Hf, Adouble2D &Sf, int &nEssensialCells, int &nHamiltonian, Aint1D &EssCells)
-{
-    wxListBox* listctr = this->GetListObject(_("EssentialUnitcellList"));
-    int nCell = listctr->GetCount();
-    nEssensialCells = nCell;
-    
-    myGrid* OnSiteCtr = this->GetGridObject(_("OS"));
-    myGrid* SKCtr = this->GetGridObject(_("SK"));
-    myGrid* OverlapCtr = this->GetGridObject(_("OL"));
-    
-    int nUnitcellAtoms = 0;
-    this->GetVar(_("nAtoms[0]"),nUnitcellAtoms);
-    
-    wxCheckTree* orbs = this->GetTreeObject(_("Orbitals"));
-    Astring0D HamiltonianMap = this->ArraysOf1DString[1];
-    nHamiltonian = HamiltonianMap.size();
-    Aint1D HamiltonianDimMap = this->ArraysOf2DInt[0];
-    wxCheckTree* bonds = this->GetTreeObject(_("Bonds"));
-    wxTreeItemId rootID = bonds->GetRootItem();
-    EssCells.clear();
-    for (int iCell=0; iCell<nCell; iCell++)
-    {
-        Aint0D lmnOfCell;
-        wxString WorkingCell = listctr->GetString(iCell);
-        wxString ucell = _("(0,0,0)-") + WorkingCell;
-        int lcell,mcell,ncell;
-        GetCellInfo(WorkingCell, lcell, mcell, ncell);
-        lmnOfCell.push_back(lcell);
-        lmnOfCell.push_back(mcell);
-        lmnOfCell.push_back(ncell);
-        EssCells.push_back(lmnOfCell);
-        wxTreeItemId CellID = bonds->FindItemIn(rootID, ucell);
-        Adouble1D hf(nHamiltonian,std::vector<double>(nHamiltonian));
-        Adouble1D sf(nHamiltonian,std::vector<double>(nHamiltonian));
-        if (CellID.IsOk())
-        {
-            if (bonds->GetItemState(CellID) >= wxCheckTree::CHECKED) GetCouplingMatrixF(SKCtr, OverlapCtr, bonds, orbs, a, b, c, XYZCoords, HamiltonianDimMap, CellID, WorkingCell, hf, sf);
-        }
-        
-        if (WorkingCell == _("(0,0,0)"))
-        {
-            AddOnSiteMatrixF(OnSiteCtr, orbs, HamiltonianDimMap, hf, sf);
-        }
-        
-        Hf.push_back(hf);
-        Sf.push_back(sf);
     }
 }
 
@@ -3046,198 +2938,6 @@ void Sec30::GetCouplingMatrix(myGrid* SKCtr, myGrid* OverlapCtr, wxCheckTree* Bo
 	}
 }
 
-void Sec30::GetCouplingMatrix(myGrid* SKCtr, myGrid* OverlapCtr, wxCheckTree* BondTree, wxCheckTree* orbs, double a[3], double b[3], double c[3], double** XYZCoords, Aint1D HamiltonianDimMap, wxTreeItemId CellID, wxString WorkingCell, Adouble1D &hi, Adouble1D &hf, Adouble1D &si, Adouble1D &sf)
-{
-    if (!CellID.IsOk())
-    {
-        wxMessageBox(_("Fatal error occurred in thread REG01. Error code: GCMF001"),_("Error"));
-        //Allocate h for zeros
-        return;
-    }
-    
-    int icell,jcell,kcell;
-    GetCellInfo(WorkingCell, icell, jcell, kcell);
-    
-    double CellX = icell*a[0] + jcell*b[0] + kcell*c[0];
-    double CellY = icell*a[1] + jcell*b[1] + kcell*c[1];
-    double CellZ = icell*a[2] + jcell*b[2] + kcell*c[2];
-            
-    wxTreeItemId rootID = orbs->GetRootItem();
-    wxString rootname = orbs->GetItemText(rootID);    
-    
-    wxTreeItemIdValue cookie;
-	wxTreeItemId item = BondTree->GetFirstChild(CellID, cookie);
-	while(item.IsOk())
-	{
-		wxString BondInfo = BondTree->GetItemText(item);
-        //////////////////////////////////////////////
-        if (BondTree->GetItemState(item) >= wxCheckTree::CHECKED)
-        {
-            int iAtomIndex,nShellIndex,jAtomIndex,mShellIndex,bondtype;
-            this->GetBondInfo(BondInfo, iAtomIndex, nShellIndex, jAtomIndex, mShellIndex, bondtype);
-            wxString BondStr = wxString::Format(wxT("Bond %d"), bondtype);
-            
-            Adouble0D iBondSK, fBondSK;
-            GetBondSK(SKCtr, BondStr, iBondSK, fBondSK);
-            
-            Adouble0D iBondSK_s, fBondSK_s;
-            GetBondSK(OverlapCtr, BondStr, iBondSK_s, fBondSK_s);
-            
-            int Dim1 = -1;
-            int Dim2 = -1;
-            bool IsShell1, IsShell2;
-            wxString Orbs1, Orbs2;
-            
-            wxString atom1 = wxString::Format(wxT("AtomInd%d"),iAtomIndex + 1);
-            wxComboBox* comb1 = this->GetComboObject(atom1);
-            wxString TBAtom1 = comb1->GetStringSelection();
-            this->GetOrbitalInfo(orbs, TBAtom1, nShellIndex, Orbs1, Dim1, IsShell1);
-            
-            wxString atom2 = wxString::Format(wxT("AtomInd%d"),jAtomIndex + 1);
-            wxComboBox* comb2 = this->GetComboObject(atom2);
-            wxString TBAtom2 = comb2->GetStringSelection();
-            this->GetOrbitalInfo(orbs, TBAtom2, mShellIndex, Orbs2, Dim2, IsShell2);
-
-            double x2 = XYZCoords[jAtomIndex][0] + CellX;
-            double y2 = XYZCoords[jAtomIndex][1] + CellY;
-            double z2 = XYZCoords[jAtomIndex][2] + CellZ;
-            double l, m, n;
-            this->GetDirectionalCosines(XYZCoords[iAtomIndex][0], XYZCoords[iAtomIndex][1], XYZCoords[iAtomIndex][2], x2, y2, z2, l, m, n);
-            
-            double** iHopMat = new double*[Dim1];
-            double** fHopMat = new double*[Dim1];
-            double** iSMat = new double*[Dim1];
-            double** fSMat = new double*[Dim1];
-            for(int ii = 0; ii < Dim1; ii++)
-            {
-                iHopMat[ii] = new double[Dim2];
-                fHopMat[ii] = new double[Dim2];
-                iSMat[ii] = new double[Dim2];
-                fSMat[ii] = new double[Dim2];
-            }
-            
-            double** iHopMatT = new double*[Dim2];
-            double** fHopMatT = new double*[Dim2];
-            double** iSMatT = new double*[Dim2];
-            double** fSMatT = new double*[Dim2];
-            for(int ii = 0; ii < Dim2; ii++)
-            {
-                iHopMatT[ii] = new double[Dim1];
-                fHopMatT[ii] = new double[Dim1];
-                iSMatT[ii] = new double[Dim1];
-                fSMatT[ii] = new double[Dim1];
-            }
-            
-            Orbs1.Replace(_(" "),_(""));
-            Orbs1.Replace(_("("),_(""));
-            Orbs1.Replace(_(")"),_(""));
-            Orbs2.Replace(_(" "),_(""));
-            Orbs2.Replace(_("("),_(""));
-            Orbs2.Replace(_(")"),_(""));
-            int i=-1;
-            wxStringTokenizer tokenizer1(Orbs1, ",");
-            while (tokenizer1.HasMoreTokens())
-            {
-                i++;
-                wxString o1 = tokenizer1.GetNextToken();
-                
-                int j=-1;
-                wxStringTokenizer tokenizer2(Orbs2, ",");
-                while (tokenizer2.HasMoreTokens())
-                {
-                    j++;
-                    wxString o2 = tokenizer2.GetNextToken();
-                    iHopMat[i][j] = this->Hopspd(iBondSK, l, m, n, o1, o2);
-                    fHopMat[i][j] = this->Hopspd(fBondSK, l, m, n, o1, o2);
-                    iHopMatT[j][i] = iHopMat[i][j];
-                    fHopMatT[j][i] = fHopMat[i][j];
-                    
-                    iSMat[i][j] = this->Hopspd(iBondSK_s, l, m, n, o1, o2);
-                    fSMat[i][j] = this->Hopspd(fBondSK_s, l, m, n, o1, o2);
-                    iSMatT[j][i] = iSMat[i][j];
-                    fSMatT[j][i] = fSMat[i][j];
-                }
-            }
-            
-            int i0Ham = HamiltonianDimMap[iAtomIndex][nShellIndex - 1];
-            int j0Ham = HamiltonianDimMap[jAtomIndex][mShellIndex - 1];
-            
-            if (icell==0 && jcell==0 && kcell==0)
-            {
-                for(int ii=0; ii<Dim1; ii++)
-                    for(int jj=0; jj<Dim2; jj++)
-                    {
-                        int ih = i0Ham + ii;
-                        int jh = j0Ham + jj;
-                        hi[ih][jh] = iHopMat[ii][jj];
-                        hf[ih][jh] = fHopMat[ii][jj];
-                        hi[jh][ih] = iHopMatT[jj][ii];
-                        hf[jh][ih] = fHopMatT[jj][ii];
-                        
-                        si[ih][jh] = iSMat[ii][jj];
-                        sf[ih][jh] = fSMat[ii][jj];
-                        si[jh][ih] = iSMatT[jj][ii];
-                        sf[jh][ih] = fSMatT[jj][ii];
-                    }
-            }
-            else
-            {
-                for(int ii=0; ii<Dim1; ii++)
-                    for(int jj=0; jj<Dim2; jj++)
-                    {
-                        int ih = i0Ham + ii;
-                        int jh = j0Ham + jj;
-                        hi[ih][jh] = iHopMat[ii][jj];
-                        hf[ih][jh] = fHopMat[ii][jj];
-                        
-                        si[ih][jh] = iSMat[ii][jj];
-                        sf[ih][jh] = fSMat[ii][jj];
-                    }
-            }
-            
-            for(int ii = 0; ii < Dim1; ii++)
-            {
-                if (Dim2 > 0)
-                {
-                    delete [] iHopMat[ii];
-                    delete [] fHopMat[ii];
-                    delete [] iSMat[ii];
-                    delete [] fSMat[ii];
-                }   
-            }
-            
-            for(int ii = 0; ii < Dim2; ii++)
-            {
-                if (Dim1 > 0)
-                {
-                    delete [] iHopMatT[ii];
-                    delete [] fHopMatT[ii];
-                    delete [] iSMatT[ii];
-                    delete [] fSMatT[ii];
-                }   
-            }
-            
-            if (Dim1>0)
-            {
-                delete [] iHopMat;
-                delete [] fHopMat;
-                delete [] iSMat;
-                delete [] fSMat;
-            }
-            
-            if (Dim2>0)
-            {
-                delete [] iHopMatT;
-                delete [] fHopMatT;
-                delete [] iSMatT;
-                delete [] fSMatT;
-            }
-        }
-        //////////////////////////////////////////////
-		item = BondTree->GetNextChild(CellID, cookie);
-	}
-}
-
 void Sec30::GetCouplingMatrixF(myGrid* SKCtr, myGrid* OverlapCtr, wxCheckTree* BondTree, wxCheckTree* orbs, double a[3], double b[3], double c[3], double** XYZCoords, Aint1D HamiltonianDimMap, wxTreeItemId CellID, wxString WorkingCell, Adouble1D &hf)
 {
     if (!CellID.IsOk())
@@ -3371,175 +3071,6 @@ void Sec30::GetCouplingMatrixF(myGrid* SKCtr, myGrid* OverlapCtr, wxCheckTree* B
 	}
 }
 
-void Sec30::GetCouplingMatrixF(myGrid* SKCtr, myGrid* OverlapCtr, wxCheckTree* BondTree, wxCheckTree* orbs, double a[3], double b[3], double c[3], double** XYZCoords, Aint1D HamiltonianDimMap, wxTreeItemId CellID, wxString WorkingCell, Adouble1D &hf, Adouble1D &sf)
-{
-    if (!CellID.IsOk())
-    {
-        wxMessageBox(_("Fatal error occurred in thread REG01. Error code: GCMF002"),_("Error"));
-        //Allocate h for zeros
-        return;
-    }
-    
-    int icell,jcell,kcell;
-    GetCellInfo(WorkingCell, icell, jcell, kcell);
-    
-    double CellX = icell*a[0] + jcell*b[0] + kcell*c[0];
-    double CellY = icell*a[1] + jcell*b[1] + kcell*c[1];
-    double CellZ = icell*a[2] + jcell*b[2] + kcell*c[2];
-    
-    wxTreeItemId rootID = orbs->GetRootItem();
-    wxString rootname = orbs->GetItemText(rootID);    
-    
-    wxTreeItemIdValue cookie;
-	wxTreeItemId item = BondTree->GetFirstChild(CellID, cookie);
-	while(item.IsOk())
-	{
-		wxString BondInfo = BondTree->GetItemText(item);
-        //////////////////////////////////////////////
-        if (BondTree->GetItemState(item) >= wxCheckTree::CHECKED)
-        {
-            int iAtomIndex,nShellIndex,jAtomIndex,mShellIndex,bondtype;
-            this->GetBondInfo(BondInfo, iAtomIndex, nShellIndex, jAtomIndex, mShellIndex, bondtype);
-            wxString BondStr = wxString::Format(wxT("Bond %d"), bondtype);
-            
-            Adouble0D iBondSK, fBondSK;
-            GetBondSKF(SKCtr, SKBuffer, BondStr, iBondSK, fBondSK);
-            
-            Adouble0D iBondSK_s, fBondSK_s;
-            GetBondSKF(OverlapCtr, OLBuffer, BondStr, iBondSK_s, fBondSK_s);
-            
-            //wxString report = _("");
-            //for (int ip=0; ip<4; ip++) report = report + wxString::Format(wxT("%.8f,"),fBondSK[ip]);
-            //wxMessageBox(report,_("debug"));
-            
-            int Dim1 = -1;
-            int Dim2 = -1;
-            bool IsShell1, IsShell2;
-            wxString Orbs1, Orbs2;
-            
-            wxString atom1 = wxString::Format(wxT("AtomInd%d"),iAtomIndex + 1);
-            wxComboBox* comb1 = this->GetComboObject(atom1);
-            wxString TBAtom1 = comb1->GetStringSelection();
-            this->GetOrbitalInfo(orbs, TBAtom1, nShellIndex, Orbs1, Dim1, IsShell1);
-            
-            wxString atom2 = wxString::Format(wxT("AtomInd%d"),jAtomIndex + 1);
-            wxComboBox* comb2 = this->GetComboObject(atom2);
-            wxString TBAtom2 = comb2->GetStringSelection();
-            this->GetOrbitalInfo(orbs, TBAtom2, mShellIndex, Orbs2, Dim2, IsShell2);
-
-            double x2 = XYZCoords[jAtomIndex][0] + CellX;
-            double y2 = XYZCoords[jAtomIndex][1] + CellY;
-            double z2 = XYZCoords[jAtomIndex][2] + CellZ;
-            double l, m, n;
-            this->GetDirectionalCosines(XYZCoords[iAtomIndex][0], XYZCoords[iAtomIndex][1], XYZCoords[iAtomIndex][2], x2, y2, z2, l, m, n);
-            
-            double** fHopMat = new double*[Dim1];
-            double** fSMat = new double*[Dim1];
-            for(int ii = 0; ii < Dim1; ii++)
-            {
-                fHopMat[ii] = new double[Dim2];
-                fSMat[ii] = new double[Dim2];
-            }
-            
-            double** fHopMatT = new double*[Dim2];
-            double** fSMatT = new double*[Dim2];
-            for(int ii = 0; ii < Dim2; ii++)
-            {
-                fHopMatT[ii] = new double[Dim1];
-                fSMatT[ii] = new double[Dim1];
-            }
-            
-            Orbs1.Replace(_(" "),_(""));
-            Orbs1.Replace(_("("),_(""));
-            Orbs1.Replace(_(")"),_(""));
-            Orbs2.Replace(_(" "),_(""));
-            Orbs2.Replace(_("("),_(""));
-            Orbs2.Replace(_(")"),_(""));
-            int i=-1;
-            wxStringTokenizer tokenizer1(Orbs1, ",");
-            while (tokenizer1.HasMoreTokens())
-            {
-                i++;
-                wxString o1 = tokenizer1.GetNextToken();
-                
-                int j=-1;
-                wxStringTokenizer tokenizer2(Orbs2, ",");
-                while (tokenizer2.HasMoreTokens())
-                {
-                    j++;
-                    wxString o2 = tokenizer2.GetNextToken();
-                    fHopMat[i][j] = this->Hopspd(fBondSK, l, m, n, o1, o2);
-                    fHopMatT[j][i] = fHopMat[i][j];
-                    
-                    fSMat[i][j] = this->Hopspd(fBondSK_s, l, m, n, o1, o2);
-                    fSMatT[j][i] = fSMat[i][j];
-                }
-            }
-            
-            int i0Ham = HamiltonianDimMap[iAtomIndex][nShellIndex - 1];
-            int j0Ham = HamiltonianDimMap[jAtomIndex][mShellIndex - 1];
-            
-            if (icell==0 && jcell==0 && kcell==0)
-            {
-                for(int ii=0; ii<Dim1; ii++)
-                    for(int jj=0; jj<Dim2; jj++)
-                    {
-                        int ih = i0Ham + ii;
-                        int jh = j0Ham + jj;
-                        hf[ih][jh] = fHopMat[ii][jj];
-                        hf[jh][ih] = fHopMatT[jj][ii];
-                        
-                        sf[ih][jh] = fSMat[ii][jj];
-                        sf[jh][ih] = fSMatT[jj][ii];
-                    }
-            }
-            else
-            {
-                for(int ii=0; ii<Dim1; ii++)
-                    for(int jj=0; jj<Dim2; jj++)
-                    {
-                        int ih = i0Ham + ii;
-                        int jh = j0Ham + jj;
-                        hf[ih][jh] = fHopMat[ii][jj];
-                        sf[ih][jh] = fSMat[ii][jj];
-                    }
-            }
-            
-            for(int ii = 0; ii < Dim1; ii++)
-            {
-                if (Dim2 > 0)
-                {
-                    delete [] fHopMat[ii];
-                    delete [] fSMat[ii];
-                }
-            }
-            
-            for(int ii = 0; ii < Dim2; ii++)
-            {
-                if (Dim1 > 0)
-                {
-                    delete [] fHopMatT[ii];
-                    delete [] fSMatT[ii];
-                }
-            }
-            
-            if (Dim1>0)
-            {
-                delete [] fHopMat;
-                delete [] fSMat;
-            }
-            
-            if (Dim2>0)
-            {
-                delete [] fHopMatT;
-                delete [] fSMatT;
-            }
-        }
-        //////////////////////////////////////////////
-		item = BondTree->GetNextChild(CellID, cookie);
-	}
-}
-
 void Sec30::AddOnSiteMatrix(myGrid* OnSiteCtr, wxCheckTree* orbs, Aint1D HamiltonianDimMap, Adouble1D &hi, Adouble1D &hf)
 {
     wxTreeItemId rootID = orbs->GetRootItem();
@@ -3587,56 +3118,6 @@ void Sec30::AddOnSiteMatrix(myGrid* OnSiteCtr, wxCheckTree* orbs, Aint1D Hamilto
     }
 }
 
-void Sec30::AddOnSiteMatrix(myGrid* OnSiteCtr, wxCheckTree* orbs, Aint1D HamiltonianDimMap, Adouble1D &hi, Adouble1D &hf, Adouble1D &si, Adouble1D &sf)
-{
-    wxTreeItemId rootID = orbs->GetRootItem();
-    wxString rootname = orbs->GetItemText(rootID);
-    
-    int nUnitcellAtoms = 0;
-    this->GetVar(_("nAtoms[0]"),nUnitcellAtoms);
-    
-    for (int iAtomIndex=0; iAtomIndex<nUnitcellAtoms; iAtomIndex++)
-    {
-        int Dim1 = -1;
-        bool IsShell1;
-        wxString Orbs1;
-        
-        wxString atom1 = wxString::Format(wxT("AtomInd%d"),iAtomIndex + 1);
-        wxComboBox* comb1 = this->GetComboObject(atom1);
-        wxString TBAtom1 = comb1->GetStringSelection();
-        
-        wxTreeItemId AtomID = orbs->ActiveAndContainsItemIn(rootID ,TBAtom1);
-        int nShell = orbs->GetChildrenCount(AtomID,false);
-        
-        for (int iShell=1; iShell<=nShell; iShell++)
-        {
-            wxString ShellName = wxString::Format(wxT("Shell %d"),iShell);
-            wxTreeItemId shellID = orbs->FindItemIn(AtomID,ShellName);
-            
-            if (shellID.IsOk() && orbs->GetItemState(shellID) >= wxCheckTree::CHECKED)
-            {
-                this->GetOrbitalInfo(orbs, TBAtom1, iShell, Orbs1, Dim1, IsShell1);
-                wxString Label = TBAtom1  + _(" (") + ShellName + _(")");
-
-                int i0Ham = HamiltonianDimMap[iAtomIndex][iShell - 1];
-                
-                Adouble0D iOnSiteSK, fOnSiteSK;
-                GetOnSiteSK(OnSiteCtr, Label, iOnSiteSK, fOnSiteSK);
-                
-                for(int ii=0; ii<Dim1; ii++)
-                {
-                    int ih = i0Ham + ii;
-                    hi[ih][ih] = iOnSiteSK[ii];
-                    hf[ih][ih] = fOnSiteSK[ii];
-                    
-                    si[ih][ih] = 1.0;
-                    sf[ih][ih] = 1.0;
-                }
-            }
-        }
-    }
-}
-
 void Sec30::AddOnSiteMatrixF(myGrid* OnSiteCtr, wxCheckTree* orbs, Aint1D HamiltonianDimMap, Adouble1D &hf)
 {
     wxTreeItemId rootID = orbs->GetRootItem();
@@ -3677,54 +3158,6 @@ void Sec30::AddOnSiteMatrixF(myGrid* OnSiteCtr, wxCheckTree* orbs, Aint1D Hamilt
                 {
                     int ih = i0Ham + ii;
                     hf[ih][ih] = fOnSiteSK[ii];
-                }
-            }
-        }
-    }
-}
-
-void Sec30::AddOnSiteMatrixF(myGrid* OnSiteCtr, wxCheckTree* orbs, Aint1D HamiltonianDimMap, Adouble1D &hf, Adouble1D &sf)
-{
-    wxTreeItemId rootID = orbs->GetRootItem();
-    wxString rootname = orbs->GetItemText(rootID);
-    
-    int nUnitcellAtoms = 0;
-    this->GetVar(_("nAtoms[0]"),nUnitcellAtoms);
-    
-    for (int iAtomIndex=0; iAtomIndex<nUnitcellAtoms; iAtomIndex++)
-    {
-        int Dim1 = -1;
-        bool IsShell1;
-        wxString Orbs1;
-        
-        wxString atom1 = wxString::Format(wxT("AtomInd%d"),iAtomIndex + 1);
-        wxComboBox* comb1 = this->GetComboObject(atom1);
-        wxString TBAtom1 = comb1->GetStringSelection();
-        
-        wxTreeItemId AtomID = orbs->ActiveAndContainsItemIn(rootID ,TBAtom1);
-        int nShell = orbs->GetChildrenCount(AtomID,false);
-        
-        for (int iShell=1; iShell<=nShell; iShell++)
-        {
-            wxString ShellName = wxString::Format(wxT("Shell %d"),iShell);
-            wxTreeItemId shellID = orbs->FindItemIn(AtomID,ShellName);
-            
-            if (shellID.IsOk() && orbs->GetItemState(shellID) >= wxCheckTree::CHECKED)
-            {
-                this->GetOrbitalInfo(orbs, TBAtom1, iShell, Orbs1, Dim1, IsShell1);
-                wxString Label = TBAtom1  + _(" (") + ShellName + _(")");
-
-                int i0Ham = HamiltonianDimMap[iAtomIndex][iShell - 1];
-                
-                Adouble0D iOnSiteSK, fOnSiteSK;
-                GetOnSiteSKF(OnSiteCtr, OSBuffer, Label, iOnSiteSK, fOnSiteSK);
-                
-                for(int ii=0; ii<Dim1; ii++)
-                {
-                    int ih = i0Ham + ii;
-                    hf[ih][ih] = fOnSiteSK[ii];
-                    
-                    sf[ih][ih] = 1.0;
                 }
             }
         }
@@ -3957,65 +3390,7 @@ lapack_complex_double Sec30::GetHk(double*** H, double kx, double ky, double kz,
 int Sec30::SymEigenValues(lapack_complex_double* UpperSymMatrix, lapack_int N, double* &eig)
 {
     //return LAPACKE_dsyev(LAPACK_ROW_MAJOR, 'N', 'U', N, UpperSymMatrix, N, eig);
-    
-    //lapack_int LAPACKE_zheev( int matrix_layout, char jobz, char uplo, lapack_int n,
-    //                      lapack_complex_double* a, lapack_int lda, double* w );
     return LAPACKE_zheev(LAPACK_ROW_MAJOR, 'N', 'U', N, UpperSymMatrix, N, eig);
-}
-
-int Sec30::SymEigenValues(lapack_complex_double* UpperSymMatrixA, lapack_complex_double* UpperSymMatrixB, lapack_int N, double* &eig)
-{
-    //lapack_int LAPACKE_zhbgv( int matrix_layout, char jobz, char uplo, lapack_int n,
-    //                      lapack_int ka, lapack_int kb,
-    //                      lapack_complex_double* ab, lapack_int ldab,
-    //                      lapack_complex_double* bb, lapack_int ldbb, double* w,
-    //                      lapack_complex_double* z, lapack_int ldz );
-    
-    lapack_int nab = N+1;
-    lapack_int nz = N;
-    lapack_complex_double z[1];
-    z[0] = {0.0, 0.0};
-    int info = LAPACKE_zhbgv(LAPACK_ROW_MAJOR, 'N', 'L', N,
-                         N, N,
-                         UpperSymMatrixA, nab,
-                         UpperSymMatrixB, nab,
-                         eig,
-                         z, nz);
-    /*
-    
-    
-        lapack_int n = 3, lda = 3, info;
-        lapack_int na = n+1;
-        lapack_int nb = n+1;
-        lapack_int nc = 1;
-        
-        double w[3];
-        lapack_complex_double a[4*4] = {
-           { 9.14,  0.00}, {-4.37,  9.22}, {-1.98,  1.72}, {-8.96,  9.50},
-           { 0.00,  0.00}, {-3.35,  0.00}, { 2.25,  9.51}, { 2.57, -2.40},
-           { 0.00,  0.00}, { 0.00,  0.00}, {-4.82,  0.00}, {-3.24, -2.04},
-           { 0.00,  0.00}, { 0.00,  0.00}, { 0.00,  0.00}, { 8.44,  0.00}
-        };
-        lapack_complex_double b[4*4] = {
-           { 1.1,  0.00}, {1.0,  0.00}, {1.0,  0}, {1.0, 0},
-           { 1.2,  0.00}, {1.0,  0.00}, { 1.1,  0}, {1.4, 0},
-           { 1.1,  0.00}, { 0.5,  0.00}, {1.0,  0.00}, {1., 0},
-           { 1.20,  0.00}, { 0.4,  0.00}, { 1.0,  0.00}, { 1.0,  0.00}
-        };
-        lapack_complex_double c[1] = {
-           { 0.0,  0.00}
-        };
-        //info = LAPACKE_zhbgv( LAPACK_ROW_MAJOR, 'N', 'U', n, a, lda, w );
-        info = LAPACKE_zhbgv(LAPACK_ROW_MAJOR, 'N', 'U', n,
-                         n, n,
-                         a, na,
-                         b, nb,
-                         w,
-                         c, nc);
-         
-        wxMessageBox(wxString::Format(_("%d"),info));
-    */
-    return info;
 }
 
 bool Sec30::isMatch(double x, double y, double Thereshold)

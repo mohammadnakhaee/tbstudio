@@ -27,14 +27,12 @@
 //#include <memory>
 /**********************************************************************************/
 
-
-
 class MainFrame : public MainFrameBaseClass
 {
 public:
     wxString MySerialNumber = _("");
     wxString SoftwareName = _("TBStudio");
-    wxString FreeSoftwareLimitations = _("fitting a TB model including d-orbitals");
+    wxString FreeSoftwareLimitations = _("fitting a TB model including d-orbitals and code generator of C++, C and Fortran and also parallel code generator for all languages and limitations in non-orthogonal TBModel and using spin-orbit coupling");
     int Ver_MAJOR = 1;
     int Ver_MINOR = 2;
     int Ver_RELEASE = 1;
@@ -42,7 +40,7 @@ public:
     MainFrame(wxWindow* parent);
     virtual ~MainFrame();
     
-    //int* SelectedAtoms;
+    int* SelectedAtoms;
     GraphClass* graph3d;
     GraphClass* graph2d0;
     GraphClass* graph2d;
@@ -76,7 +74,7 @@ public:
     bool is_UpperSymMatrixHf = false;
     
     Regression* regression;
-    //std::thread* FittingThread;
+    std::thread* FittingThread;
     bool isFittingThreadBusy = false;
     
     wxRibbonButtonBar* RButtonMouse;
@@ -176,7 +174,7 @@ protected:
     virtual void FillBondsPanel();
     /****************************************/
     virtual void LoadSetupPanel();
-    virtual void EvaluateSetupPanel(int SetWeight);
+    virtual void EvaluateSetupPanel();
     virtual bool ValidateSetupPanel();
     virtual void FillSetupPanel();
     /****************************************/
@@ -196,6 +194,7 @@ protected:
     void TestZEig();
     void UpdateTBBand_if();
     void StartRegression(bool isOneStep);
+    bool IsAllowedToFit(int iband, int ik);
     int ReplaceDFTBand(int iband, int ik);
     double ShiftBand(int iband, int ik);
     double GetFitParameter(int ip, int icol);

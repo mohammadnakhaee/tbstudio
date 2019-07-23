@@ -30,14 +30,14 @@ BondsClass::BondsClass(wxWindow* parent, Sec30* sec30var, wxWindowID id, const w
     wxObjectEventFunction Funcs2[1] = { wxCommandEventHandler(BondsClass::Btn_Pick_OnClick)};
     sec30->AddButton(this, 1, Names2, Labels2, Funcs2);
     sec30->AddGroupBox(this,_("Atom index and shell number in cell (0,0,0):"),wxColour(wxT("rgb(255,255,255)")));
-    sec30->AddVarVector(this, 2, _("AtomIndex1"), _("int"), _("(i,n)"), 70, 50, false);
+    sec30->AddVarVector(this, 2, _("AtomIndex1"), _("int"), _("(i,n)"), 60, 50, false);
     sec30->AddGroupBox(this,_("Atom index and shell number in selected cell:"),wxColour(wxT("rgb(255,255,255)")));
-    sec30->AddVarVector(this, 2, _("AtomIndex2"), _("int"), _("(j,m)"), 70, 50, false);
+    sec30->AddVarVector(this, 2, _("AtomIndex2"), _("int"), _("(j,m)"), 60, 50, false);
     sec30->SetVar(_("AtomIndex1[0]"),1,false);
     sec30->SetVar(_("AtomIndex1[1]"),1,false);
     sec30->SetVar(_("AtomIndex2[0]"),1,false);
     sec30->SetVar(_("AtomIndex2[1]"),1,false);
-    wxComboBox* choicectr = sec30->AddComboCtrl(this, _("BondLabel"), _("Bond Label"), 70, 105, false);
+    wxComboBox* choicectr = sec30->AddComboCtrl(this, _("BondLabel"), _("Bond Label"), 60, 100, false);
     for (int i=1; i<=50; i++)
     {
         //wxImage img = wxImage(wxSize(10,10),true);
@@ -55,7 +55,7 @@ BondsClass::BondsClass(wxWindow* parent, Sec30* sec30var, wxWindowID id, const w
     /**********************************************************************************************************************************************/
     sec30->AddGroupBox(this,_("List of Bonds in TB Model"),wxColour(wxT("rgb(153,180,209)")));
     wxCheckTree* treectr = sec30->AddTreeCtrl(this, _("Bonds"), 340, 500, true);
-    treectr->AddRoot("TB Model");
+    wxTreeItemId rootID=treectr->AddRoot("TB Model");
     treectr->Connect(wxEVT_RIGHT_DOWN, wxMouseEventHandler(BondsClass::BondsTree_RightDown), NULL, this);
     /**********************************************************************************************************************************************/
     sec30->AddGroupBox(this,_(""),wxColour(wxT("rgb(153,180,209)")));

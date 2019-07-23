@@ -2,18 +2,18 @@
 ## Auto Generated makefile by CodeLite IDE
 ## any manual changes will be erased      
 ##
-## Debug
+## Release
 ProjectName            :=GUI
-ConfigurationName      :=Debug
+ConfigurationName      :=Release
 WorkspacePath          :=C:/Users/mohammad/Documents/Codelite/pecsjunc
 ProjectPath            :=C:/Users/mohammad/Documents/Codelite/pecsjunc/GUI
-IntermediateDirectory  :=./Debug
+IntermediateDirectory  :=./Release
 OutDir                 := $(IntermediateDirectory)
 CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=mohammad
-Date                   :=14/07/2019
+Date                   :=03/07/2019
 CodeLitePath           :="C:/Program Files/CodeLite"
 LinkerName             :=C:/TDM-GCC-64/bin/g++.exe
 SharedObjectLinkerName :=C:/TDM-GCC-64/g++.exe -shared -fPIC
@@ -28,7 +28,7 @@ LibraryPathSwitch      :=-L
 PreprocessorSwitch     :=-D
 SourceSwitch           :=-c 
 OutputFile             :=$(IntermediateDirectory)/$(ProjectName)
-Preprocessors          :=
+Preprocessors          :=$(PreprocessorSwitch)NDEBUG 
 ObjectSwitch           :=-o 
 ArchiveOutputSwitch    := 
 PreprocessOnlySwitch   :=-E
@@ -37,12 +37,12 @@ PCHCompileFlags        :=
 MakeDirCommand         :=makedir
 RcCmpOptions           := $(shell wx-config --rcflags)
 RcCompilerName         :=C:/TDM-GCC-64/bin/windres.exe
-LinkOptions            :=  -mwindows $(shell wx-config --libs std,gl,ribbon) -mwindows -std=gnu++11 -pthread -liphlpapi -IC:\Users\mohammad\Documents\Codelite\pecsjunc\LAPACKE-X64 -llapacke
-IncludePath            :=  $(IncludeSwitch). $(IncludeSwitch). $(IncludeSwitch)$(MathGL_DIR)/include $(IncludeSwitch)$(Glut_DIR)/include $(IncludeSwitch)$(LAPACKE_DIR) $(IncludeSwitch)$(Gemmi_DIR)/include $(IncludeSwitch)$(RapidXML_DIR) 
+LinkOptions            :=  -mwindows $(shell wx-config --libs std,gl,ribbon) -mwindows -std=gnu++11 -pthread -liphlpapi
+IncludePath            :=  $(IncludeSwitch). $(IncludeSwitch). $(IncludeSwitch)$(MathGL_DIR)/include $(IncludeSwitch)$(Glut_DIR)/include $(IncludeSwitch)$(LAPACKE_DIR) 
 IncludePCH             := 
 RcIncludePath          := 
-Libs                   := $(LibrarySwitch)mgl-glut $(LibrarySwitch)mgl $(LibrarySwitch)freeglut 
-ArLibs                 :=  "libmgl-glut.a" "libmgl.a" "libfreeglut.a" 
+Libs                   := $(LibrarySwitch)mgl-glut $(LibrarySwitch)mgl $(LibrarySwitch)freeglut $(LibrarySwitch)lapacke $(LibrarySwitch)lapack $(LibrarySwitch)blas $(LibrarySwitch)m 
+ArLibs                 :=  "libmgl-glut.a" "libmgl.a" "libfreeglut.a" "liblapacke" "liblapack" "libblas" "m" 
 LibPath                := $(LibraryPathSwitch). $(LibraryPathSwitch)$(Opengl_DIR) $(LibraryPathSwitch)$(MathGL_DIR)\lib $(LibraryPathSwitch)C:\TDM-GCC-64\x86_64-w64-mingw32\lib $(LibraryPathSwitch)$(Glut_DIR)\lib $(LibraryPathSwitch)$(LAPACKE_DIR) $(LibraryPathSwitch)C:\TDM-GCC-64\gcc-5.1.0-tdm64-1-fortran\bin 
 
 ##
@@ -52,8 +52,8 @@ LibPath                := $(LibraryPathSwitch). $(LibraryPathSwitch)$(Opengl_DIR
 AR       := C:/TDM-GCC-64/bin/ar.exe rcu
 CXX      := C:/TDM-GCC-64/bin/g++.exe
 CC       := C:/TDM-GCC-64/bin/gcc.exe
-CXXFLAGS :=  -g -O0 -Wall $(shell wx-config --cxxflags --gl-libs) $(Preprocessors)
-CFLAGS   :=  -g -O0 -Wall $(Preprocessors)
+CXXFLAGS :=  -O2 -Wall $(shell wx-config --cxxflags --gl-libs) $(Preprocessors)
+CFLAGS   :=  -O2 -Wall $(Preprocessors)
 ASFLAGS  := 
 AS       := C:/TDM-GCC-64/bin/as.exe
 
@@ -69,10 +69,8 @@ MathGL2_DIR:=C:\Users\mohammad\Documents\cppworkspace\3rdparty\Installed\MathGL2
 WXCFG:=gcc_dll\mswu
 Opengl_DIR:=$(GCC_DIR)\x86_64-w64-mingw32\lib
 MathGL_DIR:=..\MathGL64LGPL
-LAPACKE_DIR:=C:\Users\mohammad\Documents\Codelite\pecsjunc\LAPACKE-X64
+LAPACKE_DIR:=..\LAPACKE-X64
 Glut_DIR:=C:\Users\mohammad\Documents\Codelite\pecsjunc\freeglut64
-Gemmi_DIR:=C:\Users\mohammad\Documents\Codelite\pecsjunc\gemmi-master
-RapidXML_DIR:=C:\Users\mohammad\Documents\Codelite\pecsjunc\rapidxml-1.13
 PATH:=$(WXWIN)\lib\gcc_dll;$(GCC_DIR)\bin;$(PATH)
 PATH:=C:\Users\mohammad\Documents\Codelite\pecsjunc\MathGL64LGPL\bin;$(PATH)
 PATH:=$(Glut_DIR)\bin;$(PATH)
@@ -100,15 +98,23 @@ $(OutputFile): $(IntermediateDirectory)/.d $(Objects)
 
 PostBuild:
 	@echo Executing Post Build commands ...
-	
+	rmdir TBStudio /s /q
+	mkdir TBStudio
+	copy .\Release\* .\TBStudio
+	del .\TBStudio\*.o
+	del .\TBStudio\*.d
+	mkdir .\TBStudio\Examples
+	xcopy .\Examples .\TBStudio\Examples /E
+	copy TBStudio.ico TBStudio
+	copy Readme.txt TBStudio
 	@echo Done
 
 MakeIntermediateDirs:
-	@$(MakeDirCommand) "./Debug"
+	@$(MakeDirCommand) "./Release"
 
 
 $(IntermediateDirectory)/.d:
-	@$(MakeDirCommand) "./Debug"
+	@$(MakeDirCommand) "./Release"
 
 PreBuild:
 
@@ -316,6 +322,6 @@ $(IntermediateDirectory)/OrbitalsClass.cpp$(PreprocessSuffix): OrbitalsClass.cpp
 ## Clean
 ##
 clean:
-	$(RM) -r ./Debug/
+	$(RM) -r ./Release/
 
 
