@@ -287,12 +287,12 @@ void SetupClass::Btn_Select_OnClick(wxCommandEvent& event)
     //btnctr->SetBackgroundColour(wxColour(wxT("rgb(209,153,180)")));
     if (btnctr->GetForegroundColour() == *wxBLACK)
     {
-        //btnctr->SetForegroundColour(*wxGREEN);
+        btnctr->SetForegroundColour(*wxGREEN);
         sec30->ArraysOf0DInt[6] = 1;
     }
     else
     {
-        //btnctr->SetForegroundColour(*wxBLACK);
+        btnctr->SetForegroundColour(*wxBLACK);
         sec30->ArraysOf0DInt[6] = 0;
     }
     
@@ -379,12 +379,12 @@ void SetupClass::LoadOpenMXBand(wxString file, bool &isBandLoaded, int &maxneig,
         for (int i=0;i<nkpath;i++)
         {
             fscanf(fp,"%d %lf %lf %lf  %lf %lf %lf  %s %s",&n_perpath[i],&k1, &k2, &k3,&k4, &k5, &k6, c1, c2);
-            //kname1 = wxString(c1, wxConvUTF8);
-            //kname2 = wxString(c2, wxConvUTF8);
-            //vk[0] = k1; vk[1] = k2; vk[2] = k3;
-            //vk2[0] = k4; vk2[1] = k5; vk2[2] = k6;
-            //sec30->vk_rtv(vk,rtv,vec);
-            //sec30->vk_rtv(vk2,rtv,vec2);
+            kname1 = wxString(c1, wxConvUTF8);
+            kname2 = wxString(c2, wxConvUTF8);
+            vk[0] = k1; vk[1] = k2; vk[2] = k3;
+            vk2[0] = k4; vk2[1] = k5; vk2[2] = k6;
+            sec30->vk_rtv(vk,rtv,vec);
+            sec30->vk_rtv(vk2,rtv,vec2);
             d += sec30->norm(vec, vec2);
             nKp = nKp + n_perpath[i];
             dkLabel.push_back(d);
@@ -421,17 +421,30 @@ void SetupClass::LoadOpenMXBand(wxString file, bool &isBandLoaded, int &maxneig,
             oldvec[1]=vec[1];
             oldvec[2]=vec[2];
             
-            //A1d.push_back(d);
+            A1d.clear();
+            for(int j=0; j<3; j++)
+            {
+                double val = vk[j];
+                A1d.push_back(val);
+            }
             
-            //KPoints.push_back(A1d);
+            for(int j=0; j<3; j++)
+            {
+                double val = vec[j];
+                A1d.push_back(val);
+            }
             
-            //A1d.clear();
-            //for (int l=0;l<n1;l++)
-            //{
-                //fscanf(fp,"%lf",&eig);
-                //eig = eig * Hartree2eV;
-                //A1d.push_back(eig);
-            //}
+            A1d.push_back(d);
+            
+            KPoints.push_back(A1d);
+            
+            A1d.clear();
+            for (int l=0;l<n1;l++)
+            {
+                fscanf(fp,"%lf",&eig);
+                eig = eig * Hartree2eV;
+                A1d.push_back(eig);
+            }
             EigVal.push_back(A1d);
         }
         isBandLoaded = true;
