@@ -8,6 +8,7 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="src">
+    <File Name="ChooseSpin.cpp"/>
     <File Name="UpdateClass.cpp"/>
     <File Name="wxFingerPrint.cpp"/>
     <File Name="MACAddressUtility.cpp"/>
@@ -34,6 +35,7 @@
     <File Name="wxcrafter_bitmaps.cpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="include">
+    <File Name="ChooseSpin.h"/>
     <File Name="UpdateClass.h"/>
     <File Name="wxMACAddressUtility.h"/>
     <File Name="wxFingerPrint.h"/>
@@ -89,8 +91,10 @@
         <IncludePath Value="$(MathGL_DIR)/include"/>
         <IncludePath Value="$(Glut_DIR)/include"/>
         <IncludePath Value="$(LAPACKE_DIR)"/>
+        <IncludePath Value="$(Gemmi_DIR)/include"/>
+        <IncludePath Value="$(RapidXML_DIR)"/>
       </Compiler>
-      <Linker Options="-mwindows;$(shell wx-config --libs std,gl,ribbon);-mwindows;-std=gnu++11 -pthread -liphlpapi" Required="yes">
+      <Linker Options="-mwindows;$(shell wx-config --libs std,gl,ribbon);-mwindows;-std=gnu++11 -pthread -liphlpapi -IC:\Users\mohammad\Documents\Codelite\pecsjunc\LAPACKE-X64 -llapacke" Required="yes">
         <LibraryPath Value="$(Opengl_DIR)"/>
         <LibraryPath Value="$(MathGL_DIR)\lib"/>
         <LibraryPath Value="C:\TDM-GCC-64\x86_64-w64-mingw32\lib"/>
@@ -100,10 +104,6 @@
         <Library Value="libmgl-glut.a"/>
         <Library Value="libmgl.a"/>
         <Library Value="libfreeglut.a"/>
-        <Library Value="liblapacke"/>
-        <Library Value="liblapack"/>
-        <Library Value="libblas"/>
-        <Library Value="m"/>
       </Linker>
       <ResourceCompiler Options="$(shell wx-config --rcflags)" Required="no"/>
       <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Debug" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="no" IsGUIProgram="no" IsEnabled="yes"/>
@@ -147,6 +147,8 @@
         <IncludePath Value="$(MathGL_DIR)/include"/>
         <IncludePath Value="$(Glut_DIR)/include"/>
         <IncludePath Value="$(LAPACKE_DIR)"/>
+        <IncludePath Value="$(Gemmi_DIR)/include"/>
+        <IncludePath Value="$(RapidXML_DIR)"/>
         <Preprocessor Value="NDEBUG"/>
       </Compiler>
       <Linker Options="-mwindows;$(shell wx-config --libs std,gl,ribbon);-mwindows;-std=gnu++11 -pthread -liphlpapi" Required="yes">

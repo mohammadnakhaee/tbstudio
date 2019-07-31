@@ -27,20 +27,22 @@
 //#include <memory>
 /**********************************************************************************/
 
+
+
 class MainFrame : public MainFrameBaseClass
 {
 public:
     wxString MySerialNumber = _("");
     wxString SoftwareName = _("TBStudio");
-    wxString FreeSoftwareLimitations = _("fitting a TB model including d-orbitals and code generator of C++, C and Fortran and also parallel code generator for all languages and limitations in non-orthogonal TBModel and using spin-orbit coupling");
-    int Ver_MAJOR = 1;
-    int Ver_MINOR = 2;
-    int Ver_RELEASE = 1;
+    wxString FreeSoftwareLimitations = _("fitting a TB model including d-orbitals");
+    int Ver_MAJOR = 2;
+    int Ver_MINOR = 0;
+    int Ver_RELEASE = 0;
     
     MainFrame(wxWindow* parent);
     virtual ~MainFrame();
     
-    int* SelectedAtoms;
+    //int* SelectedAtoms;
     GraphClass* graph3d;
     GraphClass* graph2d0;
     GraphClass* graph2d;
@@ -74,7 +76,7 @@ public:
     bool is_UpperSymMatrixHf = false;
     
     Regression* regression;
-    std::thread* FittingThread;
+    //std::thread* FittingThread;
     bool isFittingThreadBusy = false;
     
     wxRibbonButtonBar* RButtonMouse;
@@ -145,7 +147,6 @@ protected:
     virtual void GetHamiltonianMap(wxCheckTree* orbs, Astring0D &HamiltonianMap, Astring0D &HamiltonianShellMap, Aint1D &HamiltonianDimMap);
     virtual void AddShellAndOrbitalInfo(wxCheckTree* orbsTree, wxString AtomName, Astring0D &HamiltonianMap, Astring0D &HamiltonianShellMap, Aint0D &HamiltonianDimMapItem, int &LastIndex);
     virtual void ReadSK();
-    virtual void InitializeSec30Arrays();
     virtual void Init_graph3d();
     virtual void Init_graph2d0();
     virtual void Init_graph2d();
@@ -174,7 +175,7 @@ protected:
     virtual void FillBondsPanel();
     /****************************************/
     virtual void LoadSetupPanel();
-    virtual void EvaluateSetupPanel();
+    virtual void EvaluateSetupPanel(int SetWeight);
     virtual bool ValidateSetupPanel();
     virtual void FillSetupPanel();
     /****************************************/
@@ -192,9 +193,9 @@ protected:
     bool IsBondContainsParameter(wxString Orbs1, wxString Orbs2, wxString sk);
     void TestEig();
     void TestZEig();
+    void InitializeSec30Arrays();
     void UpdateTBBand_if();
     void StartRegression(bool isOneStep);
-    bool IsAllowedToFit(int iband, int ik);
     int ReplaceDFTBand(int iband, int ik);
     double ShiftBand(int iband, int ik);
     double GetFitParameter(int ip, int icol);

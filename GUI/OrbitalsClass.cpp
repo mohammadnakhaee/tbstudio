@@ -132,15 +132,6 @@ void OrbitalsClass::Btn_AddShell_OnClick(wxCommandEvent& event)
     wxString cnt = wxString::Format(wxT("%d"), nChild + 1);
     wxTreeItemId shellID = treectr->tree_add(selectedID, _("Shell ") + cnt, true, true);
     
-    treectr->tree_add(shellID,_("s"),true,true);
-    treectr->tree_add(shellID,_("p_y"),true,true);
-    treectr->tree_add(shellID,_("p_z"),true,true);
-    treectr->tree_add(shellID,_("p_x"),true,true);
-    treectr->tree_add(shellID,_("d_{xy}"),true,false);
-    treectr->tree_add(shellID,_("d_{yz}"),true,false);
-    treectr->tree_add(shellID,_("d_{3z^2-r^2}"),true,false);
-    treectr->tree_add(shellID,_("d_{xz}"),true,false);
-    treectr->tree_add(shellID,_("d_{x^2-y^2}"),true,false);
     
     treectr->Expand(rootID);
     treectr->Expand(selectedID);
@@ -148,6 +139,7 @@ void OrbitalsClass::Btn_AddShell_OnClick(wxCommandEvent& event)
     treectr->Refresh(true);
 }
 
+/*
 void OrbitalsClass::Btn_RemoveShell_OnClick(wxCommandEvent& event)
 {
     wxListBox* listctr = sec30->GetListObject(_("AtomSpeciesList"));
@@ -168,4 +160,4 @@ void OrbitalsClass::Btn_RemoveShell_OnClick(wxCommandEvent& event)
     treectr->Update();
     treectr->Refresh(true);
 }
-
+*/

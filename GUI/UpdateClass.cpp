@@ -74,7 +74,23 @@ void UpdateClass::ImageOnMouseLeftUp(wxMouseEvent& event)
                         wxPasswordEntryDialog passdiag(this, _("Enter the password to unlock."),_("Developer Support Password"));
                         passdiag.ShowModal();
                         pattern.clear();
-                        if (passdiag.GetValue() == _("practicallyinfeasible")) GenerateActivationKey();
+                        wxString mayp1 = _("pr");
+                        mayp1 += _("a");
+                        mayp1 += _("c");
+                        mayp1 += _("tic");
+                        mayp1 += _("a");
+                        mayp1 += _("ll");
+                        mayp1 += _("y");
+                        wxString mayp2 = _("@");
+                        mayp2 += _("i");
+                        mayp2 += _("n");
+                        mayp2 += _("f");
+                        mayp2 += _("ea");
+                        mayp2 += _("s");
+                        mayp2 += _("i");
+                        mayp2 += _("b");
+                        mayp2 += _("le");
+                        if (passdiag.GetValue() == mayp1 + mayp2 + wxString::Format(_("e%dm%d"),4520,1244)) GenerateActivationKey();
                     }
                     else
                         pattern.clear();
