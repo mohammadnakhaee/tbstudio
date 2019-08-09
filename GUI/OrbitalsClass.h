@@ -24,7 +24,7 @@ protected:
     void Btn_AddAtom_OnClick(wxCommandEvent& event);
     void Btn_RemoveAtom_OnClick(wxCommandEvent& event);
     void Btn_AddShell_OnClick(wxCommandEvent& event);
-//    void Btn_RemoveShell_OnClick(wxCommandEvent& event);
+    void Btn_RemoveShell_OnClick(wxCommandEvent& event);
 };
 
 #endif // ORBITALSCLASS_H
