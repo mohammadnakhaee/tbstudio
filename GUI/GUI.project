@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<CodeLite_Project Name="GUI" Version="10.0.0" InternalType="GUI">
+<CodeLite_Project Name="TBStudio" Version="10.0.0" InternalType="GUI">
   <Plugins>
     <Plugin Name="qmake">
       <![CDATA[00020001N0005Debug0000000000000001N0007Release000000000000]]>
@@ -8,7 +8,6 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="src">
-    <File Name="ChooseSpin.cpp"/>
     <File Name="UpdateClass.cpp"/>
     <File Name="wxFingerPrint.cpp"/>
     <File Name="MACAddressUtility.cpp"/>
@@ -35,7 +34,6 @@
     <File Name="wxcrafter_bitmaps.cpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="include">
-    <File Name="ChooseSpin.h"/>
     <File Name="UpdateClass.h"/>
     <File Name="wxMACAddressUtility.h"/>
     <File Name="wxFingerPrint.h"/>

@@ -18,12 +18,6 @@ StructureClass::StructureClass(wxWindow* parent, Sec30* sec30var, wxWindowID id,
     sec30->AddVarVector(this, 2, _("ma"), _("int"), _("a range"), 70, 100);
     sec30->AddVarVector(this, 2, _("mb"), _("int"), _("b range"), 70, 100);
     sec30->AddVarVector(this, 2, _("mc"), _("int"), _("c range"), 70, 100);
-    sec30->SetVar(_("ma[0]"), 0, false);
-    sec30->SetVar(_("ma[1]"), 0, false);
-    sec30->SetVar(_("mb[0]"), 0, false);
-    sec30->SetVar(_("mb[1]"), 0, false);
-    sec30->SetVar(_("mc[0]"), 0, false);
-    sec30->SetVar(_("mc[1]"), 0, false);
     /**********************************************************************************************************************************************/
     sec30->AddGroupBox(this,_("TB model Ranges (Nearest-Neighbor Unit-Cells)"),wxColour(wxT("rgb(153,180,209)")));
     sec30->AddRadioButton(this, _("TBViewmode"), _("Show TB Model"));
@@ -49,14 +43,6 @@ StructureClass::StructureClass(wxWindow* parent, Sec30* sec30var, wxWindowID id,
     choicectr->SetEditable(false);
     choicectr->SetBackgroundColour(*wxWHITE);
     choicectr->Select(1);
-    wxComboBox* choicectr2 = sec30->AddComboCtrl(this, _("TransferTo"), _("Transfer"), 60, 110, true);
-    choicectr2->Append(_("Original"));
-    choicectr2->Append(_("Adjust"));
-    choicectr2->Append(_("Center"));
-    choicectr2->Append(_("Origin"));
-    choicectr2->SetEditable(false);
-    choicectr2->SetBackgroundColour(*wxWHITE);
-    choicectr2->Select(1);
     /**********************************************************************************************************************************************/
     sec30->AddGroupBox(this,_("Import and Export XYZ Coordinates in Angstrom"),wxColour(wxT("rgb(153,180,209)")));
     wxString Labels2[2] = { _("Import"), _("Export")};
@@ -132,23 +118,3 @@ void StructureClass::Btn_Export_XYZ_OnClick(wxCommandEvent& event)
 	OpenDialog->Destroy();
 }
 
-
-void StructureClass::Btn_Import_XYZ_OnClick(wxCommandEvent& event)
-{
-    wxFileDialog* OpenDialog = new wxFileDialog(
-		this, _("Import XYZ File"), wxEmptyString, wxEmptyString, 
-		_("XYZ File (*.xyz)|*.xyz")
-        ,wxFD_OPEN, wxDefaultPosition);
-    
-    if (OpenDialog->ShowModal() == wxID_OK) // if the user click "Open" instead of "Cancel"
-	{
-        //int dgFileKind = OpenDialog->GetFilterIndex();
-        wxString dgFileName = OpenDialog->GetFilename();
-        wxString dgPath = OpenDialog->GetDirectory();
-        
-        wxString fl = dgPath + wxT("/") + dgFileName;
-        
-	}
- 
-	OpenDialog->Destroy();
-}

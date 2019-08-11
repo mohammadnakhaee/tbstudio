@@ -83,7 +83,7 @@ SetupClass::SetupClass(wxWindow* parent, Sec30* sec30var, wxWindowID id, const w
     sec30->AddVarVector(this, 1, _("OPrnt"), _("int"), _("Figure Updating Step"), 170, 100, false, false);
     sec30->SetVar(_("OPrnt[0]"), 3, false);
     sec30->AddVarVector(this, 1, _("OMaxIter"), _("int"), _("Iteration Limit"), 170, 100, false, false);
-    sec30->SetVar(_("OMaxIter[0]"), 50, false);
+    sec30->SetVar(_("OMaxIter[0]"), 100, false);
     sec30->AddVarVector(this, 1, _("Oeps1"), _("double"), _("Gradient Threshold"), 170, 100, false, false);
     sec30->SetVar(_("Oeps1[0]"), 0.0001, false);
     sec30->AddVarVector(this, 1, _("Oeps2"), _("double"), _("Parameters Threshold"), 170, 100, false, false);
@@ -99,11 +99,9 @@ SetupClass::SetupClass(wxWindow* parent, Sec30* sec30var, wxWindowID id, const w
     sec30->AddVarVector(this, 1, _("OLamDn"), _("double"), _("Decreasing Lambda"), 170, 100, false, false);
     sec30->SetVar(_("OLamDn[0]"), 0.0001, false);
     sec30->AddVarVector(this, 1, _("OMaxP"), _("double"), _("Parameters Maximum Limit"), 170, 100, false, false);
-    sec30->SetVar(_("OMaxP[0]"), 1000.0, false);
+    sec30->SetVar(_("OMaxP[0]"), 100.0, false);
     sec30->AddVarVector(this, 1, _("OMinP"), _("double"), _("Parameters Minimum Limit"), 170, 100, false, false);
-    sec30->SetVar(_("OMinP[0]"), -1000.0, false);
-    sec30->AddVarVector(this, 1, _("OMixing"), _("double"), _("Mixing"), 170, 100, false, false);
-    sec30->SetVar(_("OMixing[0]"), 1.0, false);
+    sec30->SetVar(_("OMinP[0]"), -100.0, false);
     sec30->AddVarVector(this, 1, _("OReScale"), _("double"), _("Rescale Factor"), 170, 100, false, false);
     sec30->SetVar(_("OReScale[0]"), 1.0, false);
     /**********************************************************************************************************************************************/
@@ -557,7 +555,6 @@ void SetupClass::LoadOpenMXUnfoldedBand(wxString file)
 
 void SetupClass::LoadVaspXMLOutput(wxString file, bool &isBandLoaded, int &maxneig, int &mspin, double &ChemP, int &nKp, Adouble1D &KPoints, Adouble1D &EigVal, Adouble0D &dkLabel, Astring0D &kLabel)
 {
-
     isBandLoaded = false;
     try
     {
@@ -598,7 +595,7 @@ void SetupClass::LoadVaspXMLOutput(wxString file, bool &isBandLoaded, int &maxne
         
         for(int i=0; i<3; i++)
         {
-            for(int j=0; j<3; j++) rtv[i][j] = 2.0*3.1415926535897932384626*rtv[i][j];// Vasp does not have a 2pi factor in its calculations
+            for(int j=0; j<3; j++) rtv[i][j] = rtv[i][j];// * BohrToAng;
             Adouble0D A1dvecs;
             A1dvecs.push_back(rtv[i][0]);
             A1dvecs.push_back(rtv[i][1]);
@@ -673,18 +670,18 @@ void SetupClass::LoadVaspXMLOutput(wxString file, bool &isBandLoaded, int &maxne
         int PathCounter = 0;
         int ThisPathInd = 0;
         d = 0.0;
-        bool isFirst = true;
+        int ind=0;
         for (rapidxml::xml_node<>* nd = kpointlist->first_node("v"); nd; nd = nd->next_sibling("v"))   //for(int i=0; i<nKp; i++)
         {
+            ind++;
             sscanf(nd->value(), "%lf %lf %lf", &vk[0], &vk[1], &vk[2]);
             
             sec30->vk_rtv(vk,rtv,vec);
-            if (isFirst)
+            if (ind==0)
             {
                 oldvec[0]=vec[0];
                 oldvec[1]=vec[1];
                 oldvec[2]=vec[2];
-                isFirst = false;
             }
             double deltakPath = sec30->norm(vec, oldvec);
             if (PathCounter == n_perpath[ThisPathInd])
@@ -739,6 +736,7 @@ void SetupClass::LoadVaspXMLOutput(wxString file, bool &isBandLoaded, int &maxne
                 break;
             }
         }
+        
         
         //Loading Eigenvalues
         rapidxml::xml_node<>* calculation = modeling_node->first_node("calculation");

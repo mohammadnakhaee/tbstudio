@@ -35,7 +35,6 @@
 #include <gemmi/cif.hpp>
 #include "rapidxml_utils.hpp"
 #include <bits/stdc++.h> //sort vectors
-#include <ChooseSpin.h>
 /******************************************************************************/
 
 /******************************************************************************/
@@ -134,10 +133,6 @@ public:
     void SetVar(wxString VariableName, int iRow, int iCol, int Value, bool FireEvent);
     void SetVar(wxString VariableName, int iRow, int iCol, bool Value, bool FireEvent);
     void SetVar(wxString VariableName, int iRow, int iCol, wxString Value, bool FireEvent);
-    bool GetVar(wxString VariableName, int iRow, int iCol, double& Value);
-    bool GetVar(wxString VariableName, int iRow, int iCol, int& Value);
-    bool GetVar(wxString VariableName, int iRow, int iCol, bool& Value);
-    bool GetVar(wxString VariableName, int iRow, int iCol, wxString& Value);
     void SetRadioVar(wxString VariableName, bool Value, bool FireEvent);
     void GetRadioVar(wxString VariableName, bool& Value);
     void SetCheckVar(wxString VariableName, bool Value, bool FireEvent);
@@ -177,31 +172,30 @@ public:
     void GetDirectionalCosines(double x1, double y1, double z1, double x2, double y2, double z2, double &l, double &m, double &n);
     double Hopspd(Adouble0D BondSK, double l, double m, double n, wxString o1, wxString o2);
     double Hopspd(double sss, double sps, double sds, double pps, double ppp, double pds, double pdp, double dds, double ddp, double ddd, double l, double m, double n, wxString o1, wxString o2);
-    void ConstructTBHamiltonian(double a[3], double b[3], double c[3], double** XYZCoords, Adouble2D &Hi, Adouble2D &Hf, int &nEssensialCells, int &nHamiltonian, Aint1D &EssCells, bool isSOC, Adouble2D &SOC_i, Adouble2D &SOC_f);
-    void ConstructTBHamiltonian(double a[3], double b[3], double c[3], double** XYZCoords, Adouble2D &Hi, Adouble2D &Hf, Adouble2D &Si, Adouble2D &Sf, int &nEssensialCells, int &nHamiltonian, Aint1D &EssCells, bool isSOC, Adouble2D &SOC_i, Adouble2D &SOC_f);
-    void ConstructTBHamiltonianF(double a[3], double b[3], double c[3], double** XYZCoords, Adouble2D &Hf, int &nEssensialCells, int &nHamiltonian, Aint1D &EssCells, bool isSOC, Adouble2D &SOC_f);
-    void ConstructTBHamiltonianF(double a[3], double b[3], double c[3], double** XYZCoords, Adouble2D &Hf, Adouble2D &Sf, int &nEssensialCells, int &nHamiltonian, Aint1D &EssCells, bool isSOC, Adouble2D &SOC_f);
+    void ConstructTBHamiltonian(double a[3], double b[3], double c[3], double** XYZCoords, Adouble2D &Hi, Adouble2D &Hf, int &nEssensialCells, int &nHamiltonian, Aint1D &EssCells);
+    void ConstructTBHamiltonian(double a[3], double b[3], double c[3], double** XYZCoords, Adouble2D &Hi, Adouble2D &Hf, Adouble2D &Si, Adouble2D &Sf, int &nEssensialCells, int &nHamiltonian, Aint1D &EssCells);
+    void ConstructTBHamiltonianF(double a[3], double b[3], double c[3], double** XYZCoords, Adouble2D &Hf, int &nEssensialCells, int &nHamiltonian, Aint1D &EssCells);
+    void ConstructTBHamiltonianF(double a[3], double b[3], double c[3], double** XYZCoords, Adouble2D &Hf, Adouble2D &Sf, int &nEssensialCells, int &nHamiltonian, Aint1D &EssCells);
     void GetCouplingMatrix(myGrid* SKCtr, myGrid* OverlapCtr, wxCheckTree* BondTree, wxCheckTree* orbs, double a[3], double b[3], double c[3], double** XYZCoords, Aint1D HamiltonianDimMap, wxTreeItemId CellID, wxString WorkingCell, Adouble1D &hi, Adouble1D &hf);
     void GetCouplingMatrix(myGrid* SKCtr, myGrid* OverlapCtr, wxCheckTree* BondTree, wxCheckTree* orbs, double a[3], double b[3], double c[3], double** XYZCoords, Aint1D HamiltonianDimMap, wxTreeItemId CellID, wxString WorkingCell, Adouble1D &hi, Adouble1D &hf, Adouble1D &si, Adouble1D &sf);
     void GetCouplingMatrixF(myGrid* SKCtr, myGrid* OverlapCtr, wxCheckTree* BondTree, wxCheckTree* orbs, double a[3], double b[3], double c[3], double** XYZCoords, Aint1D HamiltonianDimMap, wxTreeItemId CellID, wxString WorkingCell, Adouble1D &hf);
     void GetCouplingMatrixF(myGrid* SKCtr, myGrid* OverlapCtr, wxCheckTree* BondTree, wxCheckTree* orbs, double a[3], double b[3], double c[3], double** XYZCoords, Aint1D HamiltonianDimMap, wxTreeItemId CellID, wxString WorkingCell, Adouble1D &hf, Adouble1D &sf);
-    void AddOnSiteMatrix(myGrid* OnSiteCtr, wxCheckTree* orbs, Aint1D HamiltonianDimMap, Adouble1D &hi, Adouble1D &hf, bool isSOC, Adouble2D &SOC_i, Adouble2D &SOC_f);
-    void AddOnSiteMatrix(myGrid* OnSiteCtr, wxCheckTree* orbs, Aint1D HamiltonianDimMap, Adouble1D &hi, Adouble1D &hf, Adouble1D &si, Adouble1D &sf, bool isSOC, Adouble2D &SOC_i, Adouble2D &SOC_f);
-    void AddOnSiteMatrixF(myGrid* OnSiteCtr, wxCheckTree* orbs, Aint1D HamiltonianDimMap, Adouble1D &hf, bool isSOC, Adouble2D &SOC_f);
-    void AddOnSiteMatrixF(myGrid* OnSiteCtr, wxCheckTree* orbs, Aint1D HamiltonianDimMap, Adouble1D &hf, Adouble1D &sf, bool isSOC, Adouble2D &SOC_f);
+    void AddOnSiteMatrix(myGrid* OnSiteCtr, wxCheckTree* orbs, Aint1D HamiltonianDimMap, Adouble1D &hi, Adouble1D &hf);
+    void AddOnSiteMatrix(myGrid* OnSiteCtr, wxCheckTree* orbs, Aint1D HamiltonianDimMap, Adouble1D &hi, Adouble1D &hf, Adouble1D &si, Adouble1D &sf);
+    void AddOnSiteMatrixF(myGrid* OnSiteCtr, wxCheckTree* orbs, Aint1D HamiltonianDimMap, Adouble1D &hf);
+    void AddOnSiteMatrixF(myGrid* OnSiteCtr, wxCheckTree* orbs, Aint1D HamiltonianDimMap, Adouble1D &hf, Adouble1D &sf);
     void GetCellInfo(wxString cellStr, int &icell, int &jcell, int &kcell);
     void GetBondSK(myGrid* GridCtrl, wxString Label, Adouble0D &iBondSK, Adouble0D &fBondSK);
     void GetBondSKF(myGrid* GridCtrl, double* GridBuffer, wxString Label, Adouble0D &iBondSK, Adouble0D &fBondSK);
-    void GetOnSiteSK(myGrid* GridCtrl, wxString Label, Adouble0D &iBondSK, Adouble0D &fBondSK, double &i_p_soc, double &i_d_soc, double &f_p_soc, double &f_d_soc, Aint0D &Orbital_Patern);
-    void GetOnSiteSKF(myGrid* GridCtrl, double* GridBuffer, wxString Label, Adouble0D &iBondSK, Adouble0D &fBondSK, double &f_p_soc, double &f_d_soc, Aint0D &Orbital_Patern);
-    void GetSOC(double p_soc, double d_soc, Aint0D Orbital_Patern, double** ReSOC, double** ImSOC);
-    int SetOnSiteSKElement(int ind, wxString skName, bool isOki, Adouble0D &iBondSK, double ival, bool isOkf, Adouble0D &fBondSK, double fval);
+    void GetOnSiteSK(myGrid* GridCtrl, wxString Label, Adouble0D &iBondSK, Adouble0D &fBondSK);
+    void GetOnSiteSKF(myGrid* GridCtrl, double* GridBuffer, wxString Label, Adouble0D &iBondSK, Adouble0D &fBondSK);
+    void SetOnSiteSKElement(wxString skName, bool isOki, Adouble0D &iBondSK, double ival, bool isOkf, Adouble0D &fBondSK, double fval);
     int GetOnSiteSKInd(wxString skName);
     void SetBondSKElement(wxString skName, bool isOki, Adouble0D &iBondSK, double ival, bool isOkf, Adouble0D &fBondSK, double fval);
     int GetSKInd(wxString skName);
     lapack_complex_double GetHk(double*** H, double kx, double ky, double kz, double a[3], double b[3], double c[3], int nEssensialCells, int** lmnEssCells, int iH, int jH);
-    int SymEigenValues(lapack_complex_double* LowerSymMatrix, lapack_int N, double* &eig);
-    int SymEigenValues(lapack_complex_double* LowerSymMatrixA, lapack_complex_double* LowerSymMatrixB, lapack_int N, double* &eig);
+    int SymEigenValues(lapack_complex_double* UpperSymMatrix, lapack_int N, double* &eig);
+    int SymEigenValues(lapack_complex_double* UpperSymMatrixA, lapack_complex_double* UpperSymMatrixB, lapack_int N, double* &eig);
     bool isMatch(double x, double y, double Thereshold);
     void CopyLastSKToInitialSK();
     static wxString GetSN(wxString UserName);

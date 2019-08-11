@@ -35,9 +35,9 @@ public:
     wxString MySerialNumber = _("");
     wxString SoftwareName = _("TBStudio");
     wxString FreeSoftwareLimitations = _("fitting a TB model including d-orbitals");
-    int Ver_MAJOR = 2;
-    int Ver_MINOR = 0;
-    int Ver_RELEASE = 0;
+    int Ver_MAJOR = 1;
+    int Ver_MINOR = 2;
+    int Ver_RELEASE = 1;
     
     MainFrame(wxWindow* parent);
     virtual ~MainFrame();
@@ -147,6 +147,7 @@ protected:
     virtual void GetHamiltonianMap(wxCheckTree* orbs, Astring0D &HamiltonianMap, Astring0D &HamiltonianShellMap, Aint1D &HamiltonianDimMap);
     virtual void AddShellAndOrbitalInfo(wxCheckTree* orbsTree, wxString AtomName, Astring0D &HamiltonianMap, Astring0D &HamiltonianShellMap, Aint0D &HamiltonianDimMapItem, int &LastIndex);
     virtual void ReadSK();
+    virtual void InitializeSec30Arrays();
     virtual void Init_graph3d();
     virtual void Init_graph2d0();
     virtual void Init_graph2d();
@@ -193,7 +194,6 @@ protected:
     bool IsBondContainsParameter(wxString Orbs1, wxString Orbs2, wxString sk);
     void TestEig();
     void TestZEig();
-    void InitializeSec30Arrays();
     void UpdateTBBand_if();
     void StartRegression(bool isOneStep);
     int ReplaceDFTBand(int iband, int ik);
