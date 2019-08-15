@@ -532,7 +532,7 @@ bool Sec30::GetVar(wxString VariableName, wxString& Value)
     return true;
 }
 
-/*void Sec30::SetVar(wxString VariableName, int iRow, int iCol, double Value, bool FireEvent)
+void Sec30::SetVar(wxString VariableName, int iRow, int iCol, double Value, bool FireEvent)
 {
     wxString val = wxString::Format(wxT("%1f"), Value);
     sec30TextCtrl* ctr = (sec30TextCtrl*)FindWindowByName(VariableName,GetParent());
@@ -580,7 +580,6 @@ void Sec30::SetVar(wxString VariableName, int iRow, int iCol, wxString Value, bo
         SendUpdateEvent(name);
     }
 }
-*/
 
 bool Sec30::GetVar(wxString VariableName, int iRow, int iCol, double& Value)
 {

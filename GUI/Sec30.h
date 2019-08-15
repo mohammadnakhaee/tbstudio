@@ -133,6 +133,10 @@ public:
     void SetVar(wxString VariableName, int iRow, int iCol, int Value, bool FireEvent);
     void SetVar(wxString VariableName, int iRow, int iCol, bool Value, bool FireEvent);
     void SetVar(wxString VariableName, int iRow, int iCol, wxString Value, bool FireEvent);
+    bool GetVar(wxString VariableName, int iRow, int iCol, double& Value);
+    bool GetVar(wxString VariableName, int iRow, int iCol, int& Value);
+    bool GetVar(wxString VariableName, int iRow, int iCol, bool& Value);
+    bool GetVar(wxString VariableName, int iRow, int iCol, wxString& Value);
     void SetRadioVar(wxString VariableName, bool Value, bool FireEvent);
     void GetRadioVar(wxString VariableName, bool& Value);
     void SetCheckVar(wxString VariableName, bool Value, bool FireEvent);
