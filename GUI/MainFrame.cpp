@@ -692,7 +692,7 @@ void MainFrame::InitializeSec30Arrays()
     int nArraysOf1DDouble = 4;
     int nArraysOf1DString = 3;
     int nArraysOf2DDouble = 5;
-    int nArraysOf3DDouble = 4;
+    int nArraysOf3DDouble = 6;
     sec30->ArraysOf0DDouble.clear();
     sec30->ArraysOf0DInt.clear();
     sec30->ArraysOf2DInt.clear();
@@ -758,6 +758,8 @@ void MainFrame::InitializeSec30Arrays()
     sec30->ArraysOf3DDouble[1] = Adouble2D();//double*** Hf; Vf_{0,0,0}, Vf_{1,0,0}, Vf_{0,1,0}, Vf_{1,1,0}, Vf_{1,-1,0}
     sec30->ArraysOf3DDouble[2] = Adouble2D();//double*** Si; Si_{0,0,0}, Si_{1,0,0}, Si_{0,1,0}, Si_{1,1,0}, Si_{1,-1,0}
     sec30->ArraysOf3DDouble[3] = Adouble2D();//double*** Sf; Sf_{0,0,0}, Sf_{1,0,0}, Sf_{0,1,0}, Sf_{1,1,0}, Sf_{1,-1,0}
+    sec30->ArraysOf3DDouble[4] = Adouble2D();//double*** SOCi; SOCi_Re, SOCi_Im
+    sec30->ArraysOf3DDouble[5] = Adouble2D();//double*** SOCf; SOCf_Re, SOCf_Im
 }
 
 void MainFrame::Init_graph3d()
@@ -2370,7 +2372,11 @@ void MainFrame::BtnPause_OnClick(wxRibbonButtonBarEvent& event)
 
 void MainFrame::BtnStop_OnClick(wxRibbonButtonBarEvent& event)
 {
-    
+    if (!sec30->IsStopClicked)
+    {
+        sec30->IsStopClicked = true;
+        logfile->AppendText(_("\nTerminating the regression process!\n"));
+    }
 }
 
 void MainFrame::BtnCppCode_OnClick(wxRibbonButtonBarEvent& event)
@@ -2715,9 +2721,9 @@ void MainFrame::LoadIcons()
     RButtonBar7->AddButton(myID, _("One Step"), GetPng(onestep_png,onestep_png_size), _(""), wxRIBBON_BUTTON_NORMAL);
     RButtonBar7->Connect(myID, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrame::BtnOnestep_OnClick), NULL, this);
     
-    myID = wxID_FILE3;
-    RButtonBar7->AddButton(myID, _("Pause"), GetPng(pause_png,pause_png_size), _(""), wxRIBBON_BUTTON_NORMAL);
-    RButtonBar7->Connect(myID, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrame::BtnPause_OnClick), NULL, this);
+    //myID = wxID_FILE3;
+    //RButtonBar7->AddButton(myID, _("Pause"), GetPng(pause_png,pause_png_size), _(""), wxRIBBON_BUTTON_NORMAL);
+    //RButtonBar7->Connect(myID, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrame::BtnPause_OnClick), NULL, this);
     
     myID = wxID_FILE4;
     RButtonBar7->AddButton(myID, _("Stop"), GetPng(stop_png,stop_png_size), _(""), wxRIBBON_BUTTON_NORMAL);
@@ -2984,10 +2990,7 @@ void MainFrame::UpdateTBBand_if()
         XYZCoords[i0][2] = z;
     }
     
-    Adouble2D Hi;
-    Adouble2D Hf;
-    Adouble2D Si;
-    Adouble2D Sf;
+    Adouble2D Hi, Si, Hf, Sf, SOC_i, SOC_f;
     int nEssensialCells;
     int nHamiltonian;
     Aint1D EssCells;
@@ -2997,10 +3000,13 @@ void MainFrame::UpdateTBBand_if()
     bool isOverlap;
     sec30->GetCheckVar(_("Overlap[0]"), isOverlap);
     
+    bool isSpin = false;
+    if (isSOC) isSpin = true;
+    
     if(isOverlap)
-        sec30->ConstructTBHamiltonian(a, b, c, XYZCoords, Hi, Hf, Si, Sf, nEssensialCells, nHamiltonian, EssCells);
+        sec30->ConstructTBHamiltonian(a, b, c, XYZCoords, Hi, Hf, Si, Sf, nEssensialCells, nHamiltonian, EssCells, isSOC, SOC_i, SOC_f);
     else
-        sec30->ConstructTBHamiltonian(a, b, c, XYZCoords, Hi, Hf, nEssensialCells, nHamiltonian, EssCells);
+        sec30->ConstructTBHamiltonian(a, b, c, XYZCoords, Hi, Hf, nEssensialCells, nHamiltonian, EssCells, isSOC, SOC_i, SOC_f);
         
     
     for (int i=0; i<natoms; i++) delete [] XYZCoords[i];
@@ -3010,6 +3016,11 @@ void MainFrame::UpdateTBBand_if()
     sec30->ArraysOf3DDouble[1] = Hf;
     sec30->ArraysOf3DDouble[2] = Si;
     sec30->ArraysOf3DDouble[3] = Sf;
+    if (isSOC)
+    {
+        sec30->ArraysOf3DDouble[4] = SOC_i;
+        sec30->ArraysOf3DDouble[5] = SOC_f;
+    }
     
     if (nEssensialCells < 1) return;
     if (nHamiltonian < 1) return;
@@ -3079,41 +3090,51 @@ void MainFrame::UpdateTBBand_if()
         }
     }
     /////////////////////////Calculate the TB Band-structure////////////////////////
-    Adouble1D iTBEigVal(nKPoint,std::vector<double>(nHamiltonian));
-    Adouble1D fTBEigVal(nKPoint,std::vector<double>(nHamiltonian));
-    int nH2 = nHamiltonian*nHamiltonian;
-    lapack_complex_double* UpperSymMatrixHi;
-    lapack_complex_double* UpperSymMatrixHf;
-    lapack_complex_double* UpperSymMatrixSi;
-    lapack_complex_double* UpperSymMatrixSf;
-    double* eigHi = new double[nHamiltonian];
-    double* eigHf = new double[nHamiltonian];
+    lapack_complex_double* LowerSymMatrixHi;
+    lapack_complex_double* LowerSymMatrixHf;
+    lapack_complex_double* LowerSymMatrixSi;
+    lapack_complex_double* LowerSymMatrixSf;
+    double* eigHi;
+    double* eigHf;
+    
+    int nHamiltonianTot;
+    if (isSpin)
+        nHamiltonianTot = 2*nHamiltonian;
+    else
+        nHamiltonianTot = nHamiltonian;
+    
+    int nH2 = nHamiltonianTot*nHamiltonianTot;
+    eigHi = new double[nHamiltonianTot];
+    eigHf = new double[nHamiltonianTot];
+    
+    Adouble1D iTBEigVal(nKPoint,std::vector<double>(nHamiltonianTot));
+    Adouble1D fTBEigVal(nKPoint,std::vector<double>(nHamiltonianTot));
     
     lapack_complex_double lzerocomplex = {0.0, 0.0};
     
+    int nOverlapMat = (nHamiltonianTot+nH2) + 1;
     if(isOverlap)
     {
-        int nAB2 = (nHamiltonian+nH2) + 1;
-        UpperSymMatrixHi = new lapack_complex_double[nAB2];
-        UpperSymMatrixHf = new lapack_complex_double[nAB2];
-        UpperSymMatrixSi = new lapack_complex_double[nAB2];
-        UpperSymMatrixSf = new lapack_complex_double[nAB2];
-        for(int i=0; i<nAB2; i++)
+        LowerSymMatrixHi = new lapack_complex_double[nOverlapMat];
+        LowerSymMatrixHf = new lapack_complex_double[nOverlapMat];
+        LowerSymMatrixSi = new lapack_complex_double[nOverlapMat];
+        LowerSymMatrixSf = new lapack_complex_double[nOverlapMat];
+        for(int i=0; i<nOverlapMat; i++)
         {
-            UpperSymMatrixHi[i] = lzerocomplex;
-            UpperSymMatrixHf[i] = lzerocomplex;
-            UpperSymMatrixSi[i] = lzerocomplex;
-            UpperSymMatrixSf[i] = lzerocomplex;
+            LowerSymMatrixHi[i] = lzerocomplex;
+            LowerSymMatrixHf[i] = lzerocomplex;
+            LowerSymMatrixSi[i] = lzerocomplex;
+            LowerSymMatrixSf[i] = lzerocomplex;
         }
     }
     else
     {
-        UpperSymMatrixHi = new lapack_complex_double[nH2];
-        UpperSymMatrixHf = new lapack_complex_double[nH2];
+        LowerSymMatrixHi = new lapack_complex_double[nH2];
+        LowerSymMatrixHf = new lapack_complex_double[nH2];
         for(int i=0; i<nH2; i++)
         {
-            UpperSymMatrixHi[i] = lzerocomplex;
-            UpperSymMatrixHf[i] = lzerocomplex;
+            LowerSymMatrixHi[i] = lzerocomplex;
+            LowerSymMatrixHf[i] = lzerocomplex;
         }
     }
     
@@ -3130,27 +3151,96 @@ void MainFrame::UpdateTBBand_if()
         //ky = KPoints[ik][4];
         //kz = KPoints[ik][5];
         
-        if(isOverlap)
+        if (isSpin)
         {
-            for(int iH=0; iH<nHamiltonian; iH++)
+            lapack_complex_double cmlx;
+            if(isOverlap)
             {
-                eigHi[iH] = 0.0;
-                for(int jH=iH; jH>=0; jH--)
+                for(int i=0; i<nOverlapMat; i++)
                 {
-                    int i1 = iH - jH;
-                    UpperSymMatrixHi[i1 * nHamiltonian + iH] = sec30->GetHk(Mi, kx, ky, kz, a, b, c, nEssensialCells, lmnEssCells, iH, jH);
-                    UpperSymMatrixSi[i1 * nHamiltonian + iH] = sec30->GetHk(sMi, kx, ky, kz, a, b, c, nEssensialCells, lmnEssCells, iH, jH);
+                    LowerSymMatrixHi[i] = lzerocomplex;
+                    LowerSymMatrixSi[i] = lzerocomplex;
+                }
+                
+                for(int iH=0; iH<nHamiltonian; iH++)
+                {
+                    for(int jH=iH; jH>=0; jH--)
+                    {
+                        int i1 = 2*(iH - jH); // i1 = (2*iH) - (2*jH);
+                        LowerSymMatrixHi[i1 * nHamiltonianTot + 2*iH] = sec30->GetHk(Mi, kx, ky, kz, a, b, c, nEssensialCells, lmnEssCells, iH, jH);
+                        LowerSymMatrixSi[i1 * nHamiltonianTot + 2*iH] = sec30->GetHk(sMi, kx, ky, kz, a, b, c, nEssensialCells, lmnEssCells, iH, jH);
+                        LowerSymMatrixHi[i1 * nHamiltonianTot + 2*iH + 1] = LowerSymMatrixHi[i1 * nHamiltonianTot + 2*iH];
+                        LowerSymMatrixSi[i1 * nHamiltonianTot + 2*iH + 1] = LowerSymMatrixSi[i1 * nHamiltonianTot + 2*iH];
+                    }
+                }
+                
+                //Add SOC to Hk
+                for(int iH=0; iH<nHamiltonianTot; iH++)
+                {
+                    eigHi[iH] = 0.0;
+                    for(int jH=iH; jH>=0; jH--)
+                    {
+                        int i1 = iH - jH;
+                        cmlx = {SOC_i[0][iH][jH], SOC_i[1][iH][jH]}; // Real and Imaginary parts of SOC are [0] and [1]
+                        LowerSymMatrixHi[i1 * nHamiltonianTot + iH] += cmlx;
+                    }
+                }
+            }
+            else
+            {
+                for(int iH=0; iH<nHamiltonian; iH++)
+                {
+                    for(int jH=0; jH<=iH; jH++)
+                    {
+                        LowerSymMatrixHi[2*iH * nHamiltonianTot + 2*jH] = sec30->GetHk(Mi, kx, ky, kz, a, b, c, nEssensialCells, lmnEssCells, iH, jH);
+                        LowerSymMatrixHi[2*iH * nHamiltonianTot + 2*jH + 1] = lzerocomplex;
+                        LowerSymMatrixHi[(2*iH + 1) * nHamiltonianTot + 2*jH + 1] = LowerSymMatrixHi[2*iH * nHamiltonianTot + 2*jH];
+                        LowerSymMatrixHi[(2*iH + 1) * nHamiltonianTot + 2*jH] = lzerocomplex;
+                    }
+                }
+
+                //Add SOC to Hk
+                for(int iH=0; iH<nHamiltonianTot; iH++)
+                {
+                    eigHi[iH] = 0.0;
+                    for(int jH=0; jH<=iH; jH++)
+                    {
+                        cmlx = {SOC_i[0][iH][jH], SOC_i[1][iH][jH]}; // Real and Imaginary parts of SOC are [0] and [1]
+                        LowerSymMatrixHi[iH * nHamiltonianTot + jH] += cmlx;
+                    }
                 }
             }
         }
         else
         {
-            for(int iH=0; iH<nHamiltonian; iH++)
+            if(isOverlap)
             {
-                eigHi[iH] = 0.0;
-                for(int jH=iH; jH<nHamiltonian; jH++)
+                for(int i=0; i<nOverlapMat; i++)
                 {
-                    UpperSymMatrixHi[iH * nHamiltonian + jH] = sec30->GetHk(Mi, kx, ky, kz, a, b, c, nEssensialCells, lmnEssCells, iH, jH);
+                    LowerSymMatrixHi[i] = lzerocomplex;
+                    LowerSymMatrixSi[i] = lzerocomplex;
+                }
+                
+                for(int iH=0; iH<nHamiltonian; iH++)
+                {
+                    eigHi[iH] = 0.0;
+                    for(int jH=iH; jH>=0; jH--)
+                    {
+                        int i1 = iH - jH;
+                        LowerSymMatrixHi[i1 * nHamiltonianTot + iH] = sec30->GetHk(Mi, kx, ky, kz, a, b, c, nEssensialCells, lmnEssCells, iH, jH);
+                        LowerSymMatrixSi[i1 * nHamiltonianTot + iH] = sec30->GetHk(sMi, kx, ky, kz, a, b, c, nEssensialCells, lmnEssCells, iH, jH);
+                    }
+                }
+            }
+            else
+            {
+                for(int iH=0; iH<nHamiltonian; iH++)
+                {
+                    eigHi[iH] = 0.0;
+                    for(int jH=0; jH<=iH; jH++)
+                    {
+                        LowerSymMatrixHi[iH * nHamiltonianTot + jH] = sec30->GetHk(Mi, kx, ky, kz, a, b, c, nEssensialCells, lmnEssCells, iH, jH);
+                    }
                 }
             }
         }
@@ -3158,33 +3248,102 @@ void MainFrame::UpdateTBBand_if()
         int checki;
         
         if(isOverlap)
-            checki = sec30->SymEigenValues(UpperSymMatrixHi, UpperSymMatrixSi, nHamiltonian, eigHi);
+            checki = sec30->SymEigenValues(LowerSymMatrixHi, LowerSymMatrixSi, nHamiltonianTot, eigHi);
         else
-            checki = sec30->SymEigenValues(UpperSymMatrixHi, nHamiltonian, eigHi);
+            checki = sec30->SymEigenValues(LowerSymMatrixHi, nHamiltonianTot, eigHi);
         
-        for(int iH=0; iH<nHamiltonian; iH++) iTBEigVal[ik][iH] = eigHi[iH];
+        for(int iH=0; iH<nHamiltonianTot; iH++) iTBEigVal[ik][iH] = eigHi[iH];
         
-        if(isOverlap)
+        if (isSpin)
         {
-            for(int iH=0; iH<nHamiltonian; iH++)
+            lapack_complex_double cmlx;
+            if(isOverlap)
             {
-                eigHf[iH] = 0.0;
-                for(int jH=iH; jH>=0; jH--)
+                for(int i=0; i<nOverlapMat; i++)
                 {
-                    int i1 = iH - jH;
-                    UpperSymMatrixHf[i1 * nHamiltonian + iH] = sec30->GetHk(Mf, kx, ky, kz, a, b, c, nEssensialCells, lmnEssCells, iH, jH);
-                    UpperSymMatrixSf[i1 * nHamiltonian + iH] = sec30->GetHk(sMf, kx, ky, kz, a, b, c, nEssensialCells, lmnEssCells, iH, jH);
+                    LowerSymMatrixHf[i] = lzerocomplex;
+                    LowerSymMatrixSf[i] = lzerocomplex;
+                }
+                
+                for(int iH=0; iH<nHamiltonian; iH++)
+                {
+                    for(int jH=iH; jH>=0; jH--)
+                    {
+                        int i1 = 2*(iH - jH); // i1 = (2*iH) - (2*jH);
+                        LowerSymMatrixHf[i1 * nHamiltonianTot + 2*iH] = sec30->GetHk(Mf, kx, ky, kz, a, b, c, nEssensialCells, lmnEssCells, iH, jH);
+                        LowerSymMatrixSf[i1 * nHamiltonianTot + 2*iH] = sec30->GetHk(sMf, kx, ky, kz, a, b, c, nEssensialCells, lmnEssCells, iH, jH);
+                        LowerSymMatrixHf[i1 * nHamiltonianTot + 2*iH + 1] = LowerSymMatrixHf[i1 * nHamiltonianTot + 2*iH];
+                        LowerSymMatrixSf[i1 * nHamiltonianTot + 2*iH + 1] = LowerSymMatrixSf[i1 * nHamiltonianTot + 2*iH];
+                    }
+                }
+                
+                //Add SOC to Hk
+                for(int iH=0; iH<nHamiltonianTot; iH++)
+                {
+                    eigHf[iH] = 0.0;
+                    for(int jH=iH; jH>=0; jH--)
+                    {
+                        int i1 = iH - jH;
+                        cmlx = {SOC_f[0][iH][jH], SOC_f[1][iH][jH]};// Real and Imaginary parts of SOC are [0] and [1]
+                        LowerSymMatrixHf[i1 * nHamiltonianTot + iH] += cmlx;
+                    }
+                }
+            }
+            else
+            {
+                for(int iH=0; iH<nHamiltonian; iH++)
+                {
+                    for(int jH=0; jH<=iH; jH++)
+                    {
+                        LowerSymMatrixHf[2*iH * nHamiltonianTot + 2*jH] = sec30->GetHk(Mf, kx, ky, kz, a, b, c, nEssensialCells, lmnEssCells, iH, jH);
+                        LowerSymMatrixHf[2*iH * nHamiltonianTot + 2*jH + 1] = lzerocomplex;
+                        LowerSymMatrixHf[(2*iH + 1) * nHamiltonianTot + 2*jH + 1] = LowerSymMatrixHf[2*iH * nHamiltonianTot + 2*jH];
+                        LowerSymMatrixHf[(2*iH + 1) * nHamiltonianTot + 2*jH] = lzerocomplex;
+                    }
+                }
+                
+                //Add SOC to Hk
+                for(int iH=0; iH<nHamiltonianTot; iH++)
+                {
+                    eigHf[iH] = 0.0;
+                    for(int jH=0; jH<=iH; jH++)
+                    {
+                        cmlx = {SOC_f[0][iH][jH], SOC_f[1][iH][jH]};// Real and Imaginary parts of SOC are [0] and [1]
+                        LowerSymMatrixHf[iH * nHamiltonianTot + jH] += cmlx;
+                    }
                 }
             }
         }
         else
         {
-            for(int iH=0; iH<nHamiltonian; iH++)
+            if(isOverlap)
             {
-                eigHf[iH] = 0.0;
-                for(int jH=iH; jH<nHamiltonian; jH++)
+                for(int i=0; i<nOverlapMat; i++)
                 {
-                    UpperSymMatrixHf[iH * nHamiltonian + jH] = sec30->GetHk(Mf, kx, ky, kz, a, b, c, nEssensialCells, lmnEssCells, iH, jH);
+                    LowerSymMatrixHf[i] = lzerocomplex;
+                    LowerSymMatrixSf[i] = lzerocomplex;
+                }
+                
+                for(int iH=0; iH<nHamiltonian; iH++)
+                {
+                    eigHf[iH] = 0.0;
+                    for(int jH=iH; jH>=0; jH--)
+                    {
+                        int i1 = iH - jH;
+                        LowerSymMatrixHf[i1 * nHamiltonianTot + iH] = sec30->GetHk(Mf, kx, ky, kz, a, b, c, nEssensialCells, lmnEssCells, iH, jH);
+                        LowerSymMatrixSf[i1 * nHamiltonianTot + iH] = sec30->GetHk(sMf, kx, ky, kz, a, b, c, nEssensialCells, lmnEssCells, iH, jH);
+                    }
+                }
+            }
+            else
+            {
+                for(int iH=0; iH<nHamiltonian; iH++)
+                {
+                    eigHf[iH] = 0.0;
+                    for(int jH=0; jH<=iH; jH++)
+                    {
+                        LowerSymMatrixHf[iH * nHamiltonianTot + jH] = sec30->GetHk(Mf, kx, ky, kz, a, b, c, nEssensialCells, lmnEssCells, iH, jH);
+                    }
                 }
             }
         }
@@ -3192,19 +3351,19 @@ void MainFrame::UpdateTBBand_if()
         int checkf;
         
         if(isOverlap)
-            checkf = sec30->SymEigenValues(UpperSymMatrixHf, UpperSymMatrixSf, nHamiltonian, eigHf);
+            checkf = sec30->SymEigenValues(LowerSymMatrixHf, LowerSymMatrixSf, nHamiltonianTot, eigHf);
         else
-            checkf = sec30->SymEigenValues(UpperSymMatrixHf, nHamiltonian, eigHf);
+            checkf = sec30->SymEigenValues(LowerSymMatrixHf, nHamiltonianTot, eigHf);
         
-        for(int iH=0; iH<nHamiltonian; iH++) fTBEigVal[ik][iH] = eigHf[iH];
+        for(int iH=0; iH<nHamiltonianTot; iH++) fTBEigVal[ik][iH] = eigHf[iH];
     }
     
-    delete [] UpperSymMatrixHi;
-    delete [] UpperSymMatrixHf;
+    delete [] LowerSymMatrixHi;
+    delete [] LowerSymMatrixHf;
     if(isOverlap)
     {
-        delete [] UpperSymMatrixSi;
-        delete [] UpperSymMatrixSf;
+        delete [] LowerSymMatrixSi;
+        delete [] LowerSymMatrixSf;
     }
     delete [] eigHi;
     delete [] eigHf;
@@ -3303,7 +3462,7 @@ void MainFrame::StartRegression(bool isOneStep)
     
     int prnt, MaxIter, Update_Type;
     double epsilon_1, epsilon_2, epsilon_3, epsilon_4, lambda_0, lambda_UP_fac, lambda_DN_fac;
-    double p_min, p_max, RescaleFactor;
+    double p_min, p_max, Mixing, RescaleFactor;
     
     wxComboBox* ctrm =  sec30->GetComboObject(_("OMethod"));
     int MethodSel = ctrm->GetSelection();
@@ -3326,6 +3485,7 @@ void MainFrame::StartRegression(bool isOneStep)
     isAllvalid = isAllvalid && sec30->GetVar(_("OLamDn[0]"), lambda_DN_fac);
     isAllvalid = isAllvalid && sec30->GetVar(_("OMaxP[0]"), p_max);
     isAllvalid = isAllvalid && sec30->GetVar(_("OMinP[0]"), p_min);
+    isAllvalid = isAllvalid && sec30->GetVar(_("OMixing[0]"), Mixing);
     isAllvalid = isAllvalid && sec30->GetVar(_("OReScale[0]"), RescaleFactor);
     
     if (!isAllvalid) {wxMessageBox(_("Invalid value in Fitting Algorithmic Parameters."),_("Error"));return;}
@@ -3340,6 +3500,7 @@ void MainFrame::StartRegression(bool isOneStep)
     if (lambda_UP_fac<0.000001) {wxMessageBox(_("Invalid value for Increasing Lambda. >0.000001"),_("Error"));return;}
     if (lambda_DN_fac<0.000001) {wxMessageBox(_("Invalid value for Decreasing Lambda. >0.000001"),_("Error"));return;}
     if (p_max<p_min) {wxMessageBox(_("Parameters Minimum Limit must be smaller than Parameters Maximum Limit."),_("Error"));return;}
+    if (!(Mixing > 0 && Mixing <= 1.0)) {wxMessageBox(_("Invalid value for Mixing Factor. >0 and <=1.0"),_("Error"));return;}
     if (RescaleFactor<0.000001) {wxMessageBox(_("Invalid value for Rescale Factor. >0.000001"),_("Error"));return;}
     
     int TBBandFirst, TBBandLast, DFTFirst;
@@ -3497,7 +3658,7 @@ void MainFrame::StartRegression(bool isOneStep)
         dp[ip] = -0.01;
     }
     
-    
+    sec30->IsStopClicked = false;
     
     ////////////////////////////////
     //int nH2=64;
@@ -3506,7 +3667,7 @@ void MainFrame::StartRegression(bool isOneStep)
     ////////////////////////////////
     
     //Start(double* p, int np, double* t, double* y_dat, int ny, double* weight, double* dp, double p_min, double p_max, double* c, lmOptions opts)
-    std::thread RegressionThread(&Regression::Start, regression, p, np, t, y_dat, ny, weight, dp, p_min, p_max, cnst, opts, isOneStep);
+    std::thread RegressionThread(&Regression::Start, regression, p, np, t, y_dat, ny, weight, dp, p_min, p_max, Mixing, cnst, opts, isOneStep);
     RegressionThread.detach();
     
     ////////////////It works well///////////////////////
@@ -3607,10 +3768,12 @@ void MainFrame::ExportMatrices(wxString filepath, wxString BaseName, int MyID_In
     int ID = MyID_Initial0Final1;
     int Hind = 0;
     int Sind = 2;
+    int SOCind = 4;
     if (ID == 1)
     {
         Hind = 1;
         Sind = 3;
+        SOCind = 5;
     }
     
     int nEss = sec30->ArraysOf3DDouble[Hind].size();
@@ -3641,31 +3804,80 @@ void MainFrame::ExportMatrices(wxString filepath, wxString BaseName, int MyID_In
     }
     
     int nEssS = sec30->ArraysOf3DDouble[Sind].size();
-    if (nEssS < 1) return;
-    
-    int nS = sec30->ArraysOf3DDouble[Sind][0].size();
-    if (nS < 1) return;
-    
-    for (int iCell=0; iCell<nCell; iCell++)
+    if (nEssS > 0)
     {
-        wxString WorkingCell = listctr->GetString(iCell);
-        
-        FILE *fp;
-        wxString fname1 = filepath + wxT("/") + BaseName + wxT("_S") + WorkingCell + wxT(".dat");
-        if ((fp = fopen(fname1,"w")) != NULL)
+        int nS = sec30->ArraysOf3DDouble[Sind][0].size();
+        if (nS > 0)
         {
-            for (int iS=0; iS<nS; iS++)
+            for (int iCell=0; iCell<nCell; iCell++)
             {
-                fprintf(fp, "%.8f", sec30->ArraysOf3DDouble[Sind][iCell][iS][0]);
-                for (int jS=1; jS<nS; jS++)
+                wxString WorkingCell = listctr->GetString(iCell);
+                
+                FILE *fp;
+                wxString fname1 = filepath + wxT("/") + BaseName + wxT("_S") + WorkingCell + wxT(".dat");
+                if ((fp = fopen(fname1,"w")) != NULL)
                 {
-                    fprintf(fp, "\t%.8f", sec30->ArraysOf3DDouble[Sind][iCell][iS][jS]);
+                    for (int iS=0; iS<nS; iS++)
+                    {
+                        fprintf(fp, "%.8f", sec30->ArraysOf3DDouble[Sind][iCell][iS][0]);
+                        for (int jS=1; jS<nS; jS++)
+                        {
+                            fprintf(fp, "\t%.8f", sec30->ArraysOf3DDouble[Sind][iCell][iS][jS]);
+                        }
+                        fprintf(fp, "\n");
+                    }
+                    fclose(fp);
                 }
-                fprintf(fp, "\n");
             }
-            fclose(fp);
         }
     }
+    
+    
+    int nSOCBuf = sec30->ArraysOf3DDouble[SOCind].size();
+    if (nSOCBuf == 2)
+    {
+        int nSOCReal = sec30->ArraysOf3DDouble[SOCind][0].size();
+        int nSOCImage = sec30->ArraysOf3DDouble[SOCind][1].size();
+        if (nSOCReal > 1 && nSOCImage == nSOCReal) //We have spin. so at least should be 2
+        {
+            int nH_SOC = sec30->ArraysOf3DDouble[SOCind][0][0].size();
+            if (nH_SOC > 1) //We have spin. so at least should be 2
+            {
+                FILE *fpsocre;
+                wxString fnamesocre = filepath + wxT("/") + BaseName + wxT("_SOC_Re.dat");
+                if ((fpsocre = fopen(fnamesocre,"w")) != NULL)
+                {
+                    for (int iH=0; iH<nSOCReal; iH++)
+                    {
+                        fprintf(fpsocre, "%.8f", sec30->ArraysOf3DDouble[SOCind][0][iH][0]);
+                        for (int jH=1; jH<nSOCReal; jH++)
+                        {
+                            fprintf(fpsocre, "\t%.8f", sec30->ArraysOf3DDouble[SOCind][0][iH][jH]);
+                        }
+                        fprintf(fpsocre, "\n");
+                    }
+                    fclose(fpsocre);
+                }
+                
+                FILE *fpsocim;
+                wxString fnamesocim = filepath + wxT("/") + BaseName + wxT("_SOC_Im.dat");
+                if ((fpsocim = fopen(fnamesocim,"w")) != NULL)
+                {
+                    for (int iH=0; iH<nSOCImage; iH++)
+                    {
+                        fprintf(fpsocim, "%.8f", sec30->ArraysOf3DDouble[SOCind][1][iH][0]);
+                        for (int jH=1; jH<nSOCImage; jH++)
+                        {
+                            fprintf(fpsocim, "\t%.8f", sec30->ArraysOf3DDouble[SOCind][1][iH][jH]);
+                        }
+                        fprintf(fpsocim, "\n");
+                    }
+                    fclose(fpsocim);
+                }
+            }
+        }
+    }
+    
 }
 
 void MainFrame::GenerateCode(wxString filepath, wxString BaseName, wxString CodeType, int MyID_Initial0Final1, bool OnlyDatFiles)
@@ -3707,10 +3919,12 @@ void MainFrame::GenerateCppCode(wxString filepath, wxString BaseName, int MyID_I
     int ID = MyID_Initial0Final1;
     int Hind = 0;
     int Sind = 2;
+    int SOCind = 4;
     if (ID == 1)
     {
         Hind = 1;
         Sind = 3;
+        SOCind = 5;
     }
     
     int nEss = sec30->ArraysOf3DDouble[Hind].size();
@@ -3723,6 +3937,9 @@ void MainFrame::GenerateCppCode(wxString filepath, wxString BaseName, int MyID_I
     int nEssS = sec30->ArraysOf3DDouble[Sind].size();
     if (nEssS > 0) isS = true;
     
+    bool isSOC = false;
+    int nSOCBuf = sec30->ArraysOf3DDouble[SOCind].size();
+    if (nSOCBuf > 1) isSOC = true;
     //int nk = sec30->ArraysOf2DDouble[0].size();//double** KPoints; [ka,kb,kc,kx,ky,kz,d_path]
     //int nklabel = sec30->ArraysOf1DDouble[0].size();//double* dkLabel;
     
@@ -3731,7 +3948,7 @@ void MainFrame::GenerateCppCode(wxString filepath, wxString BaseName, int MyID_I
     wxString fpath =  filepath + wxT("/") + fname;
     if ((fpk = fopen(fpath,"w")) != NULL)
     {
-        fprintf(fpk,"//compile command: g++ %s\n",fname);
+        fprintf(fpk,"//compile command: g++ %s\n",fname.c_str().AsChar());
         fprintf(fpk,"//headers\n");
         fprintf(fpk,"#include <stdlib.h>\n");
         fprintf(fpk,"#include <stdio.h>\n");
@@ -3748,8 +3965,14 @@ void MainFrame::GenerateCppCode(wxString filepath, wxString BaseName, int MyID_I
         fprintf(fpk,"//Main program\n");
         fprintf(fpk,"int main() {\n");
         fprintf(fpk,"\t/* Parameters */\n");
-        fprintf(fpk,"\tint nH = %d;\n", nH);
-        
+        if (isSOC)
+        {
+            fprintf(fpk,"\tint nH0 = %d;\n", nH);
+            fprintf(fpk,"\tint nH = 2*nH0;\n");
+        }
+        else
+            fprintf(fpk,"\tint nH = %d;\n", nH);
+            
         wxListBox* listctr = sec30->GetListObject(_("EssentialUnitcellList"));
         int nCell = listctr->GetCount();        
 
@@ -3816,44 +4039,126 @@ void MainFrame::GenerateCppCode(wxString filepath, wxString BaseName, int MyID_I
             fprintf(fpk,"\t}\n");
         }
         
-        fprintf(fpk,"\n\t/* Load files */\n");
-        fprintf(fpk,"\tprintf(\"\\n\");\n");
-        fprintf(fpk,"\tchar filename[100];\n");
-        fprintf(fpk,"\tint it = 0;\n");
-        fprintf(fpk,"\tfor(int iCell = 0; iCell < nCells; iCell++)\n");
-        fprintf(fpk,"\t{\n");
-        fprintf(fpk,"\t\tFILE *fp;\n");
-        fprintf(fpk,"\t\tsprintf(filename, \"%s_H(%%d,%%d,%%d).dat\",Cells[iCell][0] ,Cells[iCell][1] ,Cells[iCell][2]);\n",BaseName.c_str().AsChar());
-        fprintf(fpk,"\t\tprintf(\"%%d) loading file: %%s\\n\", ++it, filename);\n");
-        fprintf(fpk,"\t\tfp = fopen(filename,\"r\");\n");
-        fprintf(fpk,"\t\tfor(int i = 0; i < nH; i++)\n");
-        fprintf(fpk,"\t\t{\n");
-        fprintf(fpk,"\t\t\tfor(int j = 0; j < nH; j++)\n");
-        fprintf(fpk,"\t\t\t{\n");
-        fprintf(fpk,"\t\t\t\tfscanf(fp, \"%%lf\", &h[iCell][i][j]);\n");
-        fprintf(fpk,"\t\t\t\tprintf(\"%%.3f \", h[iCell][i][j]);\n");
-        fprintf(fpk,"\t\t\t}\n");
-        fprintf(fpk,"\t\t\tfscanf(fp,\"\\n\");\n");
-        fprintf(fpk,"\t\t\tprintf(\"\\n\");\n");
-        fprintf(fpk,"\t\t}\n");
-        fprintf(fpk,"\t\tfclose(fp);\n");
-        fprintf(fpk,"\t\tprintf(\"\\n\");\n");
-        fprintf(fpk,"\t}\n");
-        
-        if (isS)
+        if (isSOC)
         {
-            fprintf(fpk,"\n\tfor(int iCell = 0; iCell < nCells; iCell++)\n");
+            fprintf(fpk,"\n\t/* Allocate the Hsoc array */\n");
+            fprintf(fpk,"\tstd::complex<double>** Hsoc = new std::complex<double>*[nH];\n");
+            fprintf(fpk,"\tfor(int i = 0; i < nH; i++) Hsoc[i] = new std::complex<double>[nH];\n");
+        }
+        
+        if (isSOC)
+        {
+            fprintf(fpk,"\n\t/* Load files */\n");
+            fprintf(fpk,"\tprintf(\"\\n\");\n");
+            fprintf(fpk,"\tchar filename[100];\n");
+            fprintf(fpk,"\tint it = 0;\n");
+            fprintf(fpk,"\tfor(int iCell = 0; iCell < nCells; iCell++)\n");
             fprintf(fpk,"\t{\n");
             fprintf(fpk,"\t\tFILE *fp;\n");
-            fprintf(fpk,"\t\tsprintf(filename, \"%s_S(%%d,%%d,%%d).dat\",Cells[iCell][0] ,Cells[iCell][1] ,Cells[iCell][2]);\n",BaseName.c_str().AsChar());
+            fprintf(fpk,"\t\tsprintf(filename, \"%s_H(%%d,%%d,%%d).dat\",Cells[iCell][0] ,Cells[iCell][1] ,Cells[iCell][2]);\n",BaseName.c_str().AsChar());
+            fprintf(fpk,"\t\tprintf(\"%%d) loading file: %%s\\n\", ++it, filename);\n");
+            fprintf(fpk,"\t\tfp = fopen(filename,\"r\");\n");
+            fprintf(fpk,"\t\tfor(int i = 0; i < nH0; i++)\n");
+            fprintf(fpk,"\t\t{\n");
+            fprintf(fpk,"\t\t\tfor(int j = 0; j < nH0; j++)\n");
+            fprintf(fpk,"\t\t\t{\n");
+            fprintf(fpk,"\t\t\t\tfscanf(fp, \"%%lf\", &h[iCell][2*i][2*j]);\n");
+            fprintf(fpk,"\t\t\t\th[iCell][2*i + 1][2*j + 1] = h[iCell][2*i][2*j];\n");
+            fprintf(fpk,"\t\t\t\th[iCell][2*i][2*j + 1] = 0.0;\n");
+            fprintf(fpk,"\t\t\t\th[iCell][2*i + 1][2*j] = 0.0;\n");
+            fprintf(fpk,"\t\t\t}\n");
+            fprintf(fpk,"\t\t\tfscanf(fp,\"\\n\");\n");
+            fprintf(fpk,"\t\t}\n");
+            fprintf(fpk,"\t\tfclose(fp);\n");
+            fprintf(fpk,"\t\t\n");
+            fprintf(fpk,"\t\tfor(int i = 0; i < nH; i++)\n");
+            fprintf(fpk,"\t\t{\n");
+            fprintf(fpk,"\t\t\tfor(int j = 0; j < nH; j++)\n");
+            fprintf(fpk,"\t\t\t\tprintf(\"%%.3f \", h[iCell][i][j]);\n");
+            fprintf(fpk,"\t\t\tprintf(\"\\n\");\n");
+            fprintf(fpk,"\t\t}\n");
+            fprintf(fpk,"\t\tprintf(\"\\n\");\n");
+            fprintf(fpk,"\t}\n");
+            
+            if(isS)
+            {
+                fprintf(fpk,"\n\tfor(int iCell = 0; iCell < nCells; iCell++)\n");
+                fprintf(fpk,"\t{\n");
+                fprintf(fpk,"\t\tFILE *fp;\n");
+                fprintf(fpk,"\t\tsprintf(filename, \"%s_S(%%d,%%d,%%d).dat\",Cells[iCell][0] ,Cells[iCell][1] ,Cells[iCell][2]);\n",BaseName.c_str().AsChar());
+                fprintf(fpk,"\t\tprintf(\"%%d) loading file: %%s\\n\", ++it, filename);\n");
+                fprintf(fpk,"\t\tfp = fopen(filename,\"r\");\n");
+                fprintf(fpk,"\t\tfor(int i = 0; i < nH0; i++)\n");
+                fprintf(fpk,"\t\t{\n");
+                fprintf(fpk,"\t\t\tfor(int j = 0; j < nH0; j++)\n");
+                fprintf(fpk,"\t\t\t{\n");
+                fprintf(fpk,"\t\t\t\tfscanf(fp, \"%%lf\", &s[iCell][2*i][2*j]);\n");
+                fprintf(fpk,"\t\t\t\ts[iCell][2*i + 1][2*j + 1] = s[iCell][2*i][2*j];\n");
+                fprintf(fpk,"\t\t\t\ts[iCell][2*i][2*j + 1] = 0.0;\n");
+                fprintf(fpk,"\t\t\t\ts[iCell][2*i + 1][2*j] = 0.0;\n");
+                fprintf(fpk,"\t\t\t}\n");
+                fprintf(fpk,"\t\t\tfscanf(fp,\"\\n\");\n");
+                fprintf(fpk,"\t\t}\n");
+                fprintf(fpk,"\t\tfclose(fp);\n");
+                fprintf(fpk,"\t\t\n");
+                fprintf(fpk,"\t\tfor(int i = 0; i < nH; i++)\n");
+                fprintf(fpk,"\t\t{\n");
+                fprintf(fpk,"\t\t\tfor(int j = 0; j < nH; j++)\n");
+                fprintf(fpk,"\t\t\t\tprintf(\"%%.3f \", s[iCell][i][j]);\n");
+                fprintf(fpk,"\t\t\tprintf(\"\\n\");\n");
+                fprintf(fpk,"\t\t}\n");
+                fprintf(fpk,"\t\tprintf(\"\\n\");\n");
+                fprintf(fpk,"\t}\n");
+            }
+            
+            fprintf(fpk,"\t\n");
+            fprintf(fpk,"\tFILE *fpSOCRe;\n");
+            fprintf(fpk,"\tFILE *fpSOCIm;\n");
+            fprintf(fpk,"\tfpSOCRe = fopen(\"%s_SOC_Re.dat\",\"r\");\n",BaseName.c_str().AsChar());
+            fprintf(fpk,"\tfpSOCIm = fopen(\"%s_SOC_Im.dat\",\"r\");\n",BaseName.c_str().AsChar());
+            fprintf(fpk,"\tfor(int i = 0; i < nH; i++)\n");
+            fprintf(fpk,"\t{\n");
+            fprintf(fpk,"\t\tfor(int j = 0; j < nH; j++)\n");
+            fprintf(fpk,"\t\t{\n");
+            fprintf(fpk,"\t\t\tdouble re, im;\n");
+            fprintf(fpk,"\t\t\tfscanf(fpSOCRe, \"%%lf\", &re);\n");
+            fprintf(fpk,"\t\t\tfscanf(fpSOCIm, \"%%lf\", &im);\n");
+            fprintf(fpk,"\t\t\tHsoc[i][j].real(re);\n");
+            fprintf(fpk,"\t\t\tHsoc[i][j].imag(im);\n");
+            fprintf(fpk,"\t\t}\n");
+            fprintf(fpk,"\t\tfscanf(fpSOCRe,\"\\n\");\n");
+            fprintf(fpk,"\t\tfscanf(fpSOCIm,\"\\n\");\n");
+            fprintf(fpk,"\t}\n");
+            fprintf(fpk,"\tfclose(fpSOCRe);\n");
+            fprintf(fpk,"\tfclose(fpSOCIm);\n");
+            
+            fprintf(fpk,"\t\n");
+            fprintf(fpk,"\tfor(int i = 0; i < nH; i++)\n");
+            fprintf(fpk,"\t{\n");
+            fprintf(fpk,"\t\tfor(int j = 0; j < nH; j++)\n");
+            fprintf(fpk,"\t\t\tprintf(\"(%%.3f, %%.3f)\", Hsoc[i][j].real(), Hsoc[i][j].imag());\n");
+            fprintf(fpk,"\t\tprintf(\"\\n\");\n");
+            fprintf(fpk,"\t}\n");
+            fprintf(fpk,"\tprintf(\"\\n\");\n");
+        }
+        else
+        {
+            fprintf(fpk,"\n\t/* Load files */\n");
+            fprintf(fpk,"\tprintf(\"\\n\");\n");
+            fprintf(fpk,"\tchar filename[100];\n");
+            fprintf(fpk,"\tint it = 0;\n");
+            fprintf(fpk,"\tfor(int iCell = 0; iCell < nCells; iCell++)\n");
+            fprintf(fpk,"\t{\n");
+            fprintf(fpk,"\t\tFILE *fp;\n");
+            fprintf(fpk,"\t\tsprintf(filename, \"%s_H(%%d,%%d,%%d).dat\",Cells[iCell][0] ,Cells[iCell][1] ,Cells[iCell][2]);\n",BaseName.c_str().AsChar());
             fprintf(fpk,"\t\tprintf(\"%%d) loading file: %%s\\n\", ++it, filename);\n");
             fprintf(fpk,"\t\tfp = fopen(filename,\"r\");\n");
             fprintf(fpk,"\t\tfor(int i = 0; i < nH; i++)\n");
             fprintf(fpk,"\t\t{\n");
             fprintf(fpk,"\t\t\tfor(int j = 0; j < nH; j++)\n");
             fprintf(fpk,"\t\t\t{\n");
-            fprintf(fpk,"\t\t\t\tfscanf(fp, \"%%lf\", &s[iCell][i][j]);\n");
-            fprintf(fpk,"\t\t\t\tprintf(\"%%.3f \", s[iCell][i][j]);\n");
+            fprintf(fpk,"\t\t\t\tfscanf(fp, \"%%lf\", &h[iCell][i][j]);\n");
+            fprintf(fpk,"\t\t\t\tprintf(\"%%.3f \", h[iCell][i][j]);\n");
             fprintf(fpk,"\t\t\t}\n");
             fprintf(fpk,"\t\t\tfscanf(fp,\"\\n\");\n");
             fprintf(fpk,"\t\t\tprintf(\"\\n\");\n");
@@ -3861,6 +4166,29 @@ void MainFrame::GenerateCppCode(wxString filepath, wxString BaseName, int MyID_I
             fprintf(fpk,"\t\tfclose(fp);\n");
             fprintf(fpk,"\t\tprintf(\"\\n\");\n");
             fprintf(fpk,"\t}\n");
+            
+            if(isS)
+            {
+                fprintf(fpk,"\n\tfor(int iCell = 0; iCell < nCells; iCell++)\n");
+                fprintf(fpk,"\t{\n");
+                fprintf(fpk,"\t\tFILE *fp;\n");
+                fprintf(fpk,"\t\tsprintf(filename, \"%s_S(%%d,%%d,%%d).dat\",Cells[iCell][0] ,Cells[iCell][1] ,Cells[iCell][2]);\n",BaseName.c_str().AsChar());
+                fprintf(fpk,"\t\tprintf(\"%%d) loading file: %%s\\n\", ++it, filename);\n");
+                fprintf(fpk,"\t\tfp = fopen(filename,\"r\");\n");
+                fprintf(fpk,"\t\tfor(int i = 0; i < nH; i++)\n");
+                fprintf(fpk,"\t\t{\n");
+                fprintf(fpk,"\t\t\tfor(int j = 0; j < nH; j++)\n");
+                fprintf(fpk,"\t\t\t{\n");
+                fprintf(fpk,"\t\t\t\tfscanf(fp, \"%%lf\", &s[iCell][i][j]);\n");
+                fprintf(fpk,"\t\t\t\tprintf(\"%%.3f \", s[iCell][i][j]);\n");
+                fprintf(fpk,"\t\t\t}\n");
+                fprintf(fpk,"\t\t\tfscanf(fp,\"\\n\");\n");
+                fprintf(fpk,"\t\t\tprintf(\"\\n\");\n");
+                fprintf(fpk,"\t\t}\n");
+                fprintf(fpk,"\t\tfclose(fp);\n");
+                fprintf(fpk,"\t\tprintf(\"\\n\");\n");
+                fprintf(fpk,"\t}\n");
+            }
         }
         
         if (isS)
@@ -3881,7 +4209,10 @@ void MainFrame::GenerateCppCode(wxString filepath, wxString BaseName, int MyID_I
         fprintf(fpk,"\t{\n");
         fprintf(fpk,"\t\tfor(int j=0; j<nH; j++)\n");
         fprintf(fpk,"\t\t{\n");
-        fprintf(fpk,"\t\t\tHk[i * nH + j] = Getk(h, kx, ky, kz, a, b, c, nCells, Cells, i, j);\n");
+        if (isSOC)
+            fprintf(fpk,"\t\t\tHk[i * nH + j] = Getk(h, kx, ky, kz, a, b, c, nCells, Cells, i, j) + Hsoc[i][j];\n");
+        else
+            fprintf(fpk,"\t\t\tHk[i * nH + j] = Getk(h, kx, ky, kz, a, b, c, nCells, Cells, i, j);\n");
         fprintf(fpk,"\t\t\tprintf(\"(%%.3f, %%.3f)\", Hk[i * nH + j].real(), Hk[i * nH + j].imag());\n");
         fprintf(fpk,"\t\t}\n");
         fprintf(fpk,"\t\tprintf(\"\\n\");\n");
@@ -3913,7 +4244,10 @@ void MainFrame::GenerateCppCode(wxString filepath, wxString BaseName, int MyID_I
         fprintf(fpk,"\t{\n");
         fprintf(fpk,"\t\tfor(int j=0; j<nH; j++)\n");
         fprintf(fpk,"\t\t{\n");
-        fprintf(fpk,"\t\t\tHk[i * nH + j] = GetkFrac(h, ka, kb, kc, as, bs, cs, a, b, c, nCells, Cells, i, j);\n");
+        if (isSOC)
+            fprintf(fpk,"\t\t\tHk[i * nH + j] = GetkFrac(h, ka, kb, kc, as, bs, cs, a, b, c, nCells, Cells, i, j) + Hsoc[i][j];\n");
+        else
+            fprintf(fpk,"\t\t\tHk[i * nH + j] = GetkFrac(h, ka, kb, kc, as, bs, cs, a, b, c, nCells, Cells, i, j);\n");
         fprintf(fpk,"\t\t\tprintf(\"(%%.3f, %%.3f)\", Hk[i * nH + j].real(), Hk[i * nH + j].imag());\n");
         fprintf(fpk,"\t\t}\n");
         fprintf(fpk,"\t\tprintf(\"\\n\");\n");
@@ -3955,8 +4289,15 @@ void MainFrame::GenerateCppCode(wxString filepath, wxString BaseName, int MyID_I
             fprintf(fpk,"\tdelete[] s;\n");
         }
         
+        if (isSOC)
+        {
+            fprintf(fpk,"\n\t/* Deallocate the Hsoc array */\n");
+            fprintf(fpk,"\tfor(int i = 0; i < nH; i++) delete[] Hsoc[i];\n");
+            fprintf(fpk,"\tdelete[] Hsoc;\n");
+        }
+        
         fprintf(fpk,"\n\texit( 0 );\n");
-        fprintf(fpk,"\t}\n");
+        fprintf(fpk,"}\n");
         
         
         fprintf(fpk,"\n\t//Implementation\n");
@@ -4034,10 +4375,12 @@ void MainFrame::GenerateCCode(wxString filepath, wxString BaseName, int MyID_Ini
     int ID = MyID_Initial0Final1;
     int Hind = 0;
     int Sind = 2;
+    int SOCind = 4;
     if (ID == 1)
     {
         Hind = 1;
         Sind = 3;
+        SOCind = 5;
     }
     
     int nEss = sec30->ArraysOf3DDouble[Hind].size();
@@ -4049,6 +4392,10 @@ void MainFrame::GenerateCCode(wxString filepath, wxString BaseName, int MyID_Ini
     bool isS = false;
     int nEssS = sec30->ArraysOf3DDouble[Sind].size();
     if (nEssS > 0) isS = true;
+    
+    bool isSOC = false;
+    int nSOCBuf = sec30->ArraysOf3DDouble[SOCind].size();
+    if (nSOCBuf > 1) isSOC = true;
     
     //int nk = sec30->ArraysOf2DDouble[0].size();//double** KPoints; [ka,kb,kc,kx,ky,kz,d_path]
     //int nklabel = sec30->ArraysOf1DDouble[0].size();//double* dkLabel;
@@ -4084,7 +4431,13 @@ void MainFrame::GenerateCCode(wxString filepath, wxString BaseName, int MyID_Ini
         fprintf(fpk,"\n//Main program\n");
         fprintf(fpk,"int main() {\n");
         fprintf(fpk,"\t/* Parameters */\n");
-        fprintf(fpk,"\tint nH = %d;\n", nH);
+        if (isSOC)
+        {
+            fprintf(fpk,"\tint nH0 = %d;\n", nH);
+            fprintf(fpk,"\tint nH = 2*nH0;\n");
+        }
+        else
+            fprintf(fpk,"\tint nH = %d;\n", nH);
         
         wxListBox* listctr = sec30->GetListObject(_("EssentialUnitcellList"));
         int nCell = listctr->GetCount();
@@ -4103,7 +4456,7 @@ void MainFrame::GenerateCCode(wxString filepath, wxString BaseName, int MyID_Ini
         sec30->GetVar(_("c[1]"), c[1]);
         sec30->GetVar(_("c[2]"), c[2]);
         
-        fprintf(fpk,"\n\t/* Set the unitcell vectors */\n");
+        fprintf(fpk,"\t/* Set the unitcell vectors */\n");
         fprintf(fpk,"\tdouble a[3] = {%.8f, %.8f, %.8f};\n", a[0], a[1], a[2]);
         fprintf(fpk,"\tdouble b[3] = {%.8f, %.8f, %.8f};\n", b[0], b[1], b[2]);
         fprintf(fpk,"\tdouble c[3] = {%.8f, %.8f, %.8f};\n", c[0], c[1], c[2]);
@@ -4134,52 +4487,135 @@ void MainFrame::GenerateCCode(wxString filepath, wxString BaseName, int MyID_Ini
         }
         fprintf(fpk,"\t};\n");
         
-        if(isS)
-            fprintf(fpk,"\n\t/* Allocate h and s arrays */\n");
+        if(isSOC)
+        {
+            if(isS)
+                fprintf(fpk,"\n\t/* Allocate h, s and Hsoc arrays */\n");
+            else
+                fprintf(fpk,"\n\t/* Allocate h and Hsoc arrays */\n");
+        }
         else
-            fprintf(fpk,"\n\t/* Allocate the h array */\n");
+        {
+            if(isS)
+                fprintf(fpk,"\n\t/* Allocate h and s arrays */\n");
+            else
+                fprintf(fpk,"\n\t/* Allocate the h array */\n");
+        }
         fprintf(fpk,"\tdouble*** h = alloc3d(nCells, nH, nH);\n");
         if(isS) fprintf(fpk,"\tdouble*** s = alloc3d(nCells, nH, nH);\n");
+        if(isSOC) fprintf(fpk,"\tdouble*** Hsoc = alloc3d(2, nH, nH);\n");
         fprintf(fpk,"\t\n");
         
-        fprintf(fpk,"\n\t/* Load files */\n");
-        fprintf(fpk,"\tprintf(\"\\n\");\n");
-        fprintf(fpk,"\tchar filename[100];\n");
-        fprintf(fpk,"\tint it = 0;\n");
-        fprintf(fpk,"\tfor(int iCell = 0; iCell < nCells; iCell++)\n");
-        fprintf(fpk,"\t{\n");
-        fprintf(fpk,"\t\tFILE *fp;\n");
-        fprintf(fpk,"\t\tsprintf(filename, \"%s_H(%%d,%%d,%%d).dat\",Cells[iCell][0] ,Cells[iCell][1] ,Cells[iCell][2]);\n",BaseName.c_str().AsChar());
-        fprintf(fpk,"\t\tprintf(\"%%d) loading file: %%s\\n\", ++it, filename);\n");
-        fprintf(fpk,"\t\tfp = fopen(filename,\"r\");\n");
-        fprintf(fpk,"\t\tfor(int i = 0; i < nH; i++)\n");
-        fprintf(fpk,"\t\t{\n");
-        fprintf(fpk,"\t\t\tfor(int j = 0; j < nH; j++)\n");
-        fprintf(fpk,"\t\t\t{\n");
-        fprintf(fpk,"\t\t\t\tfscanf(fp, \"%%lf\", &h[iCell][i][j]);\n");
-        fprintf(fpk,"\t\t\t\tprintf(\"%%.3f \", h[iCell][i][j]);\n");
-        fprintf(fpk,"\t\t\t}\n");
-        fprintf(fpk,"\t\t\tfscanf(fp,\"\\n\");\n");
-        fprintf(fpk,"\t\t\tprintf(\"\\n\");\n");
-        fprintf(fpk,"\t\t}\n");
-        fprintf(fpk,"\t\tfclose(fp);\n");
-        fprintf(fpk,"\t\tprintf(\"\\n\");\n");
-        fprintf(fpk,"\t}\n");
-        
-        if(isS)
+        if (isSOC)
         {
-            fprintf(fpk,"\n\tfor(int iCell = 0; iCell < nCells; iCell++)\n");
+            fprintf(fpk,"\n\t/* Load files */\n");
+            fprintf(fpk,"\tprintf(\"\\n\");\n");
+            fprintf(fpk,"\tchar filename[100];\n");
+            fprintf(fpk,"\tint it = 0;\n");
+            fprintf(fpk,"\tfor(int iCell = 0; iCell < nCells; iCell++)\n");
             fprintf(fpk,"\t{\n");
             fprintf(fpk,"\t\tFILE *fp;\n");
-            fprintf(fpk,"\t\tsprintf(filename, \"%s_S(%%d,%%d,%%d).dat\",Cells[iCell][0] ,Cells[iCell][1] ,Cells[iCell][2]);\n",BaseName.c_str().AsChar());
+            fprintf(fpk,"\t\tsprintf(filename, \"%s_H(%%d,%%d,%%d).dat\",Cells[iCell][0] ,Cells[iCell][1] ,Cells[iCell][2]);\n",BaseName.c_str().AsChar());
+            fprintf(fpk,"\t\tprintf(\"%%d) loading file: %%s\\n\", ++it, filename);\n");
+            fprintf(fpk,"\t\tfp = fopen(filename,\"r\");\n");
+            fprintf(fpk,"\t\tfor(int i = 0; i < nH0; i++)\n");
+            fprintf(fpk,"\t\t{\n");
+            fprintf(fpk,"\t\t\tfor(int j = 0; j < nH0; j++)\n");
+            fprintf(fpk,"\t\t\t{\n");
+            fprintf(fpk,"\t\t\t\tfscanf(fp, \"%%lf\", &h[iCell][2*i][2*j]);\n");
+            fprintf(fpk,"\t\t\t\th[iCell][2*i + 1][2*j + 1] = h[iCell][2*i][2*j];\n");
+            fprintf(fpk,"\t\t\t\th[iCell][2*i][2*j + 1] = 0.0;\n");
+            fprintf(fpk,"\t\t\t\th[iCell][2*i + 1][2*j] = 0.0;\n");
+            fprintf(fpk,"\t\t\t}\n");
+            fprintf(fpk,"\t\t\tfscanf(fp,\"\\n\");\n");
+            fprintf(fpk,"\t\t}\n");
+            fprintf(fpk,"\t\tfclose(fp);\n");
+            fprintf(fpk,"\t\t\n");
+            fprintf(fpk,"\t\tfor(int i = 0; i < nH; i++)\n");
+            fprintf(fpk,"\t\t{\n");
+            fprintf(fpk,"\t\t\tfor(int j = 0; j < nH; j++)\n");
+            fprintf(fpk,"\t\t\t\tprintf(\"%%.3f \", h[iCell][i][j]);\n");
+            fprintf(fpk,"\t\t\tprintf(\"\\n\");\n");
+            fprintf(fpk,"\t\t}\n");
+            fprintf(fpk,"\t\tprintf(\"\\n\");\n");
+            fprintf(fpk,"\t}\n");
+            
+            if(isS)
+            {
+                fprintf(fpk,"\n\tfor(int iCell = 0; iCell < nCells; iCell++)\n");
+                fprintf(fpk,"\t{\n");
+                fprintf(fpk,"\t\tFILE *fp;\n");
+                fprintf(fpk,"\t\tsprintf(filename, \"%s_S(%%d,%%d,%%d).dat\",Cells[iCell][0] ,Cells[iCell][1] ,Cells[iCell][2]);\n",BaseName.c_str().AsChar());
+                fprintf(fpk,"\t\tprintf(\"%%d) loading file: %%s\\n\", ++it, filename);\n");
+                fprintf(fpk,"\t\tfp = fopen(filename,\"r\");\n");
+                fprintf(fpk,"\t\tfor(int i = 0; i < nH0; i++)\n");
+                fprintf(fpk,"\t\t{\n");
+                fprintf(fpk,"\t\t\tfor(int j = 0; j < nH0; j++)\n");
+                fprintf(fpk,"\t\t\t{\n");
+                fprintf(fpk,"\t\t\t\tfscanf(fp, \"%%lf\", &s[iCell][2*i][2*j]);\n");
+                fprintf(fpk,"\t\t\t\ts[iCell][2*i + 1][2*j + 1] = s[iCell][2*i][2*j];\n");
+                fprintf(fpk,"\t\t\t\ts[iCell][2*i][2*j + 1] = 0.0;\n");
+                fprintf(fpk,"\t\t\t\ts[iCell][2*i + 1][2*j] = 0.0;\n");
+                fprintf(fpk,"\t\t\t}\n");
+                fprintf(fpk,"\t\t\tfscanf(fp,\"\\n\");\n");
+                fprintf(fpk,"\t\t}\n");
+                fprintf(fpk,"\t\tfclose(fp);\n");
+                fprintf(fpk,"\t\t\n");
+                fprintf(fpk,"\t\tfor(int i = 0; i < nH; i++)\n");
+                fprintf(fpk,"\t\t{\n");
+                fprintf(fpk,"\t\t\tfor(int j = 0; j < nH; j++)\n");
+                fprintf(fpk,"\t\t\t\tprintf(\"%%.3f \", s[iCell][i][j]);\n");
+                fprintf(fpk,"\t\t\tprintf(\"\\n\");\n");
+                fprintf(fpk,"\t\t}\n");
+                fprintf(fpk,"\t\tprintf(\"\\n\");\n");
+                fprintf(fpk,"\t}\n");
+            }
+            
+            fprintf(fpk,"\t\n");
+            fprintf(fpk,"\tFILE *fpSOCRe;\n");
+            fprintf(fpk,"\tFILE *fpSOCIm;\n");
+            fprintf(fpk,"\tfpSOCRe = fopen(\"%s_SOC_Re.dat\",\"r\");\n",BaseName.c_str().AsChar());
+            fprintf(fpk,"\tfpSOCIm = fopen(\"%s_SOC_Im.dat\",\"r\");\n",BaseName.c_str().AsChar());
+            fprintf(fpk,"\tfor(int i = 0; i < nH; i++)\n");
+            fprintf(fpk,"\t{\n");
+            fprintf(fpk,"\t\tfor(int j = 0; j < nH; j++)\n");
+            fprintf(fpk,"\t\t{\n");
+            fprintf(fpk,"\t\t\tfscanf(fpSOCRe, \"%%lf\", &Hsoc[0][i][j]);\n");
+            fprintf(fpk,"\t\t\tfscanf(fpSOCIm, \"%%lf\", &Hsoc[1][i][j]);\n");
+            fprintf(fpk,"\t\t}\n");
+            fprintf(fpk,"\t\tfscanf(fpSOCRe,\"\\n\");\n");
+            fprintf(fpk,"\t\tfscanf(fpSOCIm,\"\\n\");\n");
+            fprintf(fpk,"\t}\n");
+            fprintf(fpk,"\tfclose(fpSOCRe);\n");
+            fprintf(fpk,"\tfclose(fpSOCIm);\n");
+            
+            fprintf(fpk,"\t\n");
+            fprintf(fpk,"\tfor(int i = 0; i < nH; i++)\n");
+            fprintf(fpk,"\t{\n");
+            fprintf(fpk,"\t\tfor(int j = 0; j < nH; j++)\n");
+            fprintf(fpk,"\t\t\tprintf(\"(%%.3f, %%.3f)\", Hsoc[0][i][j], Hsoc[1][i][j]);\n");
+            fprintf(fpk,"\t\tprintf(\"\\n\");\n");
+            fprintf(fpk,"\t}\n");
+            fprintf(fpk,"\tprintf(\"\\n\");\n");
+        }
+        else
+        {
+            fprintf(fpk,"\n\t/* Load files */\n");
+            fprintf(fpk,"\tprintf(\"\\n\");\n");
+            fprintf(fpk,"\tchar filename[100];\n");
+            fprintf(fpk,"\tint it = 0;\n");
+            fprintf(fpk,"\tfor(int iCell = 0; iCell < nCells; iCell++)\n");
+            fprintf(fpk,"\t{\n");
+            fprintf(fpk,"\t\tFILE *fp;\n");
+            fprintf(fpk,"\t\tsprintf(filename, \"%s_H(%%d,%%d,%%d).dat\",Cells[iCell][0] ,Cells[iCell][1] ,Cells[iCell][2]);\n",BaseName.c_str().AsChar());
             fprintf(fpk,"\t\tprintf(\"%%d) loading file: %%s\\n\", ++it, filename);\n");
             fprintf(fpk,"\t\tfp = fopen(filename,\"r\");\n");
             fprintf(fpk,"\t\tfor(int i = 0; i < nH; i++)\n");
             fprintf(fpk,"\t\t{\n");
             fprintf(fpk,"\t\t\tfor(int j = 0; j < nH; j++)\n");
             fprintf(fpk,"\t\t\t{\n");
-            fprintf(fpk,"\t\t\t\tfscanf(fp, \"%%lf\", &s[iCell][i][j]);\n");
-            fprintf(fpk,"\t\t\t\tprintf(\"%%.3f \", s[iCell][i][j]);\n");
+            fprintf(fpk,"\t\t\t\tfscanf(fp, \"%%lf\", &h[iCell][i][j]);\n");
+            fprintf(fpk,"\t\t\t\tprintf(\"%%.3f \", h[iCell][i][j]);\n");
             fprintf(fpk,"\t\t\t}\n");
             fprintf(fpk,"\t\t\tfscanf(fp,\"\\n\");\n");
             fprintf(fpk,"\t\t\tprintf(\"\\n\");\n");
@@ -4187,6 +4623,29 @@ void MainFrame::GenerateCCode(wxString filepath, wxString BaseName, int MyID_Ini
             fprintf(fpk,"\t\tfclose(fp);\n");
             fprintf(fpk,"\t\tprintf(\"\\n\");\n");
             fprintf(fpk,"\t}\n");
+            
+            if(isS)
+            {
+                fprintf(fpk,"\n\tfor(int iCell = 0; iCell < nCells; iCell++)\n");
+                fprintf(fpk,"\t{\n");
+                fprintf(fpk,"\t\tFILE *fp;\n");
+                fprintf(fpk,"\t\tsprintf(filename, \"%s_S(%%d,%%d,%%d).dat\",Cells[iCell][0] ,Cells[iCell][1] ,Cells[iCell][2]);\n",BaseName.c_str().AsChar());
+                fprintf(fpk,"\t\tprintf(\"%%d) loading file: %%s\\n\", ++it, filename);\n");
+                fprintf(fpk,"\t\tfp = fopen(filename,\"r\");\n");
+                fprintf(fpk,"\t\tfor(int i = 0; i < nH; i++)\n");
+                fprintf(fpk,"\t\t{\n");
+                fprintf(fpk,"\t\t\tfor(int j = 0; j < nH; j++)\n");
+                fprintf(fpk,"\t\t\t{\n");
+                fprintf(fpk,"\t\t\t\tfscanf(fp, \"%%lf\", &s[iCell][i][j]);\n");
+                fprintf(fpk,"\t\t\t\tprintf(\"%%.3f \", s[iCell][i][j]);\n");
+                fprintf(fpk,"\t\t\t}\n");
+                fprintf(fpk,"\t\t\tfscanf(fp,\"\\n\");\n");
+                fprintf(fpk,"\t\t\tprintf(\"\\n\");\n");
+                fprintf(fpk,"\t\t}\n");
+                fprintf(fpk,"\t\tfclose(fp);\n");
+                fprintf(fpk,"\t\tprintf(\"\\n\");\n");
+                fprintf(fpk,"\t}\n");
+            }
         }
         
         if(isS)
@@ -4208,6 +4667,11 @@ void MainFrame::GenerateCCode(wxString filepath, wxString BaseName, int MyID_Ini
         fprintf(fpk,"\t\tfor(int j=0; j<nH; j++)\n");
         fprintf(fpk,"\t\t{\n");
         fprintf(fpk,"\t\t\tHk[i * nH + j] = Getk(h, kx, ky, kz, a, b, c, nCells, Cells, i, j);\n");
+        if (isSOC)
+        {
+            fprintf(fpk,"\t\t\tHk[i * nH + j].real = Hk[i * nH + j].real + Hsoc[0][i][j];\n");
+            fprintf(fpk,"\t\t\tHk[i * nH + j].imag = Hk[i * nH + j].imag + Hsoc[1][i][j];\n");
+        }
         fprintf(fpk,"\t\t\tprintf(\"(%%.3f, %%.3f)\", Hk[i * nH + j].real, Hk[i * nH + j].imag);\n");
         fprintf(fpk,"\t\t}\n");
         fprintf(fpk,"\t\tprintf(\"\\n\");\n");
@@ -4240,6 +4704,11 @@ void MainFrame::GenerateCCode(wxString filepath, wxString BaseName, int MyID_Ini
         fprintf(fpk,"\t\tfor(int j=0; j<nH; j++)\n");
         fprintf(fpk,"\t\t{\n");
         fprintf(fpk,"\t\t\tHk[i * nH + j] = GetkFrac(h, ka, kb, kc, as, bs, cs, a, b, c, nCells, Cells, i, j);\n");
+        if (isSOC)
+        {
+            fprintf(fpk,"\t\t\tHk[i * nH + j].real = Hk[i * nH + j].real + Hsoc[0][i][j];\n");
+            fprintf(fpk,"\t\t\tHk[i * nH + j].imag = Hk[i * nH + j].imag + Hsoc[1][i][j];\n");
+        }
         fprintf(fpk,"\t\t\tprintf(\"(%%.3f, %%.3f)\", Hk[i * nH + j].real, Hk[i * nH + j].imag);\n");
         fprintf(fpk,"\t\t}\n");
         fprintf(fpk,"\t\tprintf(\"\\n\");\n");
@@ -4262,17 +4731,28 @@ void MainFrame::GenerateCCode(wxString filepath, wxString BaseName, int MyID_Ini
             fprintf(fpk,"\t}\n");
         }
         
-        if(isS)
-            fprintf(fpk,"\n\t/* Deallocate h and s arrays */\n");
+        if(isSOC)
+        {
+            if(isS)
+                fprintf(fpk,"\n\t/* Deallocate h, s and Hsoc arrays */\n");
+            else
+                fprintf(fpk,"\n\t/* Deallocate h and Hsoc arrays */\n");
+        }
         else
-            fprintf(fpk,"\n\t/* Deallocate the h array */\n");
+        {
+            if(isS)
+                fprintf(fpk,"\n\t/* Deallocate h and s arrays */\n");
+            else
+                fprintf(fpk,"\n\t/* Deallocate the h array */\n");
+        }
         fprintf(fpk,"\tfree3d(h, nCells, nH);\n");
         if(isS) fprintf(fpk,"\tfree3d(s, nCells, nH);\n");
+        if (isSOC) fprintf(fpk,"\tfree3d(Hsoc, 2, nH);\n");
         fprintf(fpk,"\texit( 0 );\n");
         fprintf(fpk,"}\n");
         
         
-        fprintf(fpk,"//Implementation\n");
+        fprintf(fpk,"\n//Implementation\n");
         fprintf(fpk,"complex GetkFrac(double*** H, double ka, double kb, double kc, double as[3], double bs[3], double cs[3], double a[3], double b[3], double c[3], int nCells, int Cells[][3], int iH, int jH)\n");
         fprintf(fpk,"{\n");
         fprintf(fpk,"\tdouble k[3];\n");
@@ -4397,10 +4877,12 @@ void MainFrame::GenerateFCode(wxString filepath, wxString BaseName, int MyID_Ini
     int ID = MyID_Initial0Final1;
     int Hind = 0;
     int Sind = 2;
+    int SOCind = 4;
     if (ID == 1)
     {
         Hind = 1;
         Sind = 3;
+        SOCind = 5;
     }
     
     int nEss = sec30->ArraysOf3DDouble[Hind].size();
@@ -4412,6 +4894,10 @@ void MainFrame::GenerateFCode(wxString filepath, wxString BaseName, int MyID_Ini
     bool isS = false;
     int nEssS = sec30->ArraysOf3DDouble[Sind].size();
     if (nEssS > 0) isS = true;
+    
+    bool isSOC = false;
+    int nSOCBuf = sec30->ArraysOf3DDouble[SOCind].size();
+    if (nSOCBuf > 1) isSOC = true;
     
     //int nk = sec30->ArraysOf2DDouble[0].size();//double** KPoints; [ka,kb,kc,kx,ky,kz,d_path]
     //int nklabel = sec30->ArraysOf1DDouble[0].size();//double* dkLabel;
@@ -4431,20 +4917,50 @@ void MainFrame::GenerateFCode(wxString filepath, wxString BaseName, int MyID_Ini
         wxListBox* listctr = sec30->GetListObject(_("EssentialUnitcellList"));
         int nCell = listctr->GetCount();    
         
-        fprintf(fpk,"\tinteger, parameter:: nH = %d, nCells = %d\n", nH, nCell);
-        fprintf(fpk,"\tinteger :: it, i, j, iCell\n");
+        if(isSOC)
+            fprintf(fpk,"\tinteger, parameter:: nH0 = %d, nCells = %d\n", nH, nCell);
+        else
+            fprintf(fpk,"\tinteger, parameter:: nH = %d, nCells = %d\n", nH, nCell);
+        
+        if(isSOC)
+            fprintf(fpk,"\tinteger :: it, i, j, iCell, nH\n");
+        else
+            fprintf(fpk,"\tinteger :: it, i, j, iCell\n");
+        
         fprintf(fpk,"\tinteger, allocatable :: Cells(:,:)\n");
-        fprintf(fpk,"\treal(8) :: a(3), b(3), c(3), as(3), bs(3), cs(3), kx, ky, kz, ka, kb, kc\n");
+        
+        if(isSOC)
+            fprintf(fpk,"\treal(8) :: a(3), b(3), c(3), as(3), bs(3), cs(3), kx, ky, kz, ka, kb, kc, resoc(1:2*nH0), imsoc(1:2*nH0)\n");
+        else
+            fprintf(fpk,"\treal(8) :: a(3), b(3), c(3), as(3), bs(3), cs(3), kx, ky, kz, ka, kb, kc\n");
+        
         if (isS)
             fprintf(fpk,"\treal(8), allocatable :: h(:,:,:), s(:,:,:)\n");
         else
             fprintf(fpk,"\treal(8), allocatable :: h(:,:,:)\n");
+        
         fprintf(fpk,"\tcomplex(16) :: Getk, GetkFrac\n");
-        if (isS)
-            fprintf(fpk,"\tcomplex(16), allocatable:: Hk(:,:), Sk(:,:)\n");
+        
+        if(isSOC)
+        {
+            if (isS)
+                fprintf(fpk,"\tcomplex(16), allocatable:: Hk(:,:), Sk(:,:), Hsoc(:,:)\n");
+            else
+                fprintf(fpk,"\tcomplex(16), allocatable:: Hk(:,:), Hsoc(:,:)\n");
+        }
         else
-            fprintf(fpk,"\tcomplex(16), allocatable:: Hk(:,:)\n");
+        {
+            if (isS)
+                fprintf(fpk,"\tcomplex(16), allocatable:: Hk(:,:), Sk(:,:)\n");
+            else
+                fprintf(fpk,"\tcomplex(16), allocatable:: Hk(:,:)\n");            
+        }
+        
         fprintf(fpk,"\tcharacter(100) filename\n");
+        fprintf(fpk,"\t\n");
+        
+        fprintf(fpk,"\t!The total size of the Hamiltonian\n");
+        fprintf(fpk,"\tnH = 2*nH0\n");
         fprintf(fpk,"\t\n");
         
         double a[3],b[3],c[3];
@@ -4492,56 +5008,148 @@ void MainFrame::GenerateFCode(wxString filepath, wxString BaseName, int MyID_Ini
         fprintf(fpk,"\t\t&/), (/nCells, 3/), order = (/ 2, 1 /))\n");
         
         fprintf(fpk,"\t\n");
-        if (isS)
-            fprintf(fpk,"\t!Allocate h and s arrays\n");
+        if(isSOC)
+        {
+            if(isS)
+                fprintf(fpk,"\n\t!Allocate h, s and Hsoc arrays\n");
+            else
+                fprintf(fpk,"\n\t!Allocate h and Hsoc arrays\n");
+        }
         else
-            fprintf(fpk,"\t!Allocate the h array\n");
+        {
+            if(isS)
+                fprintf(fpk,"\n\t!Allocate h and s arrays\n");
+            else
+                fprintf(fpk,"\n\t!Allocate the h array\n");
+        }
+        
         fprintf(fpk,"\tallocate(h(1:nCells, 1:nH, 1:nH))\n");
         if (isS)
             fprintf(fpk,"\tallocate(s(1:nCells, 1:nH, 1:nH))\n");
+        if (isSOC)
+            fprintf(fpk,"\tallocate(Hsoc(1:nH, 1:nH))\n");
         fprintf(fpk,"\t\n");
         
-        fprintf(fpk,"\t!Load files\n");
-        fprintf(fpk,"2001 format (8(F6.3))\n");
-        fprintf(fpk,"\twrite(*,*) ""\n");
-        fprintf(fpk,"\tit = 0\n");
-        fprintf(fpk,"\tdo iCell = 1,nCells\n");
-        fprintf(fpk,"\t\twrite(filename,\'(\"%s_H(\", I0, \",\", I0, \",\", I0, \").dat\")\') Cells(iCell,1) ,Cells(iCell,2) ,Cells(iCell,3)\n", BaseName.c_str().AsChar());
-        fprintf(fpk,"\t\tit=it+1\n");
-        fprintf(fpk,"\t\twrite(*, \'(I0, \") loading file: \", A)\') it, filename\n");
-        fprintf(fpk,"\t\topen(unit=100, file=filename, action=\'read\')\n");
-        fprintf(fpk,"\t\tdo i=1,nH\n");
-        fprintf(fpk,"\t\t\tRead(100,*)(h(iCell, i, j) , j=1,nH)\n");
-        fprintf(fpk,"\t\t\twrite(*,2001) (h(iCell, i, j) , j=1,nH)\n");
-        fprintf(fpk,"\t\tend do\n");
-        fprintf(fpk,"\t\tclose(100)\n");
-        fprintf(fpk,"\t\twrite(*,*) \"\"\n");
-        fprintf(fpk,"\tend do\n");
-        fprintf(fpk,"\t\n");
-        
-        if (isS)
+        if(isSOC)
         {
+            fprintf(fpk,"\t!Load files\n");
+            fprintf(fpk,"2001 format (8(F6.3))\n");
+            fprintf(fpk,"\twrite(*,*) ""\n");
+            fprintf(fpk,"\tit = 0\n");
             fprintf(fpk,"\tdo iCell = 1,nCells\n");
-            fprintf(fpk,"\t\twrite(filename,\'(\"%s_S(\", I0, \",\", I0, \",\", I0, \").dat\")\') Cells(iCell,1) ,Cells(iCell,2) ,Cells(iCell,3)\n", BaseName.c_str().AsChar());
+            fprintf(fpk,"\t\twrite(filename,\'(\"%s_H(\", I0, \",\", I0, \",\", I0, \").dat\")\') Cells(iCell,1) ,Cells(iCell,2) ,Cells(iCell,3)\n", BaseName.c_str().AsChar());
+            fprintf(fpk,"\t\tit=it+1\n");
+            fprintf(fpk,"\t\twrite(*, \'(I0, \") loading file: \", A)\') it, filename\n");
+            fprintf(fpk,"\t\topen(unit=100, file=filename, action=\'read\')\n");
+            fprintf(fpk,"\t\tdo i=1,nH0\n");
+            fprintf(fpk,"\t\t\tRead(100,*)(h(iCell, 2*i - 1, 2*j - 1) , j=1,nH0)\n");
+            fprintf(fpk,"\t\t\tdo j=1,nH0\n");
+            fprintf(fpk,"\t\t\t\th(iCell, 2*i, 2*j)=h(iCell, 2*i-1, 2*j-1)\n");
+            fprintf(fpk,"\t\t\t\th(iCell, 2*i - 1, 2*j)=0.0d0\n");
+            fprintf(fpk,"\t\t\t\th(iCell, 2*i, 2*j - 1)=0.0d0\n");
+            fprintf(fpk,"\t\t\tend do\n");
+            fprintf(fpk,"\t\tend do\n");
+            fprintf(fpk,"\t\tclose(100)\n");
+            fprintf(fpk,"\t\tdo i=1,nH\n");
+            fprintf(fpk,"\t\t\twrite(*,2001) (h(iCell, i, j) , j=1,nH)\n");
+            fprintf(fpk,"\t\tend do\n");
+            fprintf(fpk,"\t\twrite(*,*) \"\"\n");
+            fprintf(fpk,"\tend do\n");
+            fprintf(fpk,"\t\n");
+            
+            if (isS)
+            {
+                fprintf(fpk,"\tdo iCell = 1,nCells\n");
+                fprintf(fpk,"\t\twrite(filename,\'(\"%s_S(\", I0, \",\", I0, \",\", I0, \").dat\")\') Cells(iCell,1) ,Cells(iCell,2) ,Cells(iCell,3)\n", BaseName.c_str().AsChar());
+                fprintf(fpk,"\t\tit=it+1\n");
+                fprintf(fpk,"\t\twrite(*, \'(I0, \") loading file: \", A)\') it, filename\n");
+                fprintf(fpk,"\t\topen(unit=100, file=filename, action=\'read\')\n");
+                fprintf(fpk,"\t\tdo i=1,nH0\n");
+                fprintf(fpk,"\t\t\tRead(100,*)(s(iCell, 2*i - 1, 2*j - 1) , j=1,nH0)\n");
+                fprintf(fpk,"\t\t\tdo j=1,nH0\n");
+                fprintf(fpk,"\t\t\t\ts(iCell, 2*i, 2*j)=s(iCell, 2*i-1, 2*j-1)\n");
+                fprintf(fpk,"\t\t\t\ts(iCell, 2*i - 1, 2*j)=0.0d0\n");
+                fprintf(fpk,"\t\t\t\ts(iCell, 2*i, 2*j - 1)=0.0d0\n");
+                fprintf(fpk,"\t\t\tend do\n");
+                fprintf(fpk,"\t\tend do\n");
+                fprintf(fpk,"\t\tclose(100)\n");
+                fprintf(fpk,"\t\tdo i=1,nH\n");
+                fprintf(fpk,"\t\t\twrite(*,2001) (s(iCell, i, j) , j=1,nH)\n");
+                fprintf(fpk,"\t\tend do\n");
+                fprintf(fpk,"\t\twrite(*,*) \"\"\n");
+                fprintf(fpk,"\tend do\n");
+                fprintf(fpk,"\t\n");
+            }
+            
+            fprintf(fpk,"\twrite(*,*) \"\"\n");
+            fprintf(fpk,"\twrite(*,*) \"Loading real and imaginary parts of SOC Hamiltonian from files\"\n");
+            fprintf(fpk,"\topen(unit=100, file=\"%s_SOC_Re.dat\", action=\'read\')\n",BaseName.c_str().AsChar());
+            fprintf(fpk,"\topen(unit=101, file=\"%s_SOC_Im.dat\", action=\'read\')\n",BaseName.c_str().AsChar());
+            fprintf(fpk,"\tdo i=1,nH\n");
+            fprintf(fpk,"\t\tRead(100,*) resoc\n");
+            fprintf(fpk,"\t\tRead(101,*) imsoc\n");
+            fprintf(fpk,"\t\tdo j=1,nH\n");
+            fprintf(fpk,"\t\t\tHsoc(i,j) = CMPLX(resoc(j), imsoc(j))\n");
+            fprintf(fpk,"\t\tend do\n");
+            fprintf(fpk,"\tend do\n");
+            fprintf(fpk,"\tclose(100)\n");
+            fprintf(fpk,"\tclose(101)\n");
+            fprintf(fpk,"\t\n");
+        }
+        else
+        {
+            fprintf(fpk,"\t!Load files\n");
+            fprintf(fpk,"2001 format (8(F6.3))\n");
+            fprintf(fpk,"\twrite(*,*) ""\n");
+            fprintf(fpk,"\tit = 0\n");
+            fprintf(fpk,"\tdo iCell = 1,nCells\n");
+            fprintf(fpk,"\t\twrite(filename,\'(\"%s_H(\", I0, \",\", I0, \",\", I0, \").dat\")\') Cells(iCell,1) ,Cells(iCell,2) ,Cells(iCell,3)\n", BaseName.c_str().AsChar());
             fprintf(fpk,"\t\tit=it+1\n");
             fprintf(fpk,"\t\twrite(*, \'(I0, \") loading file: \", A)\') it, filename\n");
             fprintf(fpk,"\t\topen(unit=100, file=filename, action=\'read\')\n");
             fprintf(fpk,"\t\tdo i=1,nH\n");
-            fprintf(fpk,"\t\t\tRead(100,*)(s(iCell, i, j) , j=1,nH)\n");
-            fprintf(fpk,"\t\t\twrite(*,2001) (s(iCell, i, j) , j=1,nH)\n");
+            fprintf(fpk,"\t\t\tRead(100,*)(h(iCell, i, j) , j=1,nH)\n");
+            fprintf(fpk,"\t\t\twrite(*,2001) (h(iCell, i, j) , j=1,nH)\n");
             fprintf(fpk,"\t\tend do\n");
             fprintf(fpk,"\t\tclose(100)\n");
             fprintf(fpk,"\t\twrite(*,*) \"\"\n");
             fprintf(fpk,"\tend do\n");
             fprintf(fpk,"\t\n");
+            
+            if (isS)
+            {
+                fprintf(fpk,"\tdo iCell = 1,nCells\n");
+                fprintf(fpk,"\t\twrite(filename,\'(\"%s_S(\", I0, \",\", I0, \",\", I0, \").dat\")\') Cells(iCell,1) ,Cells(iCell,2) ,Cells(iCell,3)\n", BaseName.c_str().AsChar());
+                fprintf(fpk,"\t\tit=it+1\n");
+                fprintf(fpk,"\t\twrite(*, \'(I0, \") loading file: \", A)\') it, filename\n");
+                fprintf(fpk,"\t\topen(unit=100, file=filename, action=\'read\')\n");
+                fprintf(fpk,"\t\tdo i=1,nH\n");
+                fprintf(fpk,"\t\t\tRead(100,*)(s(iCell, i, j) , j=1,nH)\n");
+                fprintf(fpk,"\t\t\twrite(*,2001) (s(iCell, i, j) , j=1,nH)\n");
+                fprintf(fpk,"\t\tend do\n");
+                fprintf(fpk,"\t\tclose(100)\n");
+                fprintf(fpk,"\t\twrite(*,*) \"\"\n");
+                fprintf(fpk,"\tend do\n");
+                fprintf(fpk,"\t\n");
+            }
         }
         
+        fprintf(fpk,"\n2002 format (8(\"(\",F8.2,\",\",F8.2,\")\"))\n");
+        
+        if(isSOC)
+        {
+            fprintf(fpk,"\tdo i=1,nH\n");
+            fprintf(fpk,"\t\twrite(*,2002) (Hsoc(i, j) , j=1,nH)\n");
+            fprintf(fpk,"\tend do\n");
+            fprintf(fpk,"\twrite(*,*) \"\"\n");
+            fprintf(fpk,"\t\n");
+        }
+        
+        fprintf(fpk,"\t!Allocate Hk array\n");
         fprintf(fpk,"\tallocate(Hk(1:nH,1:nH))\n");
         if (isS)
             fprintf(fpk,"\tallocate(Sk(1:nH,1:nH))\n");
         fprintf(fpk,"\t\n");
-        
-        fprintf(fpk,"\n2002 format (8(\"(\",F8.2,\",\",F8.2,\")\"))\n");
         
         fprintf(fpk,"\n\t!Calculate the Hamiltonian in a typical k=(kx, ky, kz)\n");
         fprintf(fpk,"\tkx=0.0\n");
@@ -4551,7 +5159,10 @@ void MainFrame::GenerateFCode(wxString filepath, wxString BaseName, int MyID_Ini
         fprintf(fpk,"\twrite(*,*) \"k=(kx, ky, kz) = \", kx, ky ,kz\n");
         fprintf(fpk,"\tdo i=1,nH\n");
         fprintf(fpk,"\t\tdo j=1,nH\n");
-        fprintf(fpk,"\t\t\tHk(i,j) = Getk(h, kx, ky, kz, a, b, c, nCells, Cells, nH, i, j)\n");
+        if (isSOC)
+            fprintf(fpk,"\t\t\tHk(i,j) = Getk(h, kx, ky, kz, a, b, c, nCells, Cells, nH, i, j) + Hsoc(i,j)\n");
+        else
+            fprintf(fpk,"\t\t\tHk(i,j) = Getk(h, kx, ky, kz, a, b, c, nCells, Cells, nH, i, j)\n");
         fprintf(fpk,"\t\tend do\n");
         fprintf(fpk,"\t\twrite(*,2002) (Hk(i,j) , j=1,nH)\n");
         fprintf(fpk,"\tend do\n");
@@ -4581,7 +5192,10 @@ void MainFrame::GenerateFCode(wxString filepath, wxString BaseName, int MyID_Ini
         fprintf(fpk,"\twrite(*,*) \"(ka, kb, kc) = \", ka, kb ,kc\n");
         fprintf(fpk,"\tdo i=1,nH\n");
         fprintf(fpk,"\t\tdo j=1,nH\n");
-        fprintf(fpk,"\t\t\tHk(i,j) = GetkFrac(h, ka, kb, kc, as, bs, cs, a, b, c, nCells, Cells, nH, i, j)\n");
+        if (isSOC)
+            fprintf(fpk,"\t\t\tHk(i,j) = GetkFrac(h, ka, kb, kc, as, bs, cs, a, b, c, nCells, Cells, nH, i, j) + Hsoc(i,j)\n");
+        else
+            fprintf(fpk,"\t\t\tHk(i,j) = GetkFrac(h, ka, kb, kc, as, bs, cs, a, b, c, nCells, Cells, nH, i, j)\n");
         fprintf(fpk,"\t\tend do\n");
         fprintf(fpk,"\t\twrite(*,2002) (Hk(i,j) , j=1,nH)\n");
         fprintf(fpk,"\tend do\n");
@@ -4606,6 +5220,7 @@ void MainFrame::GenerateFCode(wxString filepath, wxString BaseName, int MyID_Ini
         fprintf(fpk,"\tdeallocate(Cells)\n");
         fprintf(fpk,"\tdeallocate(h)\n");
         if (isS) fprintf(fpk,"\tdeallocate(s)\n");
+        if (isSOC) fprintf(fpk,"\tdeallocate(Hsoc)\n");
         fprintf(fpk,"\t\n");
         fprintf(fpk,"end program main\n");
         fprintf(fpk,"\n");
@@ -4642,7 +5257,7 @@ void MainFrame::GenerateFCode(wxString filepath, wxString BaseName, int MyID_Ini
         fprintf(fpk,"\t\t\tR(1) = Cells(icell,1) * a(1) + Cells(icell,2) * b(1) + Cells(icell,3) * c(1)\n");
         fprintf(fpk,"\t\t\tR(2) = Cells(icell,1) * a(2) + Cells(icell,2) * b(2) + Cells(icell,3) * c(2)\n");
         fprintf(fpk,"\t\t\tR(3) = Cells(icell,1) * a(3) + Cells(icell,2) * b(3) + Cells(icell,3) * c(3)\n");
-        fprintf(fpk,"\t\t\tGetk = Getk + (H(icell,iH,jH) + H(icell,jH,iH)) * exp(-i*dot(K, R))  !V*Exp(-ikR) + VT*Exp(ikR)\n");
+        fprintf(fpk,"\t\t\tGetk = Getk + H(icell,iH,jH) * exp(-i*dot(K, R)) + H(icell,jH,iH) * exp(i*dot(K, R))  !V*Exp(-ikR) + VT*Exp(ikR)\n");
         fprintf(fpk,"\t\tend if\n");
         fprintf(fpk,"\tend do\n");
         fprintf(fpk,"end function\n");
@@ -4692,10 +5307,12 @@ void MainFrame::GenerateMathematicaCode(wxString filepath, wxString BaseName, in
     int ID = MyID_Initial0Final1;
     int Hind = 0;
     int Sind = 2;
+    int SOCind = 4;
     if (ID == 1)
     {
         Hind = 1;
         Sind = 3;
+        SOCind = 5;
     }
     
     int nEss = sec30->ArraysOf3DDouble[Hind].size();
@@ -4708,6 +5325,10 @@ void MainFrame::GenerateMathematicaCode(wxString filepath, wxString BaseName, in
     int nEssS = sec30->ArraysOf3DDouble[Sind].size();
     if (nEssS > 0) isS = true;
     
+    bool isSOC = false;
+    int nSOCBuf = sec30->ArraysOf3DDouble[SOCind].size();
+    if (nSOCBuf > 1) isSOC = true;
+    
     int nk = sec30->ArraysOf2DDouble[0].size();//double** KPoints; [ka,kb,kc,kx,ky,kz,d_path]
     int nklabel = sec30->ArraysOf1DDouble[0].size();//double* dkLabel;
     
@@ -4716,7 +5337,13 @@ void MainFrame::GenerateMathematicaCode(wxString filepath, wxString BaseName, in
     if ((fpk = fopen(fname,"w")) != NULL)
     {
         fprintf(fpk,"(*Define the parameters*)\n");
-        fprintf(fpk,"nH = %d;\n", nH);
+        if(isSOC)
+        {
+            fprintf(fpk,"nH0 = %d;\n", nH);
+            fprintf(fpk,"nH = 2*nH0;\n", nH);
+        }
+        else
+            fprintf(fpk,"nH = %d;\n", nH);
         fprintf(fpk,"nk = %d;\n", nk);
         fprintf(fpk,"labels = {");
         for (int iklabel=0; iklabel<nklabel; iklabel++)
@@ -4779,6 +5406,49 @@ void MainFrame::GenerateMathematicaCode(wxString filepath, wxString BaseName, in
             }
         }
         
+        if(isSOC)
+        {
+            fprintf(fpk,"\nSOCRe = Import[\"./%s_SOC_Re.dat\"];\n",BaseName.c_str().AsChar());
+            fprintf(fpk,"SOCIm = Import[\"./%s_SOC_Im.dat\"];\n",BaseName.c_str().AsChar());
+            fprintf(fpk,"Hsoc = SOCRe + I*SOCIm;\n");
+            
+            fprintf(fpk,"\n(*Evaluate H*I_{2x2}*)\n");
+            for (int iCell=0; iCell<nCell; iCell++)
+            {
+                wxString WorkingCell = listctr->GetString(iCell);
+                int lcell,mcell,ncell;
+                sec30->GetCellInfo(WorkingCell, lcell, mcell, ncell);
+                if (!(lcell==0 && mcell==0 && ncell == 0))
+                {
+                    fprintf(fpk,"h[%d, %d, %d] = KroneckerProduct[h[%d, %d, %d],{{1, 0}, {0, 1}}];\n", lcell, mcell, ncell, lcell, mcell, ncell);
+                    fprintf(fpk,"h[%d, %d, %d] = KroneckerProduct[h[%d, %d, %d],{{1, 0}, {0, 1}}];\n", -lcell, -mcell, -ncell, -lcell, -mcell, -ncell);
+                }
+                else
+                    fprintf(fpk,"h[%d, %d, %d] = KroneckerProduct[h[%d, %d, %d],{{1, 0}, {0, 1}}];\n", lcell, mcell, ncell, lcell, mcell, ncell);
+            }
+            
+            if (isS)
+            {
+                fprintf(fpk,"\n(*Evaluate S*I_{2x2}*)\n");
+                for (int iCell=0; iCell<nCell; iCell++)
+                {
+                    wxString WorkingCell = listctr->GetString(iCell);
+                    int lcell,mcell,ncell;
+                    sec30->GetCellInfo(WorkingCell, lcell, mcell, ncell);
+                    if (!(lcell==0 && mcell==0 && ncell == 0))
+                    {
+                        fprintf(fpk,"s[%d, %d, %d] = KroneckerProduct[s[%d, %d, %d],{{1, 0}, {0, 1}}];\n", lcell, mcell, ncell, lcell, mcell, ncell);
+                        fprintf(fpk,"s[%d, %d, %d] = KroneckerProduct[s[%d, %d, %d],{{1, 0}, {0, 1}}];\n", -lcell, -mcell, -ncell, -lcell, -mcell, -ncell);
+                    }
+                    else
+                        fprintf(fpk,"s[%d, %d, %d] = KroneckerProduct[s[%d, %d, %d],{{1, 0}, {0, 1}}];\n", lcell, mcell, ncell, lcell, mcell, ncell);
+                }
+            }
+            
+            fprintf(fpk,"\n(*Add SOC to the total Hamiltonian: HTot = H*I_{2x2} + Hsoc*)\n");
+            fprintf(fpk,"h[%d, %d, %d] = h[%d, %d, %d] + Hsoc;\n", 0, 0, 0, 0, 0, 0);
+        }
+        
         fprintf(fpk,"\n");
         for (int iCell=0; iCell<nCell; iCell++)
         {
@@ -4829,12 +5499,12 @@ void MainFrame::GenerateMathematicaCode(wxString filepath, wxString BaseName, in
         sec30->GetVar(_("TBm[0]"), TBm);
         sec30->GetVar(_("TBn[0]"), TBn);
         if (isS)
-            fprintf(fpk,"\n(*Calculate the TB Hamiltonian and overlap matrices in resiprocal space*)\n");
+            fprintf(fpk,"\n(*Calculate the TB Hamiltonian and overlap matrices in reciprocal space*)\n");
         else
-            fprintf(fpk,"\n(*Calculate the TB Hamiltonian in resiprocal space*)\n");
-        fprintf(fpk,"HkFunc = Sum[h[l, m, n] Exp[I ((ka*as + kb*bs + kc*cs).(l*a + m*b + n*c))], {l, %d, %d}, {m, %d, %d}, {n, %d, %d}];\n", -TBl, TBl, -TBm, TBm, -TBn, TBn);
+            fprintf(fpk,"\n(*Calculate the TB Hamiltonian in reciprocal space*)\n");
+        fprintf(fpk,"HkFunc = Sum[h[l, m, n]*Exp[-I*((ka*as + kb*bs + kc*cs).(l*a + m*b + n*c))], {l, %d, %d}, {m, %d, %d}, {n, %d, %d}];\n", -TBl, TBl, -TBm, TBm, -TBn, TBn);
         if (isS)
-            fprintf(fpk,"SkFunc = Sum[s[l, m, n] Exp[I ((ka*as + kb*bs + kc*cs).(l*a + m*b + n*c))], {l, %d, %d}, {m, %d, %d}, {n, %d, %d}];\n", -TBl, TBl, -TBm, TBm, -TBn, TBn);
+            fprintf(fpk,"SkFunc = Sum[s[l, m, n]*Exp[-I*((ka*as + kb*bs + kc*cs).(l*a + m*b + n*c))], {l, %d, %d}, {m, %d, %d}, {n, %d, %d}];\n", -TBl, TBl, -TBm, TBm, -TBn, TBn);
         
         if (isS)
             fprintf(fpk,"\n(*Define H and S functions as TB Hamiltonian and overlap matrix*)\n");
@@ -4879,10 +5549,12 @@ void MainFrame::GenerateMatlabCode(wxString filepath, wxString BaseName, int MyI
     int ID = MyID_Initial0Final1;
     int Hind = 0;
     int Sind = 2;
+    int SOCind = 4;
     if (ID == 1)
     {
         Hind = 1;
         Sind = 3;
+        SOCind = 5;
     }
     
     int nEss = sec30->ArraysOf3DDouble[Hind].size();
@@ -4895,6 +5567,10 @@ void MainFrame::GenerateMatlabCode(wxString filepath, wxString BaseName, int MyI
     int nEssS = sec30->ArraysOf3DDouble[Sind].size();
     if (nEssS > 0) isS = true;
     
+    bool isSOC = false;
+    int nSOCBuf = sec30->ArraysOf3DDouble[SOCind].size();
+    if (nSOCBuf > 1) isSOC = true;
+    
     int nk = sec30->ArraysOf2DDouble[0].size();//double** KPoints; [ka,kb,kc,kx,ky,kz,d_path]
     int nklabel = sec30->ArraysOf1DDouble[0].size();//double* dkLabel;
     
@@ -4902,11 +5578,18 @@ void MainFrame::GenerateMatlabCode(wxString filepath, wxString BaseName, int MyI
     wxString fname = filepath + wxT("/") + BaseName + wxT(".m");
     if ((fpk = fopen(fname,"w")) != NULL)
     {
-        fprintf(fpk,"%%Global parameters\n");
+        fprintf(fpk,"%%Clear global parameters\n");
+        fprintf(fpk,"clear all\n");
+        fprintf(fpk,"clc\n");
+        
+        fprintf(fpk,"\n%%Global parameters\n");
         fprintf(fpk,"global nH lMax mMax nMax l0 m0 n0 a b c as bs cs\n");
         
         fprintf(fpk,"\n%%Define the parameters\n");
-        fprintf(fpk,"nH = %d;\n", nH);
+        if (isSOC)
+            fprintf(fpk,"nH = %d;\n", 2*nH);
+        else
+            fprintf(fpk,"nH = %d;\n", nH);
         fprintf(fpk,"nk = %d;\n", nk);
         fprintf(fpk,"labels = {");
         for (int iklabel=0; iklabel<nklabel; iklabel++)
@@ -4983,6 +5666,52 @@ void MainFrame::GenerateMatlabCode(wxString filepath, wxString BaseName, int MyI
             }
         }
         
+        if (isSOC)
+        {
+            fprintf(fpk,"\n%%Load real and imaginary parts of Hsoc from the files\n");
+            wxString fnamere = wxT("./") + BaseName + wxT("_SOC_Re.dat");
+            fprintf(fpk,"ReSOC = load(\'%s\');\n", fnamere.c_str().AsChar());
+            wxString fnameim = wxT("./") + BaseName + wxT("_SOC_Im.dat");
+            fprintf(fpk,"ImSOC = load(\'%s\');\n", fnameim.c_str().AsChar());
+            fprintf(fpk,"Hsoc = ReSOC + 1i * ImSOC;\n");
+            
+            fprintf(fpk,"\n%%Evaluate H*I_{2x2}\n");
+            for (int iCell=0; iCell<nCell; iCell++)
+            {
+                wxString WorkingCell = listctr->GetString(iCell);
+                int lcell,mcell,ncell;
+                sec30->GetCellInfo(WorkingCell, lcell, mcell, ncell);
+                if (!(lcell==0 && mcell==0 && ncell == 0))
+                {
+                    fprintf(fpk,"h{l0 + %d, m0 + %d, n0 + %d} = kron(h{l0 + %d, m0 + %d, n0 + %d},[1 0;0 1]);\n", lcell, mcell, ncell, lcell, mcell, ncell);
+                    fprintf(fpk,"h{l0 + %d, m0 + %d, n0 + %d} = kron(h{l0 + %d, m0 + %d, n0 + %d},[1 0;0 1]);\n", -lcell, -mcell, -ncell, -lcell, -mcell, -ncell);
+                }
+                else
+                    fprintf(fpk,"h{l0 + %d, m0 + %d, n0 + %d} = kron(h{l0 + %d, m0 + %d, n0 + %d},[1 0;0 1]);\n", lcell, mcell, ncell, lcell, mcell, ncell);
+            }
+            
+            if (isS)
+            {
+                fprintf(fpk,"\n%%Evaluate S*I_{2x2}\n");
+                for (int iCell=0; iCell<nCell; iCell++)
+                {
+                    wxString WorkingCell = listctr->GetString(iCell);
+                    int lcell,mcell,ncell;
+                    sec30->GetCellInfo(WorkingCell, lcell, mcell, ncell);
+                    if (!(lcell==0 && mcell==0 && ncell == 0))
+                    {
+                        fprintf(fpk,"s{l0 + %d, m0 + %d, n0 + %d} = kron(s{l0 + %d, m0 + %d, n0 + %d},[1 0;0 1]);\n", lcell, mcell, ncell, lcell, mcell, ncell);
+                        fprintf(fpk,"s{l0 + %d, m0 + %d, n0 + %d} = kron(s{l0 + %d, m0 + %d, n0 + %d},[1 0;0 1]);\n", -lcell, -mcell, -ncell, -lcell, -mcell, -ncell);
+                    }
+                    else
+                        fprintf(fpk,"s{l0 + %d, m0 + %d, n0 + %d} = kron(s{l0 + %d, m0 + %d, n0 + %d},[1 0;0 1]);\n", lcell, mcell, ncell, lcell, mcell, ncell);
+                }
+            }
+            
+            fprintf(fpk,"\n%%Add SOC to the total Hamiltonian: HTot = H*I_{2x2} + Hsoc\n");
+            fprintf(fpk,"h{l0 + %d, m0 + %d, n0 + %d} = h{l0 + %d, m0 + %d, n0 + %d} + Hsoc;\n", 0, 0, 0, 0, 0, 0);
+        }
+        
         fprintf(fpk,"\n%%Load k-points from the file\n");
         fprintf(fpk,"kPath = load(\'./%s_kPath.dat\');\n", BaseName.c_str().AsChar());
         
@@ -5009,8 +5738,8 @@ void MainFrame::GenerateMatlabCode(wxString filepath, wxString BaseName, int MyI
         fprintf(fpk,"cs = 2*pi*cross(a, b)/vol;\n");
         
         fprintf(fpk,"\n%%Band-Structure Calculation\n");
-        fprintf(fpk,"disp(['The number of bands is ' mat2str(nH)]);\n");
         fprintf(fpk,"nbands = nH;\n");
+        fprintf(fpk,"disp(['The number of bands is ' mat2str(nbands)]);\n");
         fprintf(fpk,"bands = zeros(nbands, nk, 2);\n");
         fprintf(fpk,"dpath = 0.0;\n");
         
@@ -5063,7 +5792,7 @@ void MainFrame::GenerateMatlabCode(wxString filepath, wxString BaseName, int MyI
         fprintf(fpk2,"\t\t\tfor m=-mMax:mMax\n");
         fprintf(fpk2,"\t\t\t\tfor n=-nMax:nMax\n");
         fprintf(fpk2,"\t\t\t\t\tMij = Mr{l0 + l, m0 + m, n0 + n}(i,j);\n");
-        fprintf(fpk2,"\t\t\t\t\tMk(i,j) = Mk(i,j) + Mij*exp(1i*(ka*as + kb*bs + kc*cs)*(l*a\' + m*b\' + n*c\'));\n");
+        fprintf(fpk2,"\t\t\t\t\tMk(i,j) = Mk(i,j) + Mij*exp(-1i*(ka*as + kb*bs + kc*cs)*(l*a\' + m*b\' + n*c\'));\n");
         fprintf(fpk2,"\t\t\t\tend\n");
         fprintf(fpk2,"\t\t\tend\n");
         fprintf(fpk2,"\t\tend\n");
@@ -5078,10 +5807,12 @@ void MainFrame::GeneratePythonCode(wxString filepath, wxString BaseName, int MyI
     int ID = MyID_Initial0Final1;
     int Hind = 0;
     int Sind = 2;
+    int SOCind = 4;
     if (ID == 1)
     {
         Hind = 1;
         Sind = 3;
+        SOCind = 5;
     }
     
     int nEss = sec30->ArraysOf3DDouble[Hind].size();
@@ -5093,6 +5824,10 @@ void MainFrame::GeneratePythonCode(wxString filepath, wxString BaseName, int MyI
     bool isS = false;
     int nEssS = sec30->ArraysOf3DDouble[Sind].size();
     if (nEssS > 0) isS = true;
+    
+    bool isSOC = false;
+    int nSOCBuf = sec30->ArraysOf3DDouble[SOCind].size();
+    if (nSOCBuf > 1) isSOC = true;
     
     int nk = sec30->ArraysOf2DDouble[0].size();//double** KPoints; [ka,kb,kc,kx,ky,kz,d_path]
     int nklabel = sec30->ArraysOf1DDouble[0].size();//double* dkLabel;
@@ -5118,7 +5853,7 @@ void MainFrame::GeneratePythonCode(wxString filepath, wxString BaseName, int MyI
         fprintf(fpk,"                  mij = Mr[l0 + l][m0 + m][n0 + n][i][j]\n");
         fprintf(fpk,"                  kvec = ka*astar + kb*bstar + kc*cstar\n");
         fprintf(fpk,"                  Rvec = l*a + m*b + n*c\n");
-        fprintf(fpk,"                  mk[i][j] = mk[i][j] + mij*np.exp(1j*np.dot(kvec,Rvec))\n");
+        fprintf(fpk,"                  mk[i][j] = mk[i][j] + mij*np.exp(-1j*np.dot(kvec,Rvec))\n");
         fprintf(fpk,"   return mk\n");
         
         fprintf(fpk,"\n#Define the parameters\n");
@@ -5207,6 +5942,51 @@ void MainFrame::GeneratePythonCode(wxString filepath, wxString BaseName, int MyI
                 if (!(lcell==0 && mcell==0 && ncell == 0))
                     fprintf(fpk,"s[l0 + %d][m0 + %d][n0 + %d] = s[l0 + %d][m0 + %d][n0 + %d].conj().T\n", -lcell, -mcell, -ncell, lcell, mcell, ncell);
             }
+        }
+        
+        if(isSOC)
+        {
+            fprintf(fpk,"\n#Taking spin into accounts\n");
+            fprintf(fpk,"nH = 2*nH\n");
+            fprintf(fpk,"SOCRe = np.loadtxt('./%s_SOC_Re.dat', usecols=range(nH))\n",BaseName.c_str().AsChar());
+            fprintf(fpk,"SOCIm = np.loadtxt('./%s_SOC_Im.dat', usecols=range(nH))\n",BaseName.c_str().AsChar());
+            fprintf(fpk,"Hsoc = SOCRe + 1j * SOCIm\n");
+            
+            fprintf(fpk,"\n#Evaluate H*I_{2x2}\n");
+            for (int iCell=0; iCell<nCell; iCell++)
+            {
+                wxString WorkingCell = listctr->GetString(iCell);
+                int lcell,mcell,ncell;
+                sec30->GetCellInfo(WorkingCell, lcell, mcell, ncell);
+                if (!(lcell==0 && mcell==0 && ncell == 0))
+                {
+                    fprintf(fpk,"h[l0 + %d][m0 + %d][n0 + %d] = np.kron(h[l0 + %d][m0 + %d][n0 + %d], np.identity(2))\n", lcell, mcell, ncell, lcell, mcell, ncell);
+                    fprintf(fpk,"h[l0 + %d][m0 + %d][n0 + %d] = np.kron(h[l0 + %d][m0 + %d][n0 + %d], np.identity(2))\n", -lcell, -mcell, -ncell, -lcell, -mcell, -ncell);
+                }
+                else
+                    fprintf(fpk,"h[l0 + %d][m0 + %d][n0 + %d] = np.kron(h[l0 + %d][m0 + %d][n0 + %d], np.identity(2))\n", lcell, mcell, ncell, lcell, mcell, ncell);
+            }
+            
+            if (isS)
+            {
+                fprintf(fpk,"\n#Evaluate S*I_{2x2}\n");
+                for (int iCell=0; iCell<nCell; iCell++)
+                {
+                    wxString WorkingCell = listctr->GetString(iCell);
+                    int lcell,mcell,ncell;
+                    sec30->GetCellInfo(WorkingCell, lcell, mcell, ncell);
+                    if (!(lcell==0 && mcell==0 && ncell == 0))
+                    {
+                        fprintf(fpk,"s[l0 + %d][m0 + %d][n0 + %d] = np.kron(s[l0 + %d][m0 + %d][n0 + %d], np.identity(2))\n", lcell, mcell, ncell, lcell, mcell, ncell);
+                        fprintf(fpk,"s[l0 + %d][m0 + %d][n0 + %d] = np.kron(s[l0 + %d][m0 + %d][n0 + %d], np.identity(2))\n", -lcell, -mcell, -ncell, -lcell, -mcell, -ncell);
+                    }
+                    else
+                        fprintf(fpk,"s[l0 + %d][m0 + %d][n0 + %d] = np.kron(s[l0 + %d][m0 + %d][n0 + %d], np.identity(2))\n", lcell, mcell, ncell, lcell, mcell, ncell);
+                }
+            }
+            
+            fprintf(fpk,"\n#Add SOC to the total Hamiltonian: HTot = H*I_{2x2} + Hsoc\n");
+            fprintf(fpk,"h[l0 + %d][m0 + %d][n0 + %d] = h[l0 + %d][m0 + %d][n0 + %d] + Hsoc\n", 0, 0, 0, 0, 0, 0);
         }
         
         fprintf(fpk,"\n#Load k-points from the file\n");

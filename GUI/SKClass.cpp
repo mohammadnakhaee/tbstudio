@@ -20,7 +20,7 @@ SKClass::SKClass(wxWindow* parent, Sec30* sec30var, wxWindowID id, const wxPoint
     /**********************************************************************************************************************************************/
     sec30->AddGroupBox(this, _("Setup the Parameter Vector"),wxColour(wxT("rgb(153,180,209)")));
     wxCheckBox* socCtrl = sec30->AddCheckBox(this, _("SOC"), _("Take SOC into Accounts"));
-    socCtrl->Enable(false);
+    //socCtrl->Enable(false);
     wxCheckBox* OvCtrl = sec30->AddCheckBox(this, _("Overlap"), _("Non-Orthogonal Basis"));
     //OvCtrl->Enable(false);
     wxString Labels1[1] = {_("Evaluate Independent Parameters")};

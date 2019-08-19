@@ -18,22 +18,24 @@ version as soon as possible. As mentioned before it is a cross platform software
 
 2. Launch TBStudio
 
-3. Open Ga.tbm from example folder
+3. Go to Graphene folder and open the file model.tbm ...
 
 4. Press Start button from Main-Ribbon > Analyze > Fitting. The SK parameters Tab will be shown. In terminal one can monitor the regression
 analysis.
 
-5. Now the time for magic! What program language have you written the Green's Function calculation? C++, C, Fortran, Mathematica, Matlab
-and Python? It does not matter. We generate for you the Hamiltonian in your preferred programming language. Go to Main-Ribbon > Wizard > Code Generator
-and generate your own code as C++, C, Fortran, Mathematica, Matlab and Python.
+5. Now the time for magic! What program language have you written your own Green's Function calculation? Which language do you prefer to
+start your code? C++, C, Fortran, Mathematica, Matlab and Python? It does not matter. We generate for you the Hamiltonian in your preferred
+programming language. Go to Main-Ribbon > Wizard > Code Generator and generate your own code as C++, C, Fortran, Mathematica, Matlab and Python.
 
 6. Hope you enjoy TBStudio ...
 
 
 
-New in Version 1.2.1
-1) In this version, one can also load both Unit-cell and Band structure from Vasp XML.
-2) CIF output was added.
-3) Weight function was added in the setup panel. One can paint on band structure to
-   increase or decrease the weight function for input data.
-4) Code generator supports now non-orthogonal TB-Model.
+
+
+
+New in Version 1.3.0
+
+1) Spin-Orbit Coupling (SOC) was added to the calculation
+2) Code generator supports also SOC, non-orthogonal TB-Model or a system including both of them.
+3) We added many examples with their references.

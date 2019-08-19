@@ -13,7 +13,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=mohammad
-Date                   :=14/07/2019
+Date                   :=29/07/2019
 CodeLitePath           :="C:/Program Files/CodeLite"
 LinkerName             :=C:/TDM-GCC-64/bin/g++.exe
 SharedObjectLinkerName :=C:/TDM-GCC-64/g++.exe -shared -fPIC
@@ -103,6 +103,7 @@ PostBuild:
 	rmdir TBStudio /s /q
 	mkdir TBStudio
 	copy .\Release\* .\TBStudio
+	copy .\DLL\* .\TBStudio
 	del .\TBStudio\*.o
 	del .\TBStudio\*.d
 	mkdir .\TBStudio\Examples
