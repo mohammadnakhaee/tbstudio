@@ -1,2 +1,2 @@
-void Cross_Product(double a[3], double b[3], double c[3]);
-double Dot_Product(double a[3], double b[3]);
+void Cross_Product(double a[4], double b[4], double c[4]);
+double Dot_Product(double a[4], double b[4]);
