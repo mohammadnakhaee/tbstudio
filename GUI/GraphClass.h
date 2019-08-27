@@ -33,9 +33,6 @@ public:
     int GetShowingAtomsCount();
     int GetShowingBondsCount();
     int GetShowingUnitcellCount();
-    void GetAtoms_Selection(int* &Atoms);
-    void SetCamDir(wxString direction);
-    void RotateCam(wxString direction);
     
 protected:
     std::list<int> EssentialListi;
