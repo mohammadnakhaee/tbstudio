@@ -182,7 +182,16 @@ void GraphClass::CreateAtomicStructure(Sec30* sec30Var, bool IsNewAllocate)
         int nintarr[16]={nShowingAtoms,nShowingAtoms,nShowingAtoms,nShowingBonds,nShowingBonds,nShowingBonds,nShowingUnitcell,nShowingUnitcell,nShowingUnitcell,4,nShowingAtoms,nShowingAtoms,nShowingAtoms,nShowingAtoms,nShowingAtoms,nShowingAtoms};
         glc->CreateDoubleArray(15,ndoublearr);
         glc->CreateIntArray(16,nintarr);
-  
+        
+        glc->DoubleArray[11][0] = a[0];
+        glc->DoubleArray[12][0] = a[1];
+        glc->DoubleArray[13][0] = a[2];
+        glc->DoubleArray[11][1] = b[0];
+        glc->DoubleArray[12][1] = b[1];
+        glc->DoubleArray[13][1] = b[2];
+        glc->DoubleArray[11][2] = c[0];
+        glc->DoubleArray[12][2] = c[1];
+        glc->DoubleArray[13][2] = c[2];
         
         glc->DoubleArray[14][0] = 0.0;
         glc->DoubleArray[14][1] = 0.0;
@@ -383,7 +392,6 @@ void GraphClass::CreateAtomicStructure(Sec30* sec30Var, bool IsNewAllocate)
                 iAtom++;
                 if (!isCountingMode)
                 {
-/*
                     glc->DoubleArray[0][iAtom] = XArray[i0] + i*a[0] + j*b[0] + k*c[0] -r0[0];
                     glc->DoubleArray[1][iAtom] = YArray[i0] + i*a[1] + j*b[1] + k*c[1] -r0[1];
                     glc->DoubleArray[2][iAtom] = ZArray[i0] + i*a[2] + j*b[2] + k*c[2] -r0[2];
@@ -397,7 +405,6 @@ void GraphClass::CreateAtomicStructure(Sec30* sec30Var, bool IsNewAllocate)
                     glc->IntArray[13][iAtom] = k;
                     glc->IntArray[14][iAtom] = i0;
                     glc->IntArray[15][iAtom] = kind[i0];
-*/
                 }
                 else
                     nShowingAtoms = iAtom + 1;
@@ -737,3 +744,37 @@ int GraphClass::GetShowingUnitcellCount()
     return nShowingUnitcell;
 }
 
+void GraphClass::GetAtoms_Selection(int* &Atoms)
+{
+    if (nShowingAtoms>0)
+    {
+        for (int i=0; i != nShowingAtoms;i++)
+        {
+            int myindex = glc->IntArray[10][i];
+            Atoms[i] = myindex;
+        }
+    }
+}
+
+void GraphClass::SetCamDir(wxString direction)
+{
+    //y glc->SetDirection(0.0,1.0,0.0, 0.0,0.0,1.0, 1.0,0.0,0.0);
+    if (direction == _("x"))
+        glc->SetDirection(0.0,0.0,1.0, 1.0,0.0,0.0, 0.0,1.0,0.0);
+    else if (direction == _("y"))
+        glc->SetDirection(-1.0,0.0,0.0, 0.0,0.0,1.0, 0.0,1.0,0.0);
+    else if (direction == _("z"))
+        glc->SetDirection(1.0,0.0,0.0, 0.0,1.0,0.0, 0.0,0.0,1.0);
+}
+
+void GraphClass::RotateCam(wxString direction)
+{
+    if (direction == _("u"))
+        glc->RotateCam(0.0, 1.0, -10.0);
+    else if (direction == _("d"))
+        glc->RotateCam(0.0, 1.0, 10.0);
+    else if (direction == _("l"))
+        glc->RotateCam(1.0, 0.0, 10.0);
+    else if (direction == _("r"))
+        glc->RotateCam(1.0, 0.0, -10.0);
+}

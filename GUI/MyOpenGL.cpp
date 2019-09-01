@@ -2028,6 +2028,52 @@ void MyGLCanvas::RotationMatrix(double Theta, double lmn[3][3])
     lmn[2][2] = n;
 }
 
+void MyGLCanvas::LoadToCanvas()
+{
+    double Theta = 0.0;
+    double lmn[3][3] = {0,0,0,0,0,0,0,0,0};
+    RotationMatrix(Theta, lmn);
+    double X1[3] = {lmn[0][0],lmn[1][0],lmn[2][0]};
+    double CosTheta = Coordinate0[0][0]*X1[0] + Coordinate0[0][1]*X1[1] + Coordinate0[0][2]*X1[2];
+    double direct[3] = {-Coordinate0[0][1]*X1[2] + X1[1]*Coordinate0[0][2], Coordinate0[0][0]*X1[2] - X1[0]*Coordinate0[0][2], -Coordinate0[0][0]*X1[1] + X1[0]*Coordinate0[0][1]};
+    double CosTheta2 = Coordinate0[2][0]*direct[0] + Coordinate0[2][1]*direct[1] + Coordinate0[2][2]*direct[2];
+    if (CosTheta2 > 0)
+        Theta = acos(CosTheta);
+    else
+        Theta = -acos(CosTheta);
+    RotationMatrix(Theta, lmn);
+    
+    for (int i=0; i<=2; i++)
+        for (int j=0; j<nDoubleArray[i]; j++)
+            DoubleArray1[i][j] = lmn[i][0] * DoubleArray[0][j] + lmn[i][1] * DoubleArray[1][j] + lmn[i][2] * DoubleArray[2][j];
+            
+    for (int i=3; i<=3; i++)
+        for (int j=0; j<nDoubleArray[i]; j++)
+            DoubleArray1[i][j] = DoubleArray[i][j];
+    
+    for (int i=4; i<=6; i++)
+        for (int j=0; j<nDoubleArray[i]; j++)
+            DoubleArray1[i][j] = lmn[i - 4][0] * DoubleArray[4][j] + lmn[i - 4][1] * DoubleArray[5][j] + lmn[i - 4][2] * DoubleArray[6][j];
+    
+    for (int i=7; i<=9; i++)
+        for (int j=0; j<nDoubleArray[i]; j++)
+            DoubleArray1[i][j] = lmn[i - 7][0] * DoubleArray[7][j] + lmn[i - 7][1] * DoubleArray[8][j] + lmn[i - 7][2] * DoubleArray[9][j];
+    
+    for (int i=10; i<=10; i++)
+        for (int j=0; j<nDoubleArray[i]; j++)
+            DoubleArray1[i][j] = DoubleArray[i][j];
+            
+    for (int i=11; i<=13; i++)
+        for (int j=0; j<nDoubleArray[i]; j++)
+            DoubleArray1[i][j] = lmn[i - 11][0] * DoubleArray[11][j] + lmn[i - 11][1] * DoubleArray[12][j] + lmn[i - 11][2] * DoubleArray[13][j];  
+    
+    for (int i=14; i<NumberOfDoubleArrays; i++)
+        for (int j=0; j<nDoubleArray[i]; j++)
+            DoubleArray1[i][j] = DoubleArray[i][j];
+    
+    Reload();
+}
+
 void MyGLCanvas::Reload()
 {
     if (Dim==3)
