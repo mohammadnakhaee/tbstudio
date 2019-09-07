@@ -1536,7 +1536,7 @@
         }, {
          "type": "string",
          "m_label": "URL:",
-         "m_value": "https://sourceforge.net/projects/cuttingedgephysics/"
+         "m_value": "https://tight-binding.com"
         }, {
          "type": "colour",
          "m_label": "Normal Colour:",

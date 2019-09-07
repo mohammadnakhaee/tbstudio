@@ -449,7 +449,7 @@ void Sec30::SendUpdateEvent(wxString info, int MyID)
 
 void Sec30::SetVar(wxString VariableName, double Value, bool FireEvent)
 {
-    wxString val = wxString::Format(wxT("%1f"), Value);
+    wxString val = wxString::Format(wxT("%.8f"), Value);
     sec30TextCtrl* ctr = (sec30TextCtrl*)FindWindowByName(VariableName,GetParent());
     ctr->SetCellValue(0,0,val);
     if (FireEvent)
@@ -534,7 +534,7 @@ bool Sec30::GetVar(wxString VariableName, wxString& Value)
 
 void Sec30::SetVar(wxString VariableName, int iRow, int iCol, double Value, bool FireEvent)
 {
-    wxString val = wxString::Format(wxT("%1f"), Value);
+    wxString val = wxString::Format(wxT("%.8f"), Value);
     sec30TextCtrl* ctr = (sec30TextCtrl*)FindWindowByName(VariableName,GetParent());
     ctr->SetCellValue(iRow, iCol, val);
     if (FireEvent)

@@ -2543,10 +2543,10 @@ void MainFrame::ShowAbout()
     info.SetVersion(wxString::Format(_("%d.%d.%d"), Ver_MAJOR, Ver_MINOR, Ver_RELEASE));
     info.SetDescription(_("TBStudio is a powerful and easy to use software package to construct Tight-Binding (TB) model for\nnano-scale materials. Starting from the simplified linear combination of atomic orbitals method in\ncombination with first-principles calculations (such as OpenMX or Vasp packages), one can construct\na TB model in the two-centre approximation. Using Slater and Koster approach we calculate the TB\nHamiltonian of the system and use a nonlinear fitting algorithm to find the best entries for both\nHamiltonian and overlap matrices to reproduce the first-principles data. We obtain expressions for\nthe Hamiltonian and overlap matrix elements between different orbitals (s, p and d orbitals with or\nwithout spin-orbit coupling) for the different atoms and present the SK coefficients in a orthogonal\nor nonorthogonal basis set. Furthermore, by using TBStudio one can generate a code in preferred\nprogramming language such as C++, C, Fortran, Mathematica, Matlab and Python."));
     
-    info.SetCopyright(_("Copyright (c) 2019 Mohammad Nakhaee"));
+    info.SetCopyright(_("Freeware, Copyright (c) 2019 Mohammad Nakhaee"));
 
     wxArrayString developers;
-    developers.Add(_("Mohammad Nakhaee\nPhysics department (CMT), Antwerp university, Antwerpen, Belgium.\nmohammad.nakhaee@uantwerpen.be\nmohammad.nakhaee.1@gmail.com"));
+    developers.Add(_("This software was initiated and developed by Mohammad Nakhaee during his Ph.D. at\nPhysics department (CMT), Antwerp university, Antwerpen, Belgium.\nEmail: developer.support@tight-binding.com"));
     info.SetDevelopers(developers);
     
     
@@ -2555,7 +2555,7 @@ void MainFrame::ShowAbout()
 
 void MainFrame::BtnTutorials_OnClick(wxRibbonButtonBarEvent& event)
 {
-    
+    wxLaunchDefaultBrowser(wxT("https://tight-binding.com/video-tutorials/"));
 }
 
 void MainFrame::BtnWebsite_OnClick(wxRibbonButtonBarEvent& event)
@@ -3020,6 +3020,11 @@ void MainFrame::UpdateTBBand_if()
     {
         sec30->ArraysOf3DDouble[4] = SOC_i;
         sec30->ArraysOf3DDouble[5] = SOC_f;
+    }
+    else
+    {
+        sec30->ArraysOf3DDouble[4] = Adouble2D();
+        sec30->ArraysOf3DDouble[5] = Adouble2D();
     }
     
     if (nEssensialCells < 1) return;
@@ -4959,9 +4964,12 @@ void MainFrame::GenerateFCode(wxString filepath, wxString BaseName, int MyID_Ini
         fprintf(fpk,"\tcharacter(100) filename\n");
         fprintf(fpk,"\t\n");
         
-        fprintf(fpk,"\t!The total size of the Hamiltonian\n");
-        fprintf(fpk,"\tnH = 2*nH0\n");
-        fprintf(fpk,"\t\n");
+        if (isSOC)
+        {
+            fprintf(fpk,"\t!The total size of the Hamiltonian\n");
+            fprintf(fpk,"\tnH = 2*nH0\n");
+            fprintf(fpk,"\t\n");
+        }
         
         double a[3],b[3],c[3];
         sec30->GetVar(_("a[0]"), a[0]);
@@ -5267,6 +5275,7 @@ void MainFrame::GenerateFCode(wxString filepath, wxString BaseName, int MyID_Ini
         fprintf(fpk,"\tinteger :: i\n");
         fprintf(fpk,"\treal(8) :: a(3), b(3)\n");
         fprintf(fpk,"\treal(8) :: dot\n");
+        fprintf(fpk,"\tdot = 0.0d0\n");
         fprintf(fpk,"\tdo i=1,3\n");
         fprintf(fpk,"\t\tdot = dot + a(i)*b(i)\n");
         fprintf(fpk,"\tend do\n");

@@ -269,7 +269,7 @@ UpdateClassBase::UpdateClassBase(wxWindow* parent, wxWindowID id, const wxString
     boxSizer1098->Add(welcomeImage, 0, wxALL, WXC_FROM_DIP(5));
     welcomeImage->SetMinSize(wxSize(650,285));
     
-    m_hyperLink1104 = new wxHyperlinkCtrl(this, wxID_ANY, _("Check for TBStudio updates"), wxT("https://sourceforge.net/projects/cuttingedgephysics/"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxHL_DEFAULT_STYLE);
+    m_hyperLink1104 = new wxHyperlinkCtrl(this, wxID_ANY, _("Check for TBStudio updates"), wxT("https://tight-binding.com"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxHL_DEFAULT_STYLE);
     m_hyperLink1104->SetNormalColour(wxColour(wxT("#0000FF")));
     m_hyperLink1104->SetHoverColour(wxColour(wxT("#0000FF")));
     m_hyperLink1104->SetVisitedColour(wxColour(wxT("#FF0000")));

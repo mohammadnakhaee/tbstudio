@@ -46,7 +46,9 @@ public:
         else if (Type=="int")
             SetColFormatNumber(0);
         else if (Type=="double")
-            SetColFormatFloat(0);
+        {
+            SetColFormatFloat(0,-1,8);
+        }
         else if (Type=="bool")
             SetColFormatBool(0);
         

@@ -953,7 +953,10 @@ void Regression::func(double* t, int ny, double* p, int np, double* cnst, double
     
     sec30->ArraysOf3DDouble[1] = Hf;
     sec30->ArraysOf3DDouble[3] = Sf;
-    if (isSOC) sec30->ArraysOf3DDouble[5] = SOC_f;
+    if (isSOC)
+        sec30->ArraysOf3DDouble[5] = SOC_f;
+    else
+        sec30->ArraysOf3DDouble[5] = Adouble2D();
     
     for (int i=0; i<natoms; i++) delete [] XYZCoords[i];
     if (natoms>0) delete [] XYZCoords;

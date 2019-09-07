@@ -41,11 +41,6 @@ protected:
     std::list<int> EssentialListi;
     std::list<int> EssentialListj;
     std::list<int> EssentialListk;
-    std::list<int> WorkingListi;
-    std::list<int> WorkingListj;
-    std::list<int> WorkingListk;
-    std::list<int> AtomIndexListi;
-    std::list<int> AtomIndexListj;
     virtual bool isItNew(int i,int j,int k);
     virtual bool isAtomIndexNew(int i,int j);
     virtual void graph_OnPaint(wxPaintEvent& event);
