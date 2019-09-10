@@ -183,6 +183,16 @@ void GraphClass::CreateAtomicStructure(Sec30* sec30Var, bool IsNewAllocate)
         glc->CreateDoubleArray(15,ndoublearr);
         glc->CreateIntArray(16,nintarr);
         
+        glc->DoubleArray[11][0] = a[0];
+        glc->DoubleArray[12][0] = a[1];
+        glc->DoubleArray[13][0] = a[2];
+        glc->DoubleArray[11][1] = b[0];
+        glc->DoubleArray[12][1] = b[1];
+        glc->DoubleArray[13][1] = b[2];
+        glc->DoubleArray[11][2] = c[0];
+        glc->DoubleArray[12][2] = c[1];
+        glc->DoubleArray[13][2] = c[2];
+        
         glc->DoubleArray[14][0] = 0.0;
         glc->DoubleArray[14][1] = 0.0;
         glc->DoubleArray[14][2] = 0.0;
@@ -430,20 +440,20 @@ void GraphClass::CreateAtomicStructure(Sec30* sec30Var, bool IsNewAllocate)
                 int iMyess, jMyess, kMyess;
                 std::list<int>::iterator ii,ij,ik;
                 int nList = 0;
-                //if (!WorkingViewmode)
-                //{
+                if (!WorkingViewmode)
+                {
                     ii = EssentialListi.begin();
                     ij = EssentialListj.begin();
                     ik = EssentialListk.begin();
                     nList = EssentialListi.size();
-                //}
-                //else
-                //{
-                //    ii = WorkingListi.begin();
-                //    ij = WorkingListj.begin();
-                //    ik = WorkingListk.begin();
-                //    nList = WorkingListi.size();
-                //}
+                }
+                else
+                {
+                    ii = WorkingListi.begin();
+                    ij = WorkingListj.begin();
+                    ik = WorkingListk.begin();
+                    nList = WorkingListi.size();
+                }
                 
                 for (int s=0; s!=nList; s++)
                 {
@@ -534,6 +544,14 @@ void GraphClass::Update2d()
 
 void GraphClass::GetBondInfo(const wxString& bondtextvar, int& i, int& n, int& j, int& m, int& bondtype)
 {
+    wxString bondtext = bondtextvar;
+    bondtext.Replace(wxString(" "), wxString(""));
+    bondtext.Replace(wxString("["), wxString(""));
+    bondtext.Replace(wxString("]"), wxString(""));
+    bondtext.Replace(wxString("("), wxString(""));
+    bondtext.Replace(wxString(")"), wxString(""));
+    bondtext.Replace(wxString("Bond"), wxString(""));
+    bondtext.Replace(wxString("="), wxString(","));
     
     wxStringTokenizer tokenizer(bondtext, ",");
     tokenizer.GetNextToken();
@@ -687,6 +705,23 @@ double GraphClass::GetAtomRadius(int kind)
     if (k < 1) k=1;
     //return (10.0 + pow(log(abs(k) + 1),2.75)/2.0 )/60.0;
     return (10.0 + pow(log(k + 1),2.75)/2.0 )/60.0;
+}
+
+void GraphClass::SetLeftMouseMode(int mouseEventMode)
+{
+    glc->isSelectMode = false;
+    glc->isMoveMode = false;
+    glc->isRotationMode = false;
+    glc->isZoomMode = false;
+    if (mouseEventMode == 0)
+        glc->isSelectMode = true;
+    else if (mouseEventMode == 1)
+        glc->isMoveMode = true;
+    else if (mouseEventMode == 2)
+        glc->isRotationMode = true;
+    else if (mouseEventMode == 3)
+        glc->isZoomMode = true;
+    
 }
 
 int GraphClass::GetSelectedCount()
