@@ -257,7 +257,7 @@ int PlotBand(mglGraph *gr, int w, int h, Sec30* sec30, int MyID)
                 {
                     //mreal x = iX/(nX-1.0);
                     C.a[iCurve*nX + iX] = (mreal)(sec30->ArraysOf2DDouble[4][iX][iCurve + DFTnMin - 1]*2.0-1.0);//Showing fitting weight as a color. The values are between x=[0:1] but the colors are c=[-1,1], so c=2*x-1
-                    /*if ( iX > (int)(0.0*nX/9.0) && iX <= (int)(1.0*nX/9.0)) C.a[iCurve*nX + iX] = -1.0;
+                    if ( iX > (int)(0.0*nX/9.0) && iX <= (int)(1.0*nX/9.0)) C.a[iCurve*nX + iX] = -1.0;
                     if ( iX > (int)(1.0*nX/9.0) && iX <= (int)(2.0*nX/9.0)) C.a[iCurve*nX + iX] = -0.75;
                     if ( iX > (int)(2.0*nX/9.0) && iX <= (int)(3.0*nX/9.0)) C.a[iCurve*nX + iX] = -0.5;
                     if ( iX > (int)(3.0*nX/9.0) && iX <= (int)(4.0*nX/9.0)) C.a[iCurve*nX + iX] = -0.25;
@@ -265,7 +265,7 @@ int PlotBand(mglGraph *gr, int w, int h, Sec30* sec30, int MyID)
                     if ( iX > (int)(5.0*nX/9.0) && iX <= (int)(6.0*nX/9.0)) C.a[iCurve*nX + iX] = 0.25;
                     if ( iX > (int)(6.0*nX/9.0) && iX <= (int)(7.0*nX/9.0)) C.a[iCurve*nX + iX] = 0.5;
                     if ( iX > (int)(7.0*nX/9.0) && iX <= (int)(8.0*nX/9.0)) C.a[iCurve*nX + iX] = 0.75;
-                    if ( iX > (int)(8.0*nX/9.0) && iX <= (int)(9.0*nX/9.0)) C.a[iCurve*nX + iX] = 1.0;*/
+                    if ( iX > (int)(8.0*nX/9.0) && iX <= (int)(9.0*nX/9.0)) C.a[iCurve*nX + iX] = 1.0;
                 }
             }
         }
@@ -300,9 +300,9 @@ int PlotBand(mglGraph *gr, int w, int h, Sec30* sec30, int MyID)
         xlabel = sec30->ArraysOf1DString[0][nk-1];
         gr->AddTick('x', xpos2, xlabel.c_str().AsChar());
         
-        //gr->SetTicks(’x’,M_PI,0,0,"\\pi");
-        //gr->AddTick(’x’,0.886,"x^*");
-        //gr->Grid("xy","{xA9A9A9}|");
+        gr->SetTicks(’x’,M_PI,0,0,"\\pi");
+        gr->AddTick(’x’,0.886,"x^*");
+        gr->Grid("xy","{xA9A9A9}|");
         gr->Box();                 //some plotting
         gr->Axis();                //draw axis
         //gr->Adjust();
@@ -360,13 +360,13 @@ int PlotBand(mglGraph *gr, int w, int h, Sec30* sec30, int MyID)
         }
         
         gr->SetSize((int)(w*1.5),(int)(h*1.5),false);
-        //float max = (float)w;
-        //if (h>w) max = (float)h;
-        //float w2d=w/max;
-        //float h2d=h/max;
-        //gr->Aspect(w2d,h2d);
-        //gr->Adjust();
-        //gr->Puts(mglPoint(0.7, -0.05), strstream.str().c_str());
+        float max = (float)w;
+        if (h>w) max = (float)h;
+        float w2d=w/max;
+        float h2d=h/max;
+        gr->Aspect(w2d,h2d);
+        gr->Adjust();
+        gr->Puts(mglPoint(0.7, -0.05), strstream.str().c_str());
         gr->EndFrame ();          // end frame
         //gr->WriteFrame ();        // save frame
         
@@ -387,16 +387,6 @@ int sample(mglGraph *gr,double w, double h)
     
     gr->NewFrame ();          // start frame
     gr->SubPlot(1,1,0,"<_"); 
-    gr->Aspect(1.0,1.0);
-    
-    
-    gr->Title("Beam and ray tracing","",-1.5);
-    gr->SetFontSize(4);
-    gr->Box();                 //some plotting
-    gr->Axis();                //draw axis
-    gr->Label('x', "x",0);   //x Title
-    gr->Label('y', "f(x) (Arb.)",0);   //y Title
-    gr->Grid("xy","{xA9A9A9}|");
     
     gr->Plot(x, y, "{x6495ED}-2");      // "b" is colour ??
     
@@ -481,7 +471,7 @@ return 0;
 // function to draw the texture for cube faces
 static wxImage DrawDice(int size, unsigned num)
 {
-    /*
+    
     wxASSERT_MSG( num >= 1 && num <= 6, "invalid dice index" );
 
     const int dot = size/16;        // radius of a single dot
@@ -522,15 +512,15 @@ static wxImage DrawDice(int size, unsigned num)
     }
 
     dc.SelectObject(wxNullBitmap);
-*/
 
-    /*
+
+    
     std::stringstream pngfile;
     pngfile << "C:/Users/mohammad/Documents/Codelite/pecsjunc/GUI/fig.png";
     wxBitmap Bitmap;
     Bitmap.LoadFile(pngfile.str().c_str(),wxBITMAP_TYPE_PNG); 
     return Bitmap.ConvertToImage();
-    */
+    
 }
 
 // ============================================================================
@@ -806,8 +796,17 @@ void MyGLContext::PlotFigToTexture(int w, int h, Sec30* sec30, int MyID)
     PlotBand(&gr, w, h, sec30, MyID);
     //sample(&gr, w, h);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    GLenum err;
+    while((err = glGetError()) != GL_NO_ERROR)
+    {
+      std::cout << err;
+    }
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, gr.GetWidth(), gr.GetHeight(),
                      0, GL_RGB, GL_UNSIGNED_BYTE, gr.GetRGB());
+    while((err = glGetError()) != GL_NO_ERROR)
+    {
+      std::cout << err;
+    }
 }
 
 void MyGLContext::DrawSelectionFrame(float x1, float y1, float x2, float y2)
