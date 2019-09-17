@@ -152,6 +152,9 @@ private:
     void DoRotate(float l, float m, float Theta);
     void DoZoom(float l);
     void GetDirection(int i0, int j0, int i, int j, float& x, float& y, float& z);
+    int RayTraceGetAtomIndex(float x, float y);
+    void FrameGetAtomIndex(int &nList, int* &List);
+    void AddToSelectionList(int nNew, int* indexes, bool ClearList, bool RemoveIndexes);
     wxDECLARE_EVENT_TABLE();
     
 private:
