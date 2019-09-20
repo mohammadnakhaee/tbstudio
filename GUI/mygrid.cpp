@@ -55,7 +55,7 @@ void myGrid::Copy(bool OnlyDelete, bool cut)
     //int Row0 = GetCursorRow();
     int Col0 = GetGridCursorCol();
     int Row0 = GetGridCursorRow();
-        
+    
     for (int i=0; i<GetNumberRows();i++)
     {
         something_in_this_line = false;    
@@ -75,12 +75,8 @@ void myGrid::Copy(bool OnlyDelete, bool cut)
                 {                                
                     copy_data.Append(wxT("\t"));  
                 }
-                
-                if (!IsReadOnly(i, j))
-                {
-                    copy_data = copy_data + GetCellValue(i,j);
-                    if (cut || OnlyDelete) SetCellValue(i,j,wxString(""));
-                }
+                copy_data = copy_data + GetCellValue(i,j);
+                if (cut || OnlyDelete) SetCellValue(i,j,wxString(""));
             }
         }
     }
@@ -150,7 +146,7 @@ void myGrid::Paste()
         while(!cur_line.IsEmpty())
         {
             cur_field = cur_line.BeforeFirst(' ');
-            if (!IsReadOnly(i, j)) SetCellValue(i,j,cur_field);
+            SetCellValue(i,j,cur_field);
             j++; 
             cur_line  = cur_line.AfterFirst (' ');
         } 

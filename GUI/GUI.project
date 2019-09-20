@@ -8,9 +8,6 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="src">
-    <File Name="UpdateClass.cpp"/>
-    <File Name="wxFingerPrint.cpp"/>
-    <File Name="MACAddressUtility.cpp"/>
     <File Name="WelcomeClass.cpp"/>
     <File Name="Regression.cpp"/>
     <File Name="SetupClass.cpp"/>
@@ -34,10 +31,6 @@
     <File Name="wxcrafter_bitmaps.cpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="include">
-    <File Name="UpdateClass.h"/>
-    <File Name="wxMACAddressUtility.h"/>
-    <File Name="wxFingerPrint.h"/>
-    <File Name="MACAddressUtility.h"/>
     <File Name="welcome650325.h"/>
     <File Name="WelcomeClass.h"/>
     <File Name="Regression.h"/>
@@ -89,10 +82,8 @@
         <IncludePath Value="$(MathGL_DIR)/include"/>
         <IncludePath Value="$(Glut_DIR)/include"/>
         <IncludePath Value="$(LAPACKE_DIR)"/>
-        <IncludePath Value="$(Gemmi_DIR)/include"/>
-        <IncludePath Value="$(RapidXML_DIR)"/>
       </Compiler>
-      <Linker Options="-mwindows;$(shell wx-config --libs std,gl,ribbon);-mwindows;-std=gnu++11 -pthread -liphlpapi -IC:\Users\mohammad\Documents\Codelite\pecsjunc\LAPACKE-X64 -llapacke" Required="yes">
+      <Linker Options="-mwindows;$(shell wx-config --libs std,gl,ribbon);-mwindows;-std=gnu++11 -pthread" Required="yes">
         <LibraryPath Value="$(Opengl_DIR)"/>
         <LibraryPath Value="$(MathGL_DIR)\lib"/>
         <LibraryPath Value="C:\TDM-GCC-64\x86_64-w64-mingw32\lib"/>
@@ -102,6 +93,10 @@
         <Library Value="libmgl-glut.a"/>
         <Library Value="libmgl.a"/>
         <Library Value="libfreeglut.a"/>
+        <Library Value="liblapacke"/>
+        <Library Value="liblapack"/>
+        <Library Value="libblas"/>
+        <Library Value="m"/>
       </Linker>
       <ResourceCompiler Options="$(shell wx-config --rcflags)" Required="no"/>
       <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Debug" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="no" IsGUIProgram="no" IsEnabled="yes"/>
@@ -145,11 +140,9 @@
         <IncludePath Value="$(MathGL_DIR)/include"/>
         <IncludePath Value="$(Glut_DIR)/include"/>
         <IncludePath Value="$(LAPACKE_DIR)"/>
-        <IncludePath Value="$(Gemmi_DIR)/include"/>
-        <IncludePath Value="$(RapidXML_DIR)"/>
         <Preprocessor Value="NDEBUG"/>
       </Compiler>
-      <Linker Options="-mwindows;$(shell wx-config --libs std,gl,ribbon);-mwindows;-std=gnu++11 -pthread -liphlpapi" Required="yes">
+      <Linker Options="-mwindows;$(shell wx-config --libs std,gl,ribbon);-mwindows;-std=gnu++11 -pthread" Required="yes">
         <LibraryPath Value="$(Opengl_DIR)"/>
         <LibraryPath Value="$(MathGL_DIR)\lib"/>
         <LibraryPath Value="C:\TDM-GCC-64\x86_64-w64-mingw32\lib"/>
@@ -177,16 +170,7 @@
       </Debugger>
       <PreBuild/>
       <PostBuild>
-        <Command Enabled="yes">rmdir TBStudio /s /q</Command>
-        <Command Enabled="yes">mkdir TBStudio</Command>
-        <Command Enabled="yes">copy .\Release\* .\TBStudio</Command>
-        <Command Enabled="yes">copy .\DLL\* .\TBStudio</Command>
-        <Command Enabled="yes">del .\TBStudio\*.o</Command>
-        <Command Enabled="yes">del .\TBStudio\*.d</Command>
-        <Command Enabled="yes">mkdir .\TBStudio\Examples</Command>
-        <Command Enabled="yes">xcopy .\Examples .\TBStudio\Examples /E</Command>
-        <Command Enabled="yes">copy TBStudio.ico TBStudio</Command>
-        <Command Enabled="yes">copy Readme.txt TBStudio</Command>
+        <Command Enabled="yes">del *.o *.d</Command>
       </PostBuild>
       <CustomBuild Enabled="no">
         <RebuildCommand/>

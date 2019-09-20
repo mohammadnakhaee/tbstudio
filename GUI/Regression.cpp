@@ -70,7 +70,15 @@ double Regression::Variance(double* a, int na)
     return var / (na - 1);
 }
 
-void Regression::Start(double* p, int np, double* t, double* y_dat, int ny, double* weight, double* dp, double p_min, double p_max, double Mixing, double* c, lmOptions opts, bool isOneStep)
+/*void Regression::Start(double* p, int np, double* t, double* y_dat, int ny, double* weight, double* dp, double p_min, double p_max, double* c, lmOptions opts, bool isOneStep, lapack_complex_double* UpperSymMatrixHf)
+{
+    int nH2 = 64;
+    for (int i=0; i<nH2; i++) UpperSymMatrixHf[i] = {0.0,0.0};
+    wxMessageBox(_("yes3"));
+    return;
+}*/
+
+void Regression::Start(double* p, int np, double* t, double* y_dat, int ny, double* weight, double* dp, double p_min, double p_max, double* c, lmOptions opts, bool isOneStep)
 {
     SendEventRunStarted();
     myGrid* osgc = sec30->GetGridObject(_("OS"));
@@ -79,16 +87,6 @@ void Regression::Start(double* p, int np, double* t, double* y_dat, int ny, doub
     sec30->OSBuffer = new double[osgc->GetNumberRows()];
     sec30->SKBuffer = new double[skgc->GetNumberRows()];
     sec30->OLBuffer = new double[olgc->GetNumberRows()];
-    
-    int natoms = 0;
-    sec30->GetVar(_("nAtoms[0]"),natoms);
-    bool isSOC;
-    sec30->GetCheckVar(_("SOC[0]"), isSOC);
-    bool isOverlap;
-    sec30->GetCheckVar(_("Overlap[0]"), isOverlap);
-    
-    bool isSpin = false;
-    if (isSOC) isSpin = true;
     
     int MaxIter = opts.MaxIter;          // maximum number of iterations
     double redX2;
@@ -99,40 +97,22 @@ void Regression::Start(double* p, int np, double* t, double* y_dat, int ny, doub
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //Allocate out side. Because func will be called a lot and it will be slow if we allocate and delete many times.
     int nHamiltonian = sec30->ArraysOf1DString[1].size();
-    
-    int nHamiltonianTot;
-    if (isSpin)
-        nHamiltonianTot = 2*nHamiltonian;
-    else
-        nHamiltonianTot = nHamiltonian;
-        
-    int nH2 = nHamiltonianTot*nHamiltonianTot;
-    lapack_complex_double* LowerSymMatrixHf;
-    lapack_complex_double* LowerSymMatrixSf;
-    if (isOverlap)
-    {
-        int nAB2 = (nHamiltonianTot+nH2) + 1;
-        LowerSymMatrixHf = new lapack_complex_double[nAB2];
-        LowerSymMatrixSf = new lapack_complex_double[nAB2];
-    }
-    else
-    {
-        LowerSymMatrixHf = new lapack_complex_double[nH2];
-    }
-    //lapack_complex_double* LowerSymMatrixHf = (lapack_complex_double*)LAPACKE_malloc( sizeof(lapack_complex_double) * nH2 );
+    int nH2 = nHamiltonian*nHamiltonian;
+    lapack_complex_double* UpperSymMatrixHf = new lapack_complex_double[nH2];
+    //lapack_complex_double* UpperSymMatrixHf = (lapack_complex_double*)LAPACKE_malloc( sizeof(lapack_complex_double) * nH2 );
     //lapack_complex_double zero= LAPACKE_make_complex_double(0.0,0.0);
-    double* eigHf = new double[nHamiltonianTot];
-    for (int i=0; i<nHamiltonianTot; i++) eigHf[i] = 0.0;
+    for (int i=0; i<nH2; i++) UpperSymMatrixHf[i] = {0.0,0.0};
+    double* eigHf = new double[nHamiltonian];
+    for (int i=0; i<nHamiltonian; i++) eigHf[i] = 0.0;
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     
-    lm(p, np, t, y_dat, ny, weight, dp, p_min, p_max, Mixing, c, opts, redX2, sigma_p, cvg_hst, isOneStep, LowerSymMatrixHf, LowerSymMatrixSf, eigHf, natoms, isSOC, isOverlap);
+    lm(p, np, t, y_dat, ny, weight, dp, p_min, p_max, c, opts, redX2, sigma_p, cvg_hst, isOneStep, UpperSymMatrixHf, eigHf);
     
     //////////////////////////////
     //Deallocate
     delete [] eigHf;
-    delete [] LowerSymMatrixHf;
-    if (isOverlap) delete [] LowerSymMatrixSf;
-    //LAPACKE_free(LowerSymMatrixHf);
+    delete [] UpperSymMatrixHf;
+    //LAPACKE_free(UpperSymMatrixHf);
     //////////////////////////////
     
     for (int ip=0; ip<np; ip++)
@@ -174,7 +154,7 @@ void Regression::Start(double* p, int np, double* t, double* y_dat, int ny, doub
     return;
 }
 
-void Regression::lm(double* p, int np, double* t, double* y_dat, int ny, double* weight, double* dp, double p_min, double p_max, double Mixing, double* c, lmOptions opts, double &redX2, double* sigma_p, double** cvg_hst, bool isOneStep, lapack_complex_double* LowerSymMatrixHf, lapack_complex_double* LowerSymMatrixSf, double* eigHf, int natoms, bool isSOC, bool isOverlap)
+void Regression::lm(double* p, int np, double* t, double* y_dat, int ny, double* weight, double* dp, double p_min, double p_max, double* c, lmOptions opts, double &redX2, double* sigma_p, double** cvg_hst, bool isOneStep, lapack_complex_double* UpperSymMatrixHf, double* eigHf)
 {
     wxString data;
     //global   iteration  func_calls
@@ -237,18 +217,17 @@ void Regression::lm(double* p, int np, double* t, double* y_dat, int ny, double*
     double* y_hat  = new double[ny]; 
     for (int iy=0; iy<ny; iy++) y_hat[iy] = 0.0;
     
-    lm_matx(t, p_old, np, y_old, ny, InitializedX2, J, p, y_dat, weight, dp, c, JtWJ, JtWdy, X2, y_hat, func_calls, iteration, LowerSymMatrixHf, LowerSymMatrixSf, eigHf, natoms, isSOC, isOverlap);
+    lm_matx(t, p_old, np, y_old, ny, InitializedX2, J, p, y_dat, weight, dp, c, JtWJ, JtWdy, X2, y_hat, func_calls, iteration, UpperSymMatrixHf, eigHf);
     
     data = _("******************** New Regression Analysis *******************\n");
     SendDataToTerminal(data);
     
     data = _("");
-    double firstCheck = maxabs(JtWdy, np);
-    if ( firstCheck < epsilon_1)
+    if (maxabs(JtWdy, np) < epsilon_1)
     {
-        data.append(_("Fit parameters were not changed.\n"));
-        data.append(_("Check the number of first DFT band and make sure the weight function is not zero in your favourite fitting area.\n"));
-        data.append(_("********************* Regression Finished *********************\n"));
+        data.append(_("The Initial Guess is Extremely Close to Optimal.\n"));
+        data.append(wxString::Format(wxT("Convergence Tolerance for Gradient = %.8f\n"),epsilon_1));
+        data.append(_("********************* Convergence achieved *********************\n"));
         SendDataToTerminal(data);
         stop = true;
     }
@@ -365,7 +344,7 @@ void Regression::lm(double* p, int np, double* t, double* y_dat, int ny, double*
         
         for (int ip=0; ip<np; ip++) p_try[ip] = 0.0;
         
-        for (int ip=0; ip<np; ip++) p_try[ip] = p[ip] + Mixing * h[idx[ip]];  // update the [idx] elements
+        for (int ip=0; ip<np; ip++) p_try[ip] = p[ip] + h[idx[ip]];  // update the [idx] elements
         
         //p_try = p + h(idx);                            
         
@@ -378,7 +357,7 @@ void Regression::lm(double* p, int np, double* t, double* y_dat, int ny, double*
         }
         //p_try = min(max(p_min,p_try),p_max);           
         
-        func(t, ny, p_try, np, c, y1, LowerSymMatrixHf, LowerSymMatrixSf, eigHf, natoms, isSOC, isOverlap);
+        func(t, ny, p_try, np, c, y1, UpperSymMatrixHf, eigHf);
         
         for (int iy=0; iy<ny; iy++)                    // residual error using p_try
             delta_y[iy] = y_dat[iy] - y1[iy];
@@ -437,7 +416,7 @@ void Regression::lm(double* p, int np, double* t, double* y_dat, int ny, double*
             //h = alpha * h;
             for (int ip=0; ip<np; ip++) h[ip] = alpha * h[ip];
             
-            for (int ip=0; ip<np; ip++) p_try[ip] = p[ip] + Mixing * h[idx[ip]];           // update only [idx] elements
+            for (int ip=0; ip<np; ip++) p_try[ip] = p[ip] + h[idx[ip]];           // update only [idx] elements
             
             for (int ip=0; ip<np; ip++)                              // apply constraints
             {
@@ -448,7 +427,7 @@ void Regression::lm(double* p, int np, double* t, double* y_dat, int ny, double*
             }
             //p_try = min(max(p_min,p_try),p_max);         // apply constraints
             
-            func(t, ny, p_try, np, c, y1, LowerSymMatrixHf, LowerSymMatrixSf, eigHf, natoms, isSOC, isOverlap);
+            func(t, ny, p_try, np, c, y1, UpperSymMatrixHf, eigHf);
             
             for (int iy=0; iy<ny; iy++)                    // residual error using p_try
                 delta_y[iy] = y_dat[iy] - y1[iy];
@@ -463,7 +442,7 @@ void Regression::lm(double* p, int np, double* t, double* y_dat, int ny, double*
         for (int ip=0; ip<np; ip++) h2[ip] = lambda*h[ip] + JtWdy[ip];
         double rho = VecVec2Num(h, h2, np);
         
-        if ( rho > epsilon_4 )                         // it is significantly better
+        if ( rho > epsilon_4 )                         // it IS significantly better
         {
             double dX2 = X2 - X2_old;
             X2_old = X2;
@@ -471,7 +450,7 @@ void Regression::lm(double* p, int np, double* t, double* y_dat, int ny, double*
             for (int iy=0; iy<ny; iy++) y_old[iy] = y_hat[iy];
             for (int ip=0; ip<np; ip++) p[ip] = p_try[ip];
             
-            lm_matx(t, p_old, np, y_old, ny, dX2, J, p, y_dat, weight, dp, c, JtWJ, JtWdy, X2, y_hat, func_calls, iteration, LowerSymMatrixHf, LowerSymMatrixSf, eigHf, natoms, isSOC, isOverlap);
+            lm_matx(t, p_old, np, y_old, ny, dX2, J, p, y_dat, weight, dp, c, JtWJ, JtWdy, X2, y_hat, func_calls, iteration, UpperSymMatrixHf, eigHf);
             
             // decrease lambda ==> Gauss-Newton method
             switch (Update_Type)
@@ -488,7 +467,7 @@ void Regression::lm(double* p, int np, double* t, double* y_dat, int ny, double*
                     break;
             }
             
-            if ( prnt > 1 )
+            if ( prnt > 2 )
             {
                 graph2d->Update2d();
                 graph2d->Refresh(true);
@@ -507,7 +486,7 @@ void Regression::lm(double* p, int np, double* t, double* y_dat, int ny, double*
             {
                 double dX2Out = 0.0;
                 double minusone = -1.0;
-                lm_matx(t, p_old, np, y_old, ny, minusone, J, p, y_dat, weight, dp, c, JtWJ, JtWdy, dX2Out, y_hat, func_calls, iteration, LowerSymMatrixHf, LowerSymMatrixSf, eigHf, natoms, isSOC, isOverlap);
+                lm_matx(t, p_old, np, y_old, ny, minusone, J, p, y_dat, weight, dp, c, JtWJ, JtWdy, dX2Out, y_hat, func_calls, iteration, UpperSymMatrixHf, eigHf);
             }
             
             // increase lambda  ==> gradient descent method
@@ -531,14 +510,13 @@ void Regression::lm(double* p, int np, double* t, double* y_dat, int ny, double*
         if ( prnt > 1 )
         {
             data = _("");
-            //data.append(wxString::Format(wxT(">it:%d: call num:%d | chi_sq=%.8f | lambda=%.8f\n"), iteration, func_calls, X2/DoF, lambda));
-            data.append(wxString::Format(wxT(">Step number: %d\n"), iteration));
+            data.append(wxString::Format(wxT(">it:%d: call num:%d | chi_sq=%.8f | lambda=%.8f\n"), iteration, func_calls, X2/DoF, lambda));
             data.append(_("\n"));
-            data.append(_("parameters:\n"));
+            data.append(_("parameters:"));
             for(int ip=0; ip<np; ip++) data.append(wxString::Format(wxT(" %.8f,"), p[ip]));
             data.append(_("\n"));
             data.append(_("\n"));
-            data.append(_("variation of parameter:\n"));
+            data.append(_("dp/p:"));
             for(int ip=0; ip<np; ip++) data.append(wxString::Format(wxT(" %.8f,"), h[ip]/p[ip]));
             data.append(_("\n"));
             data.append(_("\n"));
@@ -549,15 +527,6 @@ void Regression::lm(double* p, int np, double* t, double* y_dat, int ny, double*
                 data = _("");
                 data.append(_("********************* One Step Done! *********************\n"));
                 SendDataToTerminal(data);
-                break;
-            }
-            
-            if(sec30->IsStopClicked)
-            {
-                data = _("");
-                data.append(_("******************** Regression Stoped *******************\n"));
-                SendDataToTerminal(data);
-                sec30->IsStopClicked = false;
                 break;
             }
         }
@@ -626,7 +595,7 @@ void Regression::lm(double* p, int np, double* t, double* y_dat, int ny, double*
         redX2 = X2 / DoF;
         
         double minusone2 = -1.0;
-        lm_matx(t, p_old, np, y_old, ny, minusone2, J, p, y_dat, weight, dp, c, JtWJ, JtWdy, X2, y_hat, func_calls, iteration, LowerSymMatrixHf, LowerSymMatrixSf, eigHf, natoms, isSOC, isOverlap);
+        lm_matx(t, p_old, np, y_old, ny, minusone2, J, p, y_dat, weight, dp, c, JtWJ, JtWdy, X2, y_hat, func_calls, iteration, UpperSymMatrixHf, eigHf);
         
         
         for (int ip=0; ip<np; ip++)
@@ -684,7 +653,7 @@ void Regression::lm(double* p, int np, double* t, double* y_dat, int ny, double*
     //////////////////////////////////////////////////////////////////////
 }
 
-void Regression::lm_FD_J(double* t, double* p, int np, double* y, int ny, double* dp, double* c, double** J, int &func_calls, lapack_complex_double* LowerSymMatrixHf, lapack_complex_double* LowerSymMatrixSf, double* eigHf, int natoms, bool isSOC, bool isOverlap)
+void Regression::lm_FD_J(double* t, double* p, int np, double* y, int ny, double* dp, double* c, double** J, int &func_calls, lapack_complex_double* UpperSymMatrixHf, double* eigHf)
 {
     int m=ny;              // number of data points
     int n=np;              // number of parameters
@@ -709,7 +678,7 @@ void Regression::lm_FD_J(double* t, double* p, int np, double* y, int ny, double
         
         if (del[j] != 0)
         {
-            func(t, ny, p, np, c, y1, LowerSymMatrixHf, LowerSymMatrixSf, eigHf, natoms, isSOC, isOverlap);
+            func(t, ny, p, np, c, y1, UpperSymMatrixHf, eigHf);
             func_calls = func_calls + 1;
             
             if (dp[j] < 0)                  // backwards difference
@@ -719,7 +688,7 @@ void Regression::lm_FD_J(double* t, double* p, int np, double* y, int ny, double
             else                            // central difference, additional func call
             {
                 p[j] = ps[j] - del[j];
-                func(t, ny, p, np, c, y2, LowerSymMatrixHf, LowerSymMatrixSf, eigHf, natoms, isSOC, isOverlap);
+                func(t, ny, p, np, c, y2, UpperSymMatrixHf, eigHf);
                 for(int iy=0; iy<ny; iy++)
                 {
                     J[iy][j] = (y1[iy]-y2[iy]) / (2.0 * del[j]);
@@ -770,17 +739,17 @@ void Regression::lm_Broyden_J(double* p_old, double* y_old, double** J, double* 
     if (ny > 0) delete [] A;
 }
 
-void Regression::lm_matx(double* t,double* p_old, int np, double* y_old, int ny, double dX2, double** J, double* p, double* y_dat, double* weight, double* dp, double* c, double** JtWJ, double* JtWdy, double Chi_sq, double* y_hat, int &func_calls, int &iteration, lapack_complex_double* LowerSymMatrixHf, lapack_complex_double* LowerSymMatrixSf, double* eigHf, int natoms, bool isSOC, bool isOverlap)
+void Regression::lm_matx(double* t,double* p_old, int np, double* y_old, int ny, double dX2, double** J, double* p, double* y_dat, double* weight, double* dp, double* c, double** JtWJ, double* JtWdy, double Chi_sq, double* y_hat, int &func_calls, int &iteration, lapack_complex_double* UpperSymMatrixHf, double* eigHf)
 {
     int Npnt = ny;               // number of data points
     int Npar = np;               // number of parameters
     
-    func(t, ny, p, np, c, y_hat, LowerSymMatrixHf, LowerSymMatrixSf, eigHf, natoms, isSOC, isOverlap);          // evaluate model using parameters 'p'
+    func(t, ny, p, np, c, y_hat, UpperSymMatrixHf, eigHf);          // evaluate model using parameters 'p'
     func_calls = func_calls + 1;
 
     if ( remainder(iteration,2*Npar) != 0 || dX2 > 0 )
     {
-        lm_FD_J(t, p, np, y_hat, ny, dp, c, J, func_calls, LowerSymMatrixHf, LowerSymMatrixSf, eigHf, natoms, isSOC, isOverlap);    //finite difference
+        lm_FD_J(t, p, np, y_hat, ny, dp, c, J, func_calls, UpperSymMatrixHf, eigHf);    //finite difference
         //J = lm_FD_J(t,p,y_hat,dp,c);
     }
     else
@@ -870,11 +839,8 @@ void Regression::Transpose(double** a, int na, int nb, double** aT)
             aT[ib][ia] = a[ia][ib];
 }
 
-void Regression::func(double* t, int ny, double* p, int np, double* cnst, double* y, lapack_complex_double* LowerSymMatrixHf, lapack_complex_double* LowerSymMatrixSf, double* eigHf, int natoms, bool isSOC, bool isOverlap)
+void Regression::func(double* t, int ny, double* p, int np, double* cnst, double* y, lapack_complex_double* UpperSymMatrixHf, double* eigHf)
 {
-    bool isSpin = false;
-    if (isSOC) isSpin = true;
-    
     bool isBandLoaded;
     if (sec30->ArraysOf0DInt[0] != 0) isBandLoaded = true;
     if (!isBandLoaded) return;
@@ -922,13 +888,8 @@ void Regression::func(double* t, int ny, double* p, int np, double* cnst, double
     double ak[3],bk[3],ck[3];
     sec30->VecToReciprocal(a, b, c, ak, bk, ck);
     
-    //int natoms = 0;
-    //sec30->GetVar(_("nAtoms[0]"),natoms);
-    //bool isSOC;
-    //sec30->GetCheckVar(_("SOC[0]"), isSOC);
-    //bool isOverlap;
-    //sec30->GetCheckVar(_("Overlap[0]"), isOverlap);
-    
+    int natoms = 0;
+    sec30->GetVar(_("nAtoms[0]"),natoms);
     double** XYZCoords = new double*[natoms];
     for (int i=0; i<natoms; i++) XYZCoords[i] = new double[3];
     
@@ -940,23 +901,14 @@ void Regression::func(double* t, int ny, double* p, int np, double* cnst, double
         XYZCoords[i][2] = cnst[ind++];
     }
     
-    Adouble2D Hf, Sf, SOC_f;
+    Adouble2D Hf;
     int nEssensialCells;
     int nHamiltonian;
     Aint1D EssCells;
-
-    //4. It should be arrays not a vector
-    if(isOverlap)
-        sec30->ConstructTBHamiltonianF(a, b, c, XYZCoords, Hf, Sf, nEssensialCells, nHamiltonian, EssCells, isSOC, SOC_f);
-    else
-        sec30->ConstructTBHamiltonianF(a, b, c, XYZCoords, Hf, nEssensialCells, nHamiltonian, EssCells, isSOC, SOC_f);
     
+    //4. It should be arrays not a vector
+    sec30->ConstructTBHamiltonianF(a, b, c, XYZCoords, Hf, nEssensialCells, nHamiltonian, EssCells);
     sec30->ArraysOf3DDouble[1] = Hf;
-    sec30->ArraysOf3DDouble[3] = Sf;
-    if (isSOC)
-        sec30->ArraysOf3DDouble[5] = SOC_f;
-    else
-        sec30->ArraysOf3DDouble[5] = Adouble2D();
     
     for (int i=0; i<natoms; i++) delete [] XYZCoords[i];
     if (natoms>0) delete [] XYZCoords;
@@ -967,7 +919,6 @@ void Regression::func(double* t, int ny, double* p, int np, double* cnst, double
     //////////////////////////////Allocate all arrays//////////////////////////////////
     int** lmnEssCells = new int*[nEssensialCells];
     double*** Mf = new double**[nEssensialCells];
-    
     for(int iECell = 0; iECell < nEssensialCells; iECell++)
     {
         lmnEssCells[iECell] = new int[3];
@@ -975,20 +926,6 @@ void Regression::func(double* t, int ny, double* p, int np, double* cnst, double
         for(int i = 0; i < nHamiltonian; i++)
         {
             Mf[iECell][i] = new double[nHamiltonian];
-        }
-    }
-    
-    double*** sMf;
-    if(isOverlap)
-    {
-        sMf = new double**[nEssensialCells];
-        for(int iECell = 0; iECell < nEssensialCells; iECell++)
-        {
-            sMf[iECell] = new double*[nHamiltonian];
-            for(int i = 0; i < nHamiltonian; i++)
-            {
-                sMf[iECell][i] = new double[nHamiltonian];
-            }
         }
     }
     
@@ -1004,50 +941,11 @@ void Regression::func(double* t, int ny, double* p, int np, double* cnst, double
             }
     }
     
-    if(isOverlap)
-    {
-        for(int iECell = 0; iECell < nEssensialCells; iECell++)
-        {
-            for(int i = 0; i < nHamiltonian; i++)
-                for(int j = 0; j < nHamiltonian; j++)
-                {
-                    sMf[iECell][i][j] = Sf[iECell][i][j];
-                }
-        }
-    }
     /////////////////////////Calculate the TB Band-structure////////////////////////
-    
-    int nHamiltonianTot;
-    if (isSpin)
-        nHamiltonianTot = 2*nHamiltonian;
-    else
-        nHamiltonianTot = nHamiltonian;
-        
-    Adouble1D fTBEigVal(nKPoint,std::vector<double>(nHamiltonianTot));
-    int nH2 = nHamiltonianTot*nHamiltonianTot;
-    
-    int nOverlapMat = (nHamiltonianTot+nH2) + 1;
-    lapack_complex_double lzerocomplex = {0.0, 0.0};
-    if(isOverlap)
-    {
-        LowerSymMatrixHf = new lapack_complex_double[nOverlapMat];
-        LowerSymMatrixSf = new lapack_complex_double[nOverlapMat];
-        for(int i=0; i<nOverlapMat; i++)
-        {
-            LowerSymMatrixHf[i] = lzerocomplex;
-            LowerSymMatrixSf[i] = lzerocomplex;
-        }
-    }
-    else
-    {
-        LowerSymMatrixHf = new lapack_complex_double[nH2];
-        for(int i=0; i<nH2; i++)
-        {
-            LowerSymMatrixHf[i] = lzerocomplex;
-        }
-    }
-    
-    for (int i=0; i<nHamiltonianTot; i++) eigHf[i] = 0.0;
+    Adouble1D fTBEigVal(nKPoint,std::vector<double>(nHamiltonian));
+    int nH2 = nHamiltonian*nHamiltonian;
+    for (int i=0; i<nH2; i++) UpperSymMatrixHf[i] = {0.0, 0.0};
+    for (int i=0; i<nHamiltonian; i++) eigHf[i] = 0.0;
     
     for (int ik=0; ik<nKPoint; ik++)
     {
@@ -1064,111 +962,22 @@ void Regression::func(double* t, int ny, double* p, int np, double* cnst, double
         
         //wxString data = wxString::Format(_("kx = %.8f ky = %.8f kz = %.8f \n"),kx,ky,kz);
         //SendDataToTerminal(data);
-        if (isSpin)
+            
+        for(int iH=0; iH<nHamiltonian; iH++)
         {
-            lapack_complex_double cmlx;
-            if(isOverlap)
+            eigHf[iH] = 0.0;
+            for(int jH=iH; jH<nHamiltonian; jH++)
             {
-                for(int i=0; i<nOverlapMat; i++)
-                {
-                    LowerSymMatrixHf[i] = lzerocomplex;
-                    LowerSymMatrixSf[i] = lzerocomplex;
-                }
-                
-                for(int iH=0; iH<nHamiltonian; iH++)
-                {
-                    for(int jH=iH; jH>=0; jH--)
-                    {
-                        int i1 = 2*(iH - jH); // i1 = (2*iH) - (2*jH);
-                        LowerSymMatrixHf[i1 * nHamiltonianTot + 2*iH] = sec30->GetHk(Mf, kx, ky, kz, a, b, c, nEssensialCells, lmnEssCells, iH, jH);
-                        LowerSymMatrixSf[i1 * nHamiltonianTot + 2*iH] = sec30->GetHk(sMf, kx, ky, kz, a, b, c, nEssensialCells, lmnEssCells, iH, jH);
-                        LowerSymMatrixHf[i1 * nHamiltonianTot + 2*iH + 1] = LowerSymMatrixHf[i1 * nHamiltonianTot + 2*iH];
-                        LowerSymMatrixSf[i1 * nHamiltonianTot + 2*iH + 1] = LowerSymMatrixSf[i1 * nHamiltonianTot + 2*iH];
-                    }
-                }
-                
-                //Add SOC to Hk
-                for(int iH=0; iH<nHamiltonianTot; iH++)
-                {
-                    eigHf[iH] = 0.0;
-                    for(int jH=iH; jH>=0; jH--)
-                    {
-                        int i1 = iH - jH;
-                        cmlx = {SOC_f[0][iH][jH], SOC_f[1][iH][jH]};// Real and Imaginary parts of SOC are [0] and [1]
-                        LowerSymMatrixHf[i1 * nHamiltonianTot + iH] += cmlx;
-                    }
-                }
-            }
-            else
-            {
-                for(int iH=0; iH<nHamiltonian; iH++)
-                {
-                    for(int jH=0; jH<=iH; jH++)
-                    {
-                        LowerSymMatrixHf[2*iH * nHamiltonianTot + 2*jH] = sec30->GetHk(Mf, kx, ky, kz, a, b, c, nEssensialCells, lmnEssCells, iH, jH);
-                        LowerSymMatrixHf[2*iH * nHamiltonianTot + 2*jH + 1] = lzerocomplex;
-                        LowerSymMatrixHf[(2*iH + 1) * nHamiltonianTot + 2*jH + 1] = LowerSymMatrixHf[2*iH * nHamiltonianTot + 2*jH];
-                        LowerSymMatrixHf[(2*iH + 1) * nHamiltonianTot + 2*jH] = lzerocomplex;
-                    }
-                }
-                
-                //Add SOC to Hk
-                for(int iH=0; iH<nHamiltonianTot; iH++)
-                {
-                    eigHf[iH] = 0.0;
-                    for(int jH=0; jH<=iH; jH++)
-                    {
-                        cmlx = {SOC_f[0][iH][jH], SOC_f[1][iH][jH]};// Real and Imaginary parts of SOC are [0] and [1]
-                        LowerSymMatrixHf[iH * nHamiltonianTot + jH] += cmlx;
-                    }
-                }
-            }
-        }
-        else
-        {
-            if(isOverlap)
-            {
-                for(int i=0; i<nOverlapMat; i++)
-                {
-                    LowerSymMatrixHf[i] = lzerocomplex;
-                    LowerSymMatrixSf[i] = lzerocomplex;
-                }
-                
-                for(int iH=0; iH<nHamiltonian; iH++)
-                {
-                    eigHf[iH] = 0.0;
-                    for(int jH=iH; jH>=0; jH--)
-                    {
-                        int i1 = iH - jH;
-                        LowerSymMatrixHf[i1 * nHamiltonianTot + iH] = sec30->GetHk(Mf, kx, ky, kz, a, b, c, nEssensialCells, lmnEssCells, iH, jH);
-                        LowerSymMatrixSf[i1 * nHamiltonianTot + iH] = sec30->GetHk(sMf, kx, ky, kz, a, b, c, nEssensialCells, lmnEssCells, iH, jH);
-                    }
-                }
-            }
-            else
-            {
-                for(int iH=0; iH<nHamiltonian; iH++)
-                {
-                    eigHf[iH] = 0.0;
-                    for(int jH=0; jH<=iH; jH++)
-                    {
-                        LowerSymMatrixHf[iH * nHamiltonianTot + jH] = sec30->GetHk(Mf, kx, ky, kz, a, b, c, nEssensialCells, lmnEssCells, iH, jH);
-                    }
-                }
+                UpperSymMatrixHf[iH * nHamiltonian + jH] = sec30->GetHk(Mf, kx, ky, kz, a, b, c, nEssensialCells, lmnEssCells, iH, jH);
             }
         }
         
-        if(isOverlap)
-            sec30->SymEigenValues(LowerSymMatrixHf, LowerSymMatrixSf, nHamiltonianTot, eigHf);
-        else
-            sec30->SymEigenValues(LowerSymMatrixHf, nHamiltonianTot, eigHf);
-        
-        for(int iH=0; iH<nHamiltonianTot; iH++) fTBEigVal[ik][iH] = eigHf[iH];
+        sec30->SymEigenValues(UpperSymMatrixHf, nHamiltonian, eigHf);
+        for(int iH=0; iH<nHamiltonian; iH++) fTBEigVal[ik][iH] = eigHf[iH];
     }
     
     sec30->ArraysOf2DDouble[3] = fTBEigVal;
     
-    //////////////////////////////Fill the y array for fitting//////////////////////////////////
     for (int iy=0; iy<ny; iy++)
     {
         int tbband = sec30->ArraysOf2DInt[2][iy][0]; //FitPoints[iy][0]
@@ -1186,16 +995,6 @@ void Regression::func(double* t, int ny, double* p, int np, double* cnst, double
     }
 	if (nEssensialCells>0) delete [] Mf;
     if (nEssensialCells>0) delete [] lmnEssCells;
-    
-    if(isOverlap)
-    {
-        for(int iECell = 0; iECell < nEssensialCells; iECell++)
-        {
-            for(int i = 0; i < nHamiltonian; i++) delete [] sMf[iECell][i];
-            delete [] sMf[iECell];
-        }
-        if (nEssensialCells>0) delete [] sMf;
-    }
 }
 
 void Regression::SendDataToTerminal(wxString data)

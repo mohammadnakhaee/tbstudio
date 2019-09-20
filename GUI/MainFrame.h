@@ -23,26 +23,21 @@
 #include <wx/ribbon/buttonbar.h>
 #include <thread>
 #include <Regression.h>
-#include "UpdateClass.h"
 //#include <memory>
 /**********************************************************************************/
-
-
 
 class MainFrame : public MainFrameBaseClass
 {
 public:
-    wxString MySerialNumber = _("");
     wxString SoftwareName = _("TBStudio");
-    wxString FreeSoftwareLimitations = _("fitting a TB model including d-orbitals");
     int Ver_MAJOR = 1;
-    int Ver_MINOR = 3;
-    int Ver_RELEASE = 2;
+    int Ver_MINOR = 1;
+    int Ver_RELEASE = 5;
     
     MainFrame(wxWindow* parent);
     virtual ~MainFrame();
     
-    //int* SelectedAtoms;
+    int* SelectedAtoms;
     GraphClass* graph3d;
     GraphClass* graph2d0;
     GraphClass* graph2d;
@@ -53,9 +48,6 @@ public:
     SetupClass* setupPanel;
     SKClass* skPanel;
     ColorsClass* ColorsForm;
-    
-    bool IsLicensed = false;
-    wxString LicenseOwner = _("");
     
     Sec30* sec30;
     //std::shared_ptr<Sec30> sec30;
@@ -76,17 +68,14 @@ public:
     bool is_UpperSymMatrixHf = false;
     
     Regression* regression;
-    //std::thread* FittingThread;
+    std::thread* FittingThread;
     bool isFittingThreadBusy = false;
     
     wxRibbonButtonBar* RButtonMouse;
     
-    
-    void ShowAbout();
     void OnExit(wxCommandEvent& event);
     void OnAbout(wxCommandEvent& event);
 protected:
-    bool CheckLicense(wxString &UserName);
     virtual void BtnMove_OnClick(wxRibbonButtonBarEvent& event);
     virtual void BtnRotate_OnClick(wxRibbonButtonBarEvent& event);
     virtual void BtnScale_OnClick(wxRibbonButtonBarEvent& event);
@@ -147,6 +136,7 @@ protected:
     virtual void GetHamiltonianMap(wxCheckTree* orbs, Astring0D &HamiltonianMap, Astring0D &HamiltonianShellMap, Aint1D &HamiltonianDimMap);
     virtual void AddShellAndOrbitalInfo(wxCheckTree* orbsTree, wxString AtomName, Astring0D &HamiltonianMap, Astring0D &HamiltonianShellMap, Aint0D &HamiltonianDimMapItem, int &LastIndex);
     virtual void ReadSK();
+    virtual void InitializeSec30Arrays();
     virtual void Init_graph3d();
     virtual void Init_graph2d0();
     virtual void Init_graph2d();
@@ -175,7 +165,7 @@ protected:
     virtual void FillBondsPanel();
     /****************************************/
     virtual void LoadSetupPanel();
-    virtual void EvaluateSetupPanel(int SetWeight);
+    virtual void EvaluateSetupPanel();
     virtual bool ValidateSetupPanel();
     virtual void FillSetupPanel();
     /****************************************/
@@ -193,9 +183,9 @@ protected:
     bool IsBondContainsParameter(wxString Orbs1, wxString Orbs2, wxString sk);
     void TestEig();
     void TestZEig();
-    void InitializeSec30Arrays();
     void UpdateTBBand_if();
     void StartRegression(bool isOneStep);
+    bool IsAllowedToFit(int iband, int ik);
     int ReplaceDFTBand(int iband, int ik);
     double ShiftBand(int iband, int ik);
     double GetFitParameter(int ip, int icol);
@@ -207,6 +197,7 @@ protected:
     void GenerateMathematicaCode(wxString filepath, wxString BaseName, int MyID_Initial0Final1);
     void GenerateMatlabCode(wxString filepath, wxString BaseName, int MyID_Initial0Final1);
     void GeneratePythonCode(wxString filepath, wxString BaseName, int MyID_Initial0Final1);
+    bool IsLicensed(wxString Module);
     
 private:
     wxTextCtrl* logfile;

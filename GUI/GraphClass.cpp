@@ -16,7 +16,7 @@ GraphClass::GraphClass(wxWindow* parent, int Dim, Sec30* sec30Var, int MyID)
     // test IsDisplaySupported() function:
     static const int attribs[] = { WX_GL_RGBA, WX_GL_DOUBLEBUFFER, 0 };
     wxLogStatus("Double-buffered display %s supported",
-                wxGLCanvas::IsDisplaySupported(attribs) ? "is" : "not");
+                wxGLCanvas::IsDisplaySupported(stereoAttribList) ? "is" : "not");
 
     if ( stereoWindow )
     {
