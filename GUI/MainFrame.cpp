@@ -3562,6 +3562,12 @@ void MainFrame::GenerateMathematicaCode(wxString filepath, wxString BaseName, in
         
         fprintf(fpk,"\n(*Define Hk function as TB Hamiltonian*)\n");
         fprintf(fpk,"H[{ka_, kb_, kc_}] := Evaluate[HkFunc];\n");
+        
+        fprintf(fpk,"\n(*Band-Structure Calculation*)\n");
+        fprintf(fpk,"Print[\"The number of bands is \" <> ToString[nH]];\n");
+        fprintf(fpk,"nbands = nH;\n");
+        fprintf(fpk,"bands = Table[{0.0, 0.0}, {nbands}, {nk}];\n");
+        fprintf(fpk,"dpath = 0.0;\n");
         fprintf(fpk,"Do[\n");
         fprintf(fpk,"  {ka0, kb0, kc0, dpath} = kPath[[ik]];\n");
         fprintf(fpk,"  eig = Eigenvalues[H[{ka0, kb0, kc0}]];\n");
@@ -3710,6 +3716,18 @@ void MainFrame::GenerateMatlabCode(wxString filepath, wxString BaseName, int MyI
         fprintf(fpk,"\tend\n");
         fprintf(fpk,"end\n");
         
+        fprintf(fpk,"\n%%Plot the band-structure\n");
+        fprintf(fpk,"dmax = dpath;\n");
+        fprintf(fpk,"close all\n");
+        fprintf(fpk,"figure(1)\n");
+        fprintf(fpk,"for iband=1:nbands\n");
+        fprintf(fpk,"\tplot(bands(iband,:,1),bands(iband,:,2),'-r')\n");
+        fprintf(fpk,"\thold on\n");
+        fprintf(fpk,"end\n\n");
+        fprintf(fpk,"xlim([0 dmax])\n");
+        fprintf(fpk,"yrange=ylim();\n");
+        fprintf(fpk,"for i=1:nlabels\n");
+        fprintf(fpk,"\tline([labels{i}{1},labels{i}{1}],[yrange(1),yrange(2)]);\n");
         fprintf(fpk,"end\n");
         fclose(fpk);
     }
@@ -3777,9 +3795,9 @@ void MainFrame::GeneratePythonCode(wxString filepath, wxString BaseName, int MyI
         fprintf(fpk,"            for m in range(-mMax, mMax + 1):\n");
         fprintf(fpk,"	       for n in range(-nMax, nMax + 1):\n");
         fprintf(fpk,"                  hij = h[l0 + l][m0 + m][n0 + n][i][j]\n");
-        fprintf(fpk,"          kvec = ka*astar + kb*bstar + kc*cstar\n");
-        fprintf(fpk,"          Rvec = l*a + m*b + n*c\n");
-        fprintf(fpk,"          hk[i][j] = hk[i][j] + hij*np.exp(1j*np.dot(kvec,Rvec))\n");
+        fprintf(fpk,"                  kvec = ka*astar + kb*bstar + kc*cstar\n");
+        fprintf(fpk,"                  Rvec = l*a + m*b + n*c\n");
+        fprintf(fpk,"                  hk[i][j] = hk[i][j] + hij*np.exp(1j*np.dot(kvec,Rvec))\n");
         fprintf(fpk,"   return hk\n");
         
         fprintf(fpk,"\n#Define the parameters\n");
@@ -3876,9 +3894,28 @@ void MainFrame::GeneratePythonCode(wxString filepath, wxString BaseName, int MyI
         fprintf(fpk,"X = [0.0 for j in xrange(nk)]\n");
         fprintf(fpk,"bands = [[0.0 for j in xrange(nk)] for i in xrange(nbands)]\n");
         fprintf(fpk,"dpath = 0.0;\n");
-
+        
+        fprintf(fpk,"for ik in range(nk):\n");
+        fprintf(fpk,"   ka = kPath[ik][0]\n");
+        fprintf(fpk,"   kb = kPath[ik][1]\n");
+        fprintf(fpk,"   kc = kPath[ik][2]\n");
+        fprintf(fpk,"   dpath = kPath[ik][3]\n");
+        fprintf(fpk,"   hk = GetHam(h, ka, kb, kc)\n");
+        fprintf(fpk,"   EIG, VEC = LA.eig(hk)\n");
+        fprintf(fpk,"   EIG = np.real(EIG)	#The imaginary part is practically zero.\n");
+        fprintf(fpk,"   EIG = np.sort(EIG)\n");
+        fprintf(fpk,"   for iband in range(nbands):\n");
+        fprintf(fpk,"      X[ik] = dpath\n");
+        fprintf(fpk,"      bands[iband][ik] = EIG[iband]\n\n");
+        
         fprintf(fpk,"dmax = dpath\n");
         
+        fprintf(fpk,"\n#Plot the band-structure\n");
+        fprintf(fpk,"for i in range(nbands):\n");
+        fprintf(fpk,"   plt.plot(X, bands[i][:], 'r-')\n\n");
+        fprintf(fpk,"for i in range(nlabels):\n");
+        fprintf(fpk,"   plt.axvline(x=xlabels[i])\n\n");
+        fprintf(fpk,"plt.xlim(0.0, dmax)\n");
         fprintf(fpk,"plt.xticks(xlabels, labels)\n");
         fprintf(fpk,"plt.show()\n");
         fclose(fpk);

@@ -95,7 +95,7 @@ void StructureClass::ExportToXYZ(wxString filepath, wxString filename)
 
   wxString fname1 = filepath + wxT("/") + filename;
   if ((fp = fopen(fname1,"w")) != NULL){
-
+/*
     fprintf(fp,"%d\n\n",tbmodel->nAtoms);
 
     std::list<double>::iterator ix = tbmodel->XArray.begin();
@@ -108,7 +108,7 @@ void StructureClass::ExportToXYZ(wxString filepath, wxString filename)
       //To use wxString in printf use one of them: GetAtomLable(kind).mb_str().data() or (const char*)GetAtomLable(kind).mb_str(),
       fprintf(fp,"%4s  %18.14f %18.14f %18.14f\n",(const char*)GetAtomLable(*ik++).mb_str(),*ix++,*iy++,*iz++);
     }
-
+*/
     fclose(fp);
   }
 
@@ -121,6 +121,13 @@ void StructureClass::Btn_Export_XYZ_OnClick(wxCommandEvent& event)
 		_("XYZ File (*.xyz)|*.xyz")
         ,wxFD_SAVE, wxDefaultPosition);
     
+    if (OpenDialog->ShowModal() == wxID_OK) // if the user click "Open" instead of "Cancel"
+	{
+        //int dgFileKind = OpenDialog->GetFilterIndex();
+        wxString dgFileName = OpenDialog->GetFilename();
+        wxString dgPath = OpenDialog->GetDirectory();
+        ExportToXYZ(dgPath, dgFileName);
+	}
  
 	OpenDialog->Destroy();
 }
