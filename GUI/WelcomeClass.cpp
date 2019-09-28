@@ -32,3 +32,6 @@ void WelcomeClass::OnTick(wxTimerEvent& event)
     Time++;
     if(Time>WelcomeTime) this->Close();
 }
+
+
+    

@@ -250,3 +250,102 @@ WelcomeClassBase::~WelcomeClassBase()
     wxDELETE( m_timer1089 );
 
 }
+
+UpdateClassBase::UpdateClassBase(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style)
+    : wxDialog(parent, id, title, pos, size, style)
+{
+    if ( !bBitmapLoaded ) {
+        // We need to initialise the default bitmap handler
+        wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
+        wxC9ED9InitBitmapResources();
+        bBitmapLoaded = true;
+    }
+    
+    wxBoxSizer* boxSizer1098 = new wxBoxSizer(wxVERTICAL);
+    this->SetSizer(boxSizer1098);
+    
+    welcomeImage = new wxStaticBitmap(this, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDLG_UNIT(this, wxSize(650,285)), 0 );
+    
+    boxSizer1098->Add(welcomeImage, 0, wxALL, WXC_FROM_DIP(5));
+    welcomeImage->SetMinSize(wxSize(650,285));
+    
+    m_hyperLink1104 = new wxHyperlinkCtrl(this, wxID_ANY, _("Check for TBStudio updates"), wxT("https://tight-binding.com"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxHL_DEFAULT_STYLE);
+    m_hyperLink1104->SetNormalColour(wxColour(wxT("#0000FF")));
+    m_hyperLink1104->SetHoverColour(wxColour(wxT("#0000FF")));
+    m_hyperLink1104->SetVisitedColour(wxColour(wxT("#FF0000")));
+    
+    boxSizer1098->Add(m_hyperLink1104, 0, wxALL, WXC_FROM_DIP(5));
+    
+    wxBoxSizer* boxSizer1118 = new wxBoxSizer(wxHORIZONTAL);
+    
+    boxSizer1098->Add(boxSizer1118, 1, wxEXPAND, WXC_FROM_DIP(5));
+    
+    wxBoxSizer* boxSizer1120 = new wxBoxSizer(wxVERTICAL);
+    
+    boxSizer1118->Add(boxSizer1120, 1, wxEXPAND, WXC_FROM_DIP(5));
+    
+    asdw = new wxStaticText(this, wxID_ANY, _("Serial Number:"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    
+    boxSizer1120->Add(asdw, 0, wxLEFT|wxRIGHT|wxTOP, WXC_FROM_DIP(5));
+    
+    SNTextBox = new wxRichTextCtrl(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,110)), wxTE_MULTILINE|wxTE_PROCESS_TAB|wxTE_PROCESS_ENTER|wxWANTS_CHARS);
+    
+    boxSizer1120->Add(SNTextBox, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    SNTextBox->SetMinSize(wxSize(-1,110));
+    
+    m_button1124 = new wxButton(this, wxID_ANY, _("Copy to Clipboard"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    
+    boxSizer1120->Add(m_button1124, 0, wxALL, WXC_FROM_DIP(5));
+    
+    wxBoxSizer* boxSizer1122 = new wxBoxSizer(wxVERTICAL);
+    
+    boxSizer1118->Add(boxSizer1122, 1, wxEXPAND, WXC_FROM_DIP(5));
+    
+    m_staticText1110 = new wxStaticText(this, wxID_ANY, _("Activation key:"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    
+    boxSizer1122->Add(m_staticText1110, 0, wxLEFT|wxRIGHT|wxTOP, WXC_FROM_DIP(5));
+    
+    AKTextBox = new wxRichTextCtrl(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,110)), wxTE_MULTILINE|wxTE_PROCESS_TAB|wxTE_PROCESS_ENTER|wxWANTS_CHARS);
+    
+    boxSizer1122->Add(AKTextBox, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    AKTextBox->SetMinSize(wxSize(-1,110));
+    
+    m_button1114 = new wxButton(this, wxID_ANY, _("Activate"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    
+    boxSizer1122->Add(m_button1114, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(5));
+    
+    SetName(wxT("UpdateClassBase"));
+    SetSize(wxDLG_UNIT(this, wxSize(-1,-1)));
+    if (GetSizer()) {
+         GetSizer()->Fit(this);
+    }
+    if(GetParent()) {
+        CentreOnParent(wxBOTH);
+    } else {
+        CentreOnScreen(wxBOTH);
+    }
+#if wxVERSION_NUMBER >= 2900
+    if(!wxPersistenceManager::Get().Find(this)) {
+        wxPersistenceManager::Get().RegisterAndRestore(this);
+    } else {
+        wxPersistenceManager::Get().Restore(this);
+    }
+#endif
+    // Connect events
+    welcomeImage->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(UpdateClassBase::ImageOnMouseLeftDown), NULL, this);
+    welcomeImage->Connect(wxEVT_LEFT_UP, wxMouseEventHandler(UpdateClassBase::ImageOnMouseLeftUp), NULL, this);
+    welcomeImage->Connect(wxEVT_MOVE, wxMoveEventHandler(UpdateClassBase::ImageOnMouseMove), NULL, this);
+    m_button1124->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(UpdateClassBase::CopyClipboardOnClick), NULL, this);
+    m_button1114->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(UpdateClassBase::ActivateOnClick), NULL, this);
+    
+}
+
+UpdateClassBase::~UpdateClassBase()
+{
+    welcomeImage->Disconnect(wxEVT_LEFT_DOWN, wxMouseEventHandler(UpdateClassBase::ImageOnMouseLeftDown), NULL, this);
+    welcomeImage->Disconnect(wxEVT_LEFT_UP, wxMouseEventHandler(UpdateClassBase::ImageOnMouseLeftUp), NULL, this);
+    welcomeImage->Disconnect(wxEVT_MOVE, wxMoveEventHandler(UpdateClassBase::ImageOnMouseMove), NULL, this);
+    m_button1124->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(UpdateClassBase::CopyClipboardOnClick), NULL, this);
+    m_button1114->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(UpdateClassBase::ActivateOnClick), NULL, this);
+    
+}

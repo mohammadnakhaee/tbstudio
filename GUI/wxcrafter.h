@@ -21,6 +21,10 @@
 #include <wx/notebook.h>
 #include <wx/dialog.h>
 #include <wx/timer.h>
+#include <wx/statbmp.h>
+#include <wx/hyperlink.h>
+#include <wx/richtext/richtextctrl.h>
+#include <wx/button.h>
 #if wxVERSION_NUMBER >= 2900
 #include <wx/persist.h>
 #include <wx/persist/toplevel.h>
@@ -115,6 +119,39 @@ public:
     wxTimer* GetTimer1089() { return m_timer1089; }
     WelcomeClassBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT(""), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(200,120), long style = wxSTAY_ON_TOP|wxBORDER_STATIC);
     virtual ~WelcomeClassBase();
+};
+
+
+class UpdateClassBase : public wxDialog
+{
+protected:
+    wxStaticBitmap* welcomeImage;
+    wxHyperlinkCtrl* m_hyperLink1104;
+    wxStaticText* asdw;
+    wxRichTextCtrl* SNTextBox;
+    wxButton* m_button1124;
+    wxStaticText* m_staticText1110;
+    wxRichTextCtrl* AKTextBox;
+    wxButton* m_button1114;
+
+protected:
+    virtual void ImageOnMouseLeftDown(wxMouseEvent& event) { event.Skip(); }
+    virtual void ImageOnMouseLeftUp(wxMouseEvent& event) { event.Skip(); }
+    virtual void ImageOnMouseMove(wxMoveEvent& event) { event.Skip(); }
+    virtual void CopyClipboardOnClick(wxCommandEvent& event) { event.Skip(); }
+    virtual void ActivateOnClick(wxCommandEvent& event) { event.Skip(); }
+
+public:
+    wxStaticBitmap* GetWelcomeImage() { return welcomeImage; }
+    wxHyperlinkCtrl* GetHyperLink1104() { return m_hyperLink1104; }
+    wxStaticText* GetAsdw() { return asdw; }
+    wxRichTextCtrl* GetSNTextBox() { return SNTextBox; }
+    wxButton* GetButton1124() { return m_button1124; }
+    wxStaticText* GetStaticText1110() { return m_staticText1110; }
+    wxRichTextCtrl* GetAKTextBox() { return AKTextBox; }
+    wxButton* GetButton1114() { return m_button1114; }
+    UpdateClassBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Update"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxDEFAULT_DIALOG_STYLE|wxSTAY_ON_TOP);
+    virtual ~UpdateClassBase();
 };
 
 #endif

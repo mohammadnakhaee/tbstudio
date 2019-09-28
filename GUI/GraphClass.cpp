@@ -8,24 +8,26 @@ GraphClass::GraphClass(wxWindow* parent, int Dim, Sec30* sec30Var, int MyID)
 {
     sec30 = sec30Var;
     ObjectID = MyID;
-    int stereoAttribList[] = { WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_STEREO, 0 };
-    bool stereoWindow = false;
-    glc = new MyGLCanvas(this, Dim, sec30, MyID, stereoWindow ? stereoAttribList : NULL);
-    
+    int AttribList[] = {WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 32, 0};
+	//int AttribList[] = { WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_STEREO, 0};
+	//int AttribList[] = {WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 32};
+    glc = new MyGLCanvas(this, Dim, sec30, MyID, AttribList);
     TopPanel->GetContainingSizer()->Add(glc,wxSizerFlags().Proportion(1).Expand().Border(wxALL, 0));
     // test IsDisplaySupported() function:
-    static const int attribs[] = { WX_GL_RGBA, WX_GL_DOUBLEBUFFER, 0 };
-    wxLogStatus("Double-buffered display %s supported",
-                wxGLCanvas::IsDisplaySupported(stereoAttribList) ? "is" : "not");
+    //static const int attribs[] = { WX_GL_RGBA, WX_GL_DOUBLEBUFFER, 0 };
+	//static const int attribs[] = {WX_GL_DOUBLEBUFFER, 0 ,WX_GL_DEPTH_SIZE, 32};
+    //wxLogStatus("Double-buffered display %s supported",
+    //            wxGLCanvas::IsDisplaySupported(attribs) ? "is" : "not");
 
-    if ( stereoWindow )
-    {
-        const wxString vendor = glGetwxString(GL_VENDOR).Lower();
-        const wxString renderer = glGetwxString(GL_RENDERER).Lower();
-        //if ( vendor.find("nvidia") != wxString::npos &&
-            //    renderer.find("quadro") == wxString::npos )
-            //ShowFullScreen(true);
-    }
+    //bool stereoWindow = false;
+    //if ( stereoWindow )
+    //{
+    //    const wxString vendor = glGetwxString(GL_VENDOR).Lower();
+    //    const wxString renderer = glGetwxString(GL_RENDERER).Lower();
+    //    //if ( vendor.find("nvidia") != wxString::npos &&
+    //        //    renderer.find("quadro") == wxString::npos )
+    //        //ShowFullScreen(true);
+    //}
 }
 
 GraphClass::~GraphClass()

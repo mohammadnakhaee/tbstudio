@@ -35,9 +35,9 @@
 #include "main.h"
 DECLARE_APP(MainApp)
 
-#ifndef wxHAS_IMAGES_IN_RESOURCES
-    #include "../../sample.xpm"
-#endif
+//#ifndef wxHAS_IMAGES_IN_RESOURCES
+//    #include "../../sample.xpm"
+//#endif
 
 
 #include <wx/clipbrd.h> 
@@ -221,10 +221,12 @@ int PlotBand(mglGraph *gr, int w, int h, Sec30* sec30, int MyID)
             xMin = (mreal)sec30->ArraysOf0DDouble[7];
             xMax = (mreal)sec30->ArraysOf0DDouble[8];
         }
-        //sec30->ArraysOf2DDouble[0] = Adouble1D();//double** FracKPoint;
-        //sec30->ArraysOf2DDouble[1] = Adouble1D();//double** EigVal;
         
-        if (DFTnMax < DFTnMin || DFTnMax<1 || DFTnMin<1 || DFTnMin>maxneig || DFTnMax>maxneig) return 0;
+        //sec30->ArraysOf2DDouble[0] = Adouble1D();//double** FracKPoint;
+        //sec30->ArraysOf2DDouble[1] = Adouble1D();//double** DFTEigVal;
+        //sec30->ArraysOf2DDouble[4] = Adouble1D();//double** DFTEigValWeight;
+        
+        if (DFTnMax < DFTnMin || DFTnMax<1 || DFTnMin<1 || DFTnMin>maxneig || DFTnMax>maxneig) return 1;
         
         int nCurve = DFTnMax - DFTnMin + 1;
         int nX = nKPoint;
@@ -254,8 +256,16 @@ int PlotBand(mglGraph *gr, int w, int h, Sec30* sec30, int MyID)
                 for(long iX=0; iX<nX; iX++)
                 {
                     //mreal x = iX/(nX-1.0);
-                    C.a[iCurve*nX + iX] = -0.5;
-                    if ( iX > (int)(nX/3.0)) C.a[iCurve*nX + iX] = 0.5;
+                    C.a[iCurve*nX + iX] = (mreal)(sec30->ArraysOf2DDouble[4][iX][iCurve + DFTnMin - 1]*2.0-1.0);//Showing fitting weight as a color. The values are between x=[0:1] but the colors are c=[-1,1], so c=2*x-1
+                    /*if ( iX > (int)(0.0*nX/9.0) && iX <= (int)(1.0*nX/9.0)) C.a[iCurve*nX + iX] = -1.0;
+                    if ( iX > (int)(1.0*nX/9.0) && iX <= (int)(2.0*nX/9.0)) C.a[iCurve*nX + iX] = -0.75;
+                    if ( iX > (int)(2.0*nX/9.0) && iX <= (int)(3.0*nX/9.0)) C.a[iCurve*nX + iX] = -0.5;
+                    if ( iX > (int)(3.0*nX/9.0) && iX <= (int)(4.0*nX/9.0)) C.a[iCurve*nX + iX] = -0.25;
+                    if ( iX > (int)(4.0*nX/9.0) && iX <= (int)(5.0*nX/9.0)) C.a[iCurve*nX + iX] = 0.0;
+                    if ( iX > (int)(5.0*nX/9.0) && iX <= (int)(6.0*nX/9.0)) C.a[iCurve*nX + iX] = 0.25;
+                    if ( iX > (int)(6.0*nX/9.0) && iX <= (int)(7.0*nX/9.0)) C.a[iCurve*nX + iX] = 0.5;
+                    if ( iX > (int)(7.0*nX/9.0) && iX <= (int)(8.0*nX/9.0)) C.a[iCurve*nX + iX] = 0.75;
+                    if ( iX > (int)(8.0*nX/9.0) && iX <= (int)(9.0*nX/9.0)) C.a[iCurve*nX + iX] = 1.0;*/
                 }
             }
         }
@@ -342,14 +352,15 @@ int PlotBand(mglGraph *gr, int w, int h, Sec30* sec30, int MyID)
         }
         //gr->Plot(X, Y, "{x800000}-2");      // maroon
         
-        gr->Line(mglPoint(X.a[0],0.0), mglPoint(X.a[nX-1],0.0), "r2|");
+        if (yMax * yMin <= 0) gr->Line(mglPoint(X.a[0],0.0), mglPoint(X.a[nX-1],0.0), "r2=");
+        
         for (int ik=1; ik<nk-1; ik++)
         {
             mreal xpos = (mreal)sec30->ArraysOf1DDouble[0][ik];
             gr->Line(mglPoint(xpos, yMin), mglPoint(xpos, yMax), "H2");
         }
         
-        gr->SetSize((int)(w*1.5),(int)(h*1.5),false);
+        gr->SetSize((int)(w),(int)(h),false);
         //float max = (float)w;
         //if (h>w) max = (float)h;
         //float w2d=w/max;
@@ -362,6 +373,8 @@ int PlotBand(mglGraph *gr, int w, int h, Sec30* sec30, int MyID)
         
         return 0;
     }
+    else
+        return 1;
 }
 
 int sample(mglGraph *gr,double w, double h)
@@ -407,7 +420,6 @@ int sampleOK(mglGraph *gr,double w, double h)
     gr->NewFrame ();          // start frame
     gr->SubPlot(1,1,0,"<_"); 
     gr->Aspect(1.0,1.0);
-    
     
     gr->Title("Beam and ray tracing","",-1.5);
     gr->SetFontSize(4);
@@ -537,21 +549,28 @@ MyGLContext::MyGLContext(wxGLCanvas *canvas, int DimVar)
 {
     Dim=DimVar;
     SetCurrent(*canvas);
-    glGenTextures(WXSIZEOF(m_textures), m_textures);
+    //glGenTextures(WXSIZEOF(m_textures), m_textures);
     
     //Shared between 2D and 3D OpenGL
-    glEnable(GL_TEXTURE_2D); //Essential
+    //glEnable(GL_TEXTURE_2D); //Essential
     glEnable(GL_NORMALIZE);  //Faster
     glEnable(GL_BLEND); //is not checked
     glEnable(GL_CULL_FACE); //is not checked
-    glEnable(GL_DEPTH_TEST); //is not checked
+	
+	//glDepthMask(GL_TRUE);
+	glEnable(GL_DEPTH_TEST); //is not checked
+	//glFrontFace(GL_CCW);
+	//glDepthFunc(GL_LESS);
+	glEnable(GL_LIGHTING);
     glEnable(GL_COLOR_MATERIAL); //To enable the colourful glusphere. Whithout this we are unable to change the color of surfaces
-    
+	
+	//glFrustum(-0.47f, 0.53f, -0.5f, 0.5f, 1.0f, 3.0f);
+    //glDisable(GL_DEPTH_TEST);
     //glEnable( GL_LINE_SMOOTH );
     //glEnable( GL_POLYGON_SMOOTH );
     //glHint( GL_LINE_SMOOTH_HINT, GL_NICEST );
     //glHint( GL_POLYGON_SMOOTH_HINT, GL_NICEST );
-    
+	
     glEnable(GL_LIGHT0); //is not checked
 	glLightfv(GL_LIGHT0, GL_POSITION, (const GLfloat[]) {30,30,50.0f});
 	glLightfv(GL_LIGHT0, GL_SPECULAR,  (const GLfloat[]) {1,1,1,1});
@@ -576,17 +595,18 @@ MyGLContext::MyGLContext(wxGLCanvas *canvas, int DimVar)
     
     //for ( unsigned i = 0; i < WXSIZEOF(m_textures); i++ )
     //{
-        glBindTexture(GL_TEXTURE_2D, m_textures[0]);
+        //glBindTexture(GL_TEXTURE_2D, m_textures[0]);
 
-        GLfloat fLargest;
-        glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &fLargest);
+        //GLfloat fLargest;
+        //glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &fLargest);
     
-        glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); //GL_NEAREST is fast but low quality textures
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        //glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+        //glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+        //glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+        //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); //GL_NEAREST is fast but low quality textures
+        //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         
+        //glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
         //glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, fLargest);
         
     //int w,h,x,y;
@@ -702,6 +722,22 @@ void MyGLContext::background()
 
 void MyGLContext::Polygons2D()
 {
+    /*double radius = 0.07;
+    double twicePi = 2.0 * 3.142;
+    float x = 0;
+    float y = 0;
+    glBegin(GL_TRIANGLE_FAN); //BEGIN CIRCLE
+    glColor3f(1.0f, 0.0f, 0.0f); // Red
+    glVertex2f(x, y); // center of circle
+    for (int i = 0; i <= 20; i++)   {
+        glVertex2f (
+            (x + (radius * cos(i * twicePi / 20))), (y + (radius * sin(i * twicePi / 20)))
+            );
+    }
+    glEnd(); //END*/
+    
+    //glutSolidSphere(0.5, 20, 20);
+    
     /*
     glBegin(GL_QUADS);              // Each set of 4 vertices form a quad
       glColor3f(1.0f, 0.0f, 0.0f); // Red
@@ -748,8 +784,8 @@ void MyGLContext::Polygons2D()
       glVertex2f(0.6f, 0.6f);
       glVertex2f(0.4f, 0.6f);
       glVertex2f(0.3f, 0.4f);
-   glEnd();
-    */
+   glEnd();*/
+    
 }
 
 void MyGLContext::Draw2D(int w, int h, Sec30* sec30, int MyID)
@@ -757,6 +793,7 @@ void MyGLContext::Draw2D(int w, int h, Sec30* sec30, int MyID)
     PlotFigToTexture(w, h, sec30, MyID);
     glDisable(GL_LIGHTING);
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+	//glClear(GL_COLOR_BUFFER_BIT);
     glPushMatrix();
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -766,8 +803,9 @@ void MyGLContext::Draw2D(int w, int h, Sec30* sec30, int MyID)
     glEnable( GL_TEXTURE_2D );
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    background();
+    //background();
     Polygons2D();
+    background();
     glFlush();  // Render now
     glPopMatrix();
     CheckGLError();
@@ -780,8 +818,17 @@ void MyGLContext::PlotFigToTexture(int w, int h, Sec30* sec30, int MyID)
     PlotBand(&gr, w, h, sec30, MyID);
     //sample(&gr, w, h);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    GLenum err;
+    while((err = glGetError()) != GL_NO_ERROR)
+    {
+      std::cout << err;
+    }
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, gr.GetWidth(), gr.GetHeight(),
                      0, GL_RGB, GL_UNSIGNED_BYTE, gr.GetRGB());
+    while((err = glGetError()) != GL_NO_ERROR)
+    {
+      std::cout << err;
+    }
 }
 
 void MyGLContext::DrawSelectionFrame(float x1, float y1, float x2, float y2)
@@ -1065,16 +1112,20 @@ void MyGLContext::Draw_Lattice(int nColDArray, int* nDArray, double** DArray, in
 
 void MyGLContext::Draw3D(int nColDArray, int* nDArray, double** DArray, int nColIArray, int* nIArray, int** IArray, double Coordinate[3][3], float xMove, float yMove, float XCam, float YCam, float zoom, float zoomCam, float w, float h)
 {
-    glEnable(GL_LIGHTING);
     GLfloat ambient[] = { 0.065, 0.065, 0.065, 0.065 };
     glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
     //glPushMatrix();
+	
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
+	
     //gluLookAt(0, 0, -1,  0, 0, 0, 1, 0, 0);
     //glFrustum(-1.0f, 1.0f, -0.5f, 0.5f, 1.0f, 10.0f);
-    glOrtho(-w, w, -h, h, -50.0f, 50.0f);
+    glOrtho(-w, w, -h, h, -250.0f, 250.0f);
+	//gluOrtho2D(-w, w, -h, h);
+	//gluPerspective(60.0, (GLfloat)((float)w/(float)h), 0.01, 1000.0);
+	//gluPerspective(45, 4.0/3.0, 0.1, 2);
     glTranslatef(XCam + xMove, YCam + yMove, 0.0f);
     float ztot = zoomCam + zoom;
     if (ztot <= 0.001) ztot = 0.001;
@@ -1092,7 +1143,8 @@ void MyGLContext::Draw3D(int nColDArray, int* nDArray, double** DArray, int nCol
     //Polygons3D(); //It works, but we do not need it no longer
     //Glu Functions Begin
     quad = gluNewQuadric();
-    glPolygonMode( GL_FRONT_AND_BACK, GL_FILL);    //GL_LINE or GL_FILL
+    glPolygonMode( GL_FRONT_AND_BACK, GL_FILL);    //GL_LINE or GL_FILL or GL_FRONT
+
     glLineWidth(1.0);
     //glShadeModel(GL_SMOOTH);
     //glEnable(GL_LINE_SMOOTH);
@@ -1198,23 +1250,6 @@ void MyGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
     // handler, changing the size of one canvas causes a viewport setting that
     // is wrong when next another canvas is repainted.
     const wxSize ClientSize = GetClientSize();
-                     
-    MyGLContext& context = wxGetApp().GetContext(this, Dim, m_useStereo);
-
-    glViewport(0,0,ClientSize.x, ClientSize.y); // decide which area of the frame will be painted
-    //gluOrtho2D(0, ClientSize.x, 0, ClientSize.y);
-    
-    // Render the graphics and swap the buffers.
-    GLboolean quadStereoSupported;
-    glGetBooleanv( GL_STEREO, &quadStereoSupported);
-    
-    //glMatrixMode(GL_PROJECTION);
-    //glLoadIdentity();
-    //gluOrtho2D(0, ClientSize.x, 0, ClientSize.y); // set up coordinate system
-    //glMatrixMode(GL_MODELVIEW);
-    //canvas.DrawRotatedCube(m_xangle, m_yangle);
-    
-    glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // Black and opaque
     
     int w,h;
     w=ClientSize.x;
@@ -1223,55 +1258,123 @@ void MyGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
     if (h>w) max = (float)h;
     float w3d=w/max;
     float h3d=h/max;
-    
-    if ( quadStereoSupported )
-    {
-        glDrawBuffer( GL_BACK_LEFT );
-        glMatrixMode(GL_PROJECTION);
-        glLoadIdentity();
-        glFrustum(-0.47f, 0.53f, -0.5f, 0.5f, 1.0f, 3.0f);
         
-        if (Dim==3)
-            context.Draw3D(NumberOfDoubleArrays, nDoubleArray, DoubleArray1,
-                            NumberOfIntArrays, nIntArray, IntArray, Coordinate1,
-                            XMove, YMove, XCam, YCam, Zoom, ZoomCam, w3d,h3d);
-        else
-            context.Draw2D(w, h, sec30, ObjectID);
-            
-        CheckGLError();
-        glDrawBuffer( GL_BACK_RIGHT );
-        glMatrixMode(GL_PROJECTION);
-        glLoadIdentity();
-        glFrustum(-0.53f, 0.47f, -0.5f, 0.5f, 1.0f, 3.0f);
-        
-        if (Dim==3)
-            context.Draw3D(NumberOfDoubleArrays, nDoubleArray, DoubleArray1,
-                            NumberOfIntArrays, nIntArray, IntArray, Coordinate1,
-                            XMove, YMove, XCam, YCam, Zoom, ZoomCam, w3d,h3d);
-        else
-            context.Draw2D(w, h, sec30, ObjectID);
-            
-        CheckGLError();
-    }
-    else
+    if (Dim==2) //Plot BandStructures
     {
-        if (Dim==3)
-            context.Draw3D(NumberOfDoubleArrays, nDoubleArray, DoubleArray1,
-                            NumberOfIntArrays, nIntArray, IntArray, Coordinate1,
-                            XMove, YMove, XCam, YCam, Zoom, ZoomCam, w3d,h3d);
-        else
-            context.Draw2D(w, h, sec30, ObjectID);
-        if ( m_useStereo && !m_stereoWarningAlreadyDisplayed )
+        //Plot using MathGL Library
+        mglGraph gr;
+        int ploterr = PlotBand(&gr, w, h, sec30, ObjectID);
+        //sample(&gr, w, h);
+        
+        //Convert to image and then to Bitmap
+        if (ploterr==0)
         {
-            m_stereoWarningAlreadyDisplayed = true;
-            wxLogError("Stereo not supported by the graphics card.");
+            wxImage img(w,h,(unsigned char *)gr.GetRGB(),true);
+            wxBitmap bmp(img);
+            dc.DrawBitmap(bmp,0,0,false);
         }
+        else
+        {
+            wxImage img(w,h,true);
+            wxRect rect(0,0,w,h);
+            img.SetRGB(rect,255,255,255);
+            wxBitmap bmp(img);
+            dc.DrawBitmap(bmp,0,0,false);
+        }
+        
+        //Print to dc
+        //wxBitmap bmp2(wxT("C:\\GCloth.png"), wxBITMAP_TYPE_PNG);
+        //dc.DrawBitmap(bmp2,0,0,false);
+        //dc.DrawBitmap(bmp,0,0,false);
     }
-    
-    SwapBuffers();
-    
-    
-    //glFinish(); // necessary
+    else  //Draw the 3d structure
+    {
+        MyGLContext& context = wxGetApp().GetContext(this, Dim, m_useStereo);
+
+        glViewport(0,0,ClientSize.x, ClientSize.y); // decide which area of the frame will be painted
+        //gluOrtho2D(0, ClientSize.x, 0, ClientSize.y);
+        
+        // Render the graphics and swap the buffers.
+        GLboolean quadStereoSupported;
+        glGetBooleanv( GL_STEREO, &quadStereoSupported);
+        
+        //glMatrixMode(GL_PROJECTION);
+        //glLoadIdentity();
+        //gluOrtho2D(0, ClientSize.x, 0, ClientSize.y); // set up coordinate system
+        //glMatrixMode(GL_MODELVIEW);
+        //canvas.DrawRotatedCube(m_xangle, m_yangle);
+        
+        glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // Black and opaque
+        
+        /*
+        int w,h;
+        w=ClientSize.x;
+        h=ClientSize.y;
+        float max = (float)w;
+        if (h>w) max = (float)h;
+        float w3d=w/max;
+        float h3d=h/max;
+        */
+        
+        if ( quadStereoSupported )
+        {
+            glDrawBuffer( GL_BACK_LEFT );
+            glMatrixMode(GL_PROJECTION);
+            glLoadIdentity();
+            glFrustum(-0.47f, 0.53f, -0.5f, 0.5f, 1.0f, 3.0f);
+            
+            if (Dim==3)
+                context.Draw3D(NumberOfDoubleArrays, nDoubleArray, DoubleArray1,
+                                NumberOfIntArrays, nIntArray, IntArray, Coordinate1,
+                                XMove, YMove, XCam, YCam, Zoom, ZoomCam, w3d,h3d);
+            //else
+            //{
+            //    //context.Draw2D(w, h, sec30, ObjectID);
+            //    this->Draw2D(w, h, sec30, ObjectID);
+            //}
+       
+            CheckGLError();
+            glDrawBuffer( GL_BACK_RIGHT );
+            glMatrixMode(GL_PROJECTION);
+            glLoadIdentity();
+            glFrustum(-0.53f, 0.47f, -0.5f, 0.5f, 1.0f, 3.0f);
+            
+            if (Dim==3)
+                context.Draw3D(NumberOfDoubleArrays, nDoubleArray, DoubleArray1,
+                                NumberOfIntArrays, nIntArray, IntArray, Coordinate1,
+                                XMove, YMove, XCam, YCam, Zoom, ZoomCam, w3d,h3d);
+            //else
+            //{
+            //    //context.Draw2D(w, h, sec30, ObjectID);
+            //    this->Draw2D(w, h, sec30, ObjectID);
+            //}
+       
+            CheckGLError();
+        }
+        else
+        {
+            if (Dim==3)
+                context.Draw3D(NumberOfDoubleArrays, nDoubleArray, DoubleArray1,
+                                NumberOfIntArrays, nIntArray, IntArray, Coordinate1,
+                                XMove, YMove, XCam, YCam, Zoom, ZoomCam, w3d,h3d);
+            //else
+            //{
+            //    //context.Draw2D(w, h, sec30, ObjectID);
+            //    this->Draw2D(w, h, sec30, ObjectID);
+            //}
+            
+            if ( m_useStereo && !m_stereoWarningAlreadyDisplayed )
+            {
+                m_stereoWarningAlreadyDisplayed = true;
+                wxLogError("Stereo not supported by the graphics card.");
+            }
+        }
+        
+        SwapBuffers();
+        
+        
+        //glFinish(); // necessary
+    }
 }
 
 void MyGLCanvas::Spin(float xSpin, float ySpin, float zSpin)
@@ -1332,15 +1435,15 @@ void MyGLCanvas::OnMouseWheel(wxMouseEvent& event)
     {
         float delta = (ZoomCam*0.1)*0.01f*event.GetWheelDelta(); //Zoom dependent delta (It seems better)
         if (scrldwn)
-            ZoomCam = ZoomCam + delta;
-        else
             ZoomCam = ZoomCam - delta;
+        else
+            ZoomCam = ZoomCam + delta;
         if (ZoomCam <=0.001) ZoomCam=0.001;
     }
     else if(Dim==2)
     {
         bool isBandLoaded = false;
-        if (sec30->ArraysOf0DInt[0] != 0) isBandLoaded = true;
+        if (sec30->ArraysOf0DInt[0] != 0)
         {
             double y1, y2;
             if (ObjectID == 0)
@@ -1404,10 +1507,13 @@ void MyGLCanvas::OnMouseLeftDown(wxMouseEvent& event)
     const wxPoint cpt = event.GetPosition();
     ClientMouseX0 = cpt.x;
     ClientMouseY0 = cpt.y;
+    
     //To get mouse position relative to top-left corner of current window or canvas, add this in a mouse event handler:
     //const wxPoint pt = wxGetMousePosition();
     //int mouseX = pt.x - this->GetScreenPosition().x;
     //int mouseY = pt.y - this->GetScreenPosition().y;
+    
+    if (sec30->ArraysOf0DInt[6] != 0) PaintMode = true;
 }
 
 void MyGLCanvas::OnMouseLeftUp(wxMouseEvent& event)
@@ -1475,12 +1581,13 @@ void MyGLCanvas::OnMouseLeftUp(wxMouseEvent& event)
     }
     else //if (Dim == 2)
     {
-        
+        if (sec30->ArraysOf0DInt[6] != 0) PaintMode = false;
     }
 }
 
 void MyGLCanvas::OnMouseMove(wxMouseEvent& event)
 {
+    SetFocus();
     if (isMouseLeftDown)
     {
         const wxPoint pt = wxGetMousePosition();
@@ -1504,7 +1611,25 @@ void MyGLCanvas::OnMouseMove(wxMouseEvent& event)
             else if (isRotationMode)
                 DoRotate(l,m,(float)(0.01*value));
             else if (isZoomMode)
-                DoZoom(0.0005*(m-l));
+                DoZoom(0.0005 * (m-l));
+        }
+        else
+        {
+            if (sec30->ArraysOf0DInt[6] != 0 && PaintMode)
+            {
+                const wxSize ClientSize = GetClientSize();
+                int w,h;
+                w=ClientSize.x;
+                h=ClientSize.y;
+                
+                if (event.CmdDown() || event.AltDown())
+                    SetWeight(ClientMouseX, ClientMouseY, w, h, -1.0);
+                else
+                    SetWeight(ClientMouseX, ClientMouseY, w, h, 1.0);
+            }
+            
+            isPaintCursur = true;
+            Refresh(false);
         }
     }
     else if (isMouseRightDown)
@@ -1563,7 +1688,7 @@ void MyGLCanvas::OnMouseRightUp(wxMouseEvent& event)
     {
         wxMenu *pmenuPopUp = new wxMenu;
         wxMenuItem* pItem;
-        pItem = new wxMenuItem(pmenuPopUp,wxID_COPY, wxT("Save Raster Image"));
+        pItem = new wxMenuItem(pmenuPopUp,wxID_COPY, wxT("Save as image"));
         pmenuPopUp->Append(pItem);
         PopupMenu(pmenuPopUp,event.GetPosition());
         delete pmenuPopUp;
@@ -1612,7 +1737,111 @@ void MyGLCanvas::OnMouseMiddleUp(wxMouseEvent& event)
 
 void MyGLCanvas::OnSaveRasterImage(wxCommandEvent &WXUNUSED(event))
 {
+    const wxSize ClientSize = GetClientSize();
     
+    int width,height;
+    width=ClientSize.x;
+    height=ClientSize.y;
+    
+    if (Dim == 3)
+    {
+        wxFileDialog* OpenDialog = new wxFileDialog(
+		this, _("Generate code"), wxEmptyString, wxEmptyString, 
+		_("PNG files (*.png)|*.png|Bitmap files (*.bmp)|*.bmp|JPEG files (*.jpg)|*.jpg")
+        ,wxFD_SAVE, wxDefaultPosition);
+    
+        if (OpenDialog->ShowModal() == wxID_OK) // if the user click "Open" instead of "Cancel"
+        {
+            int findex = OpenDialog->GetFilterIndex();
+            wxString mytype = _("");
+            if (findex == 0)
+                mytype = _("png");
+            else if (findex == 1)
+                mytype = _("bmp");
+            else if (findex == 2)
+                mytype = _("jpg");
+            
+            wxString dgPath = OpenDialog->GetDirectory();
+            wxString dgFileName = OpenDialog->GetFilename();
+            wxString BaseName = _("");
+            if (dgFileName.AfterLast('.') == mytype)
+                BaseName = dgFileName.BeforeLast('.');
+            else
+                BaseName = dgFileName;
+            wxString Thefile = dgPath + wxT("/") + BaseName + wxT(".") + mytype;
+            
+            // Make the GLubyte array, factor of 3 because it's RBG.
+            glPixelStoref(GL_PACK_ALIGNMENT,1); //RGBA -> RGB   note that it should be PACK not UNPACK
+            GLubyte* fliped_rgb_pixels = new GLubyte[3 * width * height];
+            glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, fliped_rgb_pixels); //Hardware is flipped
+            wxImage img(width,height,(unsigned char *)fliped_rgb_pixels,true);
+            SaveImageFromData(img.Mirror(false), Thefile, mytype);
+            delete [] fliped_rgb_pixels;
+        }
+        
+        OpenDialog->Destroy();
+    }
+    else
+    {
+        wxFileDialog* OpenDialog = new wxFileDialog(
+		this, _("Generate code"), wxEmptyString, wxEmptyString, 
+		_("EPS files (*.eps)|*.eps|SVG files (*.svg)|*.svg|PNG files (*.png)|*.png|JPEG files (*.jpg)|*.jpg|TGA files (*.tga)|*.tga|TEX files (*.tex)|*.tex")
+        ,wxFD_SAVE, wxDefaultPosition);
+    
+        if (OpenDialog->ShowModal() == wxID_OK) // if the user click "Open" instead of "Cancel"
+        {
+            int findex = OpenDialog->GetFilterIndex();
+            wxString mytype = _("");
+            if (findex == 0)
+                mytype = _("eps");
+            else if (findex == 1)
+                mytype = _("svg");
+            else if (findex == 2)
+                mytype = _("png");
+            else if (findex == 3)
+                mytype = _("jpg");
+            else if (findex == 4)
+                mytype = _("tga");
+            else if (findex == 5)
+                mytype = _("tex");
+                
+            wxString dgPath = OpenDialog->GetDirectory();
+            wxString dgFileName = OpenDialog->GetFilename();
+            wxString BaseName = _("");
+            if (dgFileName.AfterLast('.') == mytype)
+                BaseName = dgFileName.BeforeLast('.');
+            else
+                BaseName = dgFileName;
+            wxString Thefile = dgPath + wxT("/") + BaseName + wxT(".") + mytype;
+            
+            mglGraph gr;
+            int ploterr = PlotBand(&gr, width, height, sec30, ObjectID);
+            if (findex == 0)
+                gr.WriteEPS(Thefile);
+            else if (findex == 1)
+                gr.WriteSVG(Thefile);
+            else if (findex == 2)
+                gr.WritePNG(Thefile);
+            else if (findex == 3)
+                gr.WriteJPEG(Thefile);
+            else if (findex == 4)
+                gr.WriteTGA(Thefile);
+            else if (findex == 5)
+                gr.WriteTEX(Thefile);
+        }
+        
+        OpenDialog->Destroy();
+    }
+}
+
+void MyGLCanvas::SaveImageFromData(wxImage image, wxString filepath, wxString OutputFileType)
+{
+    if (OutputFileType == _("png"))
+        image.SaveFile(filepath, wxBITMAP_TYPE_PNG);
+    else if (OutputFileType == _("bmp"))
+        image.SaveFile(filepath, wxBITMAP_TYPE_BMP);
+    else if (OutputFileType == _("jpg"))
+        image.SaveFile(filepath, wxBITMAP_TYPE_JPEG);
 }
 
 void MyGLCanvas::DoSelect(float x1, float y1, float x2, float y2)
@@ -1638,6 +1867,61 @@ void MyGLCanvas::DoSelect(float x1, float y1, float x2, float y2)
     DoubleArray1[14][1] = fmin(SelectionFramY1,SelectionFramY2);
     DoubleArray1[14][2] = fmax(SelectionFramX1,SelectionFramX2);
     DoubleArray1[14][3] = fmax(SelectionFramY1,SelectionFramY2);
+    
+    Refresh(true);
+}
+
+void MyGLCanvas::SetWeight(float x, float y, float w, float h, float coef)
+{
+    if (sec30->ArraysOf0DInt[0] == 0) return; //if (isBandLoaded = false) rturn;
+    int nX = sec30->ArraysOf0DInt[1];
+    int DFTnMin = sec30->ArraysOf0DInt[4];
+    int DFTnMax = sec30->ArraysOf0DInt[5];
+    
+    double Xmax = sec30->ArraysOf2DDouble[0][nX-1][6];
+    double X = Xmax*x/w;
+    
+    int iX = 0;
+    for(long ix=0; ix<nX; ix++)
+    {
+        if ( sec30->ArraysOf2DDouble[0][ix][6] >= X)
+        {
+            iX=ix;
+            break;
+        }
+    }
+    
+    double y1, y2;
+    if (ObjectID == 0)
+    {
+        y1 = sec30->ArraysOf0DDouble[1];
+        y2 = sec30->ArraysOf0DDouble[2];
+    }
+    else if (ObjectID == 1)
+    {
+        y1 = sec30->ArraysOf0DDouble[3];
+        y2 = sec30->ArraysOf0DDouble[4];
+    }
+    
+    double clickedY = y1 + (y2-y1)*(h - y)/h;
+    double dy = (y2-y1)/60;
+    for(int iband=DFTnMin; iband<=DFTnMax; iband++)
+    {
+        double y = sec30->ArraysOf2DDouble[1][iX][iband-1] - sec30->ArraysOf0DDouble[0]; //EIG - ChemP
+        if(y > clickedY-dy && y < clickedY+dy)
+        {
+            int ix1 = iX-7;
+            int ix2 = iX+7;
+            if (ix1 < 0) ix1=0;
+            if (ix2 > nX-1) ix2=nX-1;
+            for(long ix=ix1; ix<=ix2; ix++)
+            {
+                sec30->ArraysOf2DDouble[4][ix][iband-1] += coef*0.1;
+                if (sec30->ArraysOf2DDouble[4][ix][iband-1] < 0.0) sec30->ArraysOf2DDouble[4][ix][iband-1]=0.0;
+                if (sec30->ArraysOf2DDouble[4][ix][iband-1] > 1.0) sec30->ArraysOf2DDouble[4][ix][iband-1]=1.0;
+            }
+        }
+    }
     
     Refresh(true);
 }

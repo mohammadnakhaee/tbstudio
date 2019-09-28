@@ -3,13 +3,13 @@
 #include "wxcrafter.h"
 #include "unistd.h"
 #include <wx/mstream.h>
-#include <welcome650325.h>
 #include "wx/log.h"
 #include <wx/statbmp.h>
+#include "Sec30.h"
 class WelcomeClass : public WelcomeClassBase
 {
 public:
-    int WelcomeTime = 1;//sec
+    int WelcomeTime = 12;//sec
     int Time = 0;//ses
     WelcomeClass(wxWindow* parent);
     virtual ~WelcomeClass();

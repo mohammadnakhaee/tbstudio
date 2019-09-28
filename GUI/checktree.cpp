@@ -13,8 +13,10 @@ bool on_check_or_label(int flags)
 
 void unhighlight( wxTreeCtrl* m_treeCtrl1, wxTreeItemId& id )
 {
+	if(!id.IsOk()) return;
     int i=m_treeCtrl1->GetItemState(id);
-
+	if(i < 0) return;
+	
     if(wxCheckTree::UNCHECKED<=i && i<wxCheckTree::UNCHECKED_DISABLED)
     {
         m_treeCtrl1->SetItemState(id,wxCheckTree::UNCHECKED);
@@ -28,12 +30,9 @@ void unhighlight( wxTreeCtrl* m_treeCtrl1, wxTreeItemId& id )
 
 void mohighlight( wxTreeCtrl* m_treeCtrl1,wxTreeItemId& id,bool toggle )
 {
+	if(!id.IsOk()) return;
     int i=m_treeCtrl1->GetItemState (id);
-
-    if(!id.IsOk() || i < 0)
-    {
-        return;
-    }
+	if(i < 0) return;
 
     bool is_checked;
 
@@ -58,8 +57,10 @@ void mohighlight( wxTreeCtrl* m_treeCtrl1,wxTreeItemId& id,bool toggle )
 
 void ldhighlight( wxTreeCtrl* m_treeCtrl1, wxTreeItemId& id )
 {
+	if(!id.IsOk()) return;
     int i=m_treeCtrl1->GetItemState (id);
-
+	if(i < 0) return;
+    
     if(wxCheckTree::UNCHECKED<=i && i<wxCheckTree::UNCHECKED_DISABLED)
     {
         m_treeCtrl1->SetItemState (id,wxCheckTree::UNCHECKED_LEFT_DOWN);

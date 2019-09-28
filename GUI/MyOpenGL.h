@@ -78,6 +78,8 @@ public:
     float SelectionFramX2 = 0.0f;
     float SelectionFramY2 = 0.0f;
     
+    bool isPaintCursur = false;
+    
     int NumberOfDoubleArrays=0;
     int* nDoubleArray;
     double** DoubleArray;
@@ -123,6 +125,8 @@ private:
 
     double OldxMin, OldxMax, OldyMin, OldyMax;
     
+    bool PaintMode = false;
+    
     void OnPaint(wxPaintEvent& event);
     void Spin(float xSpin, float ySpin, float zSpin);
     void Animate(void);
@@ -137,11 +141,13 @@ private:
     void OnMouseMiddleDown(wxMouseEvent& event);
     void OnMouseMiddleUp(wxMouseEvent& event);
     void OnSaveRasterImage(wxCommandEvent &WXUNUSED(event));
+    void SaveImageFromData(wxImage image, wxString filepath, wxString OutputFileType);
     
     void CreateDoubleArray1();
     void RotationMatrix(double Theta, double lmn[3][3]);
     void DiscardDoubleArrays1();
     void DoSelect(float x1, float y1, float x2, float y2);
+    void SetWeight(float x, float y, float w, float h, float coef);
     void DoMove(float l, float m);
     void DoMove2d(float l, float m);
     void DoRotate(float l, float m, float Theta);
