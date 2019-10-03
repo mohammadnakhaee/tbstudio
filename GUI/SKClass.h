@@ -25,8 +25,10 @@ public:
 protected:
     void Btn_Update_OnClick(wxCommandEvent& event);
     void Btn_LastValues_OnClick(wxCommandEvent& event);
-    void Btn_ExportData_OnClick(wxCommandEvent& event);
-    void Btn_ImportData_OnClick(wxCommandEvent& event);
+    void Btn_ExportInit_OnClick(wxCommandEvent& event);
+	void Btn_ExportFinal_OnClick(wxCommandEvent& event);
+    void Btn_MakeACopy_OnClick(wxCommandEvent& event);
+	void ExportSKToTXT(wxString filepath, wxString BaseName, int InitOrFinalSK);
     DECLARE_EVENT_TABLE()
 };
 #endif // BONDSCLASS_H

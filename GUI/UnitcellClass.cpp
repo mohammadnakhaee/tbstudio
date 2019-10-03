@@ -96,6 +96,7 @@ void UnitcellClass::Btn_Load_OnClick(wxCommandEvent& event)
 		_("Vasp XML Output (*.xml)|*.xml"),
         wxFD_OPEN, wxDefaultPosition);
     
+	OpenDialog->SetDirectory(sec30->WorkingDIR);
     if (OpenDialog->ShowModal() == wxID_OK) // if the user click "Open" instead of "Cancel"
 	{
         int dgFileKind = OpenDialog->GetFilterIndex();
@@ -115,6 +116,7 @@ void UnitcellClass::Btn_Load_OnClick(wxCommandEvent& event)
 		_("CIF File (*.cif)|*.cif|Vasp XML Output (*.xml)|*.xml"),
         wxFD_OPEN, wxDefaultPosition);
     
+	OpenDialog->SetDirectory(sec30->WorkingDIR);
     if (OpenDialog->ShowModal() == wxID_OK) // if the user click "Open" instead of "Cancel"
 	{
         int dgFileKind = OpenDialog->GetFilterIndex();
@@ -138,6 +140,7 @@ void UnitcellClass::Btn_Save_OnClick(wxCommandEvent& event)
 		_("CIF File (*.cif)|*.cif")
         ,wxFD_SAVE, wxDefaultPosition);
     
+	OpenDialog->SetDirectory(sec30->WorkingDIR);
     if (OpenDialog->ShowModal() == wxID_OK) // if the user click "Open" instead of "Cancel"
 	{
         int dgFileKind = OpenDialog->GetFilterIndex();
@@ -309,15 +312,15 @@ void UnitcellClass::ExportToCIF(wxString filepath, wxString filename)
 
 void UnitcellClass::ImportFromCIF0(wxString filepath, wxString filename)
 {
-    wxString fname1 = filepath + wxT("/") + filename;
-    gemmi::cif::Document doc = gemmi::cif::read_file(fname1.c_str().AsChar());
-    for (gemmi::cif::Block& block : doc.blocks)
-    {
-        for (auto c : block.find("atom_site_.", {"label", "fract_x", "fract_y", "fract_z"}))
-        {
-            logfile->AppendText(wxString::Format(_("%s, %.8f, %.8f, %.8f"), c[0], c[1], c[2], c[3]) + _("\n"));
-        }
-    }
+    //wxString fname1 = filepath + wxT("/") + filename;
+    //gemmi::cif::Document doc = gemmi::cif::read_file(fname1.c_str().AsChar());
+    //for (gemmi::cif::Block& block : doc.blocks)
+    //{
+    //    for (auto c : block.find("atom_site_.", {"label", "fract_x", "fract_y", "fract_z"}))
+    //    {
+    //        logfile->AppendText(wxString::Format(_("%s, %.8f, %.8f, %.8f"), c[0], c[1], c[2], c[3]) + _("\n"));
+    //    }
+    //}
 }
 
 void UnitcellClass::ClearAtoms()

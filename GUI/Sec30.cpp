@@ -103,7 +103,7 @@ void Sec30::AddVarVector(wxWindow *parent, int VecCnt, wxString VariableName, wx
     parent->Layout();
 }
 
-void Sec30::AddGrid(wxWindow *parent, int nRow, int nCol, wxString VariableName, wxString* ColNames, wxString* ColTypes, int* ColSizes, int* ColPrecision, int xCtrlSize, int yCtrlSize, bool EnableEvent)
+myGrid* Sec30::AddGrid(wxWindow *parent, int nRow, int nCol, wxString VariableName, wxString* ColNames, wxString* ColTypes, int* ColSizes, int* ColPrecision, int xCtrlSize, int yCtrlSize, bool EnableEvent)
 {
     wxBoxSizer* MySizer = new wxBoxSizer(wxHORIZONTAL);
     parent->GetSizer()->Add(MySizer, 0, wxLEFT|wxRIGHT|wxTOP|wxEXPAND, WXC_FROM_DIP(5));
@@ -153,6 +153,7 @@ void Sec30::AddGrid(wxWindow *parent, int nRow, int nCol, wxString VariableName,
 
     MySizer->Layout();
     parent->Layout();
+	return gc;
 }
 
 void Sec30::AddGrid(wxWindow *parent, int nRow, int nCol, wxString VariableName, wxString* ColTypes, int* ColPrecision)
@@ -4400,6 +4401,58 @@ void Sec30::CopyLastSKToInitialSK()
     
 }
 
+bool Sec30::IsSKPanelFilled()
+{
+	bool isFilled = false;
+    myGrid* osgc = this->GetGridObject(_("OS"));
+    int nRowsOS = osgc->GetNumberRows();
+    for (int i=0; i<nRowsOS; i++)
+    {
+        
+		double d1 = 0.0;
+		double d2 = 0.0;
+		wxString val1 = osgc->GetCellValue(i, 1);
+		wxString val2 = osgc->GetCellValue(i, 3);
+		bool output1 = val1.ToDouble(&d1);
+		bool output2 = val2.ToDouble(&d2);
+		if (!output1) d1 = 0.0;
+		if (!output2) d2 = 0.0;
+		if ((d1 != 0.0) || (d2 != 0.0)) return true;
+    }
+    
+    myGrid* skgc = this->GetGridObject(_("SK"));
+    int nRowsSK = skgc->GetNumberRows();
+    for (int i=0; i<nRowsSK; i++)
+    {
+		double d1 = 0.0;
+		double d2 = 0.0;
+		wxString val1 = skgc->GetCellValue(i, 1);
+		wxString val2 = skgc->GetCellValue(i, 3);
+		bool output1 = val1.ToDouble(&d1);
+		bool output2 = val2.ToDouble(&d2);
+		if (!output1) d1 = 0.0;
+		if (!output2) d2 = 0.0;
+		if ((d1 != 0.0) || (d2 != 0.0)) return true;
+    }
+    
+    myGrid* olgc = this->GetGridObject(_("OL"));
+    int nRowsOL = olgc->GetNumberRows();
+    for (int i=0; i<nRowsOL; i++)
+    {
+		double d1 = 0.0;
+		double d2 = 0.0;
+		wxString val1 = olgc->GetCellValue(i, 1);
+		wxString val2 = olgc->GetCellValue(i, 3);
+		bool output1 = val1.ToDouble(&d1);
+		bool output2 = val2.ToDouble(&d2);
+		if (!output1) d1 = 0.0;
+		if (!output2) d2 = 0.0;
+		if ((d1 != 0.0) || (d2 != 0.0)) return true;
+    }
+}
+
+/*
+//1.5.0
 wxString Sec30::GetSN(wxString UserName)
 {
     wxString m_MACAddress = wxMACAddressUtility::GetMACAddress();
@@ -4577,6 +4630,8 @@ wxString Sec30::SN2ID(wxString SerialNumber, int seed)
     wxString ID = wxString(RecBaseSN) + _(":") + wxString(RecMacAddr);
     return ID;
 }
+//1.5.0
+*/
 
 /*
 void Sec30::SetVecValue(wxWindow *parent, wxString VariableName, double* Array, int nArray)

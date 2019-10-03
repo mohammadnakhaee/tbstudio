@@ -23,6 +23,9 @@
 #include <exception>
 #include "Sec30.h"
 
+
+
+
 // It just declares MY_EVENT event type
 /******************************************************************************/
 wxDECLARE_EVENT(MyOpenGL_EVT_SelectionChanged, wxCommandEvent);
@@ -55,6 +58,7 @@ private:
 class MyGLCanvas : public wxGLCanvas
 {
 public:
+    //int canvasRefreshCnt=0;
     Sec30* sec30;
     bool isSelectMode = false;
     bool isMoveMode = false;

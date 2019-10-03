@@ -17,6 +17,8 @@ UpdateClass::~UpdateClass()
 
 void UpdateClass::ActivateOnClick(wxCommandEvent& event)
 {
+	/*
+	//1.5.0
     wxString SN1 = AKTextBox->GetValue();
     if (Sec30::IsSNSeed1MatchToThisPC(SN1))
     {
@@ -27,6 +29,8 @@ void UpdateClass::ActivateOnClick(wxCommandEvent& event)
     }
     else
         wxMessageBox(_("Unable to successfully verify the product license!"));
+	//1.5.0
+	*/
 }
 
 wxBitmap UpdateClass::GetPng(const void* data, size_t length)
@@ -115,6 +119,8 @@ void UpdateClass::ImageOnMouseMove(wxMoveEvent& event)
 
 void UpdateClass::GenerateActivationKey()
 {
+	/*
+	//1.5.0
     wxString SN = SNTextBox->GetValue();
     wxString UserName = AKTextBox->GetValue();
     if (UserName == _("")) {wxMessageBox(_("Choose a username in activation key box.")); return;}
@@ -123,4 +129,6 @@ void UpdateClass::GenerateActivationKey()
     wxString newID = BaseID + _("|") + UserName;
     wxString ActKey = Sec30::ID2SN(newID, 1);
     AKTextBox->SetValue(ActKey);
+	//1.5.0
+	*/
 }

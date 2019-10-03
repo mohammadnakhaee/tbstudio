@@ -2,6 +2,7 @@
 #define GRAPHCLASS_H
 #include "wxcrafter.h"
 #include "MyOpenGL.h"
+#include "MyFigureClass.h"
 #include "Sec30.h"
 
 class GraphClass : public GraphBaseClass
@@ -9,6 +10,8 @@ class GraphClass : public GraphBaseClass
 public:
     Sec30* sec30;
     MyGLCanvas* glc;
+	MyFigure2d* glc2d;
+	int MyDim = 0;
     int ObjectID = -1;
     GraphClass(wxWindow* parent, int Dim, Sec30* sec30Var, int MyID);
     virtual ~GraphClass();

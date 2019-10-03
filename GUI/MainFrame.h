@@ -24,6 +24,7 @@
 #include <thread>
 #include <Regression.h>
 #include "UpdateClass.h"
+#include <wx/aui/auibook.h>
 //#include <memory>
 /**********************************************************************************/
 
@@ -33,10 +34,10 @@ class MainFrame : public MainFrameBaseClass
 {
 public:
     wxString MySerialNumber = _("");
-    wxString SoftwareName = _("TBStudio");
+    wxString SoftwareName = _("Tight-Binding Studio");
     wxString FreeSoftwareLimitations = _("fitting a TB model including d-orbitals");
     int Ver_MAJOR = 1;
-    int Ver_MINOR = 4;
+    int Ver_MINOR = 5;
     int Ver_RELEASE = 0;
     
     MainFrame(wxWindow* parent);
@@ -53,7 +54,8 @@ public:
     SetupClass* setupPanel;
     SKClass* skPanel;
     ColorsClass* ColorsForm;
-    
+    wxAuiNotebook* SKtables;
+	
     bool IsLicensed = false;
     wxString LicenseOwner = _("");
     
@@ -78,7 +80,7 @@ public:
     Regression* regression;
     //std::thread* FittingThread;
     bool isFittingThreadBusy = false;
-    
+	
     wxRibbonButtonBar* RButtonMouse;
     
     
@@ -118,9 +120,11 @@ protected:
     virtual void OnchoisSelected(wxCommandEvent& event);
     virtual void BtnOpen_OnClick(wxRibbonButtonBarEvent& event);
     virtual void BtnSave_OnClick(wxRibbonButtonBarEvent& event);
+	virtual void BtnSaveAs_OnClick(wxRibbonButtonBarEvent& event);
     virtual void BtnGrid_OnClick(wxRibbonButtonBarEvent& event);
     virtual void BtnMain_OnClick(wxRibbonButtonBarEvent& event);
     virtual void BtnTerminal_OnClick(wxRibbonButtonBarEvent& event);
+	virtual void SaveAs();
     virtual void mgl_test(wxRibbonButtonBarEvent& event);
     virtual void B2D(wxRibbonButtonBarEvent& event);
     virtual void B3D(wxRibbonButtonBarEvent& event);
@@ -147,6 +151,7 @@ protected:
     virtual void GetHamiltonianMap(wxCheckTree* orbs, Astring0D &HamiltonianMap, Astring0D &HamiltonianShellMap, Aint1D &HamiltonianDimMap);
     virtual void AddShellAndOrbitalInfo(wxCheckTree* orbsTree, wxString AtomName, Astring0D &HamiltonianMap, Astring0D &HamiltonianShellMap, Aint0D &HamiltonianDimMapItem, int &LastIndex);
     virtual void ReadSK();
+	virtual void Init_Notebook();
     virtual void Init_graph3d();
     virtual void Init_graph2d0();
     virtual void Init_graph2d();
@@ -207,7 +212,16 @@ protected:
     void GenerateMathematicaCode(wxString filepath, wxString BaseName, int MyID_Initial0Final1);
     void GenerateMatlabCode(wxString filepath, wxString BaseName, int MyID_Initial0Final1);
     void GeneratePythonCode(wxString filepath, wxString BaseName, int MyID_Initial0Final1);
-    
+    void MakeACopyOfSKList();
+	myGrid* CreateGrid(wxWindow *parent, int nRow, int nCol, wxString VariableName, wxString* ColNames, wxString* ColTypes, int* ColSizes, int* ColPrecision, int xCtrlSize, int yCtrlSize, bool EnableEvent);
+	int ExportSKToFile(wxString filepath);
+	void CreateATabFromFile(wxString filepath, wxString tabname, int nLines);
+	void LoadSKFileToTable(wxString filepath, myGrid* grid);
+	void LoadSKTables();
+	int GetTheNumberOfLines(wxString filepath);
+	void SKtables_pageClose(wxAuiNotebookEvent& event);
+	void SKtables_pageClosed(wxAuiNotebookEvent& event);
+	
 private:
     wxTextCtrl* logfile;
     wxAuiManager aui_mgr;
@@ -216,12 +230,14 @@ private:
     std::list<int> EssentialListj;
     std::list<int> EssentialListk;
     bool isItNew(int i,int j,int k);
-    virtual void sec30_OnUpdated(wxCommandEvent& event);
-    virtual void myOpenGL_EVT_SelectionChanged(wxCommandEvent& event);
-    virtual void regressionEVT_OnNewData(wxCommandEvent& event);
-    virtual void regressionEVT_OnFinished(wxCommandEvent& event);
-    virtual void regressionEVT_OnStarted(wxCommandEvent& event);
-    virtual void LoadIcons();
-    virtual wxBitmap GetPng(const void* data, size_t length);
+    void sec30_OnUpdated(wxCommandEvent& event);
+    void myOpenGL_EVT_SelectionChanged(wxCommandEvent& event);
+    void regressionEVT_OnNewData(wxCommandEvent& event);
+    void regressionEVT_OnFinished(wxCommandEvent& event);
+    void regressionEVT_OnStarted(wxCommandEvent& event);
+    void LoadIcons();
+    wxBitmap GetPng(const void* data, size_t length);
+	//typedef std::unordered_map<std::string, pthread_t> ThreadMap;
+	//pthread_t RegressionThreadMap;
 };
 #endif // MAINFRAME_H

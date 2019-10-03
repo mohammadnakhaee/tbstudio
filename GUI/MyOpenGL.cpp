@@ -377,28 +377,35 @@ int PlotBand(mglGraph *gr, int w, int h, Sec30* sec30, int MyID)
         return 1;
 }
 
-int sample(mglGraph *gr,double w, double h)
+int sample(mglGraph *gr,double w, double h, int ObjectID)
 {
     gr->SetSize(w,h,true);
-    mglData y(100);
-    mglData x(100);
-    for (long j = 0; j < x.nx; j++)
+    mglData y(2);
+    mglData x(2);
+	
+	x.a[0]=-10.0;
+	y.a[0]=-10.0;
+	x.a[1]=-10.0;
+	y.a[1]=-10.0;
+    /*for (long j = 0; j < x.nx; j++)
     {
         x.a[j] = (5.0*M_PI*(j)/x.nx+it*0.5);
         y.a[j] = sin(5.0*M_PI*(j)/y.nx+it*0.5);
-    }
+    }*/
     
     gr->NewFrame ();          // start frame
     gr->SubPlot(1,1,0,"<_"); 
     gr->Aspect(1.0,1.0);
     
-    
-    gr->Title("Beam and ray tracing","",-1.5);
+    if (ObjectID==0)
+		gr->Title("Initial Band-Structure","",-1.5);
+	else
+		gr->Title("Final Band-Structure","",-1.5);
     gr->SetFontSize(4);
     gr->Box();                 //some plotting
     gr->Axis();                //draw axis
-    gr->Label('x', "x",0);   //x Title
-    gr->Label('y', "f(x) (Arb.)",0);   //y Title
+    gr->Label('x', "",0);   //x Title
+    gr->Label('y', "Energy(x) (eV)",0);   //y Title
     gr->Grid("xy","{xA9A9A9}|");
     
     gr->Plot(x, y, "{x6495ED}-2");      // "b" is colour ??
@@ -548,6 +555,7 @@ MyGLContext::MyGLContext(wxGLCanvas *canvas, int DimVar)
              : wxGLContext(canvas)
 {
     Dim=DimVar;
+	if (Dim == 2) return;
     SetCurrent(*canvas);
     //glGenTextures(WXSIZEOF(m_textures), m_textures);
     
@@ -1242,7 +1250,8 @@ void MyGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
 {
     // This is required even though dc is not used otherwise.
     wxPaintDC dc(this);
-
+	MyGLContext& context = wxGetApp().GetContext(this, Dim, m_useStereo);
+	
     // Set the OpenGL viewport according to the client size of this canvas.
     // This is done here rather than in a wxSizeEvent handler because our
     // OpenGL rendering context (and thus viewport setting) is used with
@@ -1261,27 +1270,48 @@ void MyGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
         
     if (Dim==2) //Plot BandStructures
     {
+		
         //Plot using MathGL Library
         mglGraph gr;
+		
         int ploterr = PlotBand(&gr, w, h, sec30, ObjectID);
+		//int ploterr = 0;
         //sample(&gr, w, h);
         
+		//bool CanIt = dc.CanDrawBitmap();
+		
         //Convert to image and then to Bitmap
         if (ploterr==0)
         {
             wxImage img(w,h,(unsigned char *)gr.GetRGB(),true);
-            wxBitmap bmp(img);
-            dc.DrawBitmap(bmp,0,0,false);
+            //wxBitmap bmp(img);
+            dc.DrawBitmap(img,0,0,false);
         }
         else
         {
-            wxImage img(w,h,true);
-            wxRect rect(0,0,w,h);
-            img.SetRGB(rect,255,255,255);
-            wxBitmap bmp(img);
-            dc.DrawBitmap(bmp,0,0,false);
+			sample(&gr, w, h, ObjectID);
+			wxImage img(w,h,(unsigned char *)gr.GetRGB(),true);
+            //wxImage img(w,h,true);
+            //wxRect rect(0,0,w,h);
+            //img.SetRGB(rect,255,20,25);
+            //wxBitmap bmp(img);
+            dc.DrawBitmap(img,0,0,false);
         }
-        
+		
+		/*
+		if (canvasRefreshCnt<3)
+		{
+			canvasRefreshCnt++;
+			this->Refresh(false);
+		}
+		else
+		{
+			canvasRefreshCnt=0;
+		}
+		 */
+		 
+		//this->GetContext();
+		
         //Print to dc
         //wxBitmap bmp2(wxT("C:\\GCloth.png"), wxBITMAP_TYPE_PNG);
         //dc.DrawBitmap(bmp2,0,0,false);
@@ -1289,7 +1319,6 @@ void MyGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
     }
     else  //Draw the 3d structure
     {
-        MyGLContext& context = wxGetApp().GetContext(this, Dim, m_useStereo);
 
         glViewport(0,0,ClientSize.x, ClientSize.y); // decide which area of the frame will be painted
         //gluOrtho2D(0, ClientSize.x, 0, ClientSize.y);
@@ -1479,6 +1508,7 @@ void MyGLCanvas::OnMouseWheel(wxMouseEvent& event)
         }
     }
     
+
     Refresh(false);
 }
 
@@ -1749,7 +1779,8 @@ void MyGLCanvas::OnSaveRasterImage(wxCommandEvent &WXUNUSED(event))
 		this, _("Generate code"), wxEmptyString, wxEmptyString, 
 		_("PNG files (*.png)|*.png|Bitmap files (*.bmp)|*.bmp|JPEG files (*.jpg)|*.jpg")
         ,wxFD_SAVE, wxDefaultPosition);
-    
+		
+		OpenDialog->SetDirectory(sec30->WorkingDIR);
         if (OpenDialog->ShowModal() == wxID_OK) // if the user click "Open" instead of "Cancel"
         {
             int findex = OpenDialog->GetFilterIndex();
@@ -1787,7 +1818,8 @@ void MyGLCanvas::OnSaveRasterImage(wxCommandEvent &WXUNUSED(event))
 		this, _("Generate code"), wxEmptyString, wxEmptyString, 
 		_("EPS files (*.eps)|*.eps|SVG files (*.svg)|*.svg|PNG files (*.png)|*.png|JPEG files (*.jpg)|*.jpg|TGA files (*.tga)|*.tga|TEX files (*.tex)|*.tex")
         ,wxFD_SAVE, wxDefaultPosition);
-    
+		
+		OpenDialog->SetDirectory(sec30->WorkingDIR);
         if (OpenDialog->ShowModal() == wxID_OK) // if the user click "Open" instead of "Cancel"
         {
             int findex = OpenDialog->GetFilterIndex();

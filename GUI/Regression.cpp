@@ -72,61 +72,88 @@ double Regression::Variance(double* a, int na)
 
 void Regression::Start(double* p, int np, double* t, double* y_dat, int ny, double* weight, double* dp, double p_min, double p_max, double Mixing, double* c, lmOptions opts, bool isOneStep)
 {
-    SendEventRunStarted();
-    myGrid* osgc = sec30->GetGridObject(_("OS"));
-    myGrid* skgc = sec30->GetGridObject(_("SK"));
-    myGrid* olgc = sec30->GetGridObject(_("OL"));
-    sec30->OSBuffer = new double[osgc->GetNumberRows()];
-    sec30->SKBuffer = new double[skgc->GetNumberRows()];
-    sec30->OLBuffer = new double[olgc->GetNumberRows()];
-    
-    int natoms = 0;
-    sec30->GetVar(_("nAtoms[0]"),natoms);
-    bool isSOC;
-    sec30->GetCheckVar(_("SOC[0]"), isSOC);
-    bool isOverlap;
-    sec30->GetCheckVar(_("Overlap[0]"), isOverlap);
-    
-    bool isSpin = false;
-    if (isSOC) isSpin = true;
-    
-    int MaxIter = opts.MaxIter;          // maximum number of iterations
-    double redX2;
-    double* sigma_p = new double[np];
-    double** cvg_hst = new double*[MaxIter];                          // convergence history
-    for (int i=0; i<MaxIter; i++) cvg_hst[i] = new double[np+3];
-    
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //Allocate out side. Because func will be called a lot and it will be slow if we allocate and delete many times.
-    int nHamiltonian = sec30->ArraysOf1DString[1].size();
-    
-    int nHamiltonianTot;
-    if (isSpin)
-        nHamiltonianTot = 2*nHamiltonian;
-    else
-        nHamiltonianTot = nHamiltonian;
-        
-    int nH2 = nHamiltonianTot*nHamiltonianTot;
-    lapack_complex_double* LowerSymMatrixHf;
-    lapack_complex_double* LowerSymMatrixSf;
-    if (isOverlap)
+	int natoms = 0;
+	bool isSOC;
+	bool isOverlap;
+	bool isSpin = false;
+	int MaxIter;
+	double redX2;
+	double* sigma_p;
+	double** cvg_hst;
+	int nHamiltonian;
+	int nHamiltonianTot;
+	int nH2;
+	double* eigHf;
+	lapack_complex_double* LowerSymMatrixHf;
+	lapack_complex_double* LowerSymMatrixSf;
+	
+	myGrid* osgc = sec30->GetGridObject(_("OS"));
+	myGrid* skgc = sec30->GetGridObject(_("SK"));
+	myGrid* olgc = sec30->GetGridObject(_("OL"));
+	
+	try{
+	
+		SendEventRunStarted();
+		sec30->OSBuffer = new double[osgc->GetNumberRows()];
+		sec30->SKBuffer = new double[skgc->GetNumberRows()];
+		sec30->OLBuffer = new double[olgc->GetNumberRows()];
+		
+		
+		sec30->GetVar(_("nAtoms[0]"),natoms);
+		
+		sec30->GetCheckVar(_("SOC[0]"), isSOC);
+		
+		sec30->GetCheckVar(_("Overlap[0]"), isOverlap);
+		
+		
+		if (isSOC) isSpin = true;
+		
+		MaxIter = opts.MaxIter;          // maximum number of iterations
+		sigma_p = new double[np];
+		cvg_hst = new double*[MaxIter];                          // convergence history
+		for (int i=0; i<MaxIter; i++) cvg_hst[i] = new double[np+3];
+		
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//Allocate out side. Because func will be called a lot and it will be slow if we allocate and delete many times.
+		nHamiltonian = sec30->ArraysOf1DString[1].size();
+		
+		
+		if (isSpin)
+			nHamiltonianTot = 2*nHamiltonian;
+		else
+			nHamiltonianTot = nHamiltonian;
+			
+		nH2 = nHamiltonianTot*nHamiltonianTot;
+		
+		if (isOverlap)
+		{
+			int nAB2 = (nHamiltonianTot+nH2) + 1;
+			LowerSymMatrixHf = new lapack_complex_double[nAB2];
+			LowerSymMatrixSf = new lapack_complex_double[nAB2];
+		}
+		else
+		{
+			LowerSymMatrixHf = new lapack_complex_double[nH2];
+		}
+		//lapack_complex_double* LowerSymMatrixHf = (lapack_complex_double*)LAPACKE_malloc( sizeof(lapack_complex_double) * nH2 );
+		//lapack_complex_double zero= LAPACKE_make_complex_double(0.0,0.0);
+		eigHf = new double[nHamiltonianTot];
+		for (int i=0; i<nHamiltonianTot; i++) eigHf[i] = 0.0;
+		
+	}
+    catch(std::exception& ex)
     {
-        int nAB2 = (nHamiltonianTot+nH2) + 1;
-        LowerSymMatrixHf = new lapack_complex_double[nAB2];
-        LowerSymMatrixSf = new lapack_complex_double[nAB2];
-    }
-    else
-    {
-        LowerSymMatrixHf = new lapack_complex_double[nH2];
-    }
-    //lapack_complex_double* LowerSymMatrixHf = (lapack_complex_double*)LAPACKE_malloc( sizeof(lapack_complex_double) * nH2 );
-    //lapack_complex_double zero= LAPACKE_make_complex_double(0.0,0.0);
-    double* eigHf = new double[nHamiltonianTot];
-    for (int i=0; i<nHamiltonianTot; i++) eigHf[i] = 0.0;
+		wxMessageBox("Error (Reg-101): Something went wrong ...");
+	}
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    
-    lm(p, np, t, y_dat, ny, weight, dp, p_min, p_max, Mixing, c, opts, redX2, sigma_p, cvg_hst, isOneStep, LowerSymMatrixHf, LowerSymMatrixSf, eigHf, natoms, isSOC, isOverlap);
-    
+    try
+	{
+		lm(p, np, t, y_dat, ny, weight, dp, p_min, p_max, Mixing, c, opts, redX2, sigma_p, cvg_hst, isOneStep, LowerSymMatrixHf, LowerSymMatrixSf, eigHf, natoms, isSOC, isOverlap);
+    }
+    catch(std::exception& ex)
+    {
+		wxMessageBox("Error (Reg-102): Something went wrong ...");
+	}
     //////////////////////////////
     //Deallocate
     delete [] eigHf;
@@ -601,7 +628,7 @@ void Regression::lm(double* p, int np, double* t, double* y_dat, int ny, double*
         else if ( iteration == MaxIter && !isOneStep)
         {
             data = _("");
-            data.append(_("Maximum number of iterations reached without convergence!\n"));
+            data.append(_("Maximum number of iterations reached!\n"));
             SendDataToTerminal(data);
             stop = true;
             break;
@@ -611,7 +638,8 @@ void Regression::lm(double* p, int np, double* t, double* y_dat, int ny, double*
     
     // --- convergence achieved, find covariance and confidence intervals
     
-    if (!BadCondition)
+    //if (!BadCondition)
+	if (false)
     {
         // ---- Error Analysis ----
 

@@ -42,14 +42,14 @@ StructureClass::StructureClass(wxWindow* parent, Sec30* sec30var, wxWindowID id,
     sec30->AddCheckBox(this, _("abcShow"), _("Show Primitive Unit Vectors"));
     sec30->SetCheckVar(_("xyzShow[0]"), true, false);
     sec30->SetCheckVar(_("abcShow[0]"), false, false);
-    wxComboBox* choicectr = sec30->AddComboCtrl(this, _("ShowUnitCellMode"), _("Unit-Cell"), 60, 110, true);
+    wxComboBox* choicectr = sec30->AddComboCtrl(this, _("ShowUnitCellMode"), _("Unit-Cell"), 90, 130, true);
     choicectr->Append(_("Do not show"));
     choicectr->Append(_("Primitive cell"));
     choicectr->Append(_("All cells"));
     choicectr->SetEditable(false);
     choicectr->SetBackgroundColour(*wxWHITE);
     choicectr->Select(1);
-    wxComboBox* choicectr2 = sec30->AddComboCtrl(this, _("TransferTo"), _("Transfer"), 60, 110, true);
+    wxComboBox* choicectr2 = sec30->AddComboCtrl(this, _("TransferTo"), _("Transfer"), 90, 130, true);
     choicectr2->Append(_("Original"));
     choicectr2->Append(_("Adjust"));
     choicectr2->Append(_("Center"));
@@ -121,6 +121,7 @@ void StructureClass::Btn_Export_XYZ_OnClick(wxCommandEvent& event)
 		_("XYZ File (*.xyz)|*.xyz")
         ,wxFD_SAVE, wxDefaultPosition);
     
+	OpenDialog->SetDirectory(sec30->WorkingDIR);
     if (OpenDialog->ShowModal() == wxID_OK) // if the user click "Open" instead of "Cancel"
 	{
         //int dgFileKind = OpenDialog->GetFilterIndex();
@@ -140,6 +141,7 @@ void StructureClass::Btn_Import_XYZ_OnClick(wxCommandEvent& event)
 		_("XYZ File (*.xyz)|*.xyz")
         ,wxFD_OPEN, wxDefaultPosition);
     
+	OpenDialog->SetDirectory(sec30->WorkingDIR);
     if (OpenDialog->ShowModal() == wxID_OK) // if the user click "Open" instead of "Cancel"
 	{
         //int dgFileKind = OpenDialog->GetFilterIndex();

@@ -8,11 +8,21 @@ GraphClass::GraphClass(wxWindow* parent, int Dim, Sec30* sec30Var, int MyID)
 {
     sec30 = sec30Var;
     ObjectID = MyID;
+	MyDim = Dim;
     int AttribList[] = {WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 16, 0};
 	//int AttribList[] = { WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_STEREO, 0};
 	//int AttribList[] = {WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 32};
-    glc = new MyGLCanvas(this, Dim, sec30, MyID, AttribList);
-    TopPanel->GetContainingSizer()->Add(glc,wxSizerFlags().Proportion(1).Expand().Border(wxALL, 0));
+	
+	if (Dim==2)
+	{
+		glc2d = new MyFigure2d(this, sec30, MyID);
+		TopPanel->GetContainingSizer()->Add(glc2d,wxSizerFlags().Proportion(1).Expand().Border(wxALL, 0));
+	}
+	else if (Dim==3)
+	{
+		glc = new MyGLCanvas(this, Dim, sec30, MyID, AttribList);
+		TopPanel->GetContainingSizer()->Add(glc,wxSizerFlags().Proportion(1).Expand().Border(wxALL, 0));
+	}
     // test IsDisplaySupported() function:
     //static const int attribs[] = { WX_GL_RGBA, WX_GL_DOUBLEBUFFER, 0 };
 	//static const int attribs[] = {WX_GL_DOUBLEBUFFER, 0 ,WX_GL_DEPTH_SIZE, 32};
@@ -32,7 +42,7 @@ GraphClass::GraphClass(wxWindow* parent, int Dim, Sec30* sec30Var, int MyID)
 
 GraphClass::~GraphClass()
 {
-    DiscardAtomicStructure();
+    if (MyDim==3) DiscardAtomicStructure();
 }
 
 void GraphClass::CreateAtomicStructure(Sec30* sec30Var, bool IsNewAllocate)

@@ -11,6 +11,7 @@
 //#include <WX/mdi.h>
 #include <wx/msgdlg.h>
 #include <WelcomeClass.h>
+#include <wx/dir.h>
 
 /*
 #ifdef __WXMAC__
@@ -46,9 +47,13 @@ wxGLContext* m_context;
 MainFrame::MainFrame(wxWindow* parent)
     : MainFrameBaseClass(parent)
 {
+	/*
+	//1.5.0
     MySerialNumber = Sec30::GetSN(_("Limited"));
     IsLicensed = CheckLicense(LicenseOwner);
-    
+    //1.5.0
+	*/
+	
     this->SetTitle(SoftwareName);
     this->Maximize(true);
     LoadIcons();
@@ -65,6 +70,7 @@ MainFrame::MainFrame(wxWindow* parent)
     this->Connect(RegressionEVT_OnFinished, wxCommandEventHandler(MainFrame::regressionEVT_OnFinished), NULL, this);
     this->Connect(RegressionEVT_OnStarted, wxCommandEventHandler(MainFrame::regressionEVT_OnStarted), NULL, this);
     
+	
     InitializeSec30Arrays();
     
     /*
@@ -121,7 +127,13 @@ MainFrame::MainFrame(wxWindow* parent)
     aui_mgr.SetFlags(AUI_Flags);
     aui_mgr.SetManagedWindow(mainpanel);
     aui_mgr.GetArtProvider()->SetMetric(wxAUI_DOCKART_PANE_BORDER_SIZE, 1);
-    
+	//aui_mgr.GetArtProvider()->SetMetric(wxAUI_DOCKART_GRIPPER_SIZE, 80);
+	wxColour c; //Also it is possible to determine the color in this way: wxColour c=*wxGREEN;
+    c.Set(150,0,0,255);
+    aui_mgr.GetArtProvider()->SetColour(wxAUI_DOCKART_ACTIVE_CAPTION_GRADIENT_COLOUR, c);
+    c.Set(191,205,219,255);
+	aui_mgr.GetArtProvider()->SetColour(wxAUI_DOCKART_INACTIVE_CAPTION_COLOUR, c);
+	  
     wxPanel* CenteralPanel= new wxPanel(mainpanel);
     //CenterPanel->SetBackgroundColour(* wxRED); //Google it to know why it does not work.
     aui_mgr.AddPane(CenteralPanel, wxCENTER);
@@ -162,10 +174,12 @@ MainFrame::MainFrame(wxWindow* parent)
     LeftPanel->ChangeSelection(0);
     
     
-    
+    Init_Notebook();
     Init_graph3d();
     Init_graph2d0();
     Init_graph2d();
+	
+	
     regression = new Regression(sec30, this, graph2d);
     
     WelcomeClass* welcome = new WelcomeClass(this);
@@ -173,6 +187,8 @@ MainFrame::MainFrame(wxWindow* parent)
     //welcome->CenterOnParent();
     welcome->ShowModal();
     
+	
+	
     /////////////////////////////////////////////////////////////////////////////////////
     ///////Just to call InsertPane to push old panes (graph2d0 and graph2d) aside////////
     wxPanel* dummy = new wxPanel(CenteralPanel);
@@ -254,6 +270,8 @@ MainFrame::~MainFrame()
 
 bool MainFrame::CheckLicense(wxString &UserName)
 {
+	/*
+	//1.5.0
     bool isOK = false;
     wxString SNSeed1 = _("");
     if (!Sec30::GetSNFromLicenseFile(SNSeed1)) return isOK;
@@ -261,6 +279,8 @@ bool MainFrame::CheckLicense(wxString &UserName)
     wxString ID1 = Sec30::SN2ID(SNSeed1,1);
     UserName = ID1.AfterLast('|');
     return true;
+	//1.5.0
+	*/
 }
 
 void MainFrame::OnExit(wxCommandEvent& event)
@@ -717,7 +737,7 @@ void MainFrame::InitializeSec30Arrays()
     sec30->ArraysOf0DInt[6] = 0;//bool isSelectMode;
     sec30->ArraysOf0DInt[7] = 0;//bool isTBBand_i;
     sec30->ArraysOf0DInt[8] = 0;//bool isTBBand_f;
-    sec30->ArraysOf0DInt[9] = 0;//bool isFittingParametersValid;
+    sec30->ArraysOf0DInt[9] = 0;//bool notUsed
     
     /////////////////////////////2D Int///////////////////////////////////////////////////////
     sec30->ArraysOf2DInt[0] = Aint1D();//int** HamiltonianDimMap;
@@ -762,6 +782,47 @@ void MainFrame::InitializeSec30Arrays()
     sec30->ArraysOf3DDouble[5] = Adouble2D();//double*** SOCf; SOCf_Re, SOCf_Im
 }
 
+void MainFrame::Init_Notebook()
+{
+	SKtables = new wxAuiNotebook(mainpanel, wxID_ANY,
+                                    wxPoint(0, 0),
+                                    wxSize(-1,-1),
+                                    wxAUI_NB_CLOSE_BUTTON | wxAUI_NB_SCROLL_BUTTONS);
+	
+	wxColour c; //Also it is possible to determine the color in this way: wxColour c=*wxGREEN;
+    c.Set(191,205,219,255);
+	SKtables->GetArtProvider()->SetColour(c);
+	c.Set(150,0,0,255);
+	SKtables->GetArtProvider()->SetActiveColour(c);
+    
+	SKtables->Connect(wxEVT_COMMAND_AUINOTEBOOK_PAGE_CLOSE, wxAuiNotebookEventHandler(MainFrame::SKtables_pageClose), NULL, this);
+    SKtables->Connect(wxEVT_COMMAND_AUINOTEBOOK_PAGE_CLOSED, wxAuiNotebookEventHandler(MainFrame::SKtables_pageClosed), NULL, this);
+	
+	//SKtables->SetBackgroundColour(*wxWHITE);
+	
+    //SKtables->Freeze();
+	//SKtables->Thaw();
+	
+	//SKtables = new wxAuiNotebook(mainpanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(mainpanel, wxSize(-1,-1)), wxBK_DEFAULT);
+	//wxBoxSizer* mainsizer = new wxBoxSizer(wxVERTICAL);
+    //SKtables->SetSizer(mainsizer);
+	
+	aui_mgr.SetDockSizeConstraint(0.333333,0.75);
+	aui_mgr.AddPane(SKtables, wxAuiPaneInfo().Gripper(true).Floatable(true).Dockable(true).Caption("Tables").CloseButton(false).MaximizeButton(true).MinimizeButton(true).BestSize(800,600).Dock().Top());
+	aui_mgr.Update();
+
+	wxString ColNames[3] = { _("Parameter"), _("Initial Value"), _("Last Value")};
+	wxString ColTypes[3] = { _("string"), _("double"), _("double")};
+	int ColSizes[3] = {130, 100, 100};
+	int ColPrecision[3] = { 0, 8, 8};
+	
+	myGrid* gc = CreateGrid(SKtables, 0, 3, _(""), ColNames, ColTypes, ColSizes, ColPrecision, -1, -1, false);
+
+	SKtables->AddPage(gc,_(""));
+	SKtables->Update();
+	SKtables->Refresh(true);
+}
+
 void MainFrame::Init_graph3d()
 {
     graph3d = new GraphClass(mainpanel, 3, sec30, -1);
@@ -803,16 +864,22 @@ void MainFrame::BtnGrid_OnClick(wxRibbonButtonBarEvent& event)
 void MainFrame::BtnOpen_OnClick(wxRibbonButtonBarEvent& event)
 {
     wxFileDialog* OpenDialog = new wxFileDialog(
-		this, _("Open project"), wxEmptyString, wxEmptyString, 
+		this, _("Open TB model"), wxEmptyString, wxEmptyString, 
 		_("TBM File (*.tbm)|*.tbm")
         ,wxFD_OPEN, wxDefaultPosition);
     
+	OpenDialog->SetDirectory(sec30->WorkingDIR);
     if (OpenDialog->ShowModal() == wxID_OK) // if the user click "Open" instead of "Cancel"
 	{
         wxString dgPath = OpenDialog->GetDirectory();
         wxString dgFileName = OpenDialog->GetFilename();
         sec30->LoadFromFile(dgPath, dgFileName);
         UpdateGraph2Ds();
+		sec30->WorkingDIR = dgPath;
+		sec30->WorkingFile = dgFileName;
+		this->SetTitle(SoftwareName + _(": ") + sec30->WorkingDIR + _("/") + dgFileName);
+		
+		LoadSKTables();
 	}
  
 	OpenDialog->Destroy();
@@ -820,16 +887,47 @@ void MainFrame::BtnOpen_OnClick(wxRibbonButtonBarEvent& event)
 
 void MainFrame::BtnSave_OnClick(wxRibbonButtonBarEvent& event)
 {
+    if (sec30->WorkingDIR != wxEmptyString && sec30->WorkingFile != wxEmptyString)
+	{
+		sec30->SaveToFile(sec30->WorkingDIR, sec30->WorkingFile);
+		wxMessageBox(wxT("Done!"));
+	}
+	else
+	{
+		SaveAs();
+	}
+}
+
+void MainFrame::BtnSaveAs_OnClick(wxRibbonButtonBarEvent& event)
+{
+    SaveAs();
+}
+
+void MainFrame::SaveAs()
+{
     wxFileDialog* OpenDialog = new wxFileDialog(
-		this, _("Save project"), wxEmptyString, wxEmptyString, 
+		this, _("Save as"), wxEmptyString, wxEmptyString, 
 		_("TBM File (*.tbm)|*.tbm")
         ,wxFD_SAVE, wxDefaultPosition);
-    
+		
+    OpenDialog->SetDirectory(sec30->WorkingDIR);
     if (OpenDialog->ShowModal() == wxID_OK) // if the user click "Open" instead of "Cancel"
 	{
         wxString dgPath = OpenDialog->GetDirectory();
         wxString dgFileName = OpenDialog->GetFilename();
+		
+		wxString BaseName = _("");
+        if (dgFileName.AfterLast('.') == _("tbm"))
+            BaseName = dgFileName.BeforeLast('.');
+        else
+            BaseName = dgFileName;
+		dgFileName = BaseName + _(".tbm");
+		
         sec30->SaveToFile(dgPath, dgFileName);
+		sec30->WorkingDIR = dgPath;
+		sec30->WorkingFile = dgFileName;
+		this->SetTitle(SoftwareName + _(": ") + sec30->WorkingDIR + _("/") + dgFileName);
+		wxMessageBox(wxT("Done!"));
 	}
  
 	OpenDialog->Destroy();
@@ -881,8 +979,16 @@ void MainFrame::sec30_OnUpdated(wxCommandEvent& event)
     
     if (info == _("SKClass"))
     {
-        int DoUpdateSKList = redraw;// 2 = update list
-        EvaluateSKPanel(DoUpdateSKList);
+		int EventID = redraw;
+		if (EventID == 3)
+		{
+			MakeACopyOfSKList();
+		}
+		else
+		{
+			int DoUpdateSKList = EventID;// 2 = update list
+			EvaluateSKPanel(DoUpdateSKList);
+		}
     }
     else if (info == _("SetupClass"))
     {
@@ -1377,6 +1483,10 @@ void MainFrame::EvaluateSKPanel(int isUpdateSKList)
             UpdateTBBand_if();
             UpdateGraph2Ds();
         }
+		else
+		{
+			//logfile->AppendText(_("You have made some changes in the settings of your TB model. The fitting parameters in SK panel are not valid. Please update the independent parameters in the SK panel.\n"));
+		}
     }
 }
 
@@ -1560,7 +1670,7 @@ bool MainFrame::ValidateSetupPanel()
 
 bool MainFrame::ValidateSKPanel()
 {
-    sec30->ArraysOf0DInt[9] = 0; //bool isFittingParametersValid = false;
+    //sec30->ArraysOf0DInt[9] = 0; //bool isFittingParametersValid = false;
     int ErrorIndex = 0;
     int WarningIndex = 0;
     bool isValid = true;
@@ -1755,7 +1865,9 @@ bool MainFrame::ValidateSKPanel()
     }
     
     if (isValid)
-        sec30->ArraysOf0DInt[9] = 1; //bool isFittingParametersValid = true;
+	{
+        //sec30->ArraysOf0DInt[9] = 1; //bool isFittingParametersValid = true;
+	}
     else
         logfile->AppendText(_("\nFix the errors and try again ...\n"));
     
@@ -1764,45 +1876,41 @@ bool MainFrame::ValidateSKPanel()
 
 bool MainFrame::ValidateSKParametersList()
 {
-    bool isFittingParametersValid = false;
-    if(sec30->ArraysOf0DInt[9] != 0) isFittingParametersValid = true;
-    if(isFittingParametersValid)
-    {
-        bool AnyProblem = false;
-        myGrid* osgc = sec30->GetGridObject(_("OS"));
-        //myGrid* skgc = sec30->GetGridObject(_("SK"));
-        myGrid* olgc = sec30->GetGridObject(_("OL"));
-        int nos = osgc->GetNumberRows();
-        //int nsk = skgc->GetNumberRows();
-        int nol = olgc->GetNumberRows();
-        
-        int nHamiltonian = sec30->ArraysOf1DString[1].size();
-        bool isSOC;
-        sec30->GetCheckVar(_("SOC[0]"), isSOC);
-        bool isOverlap;
-        sec30->GetCheckVar(_("Overlap[0]"), isOverlap);
+    bool isFittingParametersValid = true;
+
+	bool AnyProblem = false;
+	myGrid* osgc = sec30->GetGridObject(_("OS"));
+	//myGrid* skgc = sec30->GetGridObject(_("SK"));
+	myGrid* olgc = sec30->GetGridObject(_("OL"));
+	int nos = osgc->GetNumberRows();
+	//int nsk = skgc->GetNumberRows();
+	int nol = olgc->GetNumberRows();
+	
+	int nHamiltonian = sec30->ArraysOf1DString[1].size();
+	bool isSOC;
+	sec30->GetCheckVar(_("SOC[0]"), isSOC);
+	bool isOverlap;
+	sec30->GetCheckVar(_("Overlap[0]"), isOverlap);
     
-        if ((nol < 1 && isOverlap) || (nol > 0 && !isOverlap)) AnyProblem = true;
-        
-        if (!AnyProblem)
-        {
-            if(nos > 2)
-            {
-                wxString str = osgc->GetCellValue(nos - 2, 0);
-                if ((!str.Contains(_("soc")) && isSOC) || (str.Contains(_("soc")) && !isSOC)) AnyProblem = true;
-            }
-            else
-                AnyProblem = true;
-        }
-        
-        if (AnyProblem)
-        {
-            sec30->ArraysOf0DInt[9] = 0;//bool isFittingParametersValid = false;
-            isFittingParametersValid = false;
-        }
-    }
-    
-    if (!isFittingParametersValid) logfile->AppendText(_("The fitting parameters are not valid any more. Please update the independent parameters in the SK panel.\n"));
+	if ((nol < 1 && isOverlap) || (nol > 0 && !isOverlap)) AnyProblem = true;
+	
+	if (!AnyProblem)
+	{
+		if(nos > 2)
+		{
+			wxString str = osgc->GetCellValue(nos - 2, 0);
+			if ((!str.Contains(_("soc")) && isSOC) || (str.Contains(_("soc")) && !isSOC)) AnyProblem = true;
+		}
+		else
+			AnyProblem = true;
+	}
+	
+	if (AnyProblem)
+	{
+		//sec30->ArraysOf0DInt[9] = 0;//bool isFittingParametersValid = false;
+		isFittingParametersValid = false;
+	}
+
     return isFittingParametersValid;
 }
 
@@ -1822,15 +1930,15 @@ void MainFrame::ReArrangeSKList()
     
     myGrid* osgc = sec30->GetGridObject(_("OS"));
     int nRowsOS = osgc->GetNumberRows();
-    osgc->DeleteRows(0,nRowsOS,true);
+    if (nRowsOS!=0) osgc->DeleteRows(0,nRowsOS,true);
     
     myGrid* skgc = sec30->GetGridObject(_("SK"));
     int nRowsSK = skgc->GetNumberRows();
-    skgc->DeleteRows(0,nRowsSK,true);
+    if (nRowsSK!=0) skgc->DeleteRows(0,nRowsSK,true);
     
     myGrid* olgc = sec30->GetGridObject(_("OL"));
     int nRowsOL = olgc->GetNumberRows();
-    olgc->DeleteRows(0,nRowsOL,true);
+    if (nRowsOL!=0) olgc->DeleteRows(0,nRowsOL,true);
     
     bool isSOC;
     sec30->GetCheckVar(_("SOC[0]"), isSOC);
@@ -2386,6 +2494,7 @@ void MainFrame::BtnCppCode_OnClick(wxRibbonButtonBarEvent& event)
 		_("C++ Code (*.cpp)|*.cpp")
         ,wxFD_SAVE, wxDefaultPosition);
     
+	OpenDialog->SetDirectory(sec30->WorkingDIR);
     if (OpenDialog->ShowModal() == wxID_OK) // if the user click "Open" instead of "Cancel"
 	{
         wxString dgPath = OpenDialog->GetDirectory();
@@ -2409,6 +2518,7 @@ void MainFrame::BtnCCode_OnClick(wxRibbonButtonBarEvent& event)
 		_("C Code (*.c)|*.c")
         ,wxFD_SAVE, wxDefaultPosition);
     
+	OpenDialog->SetDirectory(sec30->WorkingDIR);
     if (OpenDialog->ShowModal() == wxID_OK) // if the user click "Open" instead of "Cancel"
 	{
         wxString dgPath = OpenDialog->GetDirectory();
@@ -2432,6 +2542,7 @@ void MainFrame::BtnFCode_OnClick(wxRibbonButtonBarEvent& event)
 		_("Fortran Code (*.f90)|*.f90")
         ,wxFD_SAVE, wxDefaultPosition);
     
+	OpenDialog->SetDirectory(sec30->WorkingDIR);
     if (OpenDialog->ShowModal() == wxID_OK) // if the user click "Open" instead of "Cancel"
 	{
         wxString dgPath = OpenDialog->GetDirectory();
@@ -2455,6 +2566,7 @@ void MainFrame::BtnMathematicaCode_OnClick(wxRibbonButtonBarEvent& event)
 		_("Mathematica Notebook (*.nb)|*.nb")
         ,wxFD_SAVE, wxDefaultPosition);
     
+	OpenDialog->SetDirectory(sec30->WorkingDIR);
     if (OpenDialog->ShowModal() == wxID_OK) // if the user click "Open" instead of "Cancel"
 	{
         wxString dgPath = OpenDialog->GetDirectory();
@@ -2478,6 +2590,7 @@ void MainFrame::BtnMatlabCode_OnClick(wxRibbonButtonBarEvent& event)
 		_("Matlab Script File (*.m)|*.m")
         ,wxFD_SAVE, wxDefaultPosition);
     
+	OpenDialog->SetDirectory(sec30->WorkingDIR);
     if (OpenDialog->ShowModal() == wxID_OK) // if the user click "Open" instead of "Cancel"
 	{
         wxString dgPath = OpenDialog->GetDirectory();
@@ -2501,6 +2614,7 @@ void MainFrame::BtnPythonCode_OnClick(wxRibbonButtonBarEvent& event)
 		_("Python Script File (*.py)|*.py")
         ,wxFD_SAVE, wxDefaultPosition);
     
+	OpenDialog->SetDirectory(sec30->WorkingDIR);
     if (OpenDialog->ShowModal() == wxID_OK) // if the user click "Open" instead of "Cancel"
 	{
         wxString dgPath = OpenDialog->GetDirectory();
@@ -2526,8 +2640,8 @@ void MainFrame::ShowAbout()
 {
     if (!IsLicensed)
     {
-        logfile->AppendText(_("\nThe free version of ") + SoftwareName + _(" has limitations in ") + FreeSoftwareLimitations + (". To eliminate all limitations you need a full featured license. To get a license you will need to supply the following serial number."));
-        logfile->AppendText(_("\n\nSerial Number:\n") + MySerialNumber +_("\n\n"));
+        //logfile->AppendText(_("\nThe free version of ") + SoftwareName + _(" has limitations in ") + FreeSoftwareLimitations + (". To eliminate all limitations you need a full featured license. To get a license you will need to supply the following serial number."));
+        //logfile->AppendText(_("\n\nSerial Number:\n") + MySerialNumber +_("\n\n"));
     }
     else
     {
@@ -2541,9 +2655,9 @@ void MainFrame::ShowAbout()
     
     info.SetName(SoftwareName);
     info.SetVersion(wxString::Format(_("%d.%d.%d"), Ver_MAJOR, Ver_MINOR, Ver_RELEASE));
-    info.SetDescription(_("TBStudio is a powerful and easy to use software package to construct Tight-Binding (TB) model for\nnano-scale materials. Starting from the simplified linear combination of atomic orbitals method in\ncombination with first-principles calculations (such as OpenMX or Vasp packages), one can construct\na TB model in the two-centre approximation. Using Slater and Koster approach we calculate the TB\nHamiltonian of the system and use a nonlinear fitting algorithm to find the best entries for both\nHamiltonian and overlap matrices to reproduce the first-principles data. We obtain expressions for\nthe Hamiltonian and overlap matrix elements between different orbitals (s, p and d orbitals with or\nwithout spin-orbit coupling) for the different atoms and present the SK coefficients in a orthogonal\nor nonorthogonal basis set. Furthermore, by using TBStudio one can generate a code in preferred\nprogramming language such as C++, C, Fortran, Mathematica, Matlab and Python."));
+    info.SetDescription(_("A technical software application for constructing Tight-Binding Hamiltonian"));
     
-    info.SetCopyright(_("Freeware, Copyright (c) 2019 Mohammad Nakhaee"));
+    info.SetCopyright(_("GNU Lesser General Public License, 2019 Mohammad Nakhaee"));
 
     wxArrayString developers;
     developers.Add(_("This software was initiated and developed by Mohammad Nakhaee during his Ph.D. at\nPhysics department (CMT), Antwerp university, Antwerpen, Belgium.\nEmail: developer.support@tight-binding.com"));
@@ -2560,10 +2674,15 @@ void MainFrame::BtnTutorials_OnClick(wxRibbonButtonBarEvent& event)
 
 void MainFrame::BtnWebsite_OnClick(wxRibbonButtonBarEvent& event)
 {
-    UpdateClass* update = new UpdateClass(this, MySerialNumber);
+	wxLaunchDefaultBrowser(wxT("https://tight-binding.com/"));
+    /*
+	//1.5.0
+	UpdateClass* update = new UpdateClass(this, MySerialNumber);
     update->CenterOnScreen();
     //welcome->CenterOnParent();
     update->ShowModal();
+	//1.5.0
+	*/
 }
 
 void MainFrame::LoadIcons()
@@ -2606,7 +2725,7 @@ void MainFrame::LoadIcons()
     int myID;
     
     wxRibbonPage* RPageFile1 = new wxRibbonPage(MainRibbon, wxID_ANY, _("File"), wxNullBitmap, 0);
-    wxRibbonPanel* RPanelProject = new wxRibbonPanel(RPageFile1, wxID_ANY, _("Panel"), wxNullBitmap, wxDefaultPosition, wxDLG_UNIT(RPageFile1, wxSize(-1,-1)), wxRIBBON_PANEL_DEFAULT_STYLE);
+    wxRibbonPanel* RPanelProject = new wxRibbonPanel(RPageFile1, wxID_ANY, _("TB Model"), wxNullBitmap, wxDefaultPosition, wxDLG_UNIT(RPageFile1, wxSize(-1,-1)), wxRIBBON_PANEL_DEFAULT_STYLE);
     wxRibbonButtonBar* RButtonBar1 = new wxRibbonButtonBar(RPanelProject, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(RPanelProject, wxSize(-1,-1)), 0);
     
     RButtonBar1->AddButton(wxID_OPEN, _("Open"), GetPng(open_png,open_png_size), _(""), wxRIBBON_BUTTON_NORMAL);
@@ -2614,6 +2733,9 @@ void MainFrame::LoadIcons()
     
     RButtonBar1->AddButton(wxID_SAVE, _("Save"), GetPng(save_png,save_png_size), _(""), wxRIBBON_BUTTON_NORMAL);
     RButtonBar1->Connect(wxID_SAVE, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrame::BtnSave_OnClick), NULL, this);
+    
+    RButtonBar1->AddButton(wxID_SAVEAS, _("Save as"), GetPng(save_png,save_png_size), _(""), wxRIBBON_BUTTON_NORMAL);
+    RButtonBar1->Connect(wxID_SAVEAS, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrame::BtnSaveAs_OnClick), NULL, this);
     
     RButtonBar1->Realize();
     
@@ -3415,266 +3537,292 @@ void MainFrame::UpdateTBBand_if()
 
 void MainFrame::StartRegression(bool isOneStep)
 {
-    if (!ValidateSKPanel()) {wxMessageBox(_("The constructed TB model is not passable. Please fix the errors reported in the terminal and try again."),_("Error"));return;}
-    
-    wxCheckTree* orbs = sec30->GetTreeObject(_("Orbitals"));
-    
-    wxListBox* TBlistctr = sec30->GetListObject(_("AtomSpeciesList"));
-    int TBnspec = TBlistctr->GetCount();
-    wxTreeItemId orbsrootID = orbs->GetRootItem();
-    
-    bool isAny_d_Orbital = false;
-    for(int j=0; j<TBnspec; j++)
-    {
-        wxString TBAtomName = TBlistctr->GetString(j);
-        wxTreeItemId orbsatomID = orbs->FindItemIn(orbsrootID,TBAtomName);
-        wxTreeItemIdValue cookie;
-        wxTreeItemId nextChild = orbs->GetFirstChild(orbsatomID, cookie);
-        int shellNumber=0;
-        while (nextChild.IsOk())
-        {
-            shellNumber++;
-            wxString itemname = orbs->GetItemText(nextChild);
-            wxString Orbs;
-            int nOrbs;
-            bool IsShell;
-            sec30->GetOrbitalInfo(orbs, TBAtomName, shellNumber, Orbs, nOrbs, IsShell);
-            if (Orbs.Contains(_("d_{")))
-            {
-                isAny_d_Orbital=true;
-                break;
-            }
-            nextChild = orbs->GetNextSibling(nextChild);
-        }
-        if (isAny_d_Orbital) break;
-    }
-    
-    if (isAny_d_Orbital)
-    {
-        if (!IsLicensed) {wxMessageBox(_("In the case of fitting a TB model including d-orbitals you need to contact developer support. Please find the contact information in Help>About."),_("Error"));return;}
-    }
-    
-    //Show the SK Tab
-    LeftPanel->ChangeSelection(4);
-    
-    int TotalNumberOfParameters;
-    sec30->GetVar(_("nParameters[0]"), TotalNumberOfParameters);
-    if (TotalNumberOfParameters<1) {wxMessageBox(_("First evaluate independent parameters."),_("Error"));return;}
-    
-    bool isBandLoaded = false;
-    if (sec30->ArraysOf0DInt[0] != 0) isBandLoaded = true;
-    if (!isBandLoaded) {wxMessageBox(_("DFT band-structure has not yet been loaded."),_("Error"));return;}
-    
-    int prnt, MaxIter, Update_Type;
+	wxCheckTree* orbs;
+	wxListBox* TBlistctr;
+	int TBnspec;
+	wxTreeItemId orbsrootID;
+	wxComboBox* ctrm;
+	bool isAny_d_Orbital, isBandLoaded, isAllvalid, isMatchVector;
+	int TotalNumberOfParameters, prnt, MaxIter, Update_Type, MethodSel, natoms, np,ny,nc;
     double epsilon_1, epsilon_2, epsilon_3, epsilon_4, lambda_0, lambda_UP_fac, lambda_DN_fac;
     double p_min, p_max, Mixing, RescaleFactor;
-    
-    wxComboBox* ctrm =  sec30->GetComboObject(_("OMethod"));
-    int MethodSel = ctrm->GetSelection();
-    if (MethodSel==0)
-        Update_Type = 3;
-    else if (MethodSel==1)
-        Update_Type = 1;
-    else if (MethodSel==2)
-        Update_Type = 2;
-    
-    bool isAllvalid = true;
-    isAllvalid = isAllvalid && sec30->GetVar(_("OPrnt[0]"), prnt);
-    isAllvalid = isAllvalid && sec30->GetVar(_("OMaxIter[0]"), MaxIter);
-    isAllvalid = isAllvalid && sec30->GetVar(_("Oeps1[0]"), epsilon_1);
-    isAllvalid = isAllvalid && sec30->GetVar(_("Oeps2[0]"), epsilon_2);
-    isAllvalid = isAllvalid && sec30->GetVar(_("Oeps3[0]"), epsilon_3);
-    isAllvalid = isAllvalid && sec30->GetVar(_("Oeps4[0]"), epsilon_4);
-    isAllvalid = isAllvalid && sec30->GetVar(_("OLam0[0]"), lambda_0);
-    isAllvalid = isAllvalid && sec30->GetVar(_("OLamUp[0]"), lambda_UP_fac);
-    isAllvalid = isAllvalid && sec30->GetVar(_("OLamDn[0]"), lambda_DN_fac);
-    isAllvalid = isAllvalid && sec30->GetVar(_("OMaxP[0]"), p_max);
-    isAllvalid = isAllvalid && sec30->GetVar(_("OMinP[0]"), p_min);
-    isAllvalid = isAllvalid && sec30->GetVar(_("OMixing[0]"), Mixing);
-    isAllvalid = isAllvalid && sec30->GetVar(_("OReScale[0]"), RescaleFactor);
-    
-    if (!isAllvalid) {wxMessageBox(_("Invalid value in Fitting Algorithmic Parameters."),_("Error"));return;}
-    if (MaxIter<1) {wxMessageBox(_("Invalid value for Iteration Limit."),_("Error"));return;}
-    if (prnt<1) {wxMessageBox(_("Invalid value for Figure Updating Step."),_("Error"));return;}
-    if (prnt>MaxIter) {wxMessageBox(_("Figure Updating Step must be smaller than Iteration Limit."),_("Error"));return;}
-    if (epsilon_1<0.000001) {wxMessageBox(_("Invalid value for Gradient Threshold. >0.000001"),_("Error"));return;}
-    if (epsilon_2<0.000001) {wxMessageBox(_("Invalid value for Parameters Threshold. >0.000001"),_("Error"));return;}
-    if (epsilon_3<0.000001) {wxMessageBox(_("Invalid value for Reduced Chi-squared Threshold. >0.000001"),_("Error"));return;}
-    if (epsilon_4<0.000001) {wxMessageBox(_("Invalid value for L-M Acceptance. >0.000001"),_("Error"));return;}
-    if (lambda_0<0.000001) {wxMessageBox(_("Invalid value for L-M Lambda0. >0.000001"),_("Error"));return;}
-    if (lambda_UP_fac<0.000001) {wxMessageBox(_("Invalid value for Increasing Lambda. >0.000001"),_("Error"));return;}
-    if (lambda_DN_fac<0.000001) {wxMessageBox(_("Invalid value for Decreasing Lambda. >0.000001"),_("Error"));return;}
-    if (p_max<p_min) {wxMessageBox(_("Parameters Minimum Limit must be smaller than Parameters Maximum Limit."),_("Error"));return;}
-    if (!(Mixing > 0 && Mixing <= 1.0)) {wxMessageBox(_("Invalid value for Mixing Factor. >0 and <=1.0"),_("Error"));return;}
-    if (RescaleFactor<0.000001) {wxMessageBox(_("Invalid value for Rescale Factor. >0.000001"),_("Error"));return;}
-    
-    int TBBandFirst, TBBandLast, DFTFirst;
-    isAllvalid = isAllvalid && sec30->GetVar(_("TBBandRange[0]"), TBBandFirst);
-    isAllvalid = isAllvalid && sec30->GetVar(_("TBBandRange[1]"), TBBandLast);
-    isAllvalid = isAllvalid && sec30->GetVar(_("DFTFirst[0]"), DFTFirst);
-    if (!isAllvalid) {wxMessageBox(_("Invalid value in Fitting Customization."),_("Error"));return;}
-    if (TBBandFirst<1) {wxMessageBox(_("Invalid value(s) for TB Bands Range."),_("Error"));return;}
-    if (TBBandLast<1) {wxMessageBox(_("Invalid value(s) for TB Bands Range."),_("Error"));return;}
-    if (TBBandFirst>TBBandLast) {wxMessageBox(_("Invalid value(s) for TB Bands Range."),_("Error"));return;}
-    if (DFTFirst<1) {wxMessageBox(_("Invalid value for DFT First Band."),_("Error"));return;}
-    
-    int nKPoint;
-    nKPoint = sec30->ArraysOf0DInt[1];
-    if (nKPoint < 1) {wxMessageBox(_("Something went wrong with the number of k-points."),_("Error"));return;}
-    
-    lmOptions opts;
-    opts.prnt = prnt;             // >1 intermediate results; >2 plots
-    opts.MaxIter = MaxIter;          // maximum number of iterations
-    opts.epsilon_1 = epsilon_1;        // convergence tolerance for gradient
-    opts.epsilon_2 = epsilon_2;        // convergence tolerance for parameters
-    opts.epsilon_3 = epsilon_3;        // convergence tolerance for Chi-square
-    opts.epsilon_4 = epsilon_4;        // determines acceptance of a L-M step
-    opts.lambda_0 = lambda_0;         // initial value of damping paramter, lambda
-    opts.lambda_UP_fac = lambda_UP_fac;    // factor for increasing lambda
-    opts.lambda_DN_fac = lambda_DN_fac;    // factor for decreasing lambda
-    opts.Update_Type = Update_Type;      // 1: Levenberg-Marquardt lambda update
-    
+	int TBBandFirst, TBBandLast, DFTFirst, nKPoint, idftBand, nFitPoints, indx;
+	lmOptions opts;
     Aint1D FitPoints;
-    int idftBand = DFTFirst - 1;
-    for (int iband=TBBandFirst; iband<=TBBandLast; iband++)
+	double a[3],b[3],c[3], akTB[3], bkTB[3], ckTB[3], akDFT[3], bkDFT[3], ckDFT[3];
+	double thershold, x, y, z, ChemP, shift;
+	myGrid* xyzgc;
+	wxString val;
+	bool isFittingParametersValid;
+	
+	try
+	{
+		//The order of these functions are very important, because ValidateSKPanel() make SK list Valid
+		//if (!ValidateSKParametersList()) {wxMessageBox(_(""),_("Error"));return;}
+		if ( (!ValidateSKPanel()) || (!ValidateSKParametersList()) ) {wxMessageBox(_("The constructed TB model is not passable. Please fix the errors reported in the terminal and try again. Maybe, You have made some changes in the settings of your TB model and now the fitting parameters in SK panel are not valid. Please update the independent parameters in the SK panel.\n\n SK Panel -> Evaluate Independent Parameters"),_("Error"));return;}
+		
+		orbs = sec30->GetTreeObject(_("Orbitals"));
+		TBlistctr = sec30->GetListObject(_("AtomSpeciesList"));
+		TBnspec = TBlistctr->GetCount();
+		orbsrootID = orbs->GetRootItem();
+		
+		isAny_d_Orbital = false;
+		for(int j=0; j<TBnspec; j++)
+		{
+			wxString TBAtomName = TBlistctr->GetString(j);
+			wxTreeItemId orbsatomID = orbs->FindItemIn(orbsrootID,TBAtomName);
+			wxTreeItemIdValue cookie;
+			wxTreeItemId nextChild = orbs->GetFirstChild(orbsatomID, cookie);
+			int shellNumber=0;
+			while (nextChild.IsOk())
+			{
+				shellNumber++;
+				wxString itemname = orbs->GetItemText(nextChild);
+				wxString Orbs;
+				int nOrbs;
+				bool IsShell;
+				sec30->GetOrbitalInfo(orbs, TBAtomName, shellNumber, Orbs, nOrbs, IsShell);
+				if (Orbs.Contains(_("d_{")))
+				{
+					isAny_d_Orbital=true;
+					break;
+				}
+				nextChild = orbs->GetNextSibling(nextChild);
+			}
+			if (isAny_d_Orbital) break;
+		}
+		
+		if (isAny_d_Orbital)
+		{
+			//if (!IsLicensed) {wxMessageBox(_("In the case of fitting a TB model including d-orbitals you need to contact developer support. Please find the contact information in Help>About."),_("Error"));return;}
+		}
+		
+		//Show the SK Tab
+		LeftPanel->ChangeSelection(4);
+		
+		sec30->GetVar(_("nParameters[0]"), TotalNumberOfParameters);
+		if (TotalNumberOfParameters<1) {wxMessageBox(_("First evaluate independent parameters."),_("Error"));return;}
+		
+		isBandLoaded = false;
+		if (sec30->ArraysOf0DInt[0] != 0) isBandLoaded = true;
+		if (!isBandLoaded) {wxMessageBox(_("DFT band-structure has not yet been loaded."),_("Error"));return;}
+
+		ctrm =  sec30->GetComboObject(_("OMethod"));
+		MethodSel = ctrm->GetSelection();
+		if (MethodSel==0)
+			Update_Type = 3;
+		else if (MethodSel==1)
+			Update_Type = 1;
+		else if (MethodSel==2)
+			Update_Type = 2;
+		
+		isAllvalid = true;
+		isAllvalid = isAllvalid && sec30->GetVar(_("OPrnt[0]"), prnt);
+		isAllvalid = isAllvalid && sec30->GetVar(_("OMaxIter[0]"), MaxIter);
+		isAllvalid = isAllvalid && sec30->GetVar(_("Oeps1[0]"), epsilon_1);
+		isAllvalid = isAllvalid && sec30->GetVar(_("Oeps2[0]"), epsilon_2);
+		isAllvalid = isAllvalid && sec30->GetVar(_("Oeps3[0]"), epsilon_3);
+		isAllvalid = isAllvalid && sec30->GetVar(_("Oeps4[0]"), epsilon_4);
+		isAllvalid = isAllvalid && sec30->GetVar(_("OLam0[0]"), lambda_0);
+		isAllvalid = isAllvalid && sec30->GetVar(_("OLamUp[0]"), lambda_UP_fac);
+		isAllvalid = isAllvalid && sec30->GetVar(_("OLamDn[0]"), lambda_DN_fac);
+		isAllvalid = isAllvalid && sec30->GetVar(_("OMaxP[0]"), p_max);
+		isAllvalid = isAllvalid && sec30->GetVar(_("OMinP[0]"), p_min);
+		isAllvalid = isAllvalid && sec30->GetVar(_("OMixing[0]"), Mixing);
+		isAllvalid = isAllvalid && sec30->GetVar(_("OReScale[0]"), RescaleFactor);
+		
+		if (!isAllvalid) {wxMessageBox(_("Invalid value in Fitting Algorithmic Parameters."),_("Error"));return;}
+		if (MaxIter<1) {wxMessageBox(_("Invalid value for Iteration Limit."),_("Error"));return;}
+		if (prnt<1) {wxMessageBox(_("Invalid value for Figure Updating Step."),_("Error"));return;}
+		if (prnt>MaxIter) {wxMessageBox(_("Figure Updating Step must be smaller than Iteration Limit."),_("Error"));return;}
+		if (epsilon_1<0.000001) {wxMessageBox(_("Invalid value for Gradient Threshold. >0.000001"),_("Error"));return;}
+		if (epsilon_2<0.000001) {wxMessageBox(_("Invalid value for Parameters Threshold. >0.000001"),_("Error"));return;}
+		if (epsilon_3<0.000001) {wxMessageBox(_("Invalid value for Reduced Chi-squared Threshold. >0.000001"),_("Error"));return;}
+		if (epsilon_4<0.000001) {wxMessageBox(_("Invalid value for L-M Acceptance. >0.000001"),_("Error"));return;}
+		if (lambda_0<0.000001) {wxMessageBox(_("Invalid value for L-M Lambda0. >0.000001"),_("Error"));return;}
+		if (lambda_UP_fac<0.000001) {wxMessageBox(_("Invalid value for Increasing Lambda. >0.000001"),_("Error"));return;}
+		if (lambda_DN_fac<0.000001) {wxMessageBox(_("Invalid value for Decreasing Lambda. >0.000001"),_("Error"));return;}
+		if (p_max<p_min) {wxMessageBox(_("Parameters Minimum Limit must be smaller than Parameters Maximum Limit."),_("Error"));return;}
+		if (!(Mixing > 0 && Mixing <= 1.0)) {wxMessageBox(_("Invalid value for Mixing Factor. >0 and <=1.0"),_("Error"));return;}
+		if (RescaleFactor<0.000001) {wxMessageBox(_("Invalid value for Rescale Factor. >0.000001"),_("Error"));return;}
+
+		isAllvalid = isAllvalid && sec30->GetVar(_("TBBandRange[0]"), TBBandFirst);
+		isAllvalid = isAllvalid && sec30->GetVar(_("TBBandRange[1]"), TBBandLast);
+		isAllvalid = isAllvalid && sec30->GetVar(_("DFTFirst[0]"), DFTFirst);
+		if (!isAllvalid) {wxMessageBox(_("Invalid value in Fitting Customization."),_("Error"));return;}
+		if (TBBandFirst<1) {wxMessageBox(_("Invalid value(s) for TB Bands Range."),_("Error"));return;}
+		if (TBBandLast<1) {wxMessageBox(_("Invalid value(s) for TB Bands Range."),_("Error"));return;}
+		if (TBBandFirst>TBBandLast) {wxMessageBox(_("Invalid value(s) for TB Bands Range."),_("Error"));return;}
+		if (DFTFirst<1) {wxMessageBox(_("Invalid value for DFT First Band."),_("Error"));return;}
+
+		nKPoint = sec30->ArraysOf0DInt[1];
+		if (nKPoint < 1) {wxMessageBox(_("Something went wrong with the number of k-points."),_("Error"));return;}
+		
+		opts.prnt = prnt;             // >1 intermediate results; >2 plots
+		opts.MaxIter = MaxIter;          // maximum number of iterations
+		opts.epsilon_1 = epsilon_1;        // convergence tolerance for gradient
+		opts.epsilon_2 = epsilon_2;        // convergence tolerance for parameters
+		opts.epsilon_3 = epsilon_3;        // convergence tolerance for Chi-square
+		opts.epsilon_4 = epsilon_4;        // determines acceptance of a L-M step
+		opts.lambda_0 = lambda_0;         // initial value of damping paramter, lambda
+		opts.lambda_UP_fac = lambda_UP_fac;    // factor for increasing lambda
+		opts.lambda_DN_fac = lambda_DN_fac;    // factor for decreasing lambda
+		opts.Update_Type = Update_Type;      // 1: Levenberg-Marquardt lambda update
+		
+		idftBand = DFTFirst - 1;
+		for (int iband=TBBandFirst; iband<=TBBandLast; iband++)
+		{
+			idftBand++;
+			for (int ik = 0; ik<nKPoint; ik++)
+			{
+				Aint0D FitPoint;
+				int iReplaceddftBand = ReplaceDFTBand(idftBand,ik);
+				FitPoint.push_back(iband);
+				FitPoint.push_back(iReplaceddftBand);
+				FitPoint.push_back(ik);
+				//FitPoint.push_back(WeightPercentages[idftBand][ik]);
+				FitPoints.push_back(FitPoint);
+			}
+		}
+		
+		sec30->ArraysOf2DInt[2] = FitPoints;
+		
+		nFitPoints = FitPoints.size();
+		if (nFitPoints < 1) {wxMessageBox(_("No reference data for regression procedure."),_("Error"));return;}
+		if (nFitPoints < TotalNumberOfParameters) {wxMessageBox(_("Non sufficient reference data for regression procedure."),_("Error"));return;}
+		
+		sec30->GetVar(_("a[0]"), a[0]);
+		sec30->GetVar(_("a[1]"), a[1]);
+		sec30->GetVar(_("a[2]"), a[2]);
+		sec30->GetVar(_("b[0]"), b[0]);
+		sec30->GetVar(_("b[1]"), b[1]);
+		sec30->GetVar(_("b[2]"), b[2]);
+		sec30->GetVar(_("c[0]"), c[0]);
+		sec30->GetVar(_("c[1]"), c[1]);
+		sec30->GetVar(_("c[2]"), c[2]);
+		
+		sec30->VecToReciprocal(a, b, c, akTB, bkTB, ckTB);
+		
+		for(int i=0; i<3; i++) akDFT[i] = sec30->ArraysOf1DDouble[1][i];
+		for(int i=0; i<3; i++) bkDFT[i] = sec30->ArraysOf1DDouble[2][i];
+		for(int i=0; i<3; i++) ckDFT[i] = sec30->ArraysOf1DDouble[3][i];
+		
+		isMatchVector = true;
+		thershold = 0.00001;
+		isMatchVector = isMatchVector && sec30->isMatch(akTB[0], akDFT[0], thershold);
+		isMatchVector = isMatchVector && sec30->isMatch(akTB[1], akDFT[1], thershold);
+		isMatchVector = isMatchVector && sec30->isMatch(akTB[2], akDFT[2], thershold);
+		isMatchVector = isMatchVector && sec30->isMatch(bkTB[0], bkDFT[0], thershold);
+		isMatchVector = isMatchVector && sec30->isMatch(bkTB[1], bkDFT[1], thershold);
+		isMatchVector = isMatchVector && sec30->isMatch(bkTB[2], bkDFT[2], thershold);
+		isMatchVector = isMatchVector && sec30->isMatch(ckTB[0], ckDFT[0], thershold);
+		isMatchVector = isMatchVector && sec30->isMatch(ckTB[1], ckDFT[1], thershold);
+		isMatchVector = isMatchVector && sec30->isMatch(ckTB[2], ckDFT[2], thershold);
+		if (!isMatchVector)
+		{
+			wxMessageDialog dial(NULL, 
+			  wxString::Format(wxT("Mismatch detected between lattice vectors of TB model and DFT data!\nDFT reciprocal lattice vectors:\na* = (%.8f,%.8f,%.8f)\nb* = (%.8f,%.8f,%.8f)\nc* = (%.8f,%.8f,%.8f)\nTB Model reciprocal lattice vectors:\na* = (%.8f,%.8f,%.8f)\nb* = (%.8f,%.8f,%.8f)\nc* = (%.8f,%.8f,%.8f)\nAre you sure you want to continue?"), akDFT[0], akDFT[1], akDFT[2], bkDFT[0], bkDFT[1], bkDFT[2], ckDFT[0], ckDFT[1], ckDFT[2], akTB[0], akTB[1], akTB[2], bkTB[0], bkTB[1], bkTB[2], ckTB[0], ckTB[1], ckTB[2]),
+			  wxT("Warning"), 
+			  wxYES_NO | wxNO_DEFAULT | wxICON_QUESTION);
+			if ( dial.ShowModal() == wxID_NO ) return;
+		}
+		
+		natoms = 0;
+		sec30->GetVar(_("nAtoms[0]"),natoms);
+		
+		np = TotalNumberOfParameters;
+		ny = nFitPoints;
+		nc = 3*natoms + 9;
+		
+		if (is_p) {delete [] p; is_p=false;}
+		if (is_t) {delete [] t; is_t=false;}
+		if (is_y_dat) {delete [] y_dat; is_y_dat=false;}
+		if (is_weight) {delete [] weight; is_weight=false;}
+		if (is_dp) {delete [] dp; is_dp=false;}
+		if (is_cnst) {delete [] cnst; is_cnst=false;}
+		//if (is_UpperSymMatrixHf) {delete [] UpperSymMatrixHf; is_UpperSymMatrixHf=false;}
+		
+		p = new double[np]; is_p=true;
+		t = new double[ny]; is_t=true;
+		y_dat = new double[ny]; is_y_dat=true;
+		weight = new double[ny]; is_weight=true;
+		dp = new double[np]; is_dp=true;
+		cnst = new double[nc]; is_cnst=true;
+		
+		cnst[0] = a[0];
+		cnst[1] = a[1];
+		cnst[2] = a[2];
+		cnst[3] = b[0];
+		cnst[4] = b[1];
+		cnst[5] = b[2];
+		cnst[6] = c[0];
+		cnst[7] = c[1];
+		cnst[8] = c[2];
+		
+		xyzgc =  sec30->GetGridObject(_("XYZ_Coords"));
+		indx=9;
+		for (int i0=0; i0<natoms; i0++)
+		{
+			val = xyzgc->GetCellValue(i0, 0);
+			val.ToDouble(&x);
+			val = xyzgc->GetCellValue(i0, 1);
+			val.ToDouble(&y);
+			val = xyzgc->GetCellValue(i0, 2);
+			val.ToDouble(&z);
+			cnst[indx++] = x;
+			cnst[indx++] = y;
+			cnst[indx++] = z;
+		}
+		
+		ChemP = sec30->ArraysOf0DDouble[0];
+		shift = 0.0;
+		for (int iy=0; iy<ny; iy++)
+		{
+			//int tbband = FitPoints[iy][0];
+			int dftband = FitPoints[iy][1];
+			int ik = FitPoints[iy][2];
+			t[iy] = iy * 0.05;
+			shift = ShiftBand(dftband,ik);
+			y_dat[iy] = sec30->ArraysOf2DDouble[1][ik][dftband - 1] - ChemP + shift;
+			weight[iy] = sec30->ArraysOf2DDouble[4][ik][dftband - 1];
+		}
+		
+		for (int ip=0; ip<np; ip++)
+		{
+			p[ip] = GetFitParameter(ip, 1);//Get initial values for parameters
+			dp[ip] = -0.01;
+		}
+		
+		sec30->IsStopClicked = false;
+		
+	}
+    catch(std::exception& ex)
     {
-        idftBand++;
-        for (int ik = 0; ik<nKPoint; ik++)
-        {
-            Aint0D FitPoint;
-            int iReplaceddftBand = ReplaceDFTBand(idftBand,ik);
-            FitPoint.push_back(iband);
-            FitPoint.push_back(iReplaceddftBand);
-            FitPoint.push_back(ik);
-            //FitPoint.push_back(WeightPercentages[idftBand][ik]);
-            FitPoints.push_back(FitPoint);
-        }
-    }
-    
-    sec30->ArraysOf2DInt[2] = FitPoints;
-    
-    int nFitPoints = FitPoints.size();
-    if (nFitPoints < 1) {wxMessageBox(_("No reference data for regression procedure."),_("Error"));return;}
-    if (nFitPoints < TotalNumberOfParameters) {wxMessageBox(_("Non sufficient reference data for regression procedure."),_("Error"));return;}
-    
-    double a[3],b[3],c[3];
-    sec30->GetVar(_("a[0]"), a[0]);
-    sec30->GetVar(_("a[1]"), a[1]);
-    sec30->GetVar(_("a[2]"), a[2]);
-    sec30->GetVar(_("b[0]"), b[0]);
-    sec30->GetVar(_("b[1]"), b[1]);
-    sec30->GetVar(_("b[2]"), b[2]);
-    sec30->GetVar(_("c[0]"), c[0]);
-    sec30->GetVar(_("c[1]"), c[1]);
-    sec30->GetVar(_("c[2]"), c[2]);
-    
-    double akTB[3], bkTB[3], ckTB[3];
-    sec30->VecToReciprocal(a, b, c, akTB, bkTB, ckTB);
-    double akDFT[3], bkDFT[3], ckDFT[3];
-    for(int i=0; i<3; i++) akDFT[i] = sec30->ArraysOf1DDouble[1][i];
-    for(int i=0; i<3; i++) bkDFT[i] = sec30->ArraysOf1DDouble[2][i];
-    for(int i=0; i<3; i++) ckDFT[i] = sec30->ArraysOf1DDouble[3][i];
-    
-    bool isMatchVector = true;
-    double thershold = 0.00001;
-    isMatchVector = isMatchVector && sec30->isMatch(akTB[0], akDFT[0], thershold);
-    isMatchVector = isMatchVector && sec30->isMatch(akTB[1], akDFT[1], thershold);
-    isMatchVector = isMatchVector && sec30->isMatch(akTB[2], akDFT[2], thershold);
-    isMatchVector = isMatchVector && sec30->isMatch(bkTB[0], bkDFT[0], thershold);
-    isMatchVector = isMatchVector && sec30->isMatch(bkTB[1], bkDFT[1], thershold);
-    isMatchVector = isMatchVector && sec30->isMatch(bkTB[2], bkDFT[2], thershold);
-    isMatchVector = isMatchVector && sec30->isMatch(ckTB[0], ckDFT[0], thershold);
-    isMatchVector = isMatchVector && sec30->isMatch(ckTB[1], ckDFT[1], thershold);
-    isMatchVector = isMatchVector && sec30->isMatch(ckTB[2], ckDFT[2], thershold);
-    if (!isMatchVector)
-    {
-        wxMessageDialog dial(NULL, 
-          wxString::Format(wxT("Mismatch detected between lattice vectors of TB model and DFT data!\nDFT reciprocal lattice vectors:\na* = (%.8f,%.8f,%.8f)\nb* = (%.8f,%.8f,%.8f)\nc* = (%.8f,%.8f,%.8f)\nTB Model reciprocal lattice vectors:\na* = (%.8f,%.8f,%.8f)\nb* = (%.8f,%.8f,%.8f)\nc* = (%.8f,%.8f,%.8f)\nAre you sure you want to continue?"), akDFT[0], akDFT[1], akDFT[2], bkDFT[0], bkDFT[1], bkDFT[2], ckDFT[0], ckDFT[1], ckDFT[2], akTB[0], akTB[1], akTB[2], bkTB[0], bkTB[1], bkTB[2], ckTB[0], ckTB[1], ckTB[2]),
-          wxT("Warning"), 
-          wxYES_NO | wxNO_DEFAULT | wxICON_QUESTION);
-        if ( dial.ShowModal() == wxID_NO ) return;
-    }
-    
-    int natoms = 0;
-    sec30->GetVar(_("nAtoms[0]"),natoms);
-    
-    int np = TotalNumberOfParameters;
-    int ny = nFitPoints;
-    int nc = 3*natoms + 9;
-    
-    if (is_p) {delete [] p; is_p=false;}
-    if (is_t) {delete [] t; is_t=false;}
-    if (is_y_dat) {delete [] y_dat; is_y_dat=false;}
-    if (is_weight) {delete [] weight; is_weight=false;}
-    if (is_dp) {delete [] dp; is_dp=false;}
-    if (is_cnst) {delete [] cnst; is_cnst=false;}
-    //if (is_UpperSymMatrixHf) {delete [] UpperSymMatrixHf; is_UpperSymMatrixHf=false;}
-    
-    p = new double[np]; is_p=true;
-    t = new double[ny]; is_t=true;
-    y_dat = new double[ny]; is_y_dat=true;
-    weight = new double[ny]; is_weight=true;
-    dp = new double[np]; is_dp=true;
-    cnst = new double[nc]; is_cnst=true;
-    
-    cnst[0] = a[0];
-    cnst[1] = a[1];
-    cnst[2] = a[2];
-    cnst[3] = b[0];
-    cnst[4] = b[1];
-    cnst[5] = b[2];
-    cnst[6] = c[0];
-    cnst[7] = c[1];
-    cnst[8] = c[2];
-    
-    myGrid* xyzgc =  sec30->GetGridObject(_("XYZ_Coords"));
-    wxString val;
-    double x, y, z;
-    int indx=9;
-    for (int i0=0; i0<natoms; i0++)
-    {
-        val = xyzgc->GetCellValue(i0, 0);
-        val.ToDouble(&x);
-        val = xyzgc->GetCellValue(i0, 1);
-        val.ToDouble(&y);
-        val = xyzgc->GetCellValue(i0, 2);
-        val.ToDouble(&z);
-        cnst[indx++] = x;
-        cnst[indx++] = y;
-        cnst[indx++] = z;
-    }
-    
-    double ChemP = sec30->ArraysOf0DDouble[0];
-    double shift = 0.0;
-    for (int iy=0; iy<ny; iy++)
-    {
-        //int tbband = FitPoints[iy][0];
-        int dftband = FitPoints[iy][1];
-        int ik = FitPoints[iy][2];
-        t[iy] = iy * 0.05;
-        shift = ShiftBand(dftband,ik);
-        y_dat[iy] = sec30->ArraysOf2DDouble[1][ik][dftband - 1] - ChemP + shift;
-        weight[iy] = sec30->ArraysOf2DDouble[4][ik][dftband - 1];
-    }
-    
-    for (int ip=0; ip<np; ip++)
-    {
-        p[ip] = GetFitParameter(ip, 1);//Get initial values for parameters
-        dp[ip] = -0.01;
-    }
-    
-    sec30->IsStopClicked = false;
-    
+		wxMessageBox("Error (St-101): Something went wrong ...");
+	}
     ////////////////////////////////
     //int nH2=64;
     //UpperSymMatrixHf = new lapack_complex_double[nH2]; is_UpperSymMatrixHf=true;
     //for (int i=0; i<nH2; i++) UpperSymMatrixHf[i] = {0.0,0.0};
     ////////////////////////////////
-    
-    //Start(double* p, int np, double* t, double* y_dat, int ny, double* weight, double* dp, double p_min, double p_max, double* c, lmOptions opts)
-    std::thread RegressionThread(&Regression::Start, regression, p, np, t, y_dat, ny, weight, dp, p_min, p_max, Mixing, cnst, opts, isOneStep);
-    RegressionThread.detach();
-    
+    try
+	{
+		//Start(double* p, int np, double* t, double* y_dat, int ny, double* weight, double* dp, double p_min, double p_max, double* c, lmOptions opts)
+		std::thread RegressionThread(&Regression::Start, regression, p, np, t, y_dat, ny, weight, dp, p_min, p_max, Mixing, cnst, opts, isOneStep);
+		//RegressionThreadMap = RegressionThread.native_handle();
+		if(RegressionThread.joinable())
+		{
+			//std::cout<<"Detaching Thread "<<std::endl;
+			RegressionThread.detach();
+		}
+		//RegressionThread.detach();
+		//RegressionThread.join();
+		//pthread_cancel(RegressionThreadMap);
+	}
+    catch(std::exception& ex)
+    {
+		wxMessageBox("Error (St-102): Something went wrong ...");
+	}
     ////////////////It works well///////////////////////
     //Regression fitting(sec30, this);                //
     //long long num=400000000;                        //
@@ -3726,16 +3874,20 @@ double MainFrame::GetFitParameter(int ip, int icol)
 void MainFrame::regressionEVT_OnNewData(wxCommandEvent& event)
 {
     logfile->AppendText(event.GetString());
+	logfile->ShowPosition(logfile->GetLastPosition());
+	//logfile->SetScrollPos(wxVERTICAL,logfile->GetScrollRange(wxVERTICAL));
 }
 
 void MainFrame::regressionEVT_OnFinished(wxCommandEvent& event)
 {
+	
     if (is_p) {delete [] p; is_p=false;}
     if (is_t) {delete [] t; is_t=false;}
     if (is_y_dat) {delete [] y_dat; is_y_dat=false;}
     if (is_weight) {delete [] weight; is_weight=false;}
     if (is_dp) {delete [] dp; is_dp=false;}
     if (is_cnst) {delete [] cnst; is_cnst=false;}
+	//pthread_cancel(RegressionThreadMap);
     //if (is_UpperSymMatrixHf) {delete [] UpperSymMatrixHf; is_UpperSymMatrixHf=false;}
     isFittingThreadBusy = false;
     UpdateTBBand_if();
@@ -3745,6 +3897,7 @@ void MainFrame::regressionEVT_OnFinished(wxCommandEvent& event)
 void MainFrame::regressionEVT_OnStarted(wxCommandEvent& event)
 {
     isFittingThreadBusy = true;
+	logfile->Clear();
 }
 
 void MainFrame::ExportMatrices(wxString filepath, wxString BaseName, int MyID_Initial0Final1)
@@ -3917,6 +4070,8 @@ void MainFrame::GenerateCode(wxString filepath, wxString BaseName, wxString Code
         GenerateMatlabCode(filepath, BaseName, MyID_Initial0Final1);
     else if (CodeType == _("Python"))
         GeneratePythonCode(filepath, BaseName, MyID_Initial0Final1);
+		
+	wxMessageBox(wxT("Done!"));
 }
 
 void MainFrame::GenerateCppCode(wxString filepath, wxString BaseName, int MyID_Initial0Final1)
@@ -6061,7 +6216,262 @@ void MainFrame::GeneratePythonCode(wxString filepath, wxString BaseName, int MyI
     }
 }
 
+void MainFrame::MakeACopyOfSKList()
+{
+	if (sec30->WorkingDIR == wxEmptyString) {wxMessageBox(wxT("Error: Your project has not yet been saved. First, save your TB model in a separate folder.")); return;}
+	wxString filename;
+	sec30->GetVar(_("SKName[0]"),filename);
+	if (filename == _("")) {wxMessageBox(_("File name is empty. Please fill out this field and try again."),_("Error")); return;}
+	
+	wxString filepath = sec30->WorkingDIR + wxT("/") + filename + wxT(".sktab");
+	if (wxFileExists(filepath)) {wxMessageBox(_("There is a tab with this name. Please choose another name."),_("Error")); return;}
+	
+	int numberOfRows = ExportSKToFile(filepath);
+	
+	CreateATabFromFile(filepath, filename, numberOfRows);
+}
 
+myGrid* MainFrame::CreateGrid(wxWindow *parent, int nRow, int nCol, wxString VariableName, wxString* ColNames, wxString* ColTypes, int* ColSizes, int* ColPrecision, int xCtrlSize, int yCtrlSize, bool EnableEvent)
+{
+    //wxBoxSizer* MySizer = new wxBoxSizer(wxHORIZONTAL);
+    //parent->GetSizer()->Add(MySizer, 0, wxLEFT|wxRIGHT|wxTOP|wxEXPAND, WXC_FROM_DIP(5));
+    
+    myGrid* gc=new myGrid(parent, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(parent, wxSize(xCtrlSize,yCtrlSize)),wxFULL_REPAINT_ON_RESIZE|wxHSCROLL|wxVSCROLL);
+    //MySizer->Add(gc, 0, wxRIGHT, WXC_FROM_DIP(5));
+    gc->EnableEditing(true);
+    gc->SetMinSize(wxSize(xCtrlSize,yCtrlSize));
+    
+    gc->SetName(VariableName);
+    
+    //gc->SetDefaultCellAlignment(wxALIGN_LEFT,wxALIGN_CENTRE); //Does not work
+    
+    gc->CreateGrid( nRow, nCol);
+	
+    for (int i=0; i< nCol; i++)
+    {
+        gc->SetColLabelValue(i,ColNames[i]);
+        gc->SetColSize(i, ColSizes[i] );// in pixels
+        gc->DisableColResize(i);
+        if (ColTypes[i]=="int")
+            gc->SetColFormatNumber(i);
+        else if (ColTypes[i]=="double")
+            gc->SetColFormatFloat(i,-1,ColPrecision[i]);
+            
+        for (int j=0; j< nRow; j++)
+		{
+            gc->SetCellAlignment(j, i, wxALIGN_LEFT,wxALIGN_CENTRE);
+			//gc->SetReadOnly(j,i,true);
+		}
+    }
+    
+    for (int i=0; i< nRow; i++) gc->DisableRowResize(i);
+    
+    wxColour c; //Also it is possible to determine the color in this way: wxColour c=*wxGREEN;
+    c.Set(191,205,219,255);
+    gc->SetLabelBackgroundColour(c);
+    gc->SetColLabelSize(20);
+    gc->SetRowLabelSize(35);
+    gc->SetColMinimalAcceptableWidth(1);
+    
+    //MySizer->Layout();
+    parent->Layout();
+	return gc;
+}
 
+int MainFrame::ExportSKToFile(wxString filepath)
+{
+    FILE *fpk;
+    if ((fpk = fopen(filepath,"w")) != NULL)
+    {
+		fprintf(fpk,"On-Site\n");
+		myGrid* osgc = sec30->GetGridObject(_("OS"));
+		int nRowsOS = osgc->GetNumberRows();
+		for (int i=0; i<nRowsOS; i++)
+		{
+			double d1 = 0.0;
+			double d2 = 0.0;
+			wxString var = osgc->GetCellValue(i, 0);
+			wxString val1 = osgc->GetCellValue(i, 1);
+			wxString val2 = osgc->GetCellValue(i, 2);
+			bool output1 = val1.ToDouble(&d1);
+			bool output2 = val2.ToDouble(&d2);
+			if (!output1) d1 = 0.0;
+			if (!output2) d2 = 0.0;
+			if ( var == _(""))
+				fprintf(fpk,"\n");
+			else if (var.Contains(wxT("Shell")))
+				fprintf(fpk,"%s\n", var.c_str().AsChar());
+			else
+				fprintf(fpk,"%s\t%.8f\t%.8f\n", var.c_str().AsChar(), d1, d2);
+		}
+		
+		fprintf(fpk,"Hamiltonian\n");
+		
+		myGrid* skgc = sec30->GetGridObject(_("SK"));
+		int nRowsSK = skgc->GetNumberRows();
+		for (int i=0; i<nRowsSK; i++)
+		{
+			double d1 = 0.0;
+			double d2 = 0.0;
+			wxString var = skgc->GetCellValue(i, 0);
+			wxString val1 = skgc->GetCellValue(i, 1);
+			wxString val2 = skgc->GetCellValue(i, 2);
+			bool output1 = val1.ToDouble(&d1);
+			bool output2 = val2.ToDouble(&d2);
+			if (!output1) d1 = 0.0;
+			if (!output2) d2 = 0.0;
+			if ( var == _(""))
+				fprintf(fpk,"\n");
+			else if (var.Contains(wxT("Bond")))
+				fprintf(fpk,"%s\n", var.c_str().AsChar());
+			else
+				fprintf(fpk,"%s\t%.8f\t%.8f\n", var.c_str().AsChar(), d1, d2);
+		}
+		
+		fprintf(fpk,"Overlap\n");
+		
+		myGrid* olgc = sec30->GetGridObject(_("OL"));
+		int nRowsOL = olgc->GetNumberRows();
+		for (int i=0; i<nRowsOL; i++)
+		{
+			double d1 = 0.0;
+			double d2 = 0.0;
+			wxString var = olgc->GetCellValue(i, 0);
+			wxString val1 = olgc->GetCellValue(i, 1);
+			wxString val2 = olgc->GetCellValue(i, 2);
+			bool output1 = val1.ToDouble(&d1);
+			bool output2 = val2.ToDouble(&d2);
+			if (!output1) d1 = 0.0;
+			if (!output2) d2 = 0.0;
+			if ( var == _(""))
+				fprintf(fpk,"\n");
+			else if (var.Contains(wxT("Bond")))
+				fprintf(fpk,"%s\n", var.c_str().AsChar());
+			else
+				fprintf(fpk,"%s\t%.8f\t%.8f\n", var.c_str().AsChar(), d1, d2);
+		}
+		
+        fclose(fpk);
+		
+		return nRowsOS + nRowsSK + nRowsOL;
+    }
+	return 0;
+}
 
+void MainFrame::CreateATabFromFile(wxString filepath, wxString tabname, int nLines)
+{
+	wxString ColNames[3] = { _("Parameter"), _("Initial Value"), _("Last Value")};
+	wxString ColTypes[3] = { _("string"), _("double"), _("double")};
+	int ColSizes[3] = {130, 100, 100};
+	int ColPrecision[3] = { 0, 8, 8};
+	
+	myGrid* gc = CreateGrid(SKtables, nLines + 3, 3, _(""), ColNames, ColTypes, ColSizes, ColPrecision, -1, -1, false);
 
+	LoadSKFileToTable(filepath, gc);
+	
+	SKtables->AddPage(gc,tabname);
+	SKtables->Update();
+	SKtables->Refresh(true);
+	
+	wxString firstone = SKtables->GetPageText(0);
+	if (firstone == _("")) SKtables->DeletePage(0);
+}
+
+void MainFrame::LoadSKFileToTable(wxString filepath, myGrid* grid)
+{
+	grid->ClearGrid();
+	std::ifstream infile(filepath);
+	std::string l;
+	int iRow = -1;
+	while (std::getline(infile, l))
+	{
+		iRow++;
+		wxString line = wxString(l);
+		if ( line.Contains(wxT("On-Site")) ||
+			 line.Contains(wxT("Hamiltonian")) ||
+			 line.Contains(wxT("Overlap")) ||
+			 line.Contains(wxT("Shell")) ||
+			 line.Contains(wxT("Bond")))
+		{
+			grid->SetCellValue(iRow, 0, line);
+		}
+		else
+		{
+			std::istringstream iss(l);
+			std::string sk = "";
+			std::string iniVal = "";
+			std::string finVal = "";
+			iss >> sk >> iniVal >> finVal;
+			grid->SetCellValue(iRow, 0, sk);
+			grid->SetCellValue(iRow, 1, iniVal);
+			grid->SetCellValue(iRow, 2, finVal);
+		}
+	}
+}
+
+int MainFrame::GetTheNumberOfLines(wxString filepath)
+{
+	std::ifstream infile(filepath);
+	std::string l;
+	int iRow = 0;
+	while (std::getline(infile, l))
+	{
+		iRow++;
+	}
+	
+	return iRow;
+}
+
+void MainFrame::LoadSKTables()
+{
+	wxDir dir(sec30->WorkingDIR);
+	if ( !dir.IsOpened() )
+	{
+		// deal with the error here - wxDir would already log an error message
+		// explaining the exact reason of the failure
+		wxMessageBox(wxT("Unable to open the containing folder to load SK list."));
+		return;
+	}
+	
+	//puts("Enumerating object files in current directory:");
+	wxString filename;
+	bool cont = dir.GetFirst(&filename);
+	while ( cont )
+	{
+		wxString filepath = sec30->WorkingDIR + wxT("/") + filename;
+		if (filename.AfterLast('.') == _("sktab"))
+		{
+			int nlines = GetTheNumberOfLines(filepath);
+			CreateATabFromFile(filepath, filename.BeforeLast('.'), nlines);
+		}
+		cont = dir.GetNext(&filename);
+	}
+}
+
+void MainFrame::SKtables_pageClose(wxAuiNotebookEvent& event)
+{
+	int ind = SKtables->GetSelection();
+	wxString fname = SKtables->GetPageText(ind);
+	wxString filepath = sec30->WorkingDIR + wxT("/") + fname + wxT(".sktab");
+	if (wxFileExists(filepath))
+	{
+		wxRemoveFile(filepath);
+	}
+}
+
+void MainFrame::SKtables_pageClosed(wxAuiNotebookEvent& event)
+{
+	if (SKtables->GetPageCount() == 0)
+	{
+		wxString ColNames[3] = { _("Parameter"), _("Initial Value"), _("Last Value")};
+		wxString ColTypes[3] = { _("string"), _("double"), _("double")};
+		int ColSizes[3] = {130, 100, 100};
+		int ColPrecision[3] = { 0, 8, 8};
+		
+		myGrid* gc = CreateGrid(SKtables, 0, 3, _(""), ColNames, ColTypes, ColSizes, ColPrecision, -1, -1, false);
+
+		SKtables->AddPage(gc,_(""));
+		SKtables->Update();
+		SKtables->Refresh(true);
+	}
+}
