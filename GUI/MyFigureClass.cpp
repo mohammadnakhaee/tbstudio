@@ -264,6 +264,16 @@ void MyFigure2d::OnMouseMove(wxMouseEvent& event)
     }
 }
 
+void MyFigure2d::OnMouseRightDown(wxMouseEvent& event)
+{
+    const wxPoint pt = wxGetMousePosition();
+    mouseX0 = pt.x;
+    mouseY0 = pt.y;
+    isMouseRightDown = true;
+    isMouseLeftDown = false;
+    isMouseMiddleDown = false;
+}
+
 void MyFigure2d::OnMouseRightUp(wxMouseEvent& event)
 {
     const wxPoint pt = wxGetMousePosition();

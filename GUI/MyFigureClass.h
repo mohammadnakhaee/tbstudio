@@ -62,6 +62,13 @@ private:
     int mouseY = 0;
     int ClientMouseX = 0;
     int ClientMouseY = 0;
+    bool isMouseLeftDown = false;
+    bool isMouseRightDown = false;
+    bool isMouseMiddleDown = false;
+    double** DoubleArray0;
+    double** DoubleArray1;
+    double Coordinate0[3][3];
+    double Coordinate1[3][3];
     
     wxTimer m_spinTimer;
     bool m_useStereo;
@@ -79,6 +86,7 @@ private:
     void OnMouseMove(wxMouseEvent& event);
     void OnMouseRightDown(wxMouseEvent& event);
     void OnMouseRightUp(wxMouseEvent& event);
+    void OnMouseMiddleDown(wxMouseEvent& event);
     void OnMouseMiddleUp(wxMouseEvent& event);
     void OnSaveRasterImage(wxCommandEvent &WXUNUSED(event));
     void SaveImageFromData(wxImage image, wxString filepath, wxString OutputFileType);
