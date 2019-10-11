@@ -4161,6 +4161,7 @@ void MainFrame::GenerateCppCode(wxString filepath, wxString BaseName, int MyID_I
         fprintf(fpk,"\tprintf(\"a = (%%.3f, %%.3f, %%.3f)\\n\", a[0], a[1], a[2]);\n");
         fprintf(fpk,"\tprintf(\"b = (%%.3f, %%.3f, %%.3f)\\n\", b[0], b[1], b[2]);\n");
         fprintf(fpk,"\tprintf(\"c = (%%.3f, %%.3f, %%.3f)\\n\", c[0], c[1], c[2]);\n");
+        fprintf(fpk,"\tprintf(\"\\nReciprocal Vectors:\\n\");\n");
         fprintf(fpk,"\tprintf(\"a* = (%%.3f, %%.3f, %%.3f)\\n\", as[0], as[1], as[2]);\n");
         fprintf(fpk,"\tprintf(\"b* = (%%.3f, %%.3f, %%.3f)\\n\", bs[0], bs[1], bs[2]);\n");
         fprintf(fpk,"\tprintf(\"c* = (%%.3f, %%.3f, %%.3f)\\n\", cs[0], cs[1], cs[2]);\n");
@@ -4216,6 +4217,19 @@ void MainFrame::GenerateCppCode(wxString filepath, wxString BaseName, int MyID_I
             fprintf(fpk,"\t\tFILE *fp;\n");
             fprintf(fpk,"\t\tsprintf(filename, \"%s_H(%%d,%%d,%%d).dat\",Cells[iCell][0] ,Cells[iCell][1] ,Cells[iCell][2]);\n",BaseName.c_str().AsChar());
             fprintf(fpk,"\t\tprintf(\"%%d) loading file: %%s\\n\", ++it, filename);\n");
+            fprintf(fpk,"\t\tfp = fopen(filename,\"r\");\n");
+            fprintf(fpk,"\t\tfor(int i = 0; i < nH0; i++)\n");
+            fprintf(fpk,"\t\t{\n");
+            fprintf(fpk,"\t\t\tfor(int j = 0; j < nH0; j++)\n");
+            fprintf(fpk,"\t\t\t{\n");
+            fprintf(fpk,"\t\t\t\tfscanf(fp, \"%%lf\", &h[iCell][2*i][2*j]);\n");
+            fprintf(fpk,"\t\t\t\th[iCell][2*i + 1][2*j + 1] = h[iCell][2*i][2*j];\n");
+            fprintf(fpk,"\t\t\t\th[iCell][2*i][2*j + 1] = 0.0;\n");
+            fprintf(fpk,"\t\t\t\th[iCell][2*i + 1][2*j] = 0.0;\n");
+            fprintf(fpk,"\t\t\t}\n");
+            fprintf(fpk,"\t\t\tfscanf(fp,\"\\n\");\n");
+            fprintf(fpk,"\t\t}\n");
+            fprintf(fpk,"\t\tfclose(fp);\n");
             fprintf(fpk,"\t\t\n");
             fprintf(fpk,"\t\tfor(int i = 0; i < nH; i++)\n");
             fprintf(fpk,"\t\t{\n");
@@ -4236,6 +4250,19 @@ void MainFrame::GenerateCppCode(wxString filepath, wxString BaseName, int MyID_I
                 fprintf(fpk,"\t\tfp = fopen(filename,\"r\");\n");
                 fprintf(fpk,"\t\tfor(int i = 0; i < nH0; i++)\n");
                 fprintf(fpk,"\t\t{\n");
+                fprintf(fpk,"\t\t\tfor(int j = 0; j < nH0; j++)\n");
+                fprintf(fpk,"\t\t\t{\n");
+                fprintf(fpk,"\t\t\t\tfscanf(fp, \"%%lf\", &s[iCell][2*i][2*j]);\n");
+                fprintf(fpk,"\t\t\t\ts[iCell][2*i + 1][2*j + 1] = s[iCell][2*i][2*j];\n");
+                fprintf(fpk,"\t\t\t\ts[iCell][2*i][2*j + 1] = 0.0;\n");
+                fprintf(fpk,"\t\t\t\ts[iCell][2*i + 1][2*j] = 0.0;\n");
+                fprintf(fpk,"\t\t\t}\n");
+                fprintf(fpk,"\t\t\tfscanf(fp,\"\\n\");\n");
+                fprintf(fpk,"\t\t}\n");
+                fprintf(fpk,"\t\tfclose(fp);\n");
+                fprintf(fpk,"\t\t\n");
+                fprintf(fpk,"\t\tfor(int i = 0; i < nH; i++)\n");
+                fprintf(fpk,"\t\t{\n");
                 fprintf(fpk,"\t\t\tfor(int j = 0; j < nH; j++)\n");
                 fprintf(fpk,"\t\t\t\tprintf(\"%%.3f \", s[iCell][i][j]);\n");
                 fprintf(fpk,"\t\t\tprintf(\"\\n\");\n");
@@ -4244,7 +4271,26 @@ void MainFrame::GenerateCppCode(wxString filepath, wxString BaseName, int MyID_I
                 fprintf(fpk,"\t}\n");
             }
             
-
+            fprintf(fpk,"\t\n");
+            fprintf(fpk,"\tFILE *fpSOCRe;\n");
+            fprintf(fpk,"\tFILE *fpSOCIm;\n");
+            fprintf(fpk,"\tfpSOCRe = fopen(\"%s_SOC_Re.dat\",\"r\");\n",BaseName.c_str().AsChar());
+            fprintf(fpk,"\tfpSOCIm = fopen(\"%s_SOC_Im.dat\",\"r\");\n",BaseName.c_str().AsChar());
+            fprintf(fpk,"\tfor(int i = 0; i < nH; i++)\n");
+            fprintf(fpk,"\t{\n");
+            fprintf(fpk,"\t\tfor(int j = 0; j < nH; j++)\n");
+            fprintf(fpk,"\t\t{\n");
+            fprintf(fpk,"\t\t\tdouble re, im;\n");
+            fprintf(fpk,"\t\t\tfscanf(fpSOCRe, \"%%lf\", &re);\n");
+            fprintf(fpk,"\t\t\tfscanf(fpSOCIm, \"%%lf\", &im);\n");
+            fprintf(fpk,"\t\t\tHsoc[i][j].real(re);\n");
+            fprintf(fpk,"\t\t\tHsoc[i][j].imag(im);\n");
+            fprintf(fpk,"\t\t}\n");
+            fprintf(fpk,"\t\tfscanf(fpSOCRe,\"\\n\");\n");
+            fprintf(fpk,"\t\tfscanf(fpSOCIm,\"\\n\");\n");
+            fprintf(fpk,"\t}\n");
+            fprintf(fpk,"\tfclose(fpSOCRe);\n");
+            fprintf(fpk,"\tfclose(fpSOCIm);\n");
             
             fprintf(fpk,"\t\n");
             fprintf(fpk,"\tfor(int i = 0; i < nH; i++)\n");
@@ -4281,6 +4327,28 @@ void MainFrame::GenerateCppCode(wxString filepath, wxString BaseName, int MyID_I
             fprintf(fpk,"\t\tprintf(\"\\n\");\n");
             fprintf(fpk,"\t}\n");
             
+            if(isS)
+            {
+                fprintf(fpk,"\n\tfor(int iCell = 0; iCell < nCells; iCell++)\n");
+                fprintf(fpk,"\t{\n");
+                fprintf(fpk,"\t\tFILE *fp;\n");
+                fprintf(fpk,"\t\tsprintf(filename, \"%s_S(%%d,%%d,%%d).dat\",Cells[iCell][0] ,Cells[iCell][1] ,Cells[iCell][2]);\n",BaseName.c_str().AsChar());
+                fprintf(fpk,"\t\tprintf(\"%%d) loading file: %%s\\n\", ++it, filename);\n");
+                fprintf(fpk,"\t\tfp = fopen(filename,\"r\");\n");
+                fprintf(fpk,"\t\tfor(int i = 0; i < nH; i++)\n");
+                fprintf(fpk,"\t\t{\n");
+                fprintf(fpk,"\t\t\tfor(int j = 0; j < nH; j++)\n");
+                fprintf(fpk,"\t\t\t{\n");
+                fprintf(fpk,"\t\t\t\tfscanf(fp, \"%%lf\", &s[iCell][i][j]);\n");
+                fprintf(fpk,"\t\t\t\tprintf(\"%%.3f \", s[iCell][i][j]);\n");
+                fprintf(fpk,"\t\t\t}\n");
+                fprintf(fpk,"\t\t\tfscanf(fp,\"\\n\");\n");
+                fprintf(fpk,"\t\t\tprintf(\"\\n\");\n");
+                fprintf(fpk,"\t\t}\n");
+                fprintf(fpk,"\t\tfclose(fp);\n");
+                fprintf(fpk,"\t\tprintf(\"\\n\");\n");
+                fprintf(fpk,"\t}\n");
+            }
         }
         
         if (isS)
@@ -4678,18 +4746,17 @@ void MainFrame::GenerateCCode(wxString filepath, wxString BaseName, int MyID_Ini
             fprintf(fpk,"\t\tfscanf(fpSOCRe,\"\\n\");\n");
             fprintf(fpk,"\t\tfscanf(fpSOCIm,\"\\n\");\n");
             fprintf(fpk,"\t}\n");
-
             fprintf(fpk,"\tfclose(fpSOCRe);\n");
             fprintf(fpk,"\tfclose(fpSOCIm);\n");
-            fprintf(fpk,"\t\t\tprintf(\"(%%.3f, %%.3f)\", Hsoc[0][i][j], Hsoc[1][i][j]);\n");
-            fprintf(fpk,"\t\tprintf(\"\\n\");\n");
-            fprintf(fpk,"\t}\n");
-            fprintf(fpk,"\tprintf(\"\\n\");\n");            
+            
             fprintf(fpk,"\t\n");
             fprintf(fpk,"\tfor(int i = 0; i < nH; i++)\n");
             fprintf(fpk,"\t{\n");
             fprintf(fpk,"\t\tfor(int j = 0; j < nH; j++)\n");
-
+            fprintf(fpk,"\t\t\tprintf(\"(%%.3f, %%.3f)\", Hsoc[0][i][j], Hsoc[1][i][j]);\n");
+            fprintf(fpk,"\t\tprintf(\"\\n\");\n");
+            fprintf(fpk,"\t}\n");
+            fprintf(fpk,"\tprintf(\"\\n\");\n");
         }
         else
         {
