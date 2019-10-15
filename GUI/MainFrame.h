@@ -114,6 +114,7 @@ protected:
     virtual void BtnMathematicaCode_OnClick(wxRibbonButtonBarEvent& event);
     virtual void BtnMatlabCode_OnClick(wxRibbonButtonBarEvent& event);
     virtual void BtnPythonCode_OnClick(wxRibbonButtonBarEvent& event);
+	virtual void BtnPyBinding_OnClick(wxRibbonButtonBarEvent& event);
     virtual void BtnAbout_OnClick(wxRibbonButtonBarEvent& event);
     virtual void BtnTutorials_OnClick(wxRibbonButtonBarEvent& event);
     virtual void BtnWebsite_OnClick(wxRibbonButtonBarEvent& event);
@@ -212,6 +213,7 @@ protected:
     void GenerateMathematicaCode(wxString filepath, wxString BaseName, int MyID_Initial0Final1);
     void GenerateMatlabCode(wxString filepath, wxString BaseName, int MyID_Initial0Final1);
     void GeneratePythonCode(wxString filepath, wxString BaseName, int MyID_Initial0Final1);
+	void GeneratePyBindingInput(wxString filepath, wxString BaseName, int MyID_Initial0Final1);
     void MakeACopyOfSKList();
 	myGrid* CreateGrid(wxWindow *parent, int nRow, int nCol, wxString VariableName, wxString* ColNames, wxString* ColTypes, int* ColSizes, int* ColPrecision, int xCtrlSize, int yCtrlSize, bool EnableEvent);
 	int ExportSKToFile(wxString filepath);

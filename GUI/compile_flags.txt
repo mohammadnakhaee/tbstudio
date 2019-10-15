@@ -1,0 +1,16 @@
+-I/usr/include/c++/9
+-I/usr/include/c++/9/x86_64-redhat-linux
+-I/usr/include/c++/9/backward
+-I/usr/lib/gcc/x86_64-redhat-linux/9/include
+-I/usr/local/include
+-I/usr/include
+-I/home/mohammadnakhaee/Documents/pecsjunc/GUI
+-I/home/mohammadnakhaee/Documents/pecsjunc/GUI/$(RapidXML_DIR)
+-I/home/mohammadnakhaee/Documents/pecsjunc/GUI/$(WXDIRInclude)
+-I/home/mohammadnakhaee/Documents/pecsjunc/GUI/$(lapackeDir)
+-I/usr/local/lib/wx/include/gtk3-unicode-3.1
+-I/usr/local/include/wx-3.1
+-D__WXGTK__
+-DWXUSINGDLL
+-DNDEBUG
+-D_FILE_OFFSET_BITS=64

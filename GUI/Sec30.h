@@ -202,6 +202,7 @@ public:
     int GetOnSiteSKInd(wxString skName);
     void SetBondSKElement(wxString skName, bool isOki, Adouble0D &iBondSK, double ival, bool isOkf, Adouble0D &fBondSK, double fval);
     int GetSKInd(wxString skName);
+	int GetAtomIndexFromHamiltonianIndex(Aint1D HamiltonianDimMap, int iH);
     lapack_complex_double GetHk(double*** H, double kx, double ky, double kz, double a[3], double b[3], double c[3], int nEssensialCells, int** lmnEssCells, int iH, int jH);
     int SymEigenValues(lapack_complex_double* LowerSymMatrix, lapack_int N, double* &eig);
     int SymEigenValues(lapack_complex_double* LowerSymMatrixA, lapack_complex_double* LowerSymMatrixB, lapack_int N, double* &eig);

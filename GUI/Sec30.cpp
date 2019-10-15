@@ -3255,7 +3255,7 @@ void Sec30::GetCouplingMatrixF(myGrid* SKCtr, myGrid* OverlapCtr, wxCheckTree* B
 {
     if (!CellID.IsOk())
     {
-        wxMessageBox(_("Fatal error occurred in thread REG01. Error code: GCMF002"),_("Error"));
+        wxMessageBox(_("Sec30 kernel: Fatal error occurred in thread REG01. Error code: GCMF002"),_("Error"));
         //Allocate h for zeros
         return;
     }
@@ -4272,6 +4272,22 @@ int Sec30::GetSKInd(wxString skName)
         return 9;
     
     return -1;
+}
+
+int Sec30::GetAtomIndexFromHamiltonianIndex(Aint1D HamiltonianDimMap, int iH)
+{
+	int nAtoms = HamiltonianDimMap.size();
+	for (int iAtomIndex=0; iAtomIndex< nAtoms; iAtomIndex++)
+	{
+		Aint0D shells = HamiltonianDimMap[iAtomIndex];
+		int nshells = shells.size();
+		for (int ishells=0; ishells< nshells; ishells++)
+		{
+			int iHTest = shells[ishells];
+			if (iHTest > iH) return iAtomIndex-1;
+		}
+	}
+	return 0;
 }
 
 lapack_complex_double Sec30::GetHk(double*** H, double kx, double ky, double kz, double a[3], double b[3], double c[3], int nEssensialCells, int** lmnEssCells, int iH, int jH)

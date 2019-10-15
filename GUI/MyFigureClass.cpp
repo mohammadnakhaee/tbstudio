@@ -357,7 +357,7 @@ void MyFigure2d::OnSaveRasterImage(wxCommandEvent &WXUNUSED(event))
 	
 	wxFileDialog* OpenDialog = new wxFileDialog(
 	this, _("Generate code"), wxEmptyString, wxEmptyString, 
-	_("EPS files (*.eps)|*.eps|SVG files (*.svg)|*.svg|PNG files (*.png)|*.png|JPEG files (*.jpg)|*.jpg|TGA files (*.tga)|*.tga|TEX files (*.tex)|*.tex")
+	_("EPS files (*.eps)|*.eps|SVG files (*.svg)|*.svg|PNG files (*.png)|*.png|JPEG files (*.jpg)|*.jpg|TGA files (*.tga)|*.tga")
 	,wxFD_SAVE, wxDefaultPosition);
 	
 	OpenDialog->SetDirectory(sec30->WorkingDIR);
@@ -375,8 +375,6 @@ void MyFigure2d::OnSaveRasterImage(wxCommandEvent &WXUNUSED(event))
 			mytype = _("jpg");
 		else if (findex == 4)
 			mytype = _("tga");
-		else if (findex == 5)
-			mytype = _("tex");
 			
 		wxString dgPath = OpenDialog->GetDirectory();
 		wxString dgFileName = OpenDialog->GetFilename();
@@ -419,9 +417,6 @@ void MyFigure2d::SaveImageFromData(wxImage image, wxString filepath, wxString Ou
 void MyFigure2d::SetWeight(float x, float y, float w, float h, float coef)
 {
     if (sec30->ArraysOf0DInt[0] == 0) return; //if (isBandLoaded = false) rturn;
-    int nX = sec30->ArraysOf0DInt[1];
-    int DFTnMin = sec30->ArraysOf0DInt[4];
-    int DFTnMax = sec30->ArraysOf0DInt[5];
     
     double Xmax = sec30->ArraysOf2DDouble[0][nX-1][6];
     double X = Xmax*x/w;
@@ -448,11 +443,11 @@ void MyFigure2d::SetWeight(float x, float y, float w, float h, float coef)
         y2 = sec30->ArraysOf0DDouble[4];
     }
     
-    double clickedY = y1 + (y2-y1)*(h - y)/h;
-    double dy = (y2-y1)/60;
+    double clickedY = y1 - (y2-y1)*(h - y)/h;
+    double dy = -(y2-y1)/60;
     for(int iband=DFTnMin; iband<=DFTnMax; iband++)
     {
-        double y = sec30->ArraysOf2DDouble[1][iX][iband-1] - sec30->ArraysOf0DDouble[0]; //EIG - ChemP
+        double y = sec30->ArraysOf2DDouble[1][iX-1][iband-1] - sec30->ArraysOf0DDouble[0]; //EIG - ChemP
         if(y > clickedY-dy && y < clickedY+dy)
         {
             int ix1 = iX-7;

@@ -1,0 +1,1 @@
+;-mwindows;-std=gnu++11 -pthread -liphlpapi

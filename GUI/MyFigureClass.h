@@ -8,7 +8,6 @@
 #include <wx/menu.h>
 #include <wx/textfile.h>
 #include <mgl2/mgl.h>
-#include <mgl2/glut.h>
 
 class MyFigure2d : public wxPanel
 {

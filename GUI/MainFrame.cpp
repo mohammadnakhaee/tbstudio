@@ -1,7 +1,6 @@
 #include "MainFrame.h"
 #include <wx/aboutdlg.h>
 #include <mgl2/mgl.h>
-#include <mgl2/glut.h>
 #include <wx/glcanvas.h>
 #include <wx/dcclient.h>
 #include <GL/gl.h>
@@ -690,8 +689,9 @@ void MainFrame::B3D(wxRibbonButtonBarEvent& event)
 
 void MainFrame::mgl_test(wxRibbonButtonBarEvent& event)
 {
-    mglGLUT gr(sample0);
-    gr.Run();
+    //#include <mgl2/glut.h>
+    //mglGLUT gr(sample0);
+    //gr.Run();
 }
 
 void MainFrame::BtnMain_OnClick(wxRibbonButtonBarEvent& event)
@@ -877,6 +877,21 @@ void MainFrame::BtnOpen_OnClick(wxRibbonButtonBarEvent& event)
         UpdateGraph2Ds();
 		sec30->WorkingDIR = dgPath;
 		sec30->WorkingFile = dgFileName;
+		while (SKtables->GetPageCount() != 0)
+		{
+			SKtables->DeletePage(0);
+		}
+		
+		wxString ColNames[3] = { _("Parameter"), _("Initial Value"), _("Last Value")};
+		wxString ColTypes[3] = { _("string"), _("double"), _("double")};
+		int ColSizes[3] = {130, 100, 100};
+		int ColPrecision[3] = { 0, 8, 8};
+		
+		myGrid* gc = CreateGrid(SKtables, 0, 3, _(""), ColNames, ColTypes, ColSizes, ColPrecision, -1, -1, false);
+		SKtables->AddPage(gc,_(""));
+		SKtables->Update();
+		SKtables->Refresh(true);
+		
 		this->SetTitle(SoftwareName + _(": ") + sec30->WorkingDIR + _("/") + dgFileName);
 		
 		LoadSKTables();
@@ -2631,6 +2646,30 @@ void MainFrame::BtnPythonCode_OnClick(wxRibbonButtonBarEvent& event)
 	OpenDialog->Destroy();
 }
 
+void MainFrame::BtnPyBinding_OnClick(wxRibbonButtonBarEvent& event)
+{
+    wxFileDialog* OpenDialog = new wxFileDialog(
+		this, _("Generate code"), wxEmptyString, wxEmptyString, 
+		_("Python Script File (*.py)|*.py")
+        ,wxFD_SAVE, wxDefaultPosition);
+    
+	OpenDialog->SetDirectory(sec30->WorkingDIR);
+    if (OpenDialog->ShowModal() == wxID_OK) // if the user click "Open" instead of "Cancel"
+	{
+        wxString dgPath = OpenDialog->GetDirectory();
+        wxString dgFileName = OpenDialog->GetFilename();
+        wxString BaseName = _("");
+        if (dgFileName.AfterLast('.') == _("py"))
+            BaseName = dgFileName.BeforeLast('.');
+        else
+            BaseName = dgFileName;
+        
+        GeneratePyBindingInput(dgPath, BaseName, 1);
+	}
+    
+	OpenDialog->Destroy();
+}
+
 void MainFrame::BtnAbout_OnClick(wxRibbonButtonBarEvent& event)
 {
     ShowAbout();
@@ -2725,7 +2764,7 @@ void MainFrame::LoadIcons()
     int myID;
     
     wxRibbonPage* RPageFile1 = new wxRibbonPage(MainRibbon, wxID_ANY, _("File"), wxNullBitmap, 0);
-    wxRibbonPanel* RPanelProject = new wxRibbonPanel(RPageFile1, wxID_ANY, _("TB Model"), wxNullBitmap, wxDefaultPosition, wxDLG_UNIT(RPageFile1, wxSize(-1,-1)), wxRIBBON_PANEL_DEFAULT_STYLE);
+    wxRibbonPanel* RPanelProject = new wxRibbonPanel(RPageFile1, wxID_ANY, _("TB Model"), wxNullBitmap, wxDefaultPosition, wxDLG_UNIT(RPageFile1, wxSize(-1,-1)), wxRIBBON_PANEL_NO_AUTO_MINIMISE);
     wxRibbonButtonBar* RButtonBar1 = new wxRibbonButtonBar(RPanelProject, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(RPanelProject, wxSize(-1,-1)), 0);
     
     RButtonBar1->AddButton(wxID_OPEN, _("Open"), GetPng(open_png,open_png_size), _(""), wxRIBBON_BUTTON_NORMAL);
@@ -2740,19 +2779,22 @@ void MainFrame::LoadIcons()
     RButtonBar1->Realize();
     
     wxRibbonPage* RPageTools = new wxRibbonPage(MainRibbon, wxID_ANY, _("Tools"), wxNullBitmap, 0);
-    wxRibbonPanel* RPanelStructure = new wxRibbonPanel(RPageTools, wxID_ANY, _("Structure"), wxNullBitmap, wxDefaultPosition, wxDLG_UNIT(RPageTools, wxSize(-1,-1)), wxRIBBON_PANEL_DEFAULT_STYLE);
+    wxRibbonPanel* RPanelStructure = new wxRibbonPanel(RPageTools, wxID_ANY, _("Structure"), wxNullBitmap, wxDefaultPosition, wxDLG_UNIT(RPageTools, wxSize(-1,-1)), wxRIBBON_PANEL_NO_AUTO_MINIMISE);
     wxRibbonButtonBar* RButtonBar2 = new wxRibbonButtonBar(RPanelStructure, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(RPanelStructure, wxSize(-1,-1)), 0);
     
     myID = wxID_SELECT_COLOR;
-    RButtonBar2->AddButton(myID, _("Style"), GetPng(colors_png,colors_png_size), _(""), wxRIBBON_BUTTON_NORMAL);
+    RButtonBar2->AddButton(myID, _("Atoms and Bonds"), GetPng(colors_png,colors_png_size), _(""), wxRIBBON_BUTTON_NORMAL);
     RButtonBar2->Connect(myID, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrame::BtnStructureStyle_OnClick), NULL, this);
-    
+	
     RButtonBar2->Realize();
+	
+	
+	
+	
+	
+	
     
-    
-    
-    
-    wxRibbonPanel* RPanelMouse = new wxRibbonPanel(RPageTools, wxID_ANY, _("Mouse"), wxNullBitmap, wxDefaultPosition, wxDLG_UNIT(RPageTools, wxSize(-1,-1)), wxRIBBON_PANEL_DEFAULT_STYLE);
+    wxRibbonPanel* RPanelMouse = new wxRibbonPanel(RPageTools, wxID_ANY, _("Mouse"), wxNullBitmap, wxDefaultPosition, wxDLG_UNIT(RPageTools, wxSize(-1,-1)), wxRIBBON_PANEL_NO_AUTO_MINIMISE);
     RButtonMouse = new wxRibbonButtonBar(RPanelMouse, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(RPanelMouse, wxSize(-1,-1)), 0);
     
     myID = wxID_FILE1;
@@ -2776,7 +2818,7 @@ void MainFrame::LoadIcons()
     
     
     //wxRibbonPage* RPageView = new wxRibbonPage(MainRibbon, wxID_ANY, _("View"), wxNullBitmap, 0);
-    wxRibbonPanel* RPanelCart = new wxRibbonPanel(RPageTools, wxID_ANY, _("Cartesian"), wxNullBitmap, wxDefaultPosition, wxDLG_UNIT(RPageTools, wxSize(-1,-1)), wxRIBBON_PANEL_DEFAULT_STYLE);
+    wxRibbonPanel* RPanelCart = new wxRibbonPanel(RPageTools, wxID_ANY, _("Cartesian"), wxNullBitmap, wxDefaultPosition, wxDLG_UNIT(RPageTools, wxSize(-1,-1)), wxRIBBON_PANEL_NO_AUTO_MINIMISE);
     wxRibbonButtonBar* RButtonBar3 = new wxRibbonButtonBar(RPanelCart, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(RPanelCart, wxSize(-1,-1)), 0);
     
     myID = wxID_FILE1;
@@ -2793,7 +2835,7 @@ void MainFrame::LoadIcons()
     
     RButtonBar3->Realize();
     
-    /*wxRibbonPanel* RPanelUnitcell = new wxRibbonPanel(RPageTools, wxID_ANY, _("Unit-cell"), wxNullBitmap, wxDefaultPosition, wxDLG_UNIT(RPageTools, wxSize(-1,-1)), wxRIBBON_PANEL_DEFAULT_STYLE);
+    /*wxRibbonPanel* RPanelUnitcell = new wxRibbonPanel(RPageTools, wxID_ANY, _("Unit-cell"), wxNullBitmap, wxDefaultPosition, wxDLG_UNIT(RPageTools, wxSize(-1,-1)), wxRIBBON_PANEL_NO_AUTO_MINIMISE);
     wxRibbonButtonBar* RButtonBar4 = new wxRibbonButtonBar(RPanelUnitcell, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(RPanelUnitcell, wxSize(-1,-1)), 0);
     
     myID = wxID_FILE1;
@@ -2810,7 +2852,7 @@ void MainFrame::LoadIcons()
     
     RButtonBar4->Realize();*/
     
-    wxRibbonPanel* RPanelRotation = new wxRibbonPanel(RPageTools, wxID_ANY, _("Rotation"), wxNullBitmap, wxDefaultPosition, wxDLG_UNIT(RPageTools, wxSize(-1,-1)), wxRIBBON_PANEL_DEFAULT_STYLE);
+    wxRibbonPanel* RPanelRotation = new wxRibbonPanel(RPageTools, wxID_ANY, _("Rotation"), wxNullBitmap, wxDefaultPosition, wxDLG_UNIT(RPageTools, wxSize(-1,-1)), wxRIBBON_PANEL_NO_AUTO_MINIMISE);
     wxRibbonButtonBar* RButtonBar5 = new wxRibbonButtonBar(RPanelRotation, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(RPanelRotation, wxSize(-1,-1)), 0);
     
     myID = wxID_FILE1;
@@ -2831,8 +2873,10 @@ void MainFrame::LoadIcons()
     
     RButtonBar5->Realize();
     
+	RPanelStructure->Realize();
+	
     wxRibbonPage* RPageCalculations = new wxRibbonPage(MainRibbon, wxID_ANY, _("Analyze"), wxNullBitmap, 0);
-    wxRibbonPanel* RPanelFitting = new wxRibbonPanel(RPageCalculations, wxID_ANY, _("Fitting"), wxNullBitmap, wxDefaultPosition, wxDLG_UNIT(RPageCalculations, wxSize(-1,-1)), wxRIBBON_PANEL_DEFAULT_STYLE);
+    wxRibbonPanel* RPanelFitting = new wxRibbonPanel(RPageCalculations, wxID_ANY, _("Fitting"), wxNullBitmap, wxDefaultPosition, wxDLG_UNIT(RPageCalculations, wxSize(-1,-1)), wxRIBBON_PANEL_NO_AUTO_MINIMISE);
     wxRibbonButtonBar* RButtonBar7 = new wxRibbonButtonBar(RPanelFitting, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(RPanelFitting, wxSize(-1,-1)), 0);
     
     myID = wxID_FILE1;
@@ -2854,7 +2898,7 @@ void MainFrame::LoadIcons()
     RButtonBar7->Realize();
 
     wxRibbonPage* RPageWizard = new wxRibbonPage(MainRibbon, wxID_ANY, _("Wizard"), wxNullBitmap, 0);
-    wxRibbonPanel* RPanelCodeGen = new wxRibbonPanel(RPageWizard, wxID_ANY, _("Code Generator"), wxNullBitmap, wxDefaultPosition, wxDLG_UNIT(RPageWizard, wxSize(-1,-1)), wxRIBBON_PANEL_DEFAULT_STYLE);
+    wxRibbonPanel* RPanelCodeGen = new wxRibbonPanel(RPageWizard, wxID_ANY, _("Code Generator"), wxNullBitmap, wxDefaultPosition, wxDLG_UNIT(RPageWizard, wxSize(-1,-1)), wxRIBBON_PANEL_NO_AUTO_MINIMISE);
     wxRibbonButtonBar* RButtonBarCG1 = new wxRibbonButtonBar(RPanelCodeGen, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(RPanelCodeGen, wxSize(-1,-1)), 0);
     
     myID = wxID_FILE1;
@@ -2881,10 +2925,14 @@ void MainFrame::LoadIcons()
     RButtonBarCG1->AddButton(myID, _("Python"), GetPng(pythoncode_png,pythoncode_png_size), _(""), wxRIBBON_BUTTON_NORMAL);
     RButtonBarCG1->Connect(myID, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrame::BtnPythonCode_OnClick), NULL, this);
     
+	myID = wxID_FILE7;
+    RButtonBarCG1->AddButton(myID, _("PyBinding"), GetPng(pybinding_png,pybinding_png_size), _(""), wxRIBBON_BUTTON_NORMAL);
+    RButtonBarCG1->Connect(myID, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrame::BtnPyBinding_OnClick), NULL, this);
+    
     RButtonBarCG1->Realize();
     
     wxRibbonPage* RPageHelp = new wxRibbonPage(MainRibbon, wxID_ANY, _("Help"), wxNullBitmap, 0);
-    wxRibbonPanel* RPanelHelp = new wxRibbonPanel(RPageHelp, wxID_ANY, _("Help"), wxNullBitmap, wxDefaultPosition, wxDLG_UNIT(RPageHelp, wxSize(-1,-1)), wxRIBBON_PANEL_DEFAULT_STYLE);
+    wxRibbonPanel* RPanelHelp = new wxRibbonPanel(RPageHelp, wxID_ANY, _("Help"), wxNullBitmap, wxDefaultPosition, wxDLG_UNIT(RPageHelp, wxSize(-1,-1)), wxRIBBON_PANEL_NO_AUTO_MINIMISE);
     wxRibbonButtonBar* RButtonBar6 = new wxRibbonButtonBar(RPanelHelp, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(RPanelHelp, wxSize(-1,-1)), 0);
     
     myID = wxID_ABOUT;
@@ -6213,6 +6261,247 @@ void MainFrame::GeneratePythonCode(wxString filepath, wxString BaseName, int MyI
         fprintf(fpk,"plt.xticks(xlabels, labels)\n");
         fprintf(fpk,"plt.show()\n");
         fclose(fpk);
+    }
+}
+
+void MainFrame::GeneratePyBindingInput(wxString filepath, wxString BaseName, int MyID_Initial0Final1)
+{
+    int ID = MyID_Initial0Final1;
+    int Hind = 0;
+    int Sind = 2;
+    int SOCind = 4;
+    if (ID == 1)
+    {
+        Hind = 1;
+        Sind = 3;
+        SOCind = 5;
+    }
+    
+    int nEss = sec30->ArraysOf3DDouble[Hind].size();
+    if (nEss < 1) return;
+    
+    int nH = sec30->ArraysOf3DDouble[Hind][0].size();
+    if (nH < 1) return;
+    
+    bool isS = false;
+    int nEssS = sec30->ArraysOf3DDouble[Sind].size();
+    if (nEssS > 0) isS = true;
+    
+    bool isSOC = false;
+    int nSOCBuf = sec30->ArraysOf3DDouble[SOCind].size();
+    if (nSOCBuf > 1) isSOC = true;
+    
+    int nk = sec30->ArraysOf2DDouble[0].size();//double** KPoints; [ka,kb,kc,kx,ky,kz,d_path]
+    int nklabel = sec30->ArraysOf1DDouble[0].size();//double* dkLabel;
+    
+    FILE *fpk;
+    wxString fname = filepath + wxT("/") + BaseName + wxT(".py");
+    if ((fpk = fopen(fname,"w")) != NULL)
+    {
+        fprintf(fpk,"#Import libraries\n");
+        fprintf(fpk,"import pybinding as pb\n");
+		
+        int TBl,TBm,TBn;
+        sec30->GetVar(_("TBl[0]"), TBl);
+        sec30->GetVar(_("TBm[0]"), TBm);
+        sec30->GetVar(_("TBn[0]"), TBn);
+		
+		double a[3],b[3],c[3];
+        sec30->GetVar(_("a[0]"), a[0]);
+        sec30->GetVar(_("a[1]"), a[1]);
+        sec30->GetVar(_("a[2]"), a[2]);
+        sec30->GetVar(_("b[0]"), b[0]);
+        sec30->GetVar(_("b[1]"), b[1]);
+        sec30->GetVar(_("b[2]"), b[2]);
+        sec30->GetVar(_("c[0]"), c[0]);
+        sec30->GetVar(_("c[1]"), c[1]);
+        sec30->GetVar(_("c[2]"), c[2]);
+		
+		fprintf(fpk,"\n# create a lattice in format of pyBinding\n");
+		fprintf(fpk,"def GetLattice(onsite_energy=[0, 0]):\n");
+		fprintf(fpk,"    lat = pb.Lattice(\n");
+		fprintf(fpk,"        a1 = [%.8f, %.8f, %.8f],\n" , a[0], a[1], a[2]);
+		fprintf(fpk,"        a2 = [%.8f, %.8f, %.8f],\n" , b[0], b[1], b[2]);
+		fprintf(fpk,"        a3 = [%.8f, %.8f, %.8f]\n"  , c[0], c[1], c[2]);
+		fprintf(fpk,"    )\n");
+		
+		int nUnitcellAtoms = 0;
+		sec30->GetVar(_("nAtoms[0]"),nUnitcellAtoms);
+		bool isSOC;
+		sec30->GetCheckVar(_("SOC[0]"), isSOC);
+		bool isOverlap;
+		sec30->GetCheckVar(_("Overlap[0]"), isOverlap);
+		wxCheckTree* orbs = sec30->GetTreeObject(_("Orbitals"));
+		Astring0D HamiltonianMap = sec30->ArraysOf1DString[1];
+		int nHamiltonian = HamiltonianMap.size();
+		Aint1D HamiltonianDimMap = sec30->ArraysOf2DInt[0];
+		Aint0D HamiltonianDimMapItem; //The index of the shell in Hamiltonian
+		wxTreeItemId orbsrootID = orbs->GetRootItem();
+		
+		int kind[nUnitcellAtoms];
+		double XArray[nUnitcellAtoms];
+		double YArray[nUnitcellAtoms];
+		double ZArray[nUnitcellAtoms];
+		
+		for (int i0=0; i0<nUnitcellAtoms; i0++)
+		{
+			//double fraca, fracb, fracc;
+			sec30->GetVar(_("KABC_Coords"), i0, 0, kind[i0]);
+			//sec30->GetVar(_("KABC_Coords"), i0, 1, fraca);
+			//sec30->GetVar(_("KABC_Coords"), i0, 2, fracb);
+			//sec30->GetVar(_("KABC_Coords"), i0, 3, fracc);
+			sec30->GetVar(_("XYZ_Coords"), i0, 0, XArray[i0]);
+			sec30->GetVar(_("XYZ_Coords"), i0, 1, YArray[i0]);
+			sec30->GetVar(_("XYZ_Coords"), i0, 2, ZArray[i0]);
+		}
+		
+		Astring0D onsitesCodelines = Astring0D();
+		
+		int iH0=0;
+		for (int iAtomIndex=0; iAtomIndex<nUnitcellAtoms; iAtomIndex++)
+		{
+			int Dim1 = -1;
+			bool IsShell1;
+			wxString Orbs1;
+			
+			wxString atom1 = wxString::Format(wxT("AtomInd%d"),iAtomIndex + 1);
+			wxComboBox* comb1 = sec30->GetComboObject(atom1);
+			wxString TBAtom1 = comb1->GetStringSelection();
+			
+			wxTreeItemId AtomID = orbs->ActiveAndContainsItemIn(orbsrootID ,TBAtom1);
+			int nShell = orbs->GetChildrenCount(AtomID,false);
+			
+			for (int iShell=1; iShell<=nShell; iShell++)
+			{
+				wxString ShellName = wxString::Format(wxT("Shell %d"),iShell);
+				wxTreeItemId shellID = orbs->FindItemIn(AtomID,ShellName);
+				
+				if (shellID.IsOk() && orbs->GetItemState(shellID) >= wxCheckTree::CHECKED)
+				{
+					sec30->GetOrbitalInfo(orbs, TBAtom1, iShell, Orbs1, Dim1, IsShell1);
+					wxString Label = TBAtom1  + _(" (") + ShellName + _(")");
+
+					Orbs1.Replace(_(" "),_(""));
+					Orbs1.Replace(_("("),_(""));
+					Orbs1.Replace(_(")"),_(""));
+					wxStringTokenizer tokenizer1(Orbs1, ",");
+					while (tokenizer1.HasMoreTokens())
+					{
+						wxString o1 = tokenizer1.GetNextToken();
+						wxString orbitallabel = wxString::Format(wxT("o%d:"),iH0+1) + sec30->GetAtomLable(kind[iAtomIndex]) + wxString::Format(wxT(":%d:"),iShell) + o1;
+						onsitesCodelines.push_back(wxString::Format(wxT("        (\'%s\', [%.8f, %.8f, %.8f], onsite_energy[%d])"), orbitallabel, XArray[iAtomIndex], YArray[iAtomIndex], ZArray[iAtomIndex], iH0));
+						iH0++;
+					}
+				}
+			}
+		}
+		
+		wxListBox* listctr = sec30->GetListObject(_("EssentialUnitcellList"));
+		
+		Adouble0D onsitesList = Adouble0D();
+		Astring0D hoppingCodelines = Astring0D();
+		int nCell = listctr->GetCount();
+		for (int iCell=0; iCell<nCell; iCell++)
+		{
+			bool isMainCell = false;
+			wxString WorkingCell = listctr->GetString(iCell);
+			if (WorkingCell == _("(0,0,0)"))
+			{
+				hoppingCodelines.push_back(wxString::Format(wxT("\n        #inside the main cell")));
+				isMainCell = true;
+			}
+			else
+				hoppingCodelines.push_back(wxString::Format(wxT("\n        #between main cell and the cell %s"), WorkingCell));
+			
+			int lcell,mcell,ncell;
+			sec30->GetCellInfo(WorkingCell, lcell, mcell, ncell);
+			for (int iH=0; iH<nH; iH++)
+			{
+				for (int jH=0; jH<nH; jH++)
+				{
+					double t = sec30->ArraysOf3DDouble[Hind][iCell][iH][jH];
+                    if (isMainCell && iH==jH)
+                    {
+                        onsitesList.push_back(t);
+                    }
+                    else
+                    {
+                        if (fabs(t) > 0.00001)
+                        {
+							Astring0D HamiltonianMap = sec30->ArraysOf1DString[1];
+							wxString path1 = HamiltonianMap[iH];
+							wxString path2 = HamiltonianMap[jH];
+							path1.Replace(_("TB-Model Atom Species/"),_(""));
+							path1.Replace(_("Shell "),_(""));
+							path2.Replace(_("TB-Model Atom Species/"),_(""));
+							path2.Replace(_("Shell "),_(""));
+							wxStringTokenizer tokenizer1(path1, "/");
+							wxStringTokenizer tokenizer2(path2, "/");
+							wxString TBatom1 = tokenizer1.GetNextToken();
+							wxString TBatom2 = tokenizer2.GetNextToken();
+							wxString shell1 = tokenizer1.GetNextToken();
+							wxString shell2 = tokenizer2.GetNextToken();
+							wxString orbital1 = tokenizer1.GetNextToken();
+							wxString orbital2 = tokenizer2.GetNextToken();
+							int iAtomIndex = sec30->GetAtomIndexFromHamiltonianIndex(HamiltonianDimMap, iH);
+							int jAtomIndex = sec30->GetAtomIndexFromHamiltonianIndex(HamiltonianDimMap, jH);
+							wxString orbitallabel1 = wxString::Format(wxT("o%d:"),iH+1) + sec30->GetAtomLable(kind[iAtomIndex]) + wxT(":") + shell1 + wxT(":") + orbital1;
+							wxString orbitallabel2 = wxString::Format(wxT("o%d:"),jH+1) + sec30->GetAtomLable(kind[jAtomIndex]) + wxT(":") + shell2 + wxT(":") + orbital2;
+							hoppingCodelines.push_back(wxString::Format(wxT("        ([%d, %d, %d], \'%s\', \'%s\', %.8f)"), lcell, mcell, ncell, orbitallabel1, orbitallabel2, t));
+						}
+					}
+				}
+			}
+		}
+
+		int nhlines1 = onsitesList.size();
+		fprintf(fpk,"\n");
+		fprintf(fpk,"#on-site energies\n");
+		fprintf(fpk,"onsite_energy = [");
+		for (int il=0; il<nhlines1; il++)
+		{
+			wxString mycode = onsitesCodelines[il];
+			if (il != nhlines1 - 1)
+				fprintf(fpk,"%.8f,", onsitesList[il]);
+			else
+				fprintf(fpk,"%.8f", onsitesList[il]);
+		}
+		fprintf(fpk,"]\n");
+		fprintf(fpk,"\n");
+		fprintf(fpk,"    lat.add_sublattices(\n");
+		fprintf(fpk,"        #name and positions\n");
+		for (int il=0; il<nhlines1; il++)
+		{
+			wxString mycode = onsitesCodelines[il];
+			if (il != nhlines1 - 1)
+				fprintf(fpk,"%s,\n", mycode.c_str().AsChar());
+			else
+				fprintf(fpk,"%s\n", mycode.c_str().AsChar());
+		}
+		fprintf(fpk,"    )\n");
+		fprintf(fpk,"\n");
+		
+		int nhlines2 = hoppingCodelines.size();
+		fprintf(fpk,"    lat.add_hoppings(\n");
+		for (int il=0; il<nhlines2; il++)
+		{
+			wxString mycode = hoppingCodelines[il];
+			if (mycode.Contains(_("#")))
+				fprintf(fpk,"%s\n", mycode.c_str().AsChar());
+			else
+			{
+				if (il != nhlines2 - 1)
+					fprintf(fpk,"%s,\n", mycode.c_str().AsChar());
+				else
+					fprintf(fpk,"%s\n", mycode.c_str().AsChar());
+			}
+		}
+		fprintf(fpk,"    )\n");
+		fprintf(fpk,"\n");
+		
+        fprintf(fpk,"    return lat\n");
+        fclose(fpk);
+		wxMessageBox(wxT("Done!"));
     }
 }
 

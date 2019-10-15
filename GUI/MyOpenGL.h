@@ -14,7 +14,6 @@
 #include "wx/glcanvas.h"
 #include <wx/timer.h>
 #include <mgl2/mgl.h>
-#include <mgl2/glut.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <GL/glext.h>
