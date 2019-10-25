@@ -6,4 +6,5 @@ RUN apt-get -y install g++
 #rm -rf /var/lib/apt/lists/*
 ADD ./ /root/code
 WORKDIR /root/code
+#RUN cmake .
 #RUN make
