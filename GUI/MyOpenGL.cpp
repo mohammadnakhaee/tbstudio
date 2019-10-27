@@ -1799,7 +1799,7 @@ void MyGLCanvas::OnSaveRasterImage(wxCommandEvent &WXUNUSED(event))
                 BaseName = dgFileName.BeforeLast('.');
             else
                 BaseName = dgFileName;
-            wxString Thefile = dgPath + wxT("/") + BaseName + wxT(".") + mytype;
+            wxString Thefile = dgPath + wxFileName::GetPathSeparator() + BaseName + wxT(".") + mytype;
             
             // Make the GLubyte array, factor of 3 because it's RBG.
             glPixelStoref(GL_PACK_ALIGNMENT,1); //RGBA -> RGB   note that it should be PACK not UNPACK
@@ -1844,7 +1844,7 @@ void MyGLCanvas::OnSaveRasterImage(wxCommandEvent &WXUNUSED(event))
                 BaseName = dgFileName.BeforeLast('.');
             else
                 BaseName = dgFileName;
-            wxString Thefile = dgPath + wxT("/") + BaseName + wxT(".") + mytype;
+            wxString Thefile = dgPath + wxFileName::GetPathSeparator() + BaseName + wxT(".") + mytype;
             
             mglGraph gr;
             int ploterr = PlotBand(&gr, width, height, sec30, ObjectID);

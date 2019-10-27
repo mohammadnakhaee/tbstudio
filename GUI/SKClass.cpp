@@ -142,7 +142,7 @@ void SKClass::ExportSKToTXT(wxString filepath, wxString BaseName, int InitOrFina
 {
 	int ind = InitOrFinalSK;
     FILE *fpk;
-    wxString fname = filepath + wxT("/") + BaseName + wxT(".txt");
+    wxString fname = filepath + wxFileName::GetPathSeparator() + BaseName + wxT(".txt");
     if ((fpk = fopen(fname,"w")) != NULL)
     {
 		fprintf(fpk,"On-Site energies\n");

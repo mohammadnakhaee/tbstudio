@@ -93,7 +93,7 @@ void StructureClass::ExportToXYZ(wxString filepath, wxString filename)
               making of a XYZ file
   *********************************************/
 
-  wxString fname1 = filepath + wxT("/") + filename;
+  wxString fname1 = filepath + wxFileName::GetPathSeparator() + filename;
   if ((fp = fopen(fname1,"w")) != NULL){
 /*
     fprintf(fp,"%d\n\n",tbmodel->nAtoms);
@@ -148,7 +148,7 @@ void StructureClass::Btn_Import_XYZ_OnClick(wxCommandEvent& event)
         wxString dgFileName = OpenDialog->GetFilename();
         wxString dgPath = OpenDialog->GetDirectory();
         
-        wxString fl = dgPath + wxT("/") + dgFileName;
+        wxString fl = dgPath + wxFileName::GetPathSeparator() + dgFileName;
         
 	}
  

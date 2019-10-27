@@ -385,7 +385,7 @@ void MyFigure2d::OnSaveRasterImage(wxCommandEvent &WXUNUSED(event))
 			BaseName = dgFileName.BeforeLast('.');
 		else
 			BaseName = dgFileName;
-		wxString Thefile = dgPath + wxT("/") + BaseName + wxT(".") + mytype;
+		wxString Thefile = dgPath + wxFileName::GetPathSeparator() + BaseName + wxT(".") + mytype;
 		
 		mglGraph gr;
 		int ploterr = PlotBand(&gr, width, height, sec30, ObjectID);

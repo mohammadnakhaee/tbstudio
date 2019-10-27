@@ -808,7 +808,7 @@ void MainFrame::Init_Notebook()
     //SKtables->SetSizer(mainsizer);
 	
 	aui_mgr.SetDockSizeConstraint(0.333333,0.75);
-	aui_mgr.AddPane(SKtables, wxAuiPaneInfo().Gripper(true).Floatable(true).Dockable(true).Caption("Tables").CloseButton(false).MaximizeButton(true).MinimizeButton(true).BestSize(800,600).Dock().Top());
+	aui_mgr.AddPane(SKtables, wxAuiPaneInfo().Gripper(false).Floatable(true).Dockable(true).Caption("Tables").CloseButton(false).MaximizeButton(true).MinimizeButton(true).BestSize(800,600).Dock().Top());
 	aui_mgr.Update();
 
 	wxString ColNames[3] = { _("Parameter"), _("Initial Value"), _("Last Value")};
@@ -892,7 +892,7 @@ void MainFrame::BtnOpen_OnClick(wxRibbonButtonBarEvent& event)
 		SKtables->Update();
 		SKtables->Refresh(true);
 		
-		this->SetTitle(SoftwareName + _(": ") + sec30->WorkingDIR + _("/") + dgFileName);
+		this->SetTitle(SoftwareName + _(": ") + sec30->WorkingDIR + wxFileName::GetPathSeparator() + dgFileName);
 		
 		LoadSKTables();
 	}
@@ -941,7 +941,7 @@ void MainFrame::SaveAs()
         sec30->SaveToFile(dgPath, dgFileName);
 		sec30->WorkingDIR = dgPath;
 		sec30->WorkingFile = dgFileName;
-		this->SetTitle(SoftwareName + _(": ") + sec30->WorkingDIR + _("/") + dgFileName);
+		this->SetTitle(SoftwareName + _(": ") + sec30->WorkingDIR + wxFileName::GetPathSeparator() + dgFileName);
 		wxMessageBox(wxT("Done!"));
 	}
  
@@ -3957,7 +3957,7 @@ void MainFrame::ExportMatrices(wxString filepath, wxString BaseName, int MyID_In
     Adouble1D KPoints = sec30->ArraysOf2DDouble[0];
     
     FILE *fpk;
-    wxString fname = filepath + wxT("/") + BaseName + wxT("_kPath") + wxT(".dat");
+    wxString fname = filepath + wxFileName::GetPathSeparator() + BaseName + wxT("_kPath") + wxT(".dat");
     if ((fpk = fopen(fname,"w")) != NULL)
     {
         for (int ik=0; ik<nKPoint; ik++)
@@ -3996,7 +3996,7 @@ void MainFrame::ExportMatrices(wxString filepath, wxString BaseName, int MyID_In
         wxString WorkingCell = listctr->GetString(iCell);
         
         FILE *fp;
-        wxString fname1 = filepath + wxT("/") + BaseName + wxT("_H") + WorkingCell + wxT(".dat");
+        wxString fname1 = filepath + wxFileName::GetPathSeparator() + BaseName + wxT("_H") + WorkingCell + wxT(".dat");
         if ((fp = fopen(fname1,"w")) != NULL)
         {
             for (int iH=0; iH<nH; iH++)
@@ -4020,7 +4020,7 @@ void MainFrame::ExportMatrices(wxString filepath, wxString BaseName, int MyID_In
                 wxString WorkingCell = listctr->GetString(iCell);
                 
                 FILE *fp;
-                wxString fname1 = filepath + wxT("/") + BaseName + wxT("_S") + WorkingCell + wxT(".dat");
+                wxString fname1 = filepath + wxFileName::GetPathSeparator() + BaseName + wxT("_S") + WorkingCell + wxT(".dat");
                 if ((fp = fopen(fname1,"w")) != NULL)
                 {
                     for (int iS=0; iS<nS; iS++)
@@ -4050,7 +4050,7 @@ void MainFrame::ExportMatrices(wxString filepath, wxString BaseName, int MyID_In
             if (nH_SOC > 1) //We have spin. so at least should be 2
             {
                 FILE *fpsocre;
-                wxString fnamesocre = filepath + wxT("/") + BaseName + wxT("_SOC_Re.dat");
+                wxString fnamesocre = filepath + wxFileName::GetPathSeparator() + BaseName + wxT("_SOC_Re.dat");
                 if ((fpsocre = fopen(fnamesocre,"w")) != NULL)
                 {
                     for (int iH=0; iH<nSOCReal; iH++)
@@ -4066,7 +4066,7 @@ void MainFrame::ExportMatrices(wxString filepath, wxString BaseName, int MyID_In
                 }
                 
                 FILE *fpsocim;
-                wxString fnamesocim = filepath + wxT("/") + BaseName + wxT("_SOC_Im.dat");
+                wxString fnamesocim = filepath + wxFileName::GetPathSeparator() + BaseName + wxT("_SOC_Im.dat");
                 if ((fpsocim = fopen(fnamesocim,"w")) != NULL)
                 {
                     for (int iH=0; iH<nSOCImage; iH++)
@@ -4153,7 +4153,7 @@ void MainFrame::GenerateCppCode(wxString filepath, wxString BaseName, int MyID_I
     
     FILE *fpk;
     wxString fname = BaseName + wxT(".cpp");
-    wxString fpath =  filepath + wxT("/") + fname;
+    wxString fpath =  filepath + wxFileName::GetPathSeparator() + fname;
     if ((fpk = fopen(fpath,"w")) != NULL)
     {
         fprintf(fpk,"//compile command: g++ %s\n",fname.c_str().AsChar());
@@ -4610,7 +4610,7 @@ void MainFrame::GenerateCCode(wxString filepath, wxString BaseName, int MyID_Ini
     
     FILE *fpk;
     wxString fname = BaseName + wxT(".c");
-    wxString fpath =  filepath + wxT("/") + fname;
+    wxString fpath =  filepath + wxFileName::GetPathSeparator() + fname;
     if ((fpk = fopen(fpath,"w")) != NULL)
     {
         fprintf(fpk,"//compile command: gcc %s -lm\n",fname.c_str().AsChar());
@@ -5112,7 +5112,7 @@ void MainFrame::GenerateFCode(wxString filepath, wxString BaseName, int MyID_Ini
     
     FILE *fpk;
     wxString fname = BaseName + wxT(".f90");
-    wxString fpath =  filepath + wxT("/") + fname;
+    wxString fpath =  filepath + wxFileName::GetPathSeparator() + fname;
     if ((fpk = fopen(fpath,"w")) != NULL)
     {
         fprintf(fpk,"!compile command: gfortran %s\n",fname.c_str().AsChar());
@@ -5545,7 +5545,7 @@ void MainFrame::GenerateMathematicaCode(wxString filepath, wxString BaseName, in
     int nklabel = sec30->ArraysOf1DDouble[0].size();//double* dkLabel;
     
     FILE *fpk;
-    wxString fname = filepath + wxT("/") + BaseName + wxT(".nb");
+    wxString fname = filepath + wxFileName::GetPathSeparator() + BaseName + wxT(".nb");
     if ((fpk = fopen(fname,"w")) != NULL)
     {
         fprintf(fpk,"(*Define the parameters*)\n");
@@ -5787,7 +5787,7 @@ void MainFrame::GenerateMatlabCode(wxString filepath, wxString BaseName, int MyI
     int nklabel = sec30->ArraysOf1DDouble[0].size();//double* dkLabel;
     
     FILE *fpk;
-    wxString fname = filepath + wxT("/") + BaseName + wxT(".m");
+    wxString fname = filepath + wxFileName::GetPathSeparator() + BaseName + wxT(".m");
     if ((fpk = fopen(fname,"w")) != NULL)
     {
         fprintf(fpk,"%%Clear global parameters\n");
@@ -6045,7 +6045,7 @@ void MainFrame::GeneratePythonCode(wxString filepath, wxString BaseName, int MyI
     int nklabel = sec30->ArraysOf1DDouble[0].size();//double* dkLabel;
     
     FILE *fpk;
-    wxString fname = filepath + wxT("/") + BaseName + wxT(".py");
+    wxString fname = filepath + wxFileName::GetPathSeparator() + BaseName + wxT(".py");
     if ((fpk = fopen(fname,"w")) != NULL)
     {
         fprintf(fpk,"#Import libraries\n");
@@ -6295,11 +6295,14 @@ void MainFrame::GeneratePyBindingInput(wxString filepath, wxString BaseName, int
     int nklabel = sec30->ArraysOf1DDouble[0].size();//double* dkLabel;
     
     FILE *fpk;
-    wxString fname = filepath + wxT("/") + BaseName + wxT(".py");
+    wxString fname = filepath + wxFileName::GetPathSeparator() + BaseName + wxT(".py");
     if ((fpk = fopen(fname,"w")) != NULL)
     {
         fprintf(fpk,"#Import libraries\n");
         fprintf(fpk,"import pybinding as pb\n");
+		fprintf(fpk,"import matplotlib.pyplot as plt\n");
+        fprintf(fpk,"import numpy as np\n");
+		fprintf(fpk,"from math import pi\n");
 		
         int TBl,TBm,TBn;
         sec30->GetVar(_("TBl[0]"), TBl);
@@ -6316,14 +6319,6 @@ void MainFrame::GeneratePyBindingInput(wxString filepath, wxString BaseName, int
         sec30->GetVar(_("c[0]"), c[0]);
         sec30->GetVar(_("c[1]"), c[1]);
         sec30->GetVar(_("c[2]"), c[2]);
-		
-		fprintf(fpk,"\n# create a lattice in format of pyBinding\n");
-		fprintf(fpk,"def GetLattice(onsite_energy=[0, 0]):\n");
-		fprintf(fpk,"    lat = pb.Lattice(\n");
-		fprintf(fpk,"        a1 = [%.8f, %.8f, %.8f],\n" , a[0], a[1], a[2]);
-		fprintf(fpk,"        a2 = [%.8f, %.8f, %.8f],\n" , b[0], b[1], b[2]);
-		fprintf(fpk,"        a3 = [%.8f, %.8f, %.8f]\n"  , c[0], c[1], c[2]);
-		fprintf(fpk,"    )\n");
 		
 		int nUnitcellAtoms = 0;
 		sec30->GetVar(_("nAtoms[0]"),nUnitcellAtoms);
@@ -6424,6 +6419,10 @@ void MainFrame::GeneratePyBindingInput(wxString filepath, wxString BaseName, int
                     {
                         onsitesList.push_back(t);
                     }
+					else if (isMainCell && iH > jH)
+					{
+						//ignore
+					}
                     else
                     {
                         if (fabs(t) > 0.00001)
@@ -6453,11 +6452,12 @@ void MainFrame::GeneratePyBindingInput(wxString filepath, wxString BaseName, int
 				}
 			}
 		}
-
+		
+		fprintf(fpk,"\n# create a lattice in format of pyBinding\n");
+		fprintf(fpk,"def GetLattice(");
+		
 		int nhlines1 = onsitesList.size();
-		fprintf(fpk,"\n");
-		fprintf(fpk,"#on-site energies\n");
-		fprintf(fpk,"onsite_energy = [");
+		fprintf(fpk,"onsite_energy=[");
 		for (int il=0; il<nhlines1; il++)
 		{
 			wxString mycode = onsitesCodelines[il];
@@ -6466,7 +6466,15 @@ void MainFrame::GeneratePyBindingInput(wxString filepath, wxString BaseName, int
 			else
 				fprintf(fpk,"%.8f", onsitesList[il]);
 		}
-		fprintf(fpk,"]\n");
+		fprintf(fpk,"]");
+		
+		fprintf(fpk,"):\n");
+		fprintf(fpk,"    lat = pb.Lattice(\n");
+		fprintf(fpk,"        a1 = [%.8f, %.8f, %.8f],\n" , a[0], a[1], a[2]);
+		fprintf(fpk,"        a2 = [%.8f, %.8f, %.8f],\n" , b[0], b[1], b[2]);
+		fprintf(fpk,"        a3 = [%.8f, %.8f, %.8f]\n"  , c[0], c[1], c[2]);
+		fprintf(fpk,"    )\n");
+
 		fprintf(fpk,"\n");
 		fprintf(fpk,"    lat.add_sublattices(\n");
 		fprintf(fpk,"        #name and positions\n");
@@ -6498,8 +6506,65 @@ void MainFrame::GeneratePyBindingInput(wxString filepath, wxString BaseName, int
 		}
 		fprintf(fpk,"    )\n");
 		fprintf(fpk,"\n");
-		
         fprintf(fpk,"    return lat\n");
+		
+		
+		fprintf(fpk,"\n");
+		fprintf(fpk,"def make_k_path(k1, k2, step=0.01, **kwargs):\n");
+		fprintf(fpk,"    #either choose num_steps or step\n");
+		fprintf(fpk,"    num_steps = 1\n");
+		fprintf(fpk,"    if 'num_steps' in kwargs:\n");
+		fprintf(fpk,"        num_steps = kwargs['num_steps']\n");
+		fprintf(fpk,"    else:\n");
+		fprintf(fpk,"        num_steps = int(np.linalg.norm(k2 - k1) // step)\n");
+		fprintf(fpk,"\n");
+		fprintf(fpk,"    #k_path.shape == num_steps, k_space_dimensions\n");
+		fprintf(fpk,"    k_path = np.array([np.linspace(s, e, num_steps, endpoint=False)\n");
+		fprintf(fpk,"                       for s, e in zip(k1, k2)]).T\n");
+		fprintf(fpk,"    return k_path\n");
+		fprintf(fpk,"\n\n");
+		fprintf(fpk,"#setup lattice with on-site potential terms\n");
+		fprintf(fpk,"lat = GetLattice()\n");
+		fprintf(fpk,"plt.figure()\n");
+		fprintf(fpk,"plt.subplot(121)\n");
+		fprintf(fpk,"plt.title('Lattice: xy')\n");
+		fprintf(fpk,"lat.plot()\n");
+		fprintf(fpk,"\n");
+		fprintf(fpk,"plt.subplot(122)\n");
+		fprintf(fpk,"plt.title('Lattice: yz')\n");
+		fprintf(fpk,"lat.plot(axes='yz')\n");
+		fprintf(fpk,"plt.show()\n");
+		fprintf(fpk,"\n");
+		fprintf(fpk,"#create a periodic model, which generates the Hamiltonian from the lattice\n");
+		fprintf(fpk,"model = pb.Model(lat, pb.translational_symmetry())\n");
+		fprintf(fpk,"\n");
+		fprintf(fpk,"#take corners of the BZ\n");
+		fprintf(fpk,"b1, b2, b3 = model.lattice.reciprocal_vectors()\n");
+		fprintf(fpk,"#Example of significant points (here, user should define the path as a function of b1, b2 and b3)\n");
+		fprintf(fpk,"P1 = b1[0:2] / 2.0\n");
+		fprintf(fpk,"Gamma = np.array([0, 0])\n");
+		fprintf(fpk,"P2 = b2[0:2] / 2.0\n");
+		fprintf(fpk,"\n");
+		fprintf(fpk,"#make a path between each of the two points\n");
+		fprintf(fpk,"kp1 = make_k_path(P1, Gamma, num_steps=50)\n");
+		fprintf(fpk,"kp2 = make_k_path(Gamma, P2, num_steps=50)\n");
+		fprintf(fpk,"kp3 = make_k_path(P2, P1, num_steps=50)\n");
+		fprintf(fpk,"\n");
+		fprintf(fpk,"#define indexes\n");
+		fprintf(fpk,"point_indices = [0, kp1.shape[0] - 1, kp1.shape[0] + kp2.shape[0] - 1, kp1.shape[0] + kp2.shape[0] + kp3.shape[0] - 1]\n");
+		fprintf(fpk,"full_kpath = pb.results.Path(np.vstack((kp1, kp2, kp3)), point_indices=point_indices)\n");
+		fprintf(fpk,"\n");
+		fprintf(fpk,"bands_list = []\n");
+		fprintf(fpk,"for k in full_kpath:\n");
+		fprintf(fpk,"    model.set_wave_vector(k)\n");
+		fprintf(fpk,"    solver = pb.solver.lapack(model)\n");
+		fprintf(fpk,"    bands_list.append(solver.eigenvalues)\n");
+		fprintf(fpk,"\n");
+		fprintf(fpk,"bands = pb.results.Bands(full_kpath, np.vstack(bands_list))\n");
+		fprintf(fpk,"bands.plot(point_labels=['P1', r'$\Gamma$',  'P2', 'P1'])\n");
+		fprintf(fpk,"plt.show()\n");
+		fprintf(fpk,"\n");
+		
         fclose(fpk);
 		wxMessageBox(wxT("Done!"));
     }
@@ -6512,7 +6577,7 @@ void MainFrame::MakeACopyOfSKList()
 	sec30->GetVar(_("SKName[0]"),filename);
 	if (filename == _("")) {wxMessageBox(_("File name is empty. Please fill out this field and try again."),_("Error")); return;}
 	
-	wxString filepath = sec30->WorkingDIR + wxT("/") + filename + wxT(".sktab");
+	wxString filepath = sec30->WorkingDIR + wxFileName::GetPathSeparator() + filename + wxT(".sktab");
 	if (wxFileExists(filepath)) {wxMessageBox(_("There is a tab with this name. Please choose another name."),_("Error")); return;}
 	
 	int numberOfRows = ExportSKToFile(filepath);
@@ -6727,7 +6792,7 @@ void MainFrame::LoadSKTables()
 	bool cont = dir.GetFirst(&filename);
 	while ( cont )
 	{
-		wxString filepath = sec30->WorkingDIR + wxT("/") + filename;
+		wxString filepath = sec30->WorkingDIR + wxFileName::GetPathSeparator() + filename;
 		if (filename.AfterLast('.') == _("sktab"))
 		{
 			int nlines = GetTheNumberOfLines(filepath);
@@ -6741,7 +6806,7 @@ void MainFrame::SKtables_pageClose(wxAuiNotebookEvent& event)
 {
 	int ind = SKtables->GetSelection();
 	wxString fname = SKtables->GetPageText(ind);
-	wxString filepath = sec30->WorkingDIR + wxT("/") + fname + wxT(".sktab");
+	wxString filepath = sec30->WorkingDIR + wxFileName::GetPathSeparator() + fname + wxT(".sktab");
 	if (wxFileExists(filepath))
 	{
 		wxRemoveFile(filepath);

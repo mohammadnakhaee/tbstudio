@@ -708,7 +708,7 @@ sec30TextCtrl* Sec30::GetTextCtrlObject(wxString VariableName)
  
 void Sec30::SaveToFile(wxString filepath, wxString filename)
 {
-    wxString fname1 = filepath + wxT("/") + filename;
+    wxString fname1 = filepath + wxFileName::GetPathSeparator() + filename;
     std::ofstream out(fname1, std::ios::out | std::ios::binary);
     
     if (out.is_open())
@@ -1203,7 +1203,7 @@ void Sec30::SaveToFile(wxString filepath, wxString filename)
     
 void Sec30::LoadFromFile(wxString filepath, wxString filename)
 {
-    wxString fname1 = filepath + wxT("/") + filename;
+    wxString fname1 = filepath + wxFileName::GetPathSeparator() + filename;
     std::ifstream infile(fname1, std::ios::in | std::ios::binary);
     
     if (infile.is_open())
@@ -2486,7 +2486,7 @@ void Sec30::GetOrbQuantumNumbers(const wxString& OrbitalName, int& l, int& m)
 
 wxString Sec30::CreateFilePath(wxString Path,wxString FileName)
 {
-    wxString file = Path + wxT("\\") + FileName;
+    wxString file = Path + wxFileName::GetPathSeparator() + FileName;
     return file;
 }
 
