@@ -1,4 +1,4 @@
-#include <main.h>
+#include "main.h"
 #include "GridClass.h"
 
 bool MainApp::OnInit()
