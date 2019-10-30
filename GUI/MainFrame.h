@@ -38,7 +38,7 @@ public:
     wxString FreeSoftwareLimitations = _("fitting a TB model including d-orbitals");
     int Ver_MAJOR = 1;
     int Ver_MINOR = 5;
-    int Ver_RELEASE = 0;
+    int Ver_RELEASE = 2;
     
     MainFrame(wxWindow* parent);
     virtual ~MainFrame();
