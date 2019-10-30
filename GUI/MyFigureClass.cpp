@@ -468,7 +468,7 @@ void MyFigure2d::SetWeight(float x, float y, float w, float h, float coef)
         }
     }
     
-    Refresh(true);
+    Refresh(false);
 }
 
 int MyFigure2d::PlotBand(mglGraph *gr, int w, int h, Sec30* sec30, int MyID)
