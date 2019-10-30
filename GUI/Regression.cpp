@@ -518,7 +518,7 @@ void Regression::lm(double* p, int np, double* t, double* y_dat, int ny, double*
             if ( prnt > 1 )
             {
                 graph2d->Update2d();
-                graph2d->Refresh(true);
+                graph2d->Refresh(false);
                 //        eval(plotcmd);
                 //PlotBands(t_Complete,p,150);
                 //        PlotBandsYData(t_Complete,p,c,200);
