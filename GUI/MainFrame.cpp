@@ -248,11 +248,13 @@ MainFrame::MainFrame(wxWindow* parent)
         this->SetTitle(SoftwareName + _(" <") + LicenseOwner + _(">"));
     }
     
-    //At the begining it does not raise in MacOS
+#if defined(__APPLE__)
+//At the begining MainFrame does not raise in MacOS and this code does not work in Ubuntu (bad behaviuor in Layout)
     this->Iconize();
     this->Maximize();
-    //wxTopLevelWindow::Iconize()
     this->Raise();
+#endif
+
 }
 
 MainFrame::~MainFrame()
