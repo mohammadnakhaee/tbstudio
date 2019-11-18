@@ -1255,6 +1255,7 @@ MyGLCanvas::MyGLCanvas(wxWindow *parent, int DimVar, Sec30* sec30Var, int MyID, 
     Coordinate1[2][2] = 1.0;
 }
 
+#if defined(__APPLE__)
 void MyGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
 {
     // This is required even though dc is not used otherwise.
@@ -1264,6 +1265,20 @@ void MyGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
 
 void MyGLCanvas::myRefresh()
 {
+	
+#else
+
+void MyGLCanvas::myRefresh()
+{
+    Refresh(false);
+}
+
+void MyGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
+{
+	// This is required even though dc is not used otherwise.
+	wxPaintDC dc(this);
+#endif
+
     MyGLContext& context = wxGetApp().GetContext(this, Dim, m_useStereo);
     // Set the OpenGL viewport according to the client size of this canvas.
     // This is done here rather than in a wxSizeEvent handler because our
