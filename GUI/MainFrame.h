@@ -38,7 +38,9 @@ public:
     wxString FreeSoftwareLimitations = _("fitting a TB model including d-orbitals");
     int Ver_MAJOR = 1;
     int Ver_MINOR = 5;
-    int Ver_RELEASE = 2;
+    int Ver_RELEASE = 3;
+    
+    wxColour ThemeMenuColour;
     
     MainFrame(wxWindow* parent);
     virtual ~MainFrame();
@@ -88,6 +90,7 @@ public:
     void OnExit(wxCommandEvent& event);
     void OnAbout(wxCommandEvent& event);
 protected:
+    virtual void MainFrameClose(wxCloseEvent& event);
     bool CheckLicense(wxString &UserName);
     virtual void BtnMove_OnClick(wxRibbonButtonBarEvent& event);
     virtual void BtnRotate_OnClick(wxRibbonButtonBarEvent& event);
@@ -234,9 +237,11 @@ private:
     bool isItNew(int i,int j,int k);
     void sec30_OnUpdated(wxCommandEvent& event);
     void myOpenGL_EVT_SelectionChanged(wxCommandEvent& event);
+    void regressionEVT_OnNewPlot(wxCommandEvent& event);
     void regressionEVT_OnNewData(wxCommandEvent& event);
     void regressionEVT_OnFinished(wxCommandEvent& event);
     void regressionEVT_OnStarted(wxCommandEvent& event);
+    void figureClass_EVT_PlotFinished(wxCommandEvent& event);
     void LoadIcons();
     wxBitmap GetPng(const void* data, size_t length);
 	//typedef std::unordered_map<std::string, pthread_t> ThreadMap;

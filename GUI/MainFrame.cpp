@@ -3,14 +3,16 @@
 #include <mgl2/mgl.h>
 #include <wx/glcanvas.h>
 #include <wx/dcclient.h>
-#include <GL/gl.h>
-#include <GL/glu.h>
-#include <GL/glext.h>
-#include <GL/glut.h>
+//#include <GL/gl.h>
+//#include <GL/glu.h>
+//#include <GL/glext.h>
+//#include <GL/glut.h>
 //#include <WX/mdi.h>
 #include <wx/msgdlg.h>
 #include <WelcomeClass.h>
 #include <wx/dir.h>
+
+#include "main.h"
 
 /*
 #ifdef __WXMAC__
@@ -24,6 +26,7 @@
                     //Not necessary, but if it was, it needs to be replaced by process.h AND io.h
 #endif
 */
+
 
 int Myi=0;
 void orthogonalStart(void);
@@ -46,13 +49,17 @@ wxGLContext* m_context;
 MainFrame::MainFrame(wxWindow* parent)
     : MainFrameBaseClass(parent)
 {
-	/*
-	//1.5.0
+    //wxColour MenueColour = wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT);
+    ThemeMenuColour.Set(93,111,142,255);
+    
+    /*
+    //1.5.0
     MySerialNumber = Sec30::GetSN(_("Limited"));
     IsLicensed = CheckLicense(LicenseOwner);
     //1.5.0
-	*/
-	
+    */
+    
+    LeftPanel0->SetBackgroundColour(ThemeMenuColour);
     this->SetTitle(SoftwareName);
     this->Maximize(true);
     LoadIcons();
@@ -61,14 +68,16 @@ MainFrame::MainFrame(wxWindow* parent)
     //tbmodel->nAtoms = 4;
     
     sec30 = new Sec30(this);
+    sec30->ThemeMenuColour = ThemeMenuColour;
     //sec30 = std::make_shared<Sec30>(this);
     
     sec30->Connect(Sec30EVT_OnUpdated, wxCommandEventHandler(MainFrame::sec30_OnUpdated), NULL, this);
     this->Connect(MyOpenGL_EVT_SelectionChanged, wxCommandEventHandler(MainFrame::myOpenGL_EVT_SelectionChanged), NULL, this);
+    this->Connect(RegressionEVT_OnNewPlot, wxCommandEventHandler(MainFrame::regressionEVT_OnNewPlot), NULL, this);
     this->Connect(RegressionEVT_OnNewData, wxCommandEventHandler(MainFrame::regressionEVT_OnNewData), NULL, this);
     this->Connect(RegressionEVT_OnFinished, wxCommandEventHandler(MainFrame::regressionEVT_OnFinished), NULL, this);
     this->Connect(RegressionEVT_OnStarted, wxCommandEventHandler(MainFrame::regressionEVT_OnStarted), NULL, this);
-    
+    this->Connect(FigureClass_EVT_PlotFinished, wxCommandEventHandler(MainFrame::figureClass_EVT_PlotFinished), NULL, this);
 	
     InitializeSec30Arrays();
     
@@ -128,7 +137,8 @@ MainFrame::MainFrame(wxWindow* parent)
     aui_mgr.GetArtProvider()->SetMetric(wxAUI_DOCKART_PANE_BORDER_SIZE, 1);
 	//aui_mgr.GetArtProvider()->SetMetric(wxAUI_DOCKART_GRIPPER_SIZE, 80);
 	wxColour c; //Also it is possible to determine the color in this way: wxColour c=*wxGREEN;
-    c.Set(150,0,0,255);
+    //c.Set(150,0,0,255);
+    c.Set(49,69,135,255);
     aui_mgr.GetArtProvider()->SetColour(wxAUI_DOCKART_ACTIVE_CAPTION_GRADIENT_COLOUR, c);
     c.Set(191,205,219,255);
 	aui_mgr.GetArtProvider()->SetColour(wxAUI_DOCKART_INACTIVE_CAPTION_COLOUR, c);
@@ -148,6 +158,8 @@ MainFrame::MainFrame(wxWindow* parent)
     wxBoxSizer* panelSizer1 = new wxBoxSizer(wxHORIZONTAL);
     panelSizer1->Add(logfile, 1, wxEXPAND);
     CenteralPanel->SetSizer(panelSizer1);
+    LeftPanel->SetBackgroundColour(ThemeMenuColour);
+    
     
     LoadColorsForm();
     LoadUnitcellPanel();
@@ -156,7 +168,7 @@ MainFrame::MainFrame(wxWindow* parent)
     LoadBondsPanel();
     LoadSKPanel();
     LoadSetupPanel();
-    
+    //LeftPanel->GetPage(0)->SetBackgroundColour(*wxBLACK);
     //////////////////////////////////////////////////////////////
     //Strange problem in run-time out side of the codelite. We should have selected one time the SK tab and it works fine.
     //It seems when we select the tab the objects will be opened.
@@ -179,9 +191,10 @@ MainFrame::MainFrame(wxWindow* parent)
     Init_graph2d();
 	
 	
-    regression = new Regression(sec30, this, graph2d);
+    regression = new Regression();
     
-    WelcomeClass* welcome = new WelcomeClass(this);
+    
+    WelcomeClass* welcome = new WelcomeClass(NULL);
     welcome->CenterOnScreen();
     //welcome->CenterOnParent();
     welcome->ShowModal();
@@ -234,6 +247,12 @@ MainFrame::MainFrame(wxWindow* parent)
         logfile->AppendText(_("\nLicensed to ") + LicenseOwner +_("\n\n"));
         this->SetTitle(SoftwareName + _(" <") + LicenseOwner + _(">"));
     }
+    
+    //At the begining it does not raise in MacOS
+    this->Iconize();
+    this->Maximize();
+    //wxTopLevelWindow::Iconize()
+    this->Raise();
 }
 
 MainFrame::~MainFrame()
@@ -264,6 +283,7 @@ MainFrame::~MainFrame()
     delete skPanel;
     delete ColorsForm;
     delete RButtonMouse;
+    
 }
 
 
@@ -524,8 +544,8 @@ void GLPane::prepareFor3DDrawing()
 void MainFrame::MainFrameBaseClass_Resize(wxSizeEvent& event)
 {
     this->Layout();
-    unitcellPanel->Layout();
-    aui_mgr.Update();
+    //if (unitcellPanel) unitcellPanel->Layout();
+    //if(aui_mgr) aui_mgr.Update();
 }
 
 void MainFrame::MainFrameBaseClass_Move(wxMoveEvent& event)
@@ -792,7 +812,8 @@ void MainFrame::Init_Notebook()
 	wxColour c; //Also it is possible to determine the color in this way: wxColour c=*wxGREEN;
     c.Set(191,205,219,255);
 	SKtables->GetArtProvider()->SetColour(c);
-	c.Set(150,0,0,255);
+    //c.Set(151,0,0,255);
+    c.Set(49,69,135,255);
 	SKtables->GetArtProvider()->SetActiveColour(c);
     
 	SKtables->Connect(wxEVT_COMMAND_AUINOTEBOOK_PAGE_CLOSE, wxAuiNotebookEventHandler(MainFrame::SKtables_pageClose), NULL, this);
@@ -951,32 +972,32 @@ void MainFrame::SaveAs()
 void MainFrame::ClearGraph3D()
 {
     graph3d->DiscardAtomicStructure();
-    graph3d->Refresh(false);
+    graph3d->myRefresh3d();
 }
 
 void MainFrame::ShowGraph3D()
 {
     graph3d->CreateAtomicStructure(sec30, true);
-    graph3d->Refresh(false);
+    graph3d->myRefresh3d();
 }
 
 void MainFrame::UpdateGraph3D()
 {
     graph3d->DiscardAtomicStructure();
     graph3d->CreateAtomicStructure(sec30);
-    graph3d->Refresh(false);
+    graph3d->myRefresh3d();
 }
 
 void MainFrame::UpdateGraph2D0()
 {
-    graph2d0->Update2d0();
-    graph2d0->Refresh(true);
+    //graph2d0->Update2d0();
+    graph2d0->myRefresh2d();
 }
 
 void MainFrame::UpdateGraph2D()
 {
-    graph2d->Update2d();
-    graph2d->Refresh(true);
+    //graph2d->Update2d();
+    graph2d->myRefresh2d();
 }
 
 void MainFrame::UpdateGraph2Ds()
@@ -1193,6 +1214,7 @@ void MainFrame::myOpenGL_EVT_SelectionChanged(wxCommandEvent& event)
 void MainFrame::LoadUnitcellPanel()
 {
     wxScrolledWindow* scrolledwindow = new wxScrolledWindow(LeftPanel,wxID_ANY,wxDefaultPosition, wxSize(-1,-1));
+    scrolledwindow->SetBackgroundColour(ThemeMenuColour);
     LeftPanel->AddPage(scrolledwindow,"Unit Cell",true);
     LeftPanel->Update();
     
@@ -1211,6 +1233,7 @@ void MainFrame::LoadUnitcellPanel()
 void MainFrame::LoadStructurePanel()
 {
     wxScrolledWindow* scrolledwindow = new wxScrolledWindow(LeftPanel,wxID_ANY,wxDefaultPosition, wxSize(-1,-1));
+    scrolledwindow->SetBackgroundColour(ThemeMenuColour);
     LeftPanel->AddPage(scrolledwindow,"Structure",true);
     LeftPanel->Update();
     
@@ -1228,6 +1251,7 @@ void MainFrame::LoadStructurePanel()
 void MainFrame::LoadOrbitalsPanel()
 {
     wxScrolledWindow* scrolledwindow = new wxScrolledWindow(LeftPanel,wxID_ANY,wxDefaultPosition, wxSize(-1,-1));
+    scrolledwindow->SetBackgroundColour(ThemeMenuColour);
     LeftPanel->AddPage(scrolledwindow,"Orbitals",true);
     LeftPanel->Update();
     
@@ -1245,6 +1269,7 @@ void MainFrame::LoadOrbitalsPanel()
 void MainFrame::LoadBondsPanel()
 {
     wxScrolledWindow* scrolledwindow = new wxScrolledWindow(LeftPanel,wxID_ANY,wxDefaultPosition, wxSize(-1,-1));
+    scrolledwindow->SetBackgroundColour(ThemeMenuColour);
     LeftPanel->AddPage(scrolledwindow,"Bonds",true);
     LeftPanel->Update();
     
@@ -1262,6 +1287,7 @@ void MainFrame::LoadBondsPanel()
 void MainFrame::LoadSetupPanel()
 {
     wxScrolledWindow* scrolledwindow = new wxScrolledWindow(LeftPanel,wxID_ANY,wxDefaultPosition, wxSize(-1,-1));
+    scrolledwindow->SetBackgroundColour(ThemeMenuColour);
     LeftPanel->AddPage(scrolledwindow,"Setup",true);
     LeftPanel->Update();
     
@@ -1279,6 +1305,7 @@ void MainFrame::LoadSetupPanel()
 void MainFrame::LoadSKPanel()
 {
     wxScrolledWindow* scrolledwindow = new wxScrolledWindow(LeftPanel,wxID_ANY,wxDefaultPosition, wxSize(-1,-1));
+    scrolledwindow->SetBackgroundColour(ThemeMenuColour);
     LeftPanel->AddPage(scrolledwindow,"SK",true);
     LeftPanel->Update();
     
@@ -1685,6 +1712,7 @@ bool MainFrame::ValidateSetupPanel()
 
 bool MainFrame::ValidateSKPanel()
 {
+    sec30->isMainThread = true;
     //sec30->ArraysOf0DInt[9] = 0; //bool isFittingParametersValid = false;
     int ErrorIndex = 0;
     int WarningIndex = 0;
@@ -1737,11 +1765,13 @@ bool MainFrame::ValidateSKPanel()
     {
         wxString TBAtomName = TBlistctr->GetString(j);
         wxTreeItemId orbsatomID = orbs->FindItemIn(orbsrootID,TBAtomName);
+        //FixSoSoon
         orbs->SetItemState(orbsatomID, wxCheckTree::UNCHECKED);
         wxTreeItemIdValue cookie;
         wxTreeItemId nextChild = orbs->GetFirstChild(orbsatomID, cookie);
         while (nextChild.IsOk())
         {
+            //FixSoSoon
             orbs->SetItemState(nextChild, wxCheckTree::UNCHECKED);
             nextChild = orbs->GetNextSibling(nextChild);
         }
@@ -1938,6 +1968,7 @@ bool MainFrame::ValidateColorsPanel()
 /****************************************************************************************************************************************************************/
 void MainFrame::ReArrangeSKList()
 {
+    sec30->isMainThread = true;
     Aint0D SKListAddress;
     
     wxString AllSK;
@@ -2726,9 +2757,11 @@ void MainFrame::BtnWebsite_OnClick(wxRibbonButtonBarEvent& event)
 
 void MainFrame::LoadIcons()
 {
-    wxColour c1 = wxColour(wxT("rgb(153,180,209)"));
-    wxColour c2 = wxColour(wxT("rgb(143,0,0)"));
-    MainRibbon->GetArtProvider()->SetColourScheme(c1, c2, c2);
+    wxColour c1 = wxColour(wxT("rgb(133,160,190)"));
+    //wxColour c2 = wxColour(wxT("rgb(13,98,124)"));
+    wxColour c2 = wxColour(wxT("rgb(48,97,180)"));
+    //MainRibbon->GetArtProvider()->SetColourScheme(c1, c2, c2);
+    MainRibbon->GetArtProvider()->SetColourScheme(ThemeMenuColour, c2, c1);
     
     wxLog::SetLogLevel(0);
     
@@ -3119,6 +3152,7 @@ void MainFrame::TestZEig()
 
 void MainFrame::UpdateTBBand_if()
 {
+    sec30->isMainThread = true;
     bool isBandLoaded;
     if (sec30->ArraysOf0DInt[0] != 0) isBandLoaded = true;
     if (!isBandLoaded) return;
@@ -3585,6 +3619,7 @@ void MainFrame::UpdateTBBand_if()
 
 void MainFrame::StartRegression(bool isOneStep)
 {
+    sec30->isMainThread = true;
 	wxCheckTree* orbs;
 	wxListBox* TBlistctr;
 	int TBnspec;
@@ -3856,7 +3891,7 @@ void MainFrame::StartRegression(bool isOneStep)
     try
 	{
 		//Start(double* p, int np, double* t, double* y_dat, int ny, double* weight, double* dp, double p_min, double p_max, double* c, lmOptions opts)
-		std::thread RegressionThread(&Regression::Start, regression, p, np, t, y_dat, ny, weight, dp, p_min, p_max, Mixing, cnst, opts, isOneStep);
+		std::thread RegressionThread(&Regression::Start, regression, p, np, t, y_dat, ny, weight, dp, p_min, p_max, Mixing, cnst, opts, isOneStep, sec30, this);
 		//RegressionThreadMap = RegressionThread.native_handle();
 		if(RegressionThread.joinable())
 		{
@@ -3919,10 +3954,16 @@ double MainFrame::GetFitParameter(int ip, int icol)
     return d;
 }
 
+void MainFrame::regressionEVT_OnNewPlot(wxCommandEvent& event)
+{
+    //wxMessageBox(wxT("I am in OnNewPlot event."));
+    graph2d->myRefresh2d();
+} 
 void MainFrame::regressionEVT_OnNewData(wxCommandEvent& event)
 {
     logfile->AppendText(event.GetString());
 	logfile->ShowPosition(logfile->GetLastPosition());
+    //10000sec30->isPrinting = false;
 	//logfile->SetScrollPos(wxVERTICAL,logfile->GetScrollRange(wxVERTICAL));
 }
 
@@ -3938,14 +3979,37 @@ void MainFrame::regressionEVT_OnFinished(wxCommandEvent& event)
 	//pthread_cancel(RegressionThreadMap);
     //if (is_UpperSymMatrixHf) {delete [] UpperSymMatrixHf; is_UpperSymMatrixHf=false;}
     isFittingThreadBusy = false;
+    
+    myGrid* osgc = sec30->GetGridObject(_("OS"));
+	myGrid* skgc = sec30->GetGridObject(_("SK"));
+	myGrid* olgc = sec30->GetGridObject(_("OL"));
+    
+    osgc->Refresh(true);
+    skgc->Refresh(true);
+    olgc->Refresh(true);
+    
     UpdateTBBand_if();
     UpdateGraph2Ds();
+    this->Refresh(false);
 }
 
 void MainFrame::regressionEVT_OnStarted(wxCommandEvent& event)
 {
     isFittingThreadBusy = true;
 	logfile->Clear();
+}
+
+void MainFrame::figureClass_EVT_PlotFinished(wxCommandEvent& event)
+{
+    sec30->isPlotting = false;
+    /*if (sec30->isPlotting)
+    {
+        wxMessageBox(wxT("MainFrame: sec30->isPlotting = true"));
+    }
+    else
+    {
+        wxMessageBox(wxT("MainFrame: sec30->isPlotting = false"));
+    }*/
 }
 
 void MainFrame::ExportMatrices(wxString filepath, wxString BaseName, int MyID_Initial0Final1)
@@ -6266,6 +6330,7 @@ void MainFrame::GeneratePythonCode(wxString filepath, wxString BaseName, int MyI
 
 void MainFrame::GeneratePyBindingInput(wxString filepath, wxString BaseName, int MyID_Initial0Final1)
 {
+    sec30->isMainThread = true;
     int ID = MyID_Initial0Final1;
     int Hind = 0;
     int Sind = 2;
@@ -6828,4 +6893,10 @@ void MainFrame::SKtables_pageClosed(wxAuiNotebookEvent& event)
 		SKtables->Update();
 		SKtables->Refresh(true);
 	}
+}
+
+void MainFrame::MainFrameClose(wxCloseEvent& event)
+{
+    this->Destroy();
+    wxGetApp().ExitMainLoop();
 }

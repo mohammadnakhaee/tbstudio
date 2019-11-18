@@ -7,13 +7,14 @@ OrbitalsClass::OrbitalsClass(wxWindow* parent, Sec30* sec30var, wxWindowID id, c
     /**********************************************************************************************************************************************/
     wxBoxSizer* BaseSizer = new wxBoxSizer(wxVERTICAL);
     SetSizer(BaseSizer);
-    SetBackgroundColour(wxColour(wxT("rgb(255,255,255)")));
+    //SetBackgroundColour(wxColour(wxT("rgb(255,255,255)")));
+    SetBackgroundColour(sec30->ThemeMenuColour);
     SetName(wxT("OrbitalsClass"));
     SetSize(wxDLG_UNIT(this, wxSize(-1,-1)));
     GetSizer()->Fit(this);
     /**********************************************************************************************************************************************/
     sec30->AddGroupBox(this,_("Atom Species in the Unit-Cell"),wxColour(wxT("rgb(153,180,209)")));
-    sec30->AddVarVector(this, 1, _("NewType"), _("wxString"), _("New TB Atom Type"), 110, 120,false);
+    sec30->AddVarVector(this, 1, _("NewType"), _("wxString"), _("New TB Atom Type"), 130, 120,false);
     wxString Labels1[2] = {_("Add TB Atom Type") , _("Remove TB Atom Type")};
     wxObjectEventFunction Funcs1[2] = { wxCommandEventHandler(OrbitalsClass::Btn_AddAtom_OnClick), wxCommandEventHandler(OrbitalsClass::Btn_RemoveAtom_OnClick)};
     sec30->AddButton(this, 2, Labels1, Funcs1);

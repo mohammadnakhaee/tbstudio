@@ -7,7 +7,8 @@ StructureClass::StructureClass(wxWindow* parent, Sec30* sec30var, wxWindowID id,
     /**********************************************************************************************************************************************/
     wxBoxSizer* BaseSizer = new wxBoxSizer(wxVERTICAL);
     SetSizer(BaseSizer);
-    SetBackgroundColour(wxColour(wxT("rgb(255,255,255)")));
+    //SetBackgroundColour(wxColour(wxT("rgb(255,255,255)")));
+    SetBackgroundColour(sec30->ThemeMenuColour);
     SetName(wxT("StructureClass"));
     SetSize(wxDLG_UNIT(this, wxSize(-1,-1)));
     GetSizer()->Fit(this);

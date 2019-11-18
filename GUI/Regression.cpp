@@ -1,16 +1,14 @@
 #include "Regression.h"
 
-
 // this is a definition so can't be in a header
+wxDEFINE_EVENT(RegressionEVT_OnNewPlot, wxCommandEvent);
 wxDEFINE_EVENT(RegressionEVT_OnNewData, wxCommandEvent);
 wxDEFINE_EVENT(RegressionEVT_OnFinished, wxCommandEvent);
 wxDEFINE_EVENT(RegressionEVT_OnStarted, wxCommandEvent);
 
-Regression::Regression(Sec30* sec30Ref, wxWindow* ParentRef, GraphClass* graph2dRef)
+Regression::Regression()
 {
-    sec30 = sec30Ref;
-    Parent = ParentRef;
-    graph2d = graph2dRef;
+
 }
 
 Regression::~Regression()
@@ -70,8 +68,12 @@ double Regression::Variance(double* a, int na)
     return var / (na - 1);
 }
 
-void Regression::Start(double* p, int np, double* t, double* y_dat, int ny, double* weight, double* dp, double p_min, double p_max, double Mixing, double* c, lmOptions opts, bool isOneStep)
+void Regression::Start(double* p, int np, double* t, double* y_dat, int ny, double* weight, double* dp, double p_min, double p_max, double Mixing, double* c, lmOptions opts, bool isOneStep, Sec30* sec30Ref, wxWindow* ParentRef)
 {
+    sec30 = sec30Ref;
+    Parent = ParentRef;
+    sec30->isMainThread = false;
+    
 	int natoms = 0;
 	bool isSOC;
 	bool isOverlap;
@@ -184,10 +186,6 @@ void Regression::Start(double* p, int np, double* t, double* y_dat, int ny, doub
             if (isOneStep) olgc->SetCellValue(irow, 1, val);
         }
     }
-    
-    osgc->Refresh(false);
-    skgc->Refresh(false);
-    olgc->Refresh(false);
     
     //////////////////////////////Finishing///////////////////////////////////////////
     for (int i=0; i<MaxIter; i++) delete [] cvg_hst[i];
@@ -312,8 +310,22 @@ void Regression::lm(double* p, int np, double* t, double* y_dat, int ny, double*
     double* covar_p = new double[np2];
     ////////////////////////////////////////////////////////////////////////
     bool BadCondition = false;
+    sec30->isPlotting = false;
+    //10000sec30->isPrinting = false;
     while (!stop)        // --- Start Main Loop
     {
+        //10000if (sec30->isPlotting || sec30->isPrinting)
+        //wxMessageBox(wxT("Check if thread is running"));
+        
+        if (sec30->isPlotting)
+        {
+            //It is crazy but we need to wait at least 1 milli secound
+            //Without this line it works in debug mode but not in release
+            //Without this we have problem in clang compilers
+            wxMilliSleep(3);
+            continue;
+        }
+        
         iteration++;
         for (int ip=0; ip<np; ip++)
             for (int jp=0; jp<np; jp++)
@@ -517,8 +529,8 @@ void Regression::lm(double* p, int np, double* t, double* y_dat, int ny, double*
             
             if ( prnt > 1 )
             {
-                graph2d->Update2d();
-                graph2d->Refresh(false);
+                //graph2d->myRefresh2d();
+                SendPlotTriger();
                 //        eval(plotcmd);
                 //PlotBands(t_Complete,p,150);
                 //        PlotBandsYData(t_Complete,p,c,200);
@@ -1226,8 +1238,16 @@ void Regression::func(double* t, int ny, double* p, int np, double* cnst, double
     }
 }
 
+void Regression::SendPlotTriger()
+{
+    sec30->isPlotting = true;
+    wxCommandEvent* event = new wxCommandEvent(RegressionEVT_OnNewPlot);
+    wxQueueEvent(Parent,event);
+}
+
 void Regression::SendDataToTerminal(wxString data)
 {
+    //10000sec30->isPrinting = true;
     wxCommandEvent* event = new wxCommandEvent(RegressionEVT_OnNewData);
     event->SetString(data);
     wxQueueEvent(Parent,event);

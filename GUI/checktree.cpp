@@ -76,7 +76,7 @@ wxCheckTree::wxCheckTree(wxWindow *parent, const wxWindowID id,const wxPoint& po
                 : wxTreeCtrl(parent, id, pos, size, style)
                 , last_mo(),last_ld(),last_kf(),mouse_entered_tree_with_left_down(false)
 {
-    wxImageList *states;
+    
 
     wxIcon icons[8];
     icons[0] = wxIcon(unchecked2_xpm);
@@ -120,6 +120,8 @@ wxCheckTree::wxCheckTree(wxWindow *parent, const wxWindowID id,const wxPoint& po
 wxCheckTree::~wxCheckTree()
 {
     m_colors.clear();
+    states->RemoveAll();
+    //delete states;
 }
 
 void wxCheckTree::SetItemTextColour(const wxTreeItemId &item, const wxColour &col)
@@ -333,8 +335,9 @@ void wxCheckTree::On_Left_Down( wxMouseEvent& event )
 {
     int flags;
     wxTreeItemId id=HitTest( event.GetPosition (), flags );
+    if (!id.IsOk()) return;
     int i=GetItemState(id);
-
+        
     if( id.IsOk () && i>=0 && on_check_or_label(flags) )
     {
         last_ld=id;
@@ -348,7 +351,7 @@ void wxCheckTree::On_Left_Up( wxMouseEvent& event )
 
     int flags;
     wxTreeItemId id = HitTest( event.GetPosition (), flags );
-
+    if (!id.IsOk()) return;
     int i = GetItemState(id);
 
     if(mouse_entered_tree_with_left_down)
@@ -422,7 +425,7 @@ void wxCheckTree::On_Mouse_Motion( wxMouseEvent& event )
 
     int flags;
     wxTreeItemId id = HitTest( event.GetPosition(), flags );
-
+    if (!id.IsOk()) return;
     if(event.LeftIsDown())
     {
         //to match the behavior of ordinary check boxes,

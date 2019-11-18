@@ -580,24 +580,25 @@ MyGLContext::MyGLContext(wxGLCanvas *canvas, int DimVar)
     //glHint( GL_POLYGON_SMOOTH_HINT, GL_NICEST );
 	
     glEnable(GL_LIGHT0); //is not checked
-	glLightfv(GL_LIGHT0, GL_POSITION, (const GLfloat[]) {30,30,50.0f});
-	glLightfv(GL_LIGHT0, GL_SPECULAR,  (const GLfloat[]) {1,1,1,1});
+	glLightfv(GL_LIGHT0, GL_POSITION, (const GLfloat[]) {30.0f,30.0f,50.0f});
+	glLightfv(GL_LIGHT0, GL_SPECULAR,  (const GLfloat[]) {1.0f,1.0f,1.0f,1.0f});
+    glLightfv(GL_LIGHT0, GL_AMBIENT, (const GLfloat[]) {0.065f,0.065f,0.065f,0.065f});
     
     glEnable(GL_LIGHT1); //is not checked
-	glLightfv(GL_LIGHT1, GL_POSITION, (const GLfloat[]) {-70,-70,0.0f});
-	glLightfv(GL_LIGHT1, GL_SPECULAR,  (const GLfloat[]) {0.5,0.5,0.5,1});
+	glLightfv(GL_LIGHT1, GL_POSITION, (const GLfloat[]) {-70.0f,-70.0f,0.0f});
+	glLightfv(GL_LIGHT1, GL_SPECULAR,  (const GLfloat[]) {0.5f,0.5f,0.5f,1.0f});
     
     glEnable(GL_LIGHT2); //is not checked
-	glLightfv(GL_LIGHT2, GL_POSITION, (const GLfloat[]) {0,0,50.0f});
-	glLightfv(GL_LIGHT2, GL_AMBIENT,  (const GLfloat[]) {0.25,0.25,0.25,0.25});
+	glLightfv(GL_LIGHT2, GL_POSITION, (const GLfloat[]) {0.0f,0.0f,50.0f});
+	glLightfv(GL_LIGHT2, GL_AMBIENT,  (const GLfloat[]) {0.25f,0.25f,0.25f,0.25f});
 	//glLightfv(GL_LIGHT0, GL_DIFFUSE,  (const GLfloat[]) {1,1,1,1});
 	//glLightfv(GL_LIGHT0, GL_SPECULAR, (const GLfloat[]) {1,1,1,1});
 
     
-    glMaterialfv(GL_FRONT, GL_EMISSION,  (const GLfloat[]) {0,0,0,1} );
-    glMaterialfv(GL_FRONT, GL_AMBIENT,  (const GLfloat[]) {1,1,1,1} );
-    glMaterialfv(GL_FRONT, GL_DIFFUSE,  (const GLfloat[]) {1,1,1,1} );
-    glMaterialfv(GL_FRONT, GL_SPECULAR,  (const GLfloat[]) {1,1,1,1} );
+    glMaterialfv(GL_FRONT, GL_EMISSION,  (const GLfloat[]) {0.0f,0.0f,0.0f,1.0f} );
+    glMaterialfv(GL_FRONT, GL_AMBIENT,  (const GLfloat[]) {1.0f,1.0f,1.0f,1.0f} );
+    glMaterialfv(GL_FRONT, GL_DIFFUSE,  (const GLfloat[]) {1.0f,1.0f,1.0f,1.0f} );
+    glMaterialfv(GL_FRONT, GL_SPECULAR,  (const GLfloat[]) {1.0f,1.0f,1.0f,1.0f} );
     glMaterialf(GL_FRONT, GL_SHININESS, 25.0f);
     
     
@@ -1120,8 +1121,9 @@ void MyGLContext::Draw_Lattice(int nColDArray, int* nDArray, double** DArray, in
 
 void MyGLContext::Draw3D(int nColDArray, int* nDArray, double** DArray, int nColIArray, int* nIArray, int** IArray, double Coordinate[3][3], float xMove, float yMove, float XCam, float YCam, float zoom, float zoomCam, float w, float h)
 {
-    GLfloat ambient[] = { 0.065, 0.065, 0.065, 0.065 };
-    glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
+    //glEnable(GL_DEPTH_TEST);
+    //glDepthFunc(GL_GEQUAL);
+    //glClearDepth(1.0f);
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
     //glPushMatrix();
 	
@@ -1169,11 +1171,17 @@ void MyGLContext::Draw3D(int nColDArray, int* nDArray, double** DArray, int nCol
     //glDepthMask(GL_TRUE);
     /*****************************************************/
     //glHint(GL_LINE_SMOOTH_HINT, GL_DONT_CARE);
+    //SetLights();
     Draw_Lattice(nColDArray, nDArray, DArray, nColIArray, nIArray, IArray, Coordinate);
+    
+    //SetLights();
+
     gluDeleteQuadric(quad);
     //Glu Functions End
+    
     glFlush();  // Render now
-    //glPopMatrix();
+    //glutSwapBuffers();
+    
     CheckGLError();
 }
 
@@ -1193,7 +1201,8 @@ wxBEGIN_EVENT_TABLE(MyGLCanvas, wxGLCanvas)
     EVT_RIGHT_UP(MyGLCanvas::OnMouseRightUp)
     EVT_MIDDLE_DOWN(MyGLCanvas::OnMouseMiddleDown)
     EVT_MIDDLE_UP(MyGLCanvas::OnMouseMiddleUp)
-    EVT_MENU(wxID_COPY,MyGLCanvas::OnSaveRasterImage)
+    EVT_MENU(wx2ID_Save,MyGLCanvas::OnSaveRasterImage)
+    EVT_SIZE(MyGLCanvas::OnReSize)
 wxEND_EVENT_TABLE()
 
 MyGLCanvas::MyGLCanvas(wxWindow *parent, int DimVar, Sec30* sec30Var, int MyID, int *attribList)
@@ -1250,6 +1259,119 @@ void MyGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
 {
     // This is required even though dc is not used otherwise.
     wxPaintDC dc(this);
+    myRefresh();
+}
+
+void MyGLCanvas::myRefresh()
+{
+    MyGLContext& context = wxGetApp().GetContext(this, Dim, m_useStereo);
+    // Set the OpenGL viewport according to the client size of this canvas.
+    // This is done here rather than in a wxSizeEvent handler because our
+    // OpenGL rendering context (and thus viewport setting) is used with
+    // multiple canvases: In MacOS we need to update the viewport in the wxSizeEvent
+    // handler
+    const wxSize ClientSize = GetClientSize();
+    
+    int w,h;
+    w=ClientSize.x;
+    h=ClientSize.y;
+    float max = (float)w;
+    if (h>w) max = (float)h;
+    float w3d=w/max;
+    float h3d=h/max;
+        
+    ////////////////////////////////////Draw the 3d structure//////////////////////////////////
+    glViewport(0,0,ClientSize.x, ClientSize.y); // decide which area of the frame will be painted
+    //gluOrtho2D(0, ClientSize.x, 0, ClientSize.y);
+        
+    // Render the graphics and swap the buffers.
+    GLboolean quadStereoSupported;
+    glGetBooleanv( GL_STEREO, &quadStereoSupported);
+        
+    //glMatrixMode(GL_PROJECTION);
+    //glLoadIdentity();
+    //gluOrtho2D(0, ClientSize.x, 0, ClientSize.y); // set up coordinate system
+    //glMatrixMode(GL_MODELVIEW);
+    //canvas.DrawRotatedCube(m_xangle, m_yangle);
+        
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // Black and opaque
+        
+    /*
+    int w,h;
+    w=ClientSize.x;
+    h=ClientSize.y;
+    float max = (float)w;
+    if (h>w) max = (float)h;
+    float w3d=w/max;
+    float h3d=h/max;
+    */
+    
+    if ( quadStereoSupported )
+    {
+        glDrawBuffer( GL_BACK_LEFT );
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+        glFrustum(-0.47f, 0.53f, -0.5f, 0.5f, 1.0f, 3.0f);
+        
+        if (Dim==3)
+            context.Draw3D(NumberOfDoubleArrays, nDoubleArray, DoubleArray1,
+                            NumberOfIntArrays, nIntArray, IntArray, Coordinate1,
+                            XMove, YMove, XCam, YCam, Zoom, ZoomCam, w3d,h3d);
+        //else
+        //{
+        //    //context.Draw2D(w, h, sec30, ObjectID);
+        //    this->Draw2D(w, h, sec30, ObjectID);
+        //}
+    
+        CheckGLError();
+        glDrawBuffer( GL_BACK_RIGHT );
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+        glFrustum(-0.53f, 0.47f, -0.5f, 0.5f, 1.0f, 3.0f);
+        
+        if (Dim==3)
+            context.Draw3D(NumberOfDoubleArrays, nDoubleArray, DoubleArray1,
+                            NumberOfIntArrays, nIntArray, IntArray, Coordinate1,
+                            XMove, YMove, XCam, YCam, Zoom, ZoomCam, w3d,h3d);
+        //else
+        //{
+        //    //context.Draw2D(w, h, sec30, ObjectID);
+        //    this->Draw2D(w, h, sec30, ObjectID);
+        //}
+       
+        CheckGLError();
+    }
+    else
+    {
+        if (Dim==3)
+            context.Draw3D(NumberOfDoubleArrays, nDoubleArray, DoubleArray1,
+                            NumberOfIntArrays, nIntArray, IntArray, Coordinate1,
+                            XMove, YMove, XCam, YCam, Zoom, ZoomCam, w3d,h3d);
+        //else
+        //{
+        //    //context.Draw2D(w, h, sec30, ObjectID);
+        //    this->Draw2D(w, h, sec30, ObjectID);
+        //}
+        
+        if ( m_useStereo && !m_stereoWarningAlreadyDisplayed )
+        {
+            m_stereoWarningAlreadyDisplayed = true;
+            wxLogError("Stereo not supported by the graphics card.");
+        }
+    }
+        
+    SwapBuffers();
+    
+    
+    //glFinish(); // necessary
+}
+
+
+/*
+ void MyGLCanvas::myRefresh()
+{
+    // This is required even though dc is not used otherwise.
+    wxPaintDC dc(this);
 	MyGLContext& context = wxGetApp().GetContext(this, Dim, m_useStereo);
 	
     // Set the OpenGL viewport according to the client size of this canvas.
@@ -1298,17 +1420,17 @@ void MyGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
             dc.DrawBitmap(img,0,0,false);
         }
 		
-		/*
-		if (canvasRefreshCnt<3)
-		{
-			canvasRefreshCnt++;
-			this->Refresh(false);
-		}
-		else
-		{
-			canvasRefreshCnt=0;
-		}
-		 */
+		
+		//if (canvasRefreshCnt<3)
+		//{
+		//	canvasRefreshCnt++;
+		//	this->myRefresh();
+		//}
+		//else
+		//{
+		//	canvasRefreshCnt=0;
+		//}
+		 
 		 
 		//this->GetContext();
 		
@@ -1335,15 +1457,15 @@ void MyGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
         
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // Black and opaque
         
-        /*
-        int w,h;
-        w=ClientSize.x;
-        h=ClientSize.y;
-        float max = (float)w;
-        if (h>w) max = (float)h;
-        float w3d=w/max;
-        float h3d=h/max;
-        */
+        
+        //int w,h;
+        //w=ClientSize.x;
+        //h=ClientSize.y;
+        //float max = (float)w;
+        //if (h>w) max = (float)h;
+        //float w3d=w/max;
+        //float h3d=h/max;
+        
         
         if ( quadStereoSupported )
         {
@@ -1405,20 +1527,21 @@ void MyGLCanvas::OnPaint(wxPaintEvent& WXUNUSED(event))
         //glFinish(); // necessary
     }
 }
-
+ */
+ 
 void MyGLCanvas::Spin(float xSpin, float ySpin, float zSpin)
 {
     TheLastXAngle += xSpin;
     TheLastYAngle += ySpin;
     TheLastZAngle += zSpin;
     
-    Refresh(false);
+    myRefresh();
 }
 
 void MyGLCanvas::Animate(void)
 {
     it++;
-    Refresh(false);
+    myRefresh();
 }
 
 void MyGLCanvas::OnKeyDown(wxKeyEvent& event)
@@ -1460,56 +1583,15 @@ void MyGLCanvas::OnMouseWheel(wxMouseEvent& event)
 {
     bool scrldwn = event.GetWheelRotation() < 0;
     //float delta = 0.01*0.01f*event.GetWheelDelta(); //Constant delta
-    if (Dim==3)
-    {
-        float delta = (ZoomCam*0.1)*0.01f*event.GetWheelDelta(); //Zoom dependent delta (It seems better)
-        if (scrldwn)
-            ZoomCam = ZoomCam - delta;
-        else
-            ZoomCam = ZoomCam + delta;
-        if (ZoomCam <=0.001) ZoomCam=0.001;
-    }
-    else if(Dim==2)
-    {
-        bool isBandLoaded = false;
-        if (sec30->ArraysOf0DInt[0] != 0)
-        {
-            double y1, y2;
-            if (ObjectID == 0)
-            {
-                y1 = sec30->ArraysOf0DDouble[1];
-                y2 = sec30->ArraysOf0DDouble[2];
-            }
-            else if (ObjectID == 1)
-            {
-                y1 = sec30->ArraysOf0DDouble[3];
-                y2 = sec30->ArraysOf0DDouble[4];
-            }
-            
-            double y0 = (y2 + y1) / 2.0;
-            double r = (y2 - y1) / 2.0;
-            float delta = (r*0.1)*0.01f*event.GetWheelDelta(); //Zoom dependent delta (It seems better)
-            if (scrldwn)
-                r = r + delta;
-            else
-                r = r - delta;
-            if (r <=0.002) r=0.002;
-            
-            if (ObjectID == 0)
-            {
-                sec30->ArraysOf0DDouble[1] = y0 - r;
-                sec30->ArraysOf0DDouble[2] = y0 + r;
-            }
-            else if (ObjectID == 1)
-            {
-                sec30->ArraysOf0DDouble[3] = y0 - r;
-                sec30->ArraysOf0DDouble[4] = y0 + r;
-            }
-        }
-    }
     
-
-    Refresh(false);
+    float delta = (ZoomCam*0.1)*deltawheelfactor3d*event.GetWheelDelta(); //Zoom dependent delta (It seems better)
+    if (scrldwn)
+        ZoomCam = ZoomCam - delta;
+    else
+        ZoomCam = ZoomCam + delta;
+    if (ZoomCam <=0.001) ZoomCam=0.001;
+    
+    myRefresh();
 }
 
 void MyGLCanvas::OnSpinTimer(wxTimerEvent& WXUNUSED(event))
@@ -1659,7 +1741,7 @@ void MyGLCanvas::OnMouseMove(wxMouseEvent& event)
             }
             
             isPaintCursur = true;
-            Refresh(false);
+            myRefresh();
         }
     }
     else if (isMouseRightDown)
@@ -1718,7 +1800,7 @@ void MyGLCanvas::OnMouseRightUp(wxMouseEvent& event)
     {
         wxMenu *pmenuPopUp = new wxMenu;
         wxMenuItem* pItem;
-        pItem = new wxMenuItem(pmenuPopUp,wxID_COPY, wxT("Save as image"));
+        pItem = new wxMenuItem(pmenuPopUp,wx2ID_Save, wxT("Save as image"));
         pmenuPopUp->Append(pItem);
         PopupMenu(pmenuPopUp,event.GetPosition());
         delete pmenuPopUp;
@@ -1763,6 +1845,11 @@ void MyGLCanvas::OnMouseMiddleUp(wxMouseEvent& event)
 {
     isMouseMiddleDown = false;
     Reload();
+}
+
+void MyGLCanvas::OnReSize(wxSizeEvent& event)
+{
+    myRefresh();
 }
 
 void MyGLCanvas::OnSaveRasterImage(wxCommandEvent &WXUNUSED(event))
@@ -1900,7 +1987,7 @@ void MyGLCanvas::DoSelect(float x1, float y1, float x2, float y2)
     DoubleArray1[14][2] = fmax(SelectionFramX1,SelectionFramX2);
     DoubleArray1[14][3] = fmax(SelectionFramY1,SelectionFramY2);
     
-    Refresh(true);
+    myRefresh();
 }
 
 void MyGLCanvas::SetWeight(float x, float y, float w, float h, float coef)
@@ -1955,7 +2042,7 @@ void MyGLCanvas::SetWeight(float x, float y, float w, float h, float coef)
         }
     }
     
-    Refresh(true);
+    myRefresh();
 }
 
 void MyGLCanvas::DoMove(float l, float m)
@@ -1971,7 +2058,7 @@ void MyGLCanvas::DoMove(float l, float m)
     
     if (l!=0) XMove = -2.0*l*w3d/w;
     if (m!=0) YMove = -2.0*m*h3d/h;
-    Refresh(false);
+    myRefresh();
 }
 
 void MyGLCanvas::DoMove2d(float l, float m)
@@ -1998,7 +2085,7 @@ void MyGLCanvas::DoMove2d(float l, float m)
         //sec30->ArraysOf0DDouble[8] = OldxMax + dx;
     }
         
-    Refresh(false);
+    myRefresh();
 }
 
 void MyGLCanvas::DoRotate(float l, float m, float Theta)
@@ -2067,13 +2154,13 @@ void MyGLCanvas::DoRotate(float l, float m, float Theta)
         DoubleArray1[13][i] = DoubleArray0[13][i]*c + b*sr;
     }
     
-    Refresh(false);
+    myRefresh();
 }
 
 void MyGLCanvas::DoZoom(float l)
 {
     if (l!=0) Zoom = -l;
-    Refresh(false);
+    myRefresh();
 }
 
 void MyGLCanvas::GetDirection(int i0, int j0, int i, int j, float& x, float& y, float& Theta)
@@ -2191,7 +2278,7 @@ void MyGLCanvas::SetDirection(double Xl, double Xm, double Xn, double Yl, double
     
     LoadToCanvas();
     //Reload();
-    Refresh();
+    myRefresh();
 }
 
 void MyGLCanvas::RotateCam(double l, double m, double theta)
@@ -2199,7 +2286,7 @@ void MyGLCanvas::RotateCam(double l, double m, double theta)
     double PI=3.14159265359;
     DoRotate(l,m,theta*PI/180.0);
     Reload();
-    Refresh();
+    myRefresh();
 }
 
 void MyGLCanvas::RotationMatrix(double Theta, double lmn[3][3])
@@ -2411,5 +2498,5 @@ void MyGLCanvas::AddToSelectionList(int nNew, int* indexes, bool ClearList, bool
     wxCommandEvent* event = new wxCommandEvent(MyOpenGL_EVT_SelectionChanged);
     wxQueueEvent(this->GetParent()->GetParent(),event);
     
-    Refresh(true);
+    myRefresh();
 }

@@ -7,6 +7,14 @@
 #include <wx/clipbrd.h> 
 #include <wx/menu.h>
 #include <wx/textfile.h>
+
+enum mymenuid
+{
+    wx0ID_COPY = wxID_HIGHEST + 11,
+    wx0ID_CUT = wxID_HIGHEST + 12,
+    wx0ID_PASTE = wxID_HIGHEST + 13,
+    wx0ID_DELETE = wxID_HIGHEST + 14
+};
 /******************************************************************************/
 // this is typically in a header: it just declares MY_EVENT event type
 /******************************************************************************/
@@ -37,6 +45,8 @@ private:
         virtual void OnRightMouseDown(wxGridEvent &event);
         virtual void OnCellChanged(wxGridEvent &event);
         virtual void myOnKeyDown(wxKeyEvent &event);
+        virtual void onGridEditorShown(wxGridEvent &event);
+        
         DECLARE_EVENT_TABLE()
 };
 /******************************************************************************/

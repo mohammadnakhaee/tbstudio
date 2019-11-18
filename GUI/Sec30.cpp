@@ -28,6 +28,7 @@ void Sec30::AddGroupBox(wxWindow *parent, wxString Caption, wxColour BGColor)
     p->SetSizer(vsizer);
     wxStaticText* st = new wxStaticText(p, wxID_ANY, Caption, wxDefaultPosition, wxDLG_UNIT(p, wxSize(-1,-1)), 0);
     vsizer->Add(st, 0, wxLEFT, WXC_FROM_DIP(5));
+    st->SetForegroundColour(*wxBLACK);
 }
 
 void Sec30::AddButton(wxWindow *parent, int ButtonCnt, wxString* Labels, wxObjectEventFunction* Funcs)
@@ -37,6 +38,7 @@ void Sec30::AddButton(wxWindow *parent, int ButtonCnt, wxString* Labels, wxObjec
     for (int i=0; i < ButtonCnt; i++)
     {
         wxButton* btn = new wxButton(parent, wxID_ANY, Labels[i], wxDefaultPosition, wxDLG_UNIT(parent, wxSize(-1,-1)), 0);
+        btn->SetForegroundColour(*wxBLACK);
         MySizer->Add(btn, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
         btn->Connect(wxEVT_COMMAND_BUTTON_CLICKED, Funcs[i], NULL, parent);
     }
@@ -49,6 +51,7 @@ void Sec30::AddButton(wxWindow *parent, int ButtonCnt, wxString* ButtonNames, wx
     for (int i=0; i < ButtonCnt; i++)
     {
         wxButton* btn = new wxButton(parent, wxID_ANY, Labels[i], wxDefaultPosition, wxDLG_UNIT(parent, wxSize(-1,-1)), 0);
+        btn->SetForegroundColour(*wxBLACK);
         MySizer->Add(btn, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
         btn->SetName(ButtonNames[i]);
         btn->Connect(wxEVT_COMMAND_BUTTON_CLICKED, Funcs[i], NULL, parent);
@@ -61,6 +64,7 @@ void Sec30::AddVarVector(wxWindow *parent, int VecCnt, wxString VariableName, wx
     parent->GetSizer()->Add(MySizer, 0, wxLEFT|wxRIGHT|wxTOP|wxEXPAND, WXC_FROM_DIP(5));
     
     wxStaticText* st = new wxStaticText(parent, wxID_ANY, VecLabel + wxT(":"), wxDefaultPosition, wxDLG_UNIT(parent, wxSize(-1,-1)), 0);
+    st->SetForegroundColour(*wxBLACK);
     MySizer->Add(st, 0, wxLEFT|wxRIGHT|wxTOP, WXC_FROM_DIP(5));
     st->SetMinSize(wxSize(LabelSize,-1));
     
@@ -184,6 +188,7 @@ void Sec30::AddRadioButton(wxWindow *parent, wxString VariableName, wxString Lab
     std::list<wxString>::iterator ivar = radios.end();
     
     wxRadioButton* ctr=new wxRadioButton(parent, wxID_ANY, Label, wxDefaultPosition, wxSize(-1,-1));
+    //ctr->SetBackgroundColour(*wxGRAY);
     MySizer->Add(ctr, 0, wxRIGHT, WXC_FROM_DIP(5));
     
     wxString var = wxString::Format(wxT("%s[%d]"), VariableName, 0);
@@ -251,6 +256,7 @@ wxChoice* Sec30::AddChoiceCtrl(wxWindow *parent, wxString VariableName, wxString
     parent->GetSizer()->Add(MySizer, 0, wxLEFT|wxRIGHT|wxTOP|wxEXPAND, WXC_FROM_DIP(5));
     
     wxStaticText* st = new wxStaticText(parent, wxID_ANY, MyLabel + wxT(":"), wxDefaultPosition, wxDLG_UNIT(parent, wxSize(-1,-1)), 0);
+    st->SetForegroundColour(*wxBLACK);
     MySizer->Add(st, 0, wxLEFT|wxRIGHT|wxTOP, WXC_FROM_DIP(5));
     st->SetMinSize(wxSize(LabelSize,-1));
     
@@ -277,6 +283,7 @@ wxComboBox* Sec30::AddComboCtrl(wxWindow *parent, wxString VariableName, wxStrin
     parent->GetSizer()->Add(MySizer, 0, wxLEFT|wxRIGHT|wxTOP|wxEXPAND, WXC_FROM_DIP(5));
     
     wxStaticText* st = new wxStaticText(parent, wxID_ANY, MyLabel + wxT(":"), wxDefaultPosition, wxDLG_UNIT(parent, wxSize(-1,-1)), 0);
+    st->SetForegroundColour(*wxBLACK);
     MySizer->Add(st, 0, wxLEFT|wxRIGHT|wxTOP, WXC_FROM_DIP(5));
     st->SetMinSize(wxSize(LabelSize,-1));
     st->SetName(_("LOf") + VariableName);
@@ -305,6 +312,7 @@ wxColourPickerCtrl* Sec30::AddColorCtrl(wxWindow *parent, wxString VariableName,
     parent->GetSizer()->Add(MySizer, 0, wxEXPAND, WXC_FROM_DIP(5));
     
     wxStaticText* st = new wxStaticText(parent, wxID_ANY, MyLabel + wxT(":"), wxDefaultPosition, wxDLG_UNIT(parent, wxSize(-1,-1)), 0);
+    st->SetForegroundColour(*wxBLACK);
     MySizer->Add(st, 0, wxLEFT|wxRIGHT|wxTOP, WXC_FROM_DIP(5));
     st->SetMinSize(wxSize(LabelSize,-1));
     
@@ -2384,7 +2392,8 @@ void Sec30::GetOrbitalInfo(wxCheckTree* orbsTree, wxString AtomName, int ShellNu
 {
     wxTreeItemId rootID = orbsTree->GetRootItem();
     wxTreeItemId atomID = orbsTree->FindItemIn(rootID,AtomName);
-    if (atomID.IsOk()) orbsTree->SetItemState(atomID, wxCheckTree::CHECKED);
+    //FixSoSoon
+    if (atomID.IsOk() && (isMainThread || isPlotting)) orbsTree->SetItemState(atomID, wxCheckTree::CHECKED);
     wxString ShellName = wxString::Format(wxT("Shell %d"),ShellNumber);
     wxTreeItemId shellID = orbsTree->FindItemIn(atomID,ShellName);
     nOrbs=0;
@@ -2393,7 +2402,8 @@ void Sec30::GetOrbitalInfo(wxCheckTree* orbsTree, wxString AtomName, int ShellNu
     if (shellID.IsOk())
     {
         IsShell = true;
-        orbsTree->SetItemState(shellID, wxCheckTree::CHECKED);
+        //FixSoSoon
+        if (isMainThread || isPlotting) orbsTree->SetItemState(shellID, wxCheckTree::CHECKED);
         wxTreeItemIdValue cookie;
         wxTreeItemId child = orbsTree->GetFirstChild(shellID, cookie);
         while( child.IsOk() )
@@ -3948,8 +3958,8 @@ void Sec30::GetBondSK(myGrid* GridCtrl, wxString Label, Adouble0D &iBondSK, Adou
     wxString title, istr, fstr;
     double ival, fval;
     int nRow = GridCtrl->GetNumberRows();
-    iBondSK = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-    fBondSK = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    iBondSK = std::vector<double>(40,0.0);//{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    fBondSK = std::vector<double>(40,0.0);//{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
     bool found = false;
     for (int irow=0; irow<nRow;irow++)
     {
@@ -3976,8 +3986,8 @@ void Sec30::GetBondSKF(myGrid* GridCtrl, double* GridBuffer, wxString Label, Ado
     wxString title, fstr;
     double fval;
     int nRow = GridCtrl->GetNumberRows();
-    iBondSK = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-    fBondSK = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    iBondSK = std::vector<double>(40,0.0);//{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    fBondSK = std::vector<double>(40,0.0);//{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
     bool found = false;
     for (int irow=0; irow<nRow;irow++)
     {
@@ -4005,8 +4015,8 @@ void Sec30::GetOnSiteSK(myGrid* GridCtrl, wxString Label, Adouble0D &iBondSK, Ad
     wxString title, istr, fstr;
     double ival, fval;
     int nRow = GridCtrl->GetNumberRows();
-    iBondSK = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-    fBondSK = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    iBondSK = std::vector<double>(40,0.0);//{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    fBondSK = std::vector<double>(40,0.0);//{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
     i_p_soc=0.0;
     f_p_soc=0.0;
     i_d_soc=0.0;
@@ -4068,8 +4078,8 @@ void Sec30::GetOnSiteSKF(myGrid* GridCtrl, double* GridBuffer, wxString Label, A
     wxString title, fstr;
     double fval;
     int nRow = GridCtrl->GetNumberRows();
-    iBondSK = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
-    fBondSK = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    iBondSK = std::vector<double>(40,0.0);//{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    fBondSK = std::vector<double>(40,0.0);//{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
     f_p_soc=0.0;
     f_d_soc=0.0;
     Orbital_Patern.clear();
@@ -4146,10 +4156,10 @@ void Sec30::GetSOC(double p_soc, double d_soc, Aint0D Orbital_Patern, double** R
                               0}, {0, 0, 0, 0, 0, 0, 0, 0, 1.0, 0, 0, -0.5, 0, 0, 0, 0, 0, 0}, {0,
                                0, 0, 0, 0, 0, 0, 0, 0, -1.0, -0.5, 0, 0, 0, 0, 0, 0, 0}};
     
-    int np_real = 4;
-    int nd_real = 12;
-    int np_imag = 8;
-    int nd_imag = 20;
+    const int np_real = 4;
+    const int nd_real = 12;
+    const int np_imag = 8;
+    const int nd_imag = 20;
     int p_realNonZero[np_real][2] = {{4, 7},{5, 6},{6, 5},{7, 4}};
     int d_realNonZero[nd_real][2] = {{8, 11},{9, 10},{10, 9},{11, 8},{12, 15},{13, 14},{14, 13},{14, 17},{15, 12},{15, 16},{16, 15},{17, 14}};
     int p_imagNonZero[np_imag][2] = {{2, 5},{2, 6},{3, 4},{3, 7},{4, 3},{5, 2},{6, 2},{7, 3}};

@@ -9,10 +9,24 @@
 #include <wx/textfile.h>
 #include <mgl2/mgl.h>
 
+#if defined(__APPLE__)
+const float deltawheelfactor2d = 0.03f;
+#else
+const float deltawheelfactor2d = 0.01f;
+#endif
+
+enum mymenuid3
+{
+    wx3ID_Save = wxID_HIGHEST + 31
+};
+
+wxDECLARE_EVENT(FigureClass_EVT_PlotFinished, wxCommandEvent);
+
 class MyFigure2d : public wxPanel
 {
 public:
     //int canvasRefreshCnt=0;
+    wxWindow *Parent;
     Sec30* sec30;
     bool isSelectMode = false;
     bool isMoveMode = false;
@@ -46,7 +60,8 @@ public:
     int* nIntArray;
     int** IntArray;
     
-	MyFigure2d(wxWindow *parent, Sec30* sec30Var, int MyID);
+    MyFigure2d(wxWindow *parent, Sec30* &sec30Var, int MyID);
+    void myRefresh();
     
 private:
     float TheLastXAngle = 0;
@@ -99,6 +114,7 @@ private:
     
 private:
     int currentRenderDimension = 0;
+    void SendPlotFinishedEvent();
 };
 
 #endif

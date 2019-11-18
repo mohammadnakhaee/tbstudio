@@ -13,7 +13,8 @@ SetupClass::SetupClass(wxWindow* parent, Sec30* sec30var, wxWindowID id, const w
     /**********************************************************************************************************************************************/
     wxBoxSizer* BaseSizer = new wxBoxSizer(wxVERTICAL);
     SetSizer(BaseSizer);
-    SetBackgroundColour(wxColour(wxT("rgb(255,255,255)")));
+    //SetBackgroundColour(wxColour(wxT("rgb(255,255,255)")));
+    SetBackgroundColour(sec30->ThemeMenuColour);
     SetName(wxT("SetupClass"));
     SetSize(wxDLG_UNIT(this, wxSize(-1,-1)));
     GetSizer()->Fit(this);
@@ -28,7 +29,7 @@ SetupClass::SetupClass(wxWindow* parent, Sec30* sec30var, wxWindowID id, const w
     choicectr->Append(_("Vasp XML Output"));
     choicectr->SetEditable(false);
     choicectr->SetBackgroundColour(*wxWHITE);
-    choicectr->Select(2);
+    choicectr->Select(0);
     wxString Labels1[2] = {_("Open File"), _("Reload")};
     wxObjectEventFunction Funcs1[2] = { wxCommandEventHandler(SetupClass::Btn_OpenFile_OnClick), wxCommandEventHandler(SetupClass::Btn_Reload_OnClick)};
     sec30->AddButton(this, 2, Labels1, Funcs1);
@@ -69,8 +70,8 @@ SetupClass::SetupClass(wxWindow* parent, Sec30* sec30var, wxWindowID id, const w
     wxString Labels3[1] = {_("Brush")};
     wxObjectEventFunction Funcs3[1] = { wxCommandEventHandler(SetupClass::Btn_Select_OnClick)};
     sec30->AddButton(this, 1, Labels3, Funcs3);
-    sec30->AddGroupBox(this,_("To increase the weight function, paint on bands."),wxColour(wxT("rgb(255,255,255)")));
-    sec30->AddGroupBox(this,_("To decrease, hold Ctrl or Alt key and paint."),wxColour(wxT("rgb(255,255,255)")));
+    sec30->AddGroupBox(this,_("To increase the weight function, paint on bands."),sec30->ThemeMenuColour);
+    sec30->AddGroupBox(this,_("To decrease, hold Ctrl or Alt key and paint."),sec30->ThemeMenuColour);
     /**********************************************************************************************************************************************/
     sec30->AddGroupBox(this,_("Fitting Algorithmic Parameters"),wxColour(wxT("rgb(153,180,209)")));
     wxComboBox* choicectrm = sec30->AddComboCtrl(this, _("OMethod"), _("Method"), 70, 200, true);
@@ -313,7 +314,7 @@ void SetupClass::Btn_Select_OnClick(wxCommandEvent& event)
     wxButton* btnctr = (wxButton*)event.GetEventObject();
     //wxButton* btnctr =  sec30->GetButtonObject(_("PickAtomBtn"));
     //btnctr->SetBackgroundColour(wxColour(wxT("rgb(209,153,180)")));
-    if (btnctr->GetForegroundColour() == *wxBLACK)
+    if (btnctr->GetForegroundColour() != *wxGREEN)
     {
         btnctr->SetForegroundColour(*wxGREEN);
         sec30->ArraysOf0DInt[6] = 1;

@@ -11,6 +11,7 @@
 
 // It just declares MY_EVENT event type
 /******************************************************************************/
+wxDECLARE_EVENT(RegressionEVT_OnNewPlot, wxCommandEvent);
 wxDECLARE_EVENT(RegressionEVT_OnNewData, wxCommandEvent);
 wxDECLARE_EVENT(RegressionEVT_OnFinished, wxCommandEvent);
 wxDECLARE_EVENT(RegressionEVT_OnStarted, wxCommandEvent);
@@ -35,15 +36,14 @@ class Regression
 public:
     Sec30* sec30;
     wxWindow* Parent;
-    GraphClass* graph2d;
     
-    Regression(Sec30* sec30Ref, wxWindow* ParentRef, GraphClass* graph2dRef);
+    Regression();
     ~Regression();
     void foo(long long nmax);
     double maxabs(double* a, int na);
     double maxdiag(double** a, int na);
     double Variance(double* a, int na);
-    void Start(double* p, int np, double* t, double* y_dat, int ny, double* weight, double* dp, double p_min, double p_max, double Mixing, double* c, lmOptions opts, bool isOneStep);
+    void Start(double* p, int np, double* t, double* y_dat, int ny, double* weight, double* dp, double p_min, double p_max, double Mixing, double* c, lmOptions opts, bool isOneStep, Sec30* sec30Ref, wxWindow* ParentRef);
     void lm(double* p, int np, double* t, double* y_dat, int ny, double* weight, double* dp, double p_min, double p_max, double Mixing, double* c, lmOptions opts, double &redX2, double* sigma_p, double** cvg_hst, bool isOneStep, lapack_complex_double* LowerSymMatrixHf, lapack_complex_double* LowerSymMatrixSf, double* eigHf, int natoms, bool isSOC, bool isOverlap);
     void lm_FD_J(double* t, double* p, int np, double* y, int ny, double* dp, double* c, double** J, int &func_calls, lapack_complex_double* LowerSymMatrixHf, lapack_complex_double* LowerSymMatrixSf, double* eigHf, int natoms, bool isSOC, bool isOverlap);
     void lm_Broyden_J(double* p_old, double* y_old, double** J, double* p, int np, double* y, int ny);
@@ -54,6 +54,7 @@ public:
     double VecVec2Num(double* a, double* b, int na);
     void Transpose(double** a, int na, int nb, double** aT);
     void func(double* t,  int ny, double* p, int np, double* cnst, double* y, lapack_complex_double* LowerSymMatrixHf, lapack_complex_double* LowerSymMatrixSf, double* eigHf, int natoms, bool isSOC, bool isOverlap);
+    void SendPlotTriger();
     void SendDataToTerminal(wxString data);
     void SendEventRunFinished();
     void SendEventRunStarted();

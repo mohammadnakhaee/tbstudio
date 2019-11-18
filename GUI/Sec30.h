@@ -35,7 +35,7 @@
 //#include "wxFingerPrint.h"
 //#include <gemmi/cif.hpp>
 #include "rapidxml_utils.hpp"
-#include <bits/stdc++.h> //sort vectors
+//#include <bits/stdc++.h> //sort vectors
 #include <wx/filename.h>
 /******************************************************************************/
 
@@ -78,6 +78,12 @@ class Sec30  : public wxWindow
 public:
     Sec30(wxWindow* parent);
     ~Sec30();
+    
+    wxColour ThemeMenuColour;
+    
+    bool isPlotting = false;
+    //10000bool isPrinting = false;
+    bool isMainThread = false;
     
     std::list<wxString> vars;
     std::list<wxString> grids;

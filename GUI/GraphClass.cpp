@@ -9,7 +9,7 @@ GraphClass::GraphClass(wxWindow* parent, int Dim, Sec30* sec30Var, int MyID)
     sec30 = sec30Var;
     ObjectID = MyID;
 	MyDim = Dim;
-    int AttribList[] = {WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 16, 0};
+    int AttribList[] = {WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 4, 0};
 	//int AttribList[] = { WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_STEREO, 0};
 	//int AttribList[] = {WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 32};
 	
@@ -544,14 +544,14 @@ void GraphClass::CreateAtomicStructure(Sec30* sec30Var, bool IsNewAllocate)
     }
 }
 
-void GraphClass::Update2d0()
+void GraphClass::myRefresh3d()
 {
-    
+    glc->myRefresh();
 }
 
-void GraphClass::Update2d()
+void GraphClass::myRefresh2d()
 {
-    
+    glc2d->myRefresh();
 }
 
 void GraphClass::GetBondInfo(const wxString& bondtextvar, int& i, int& n, int& j, int& m, int& bondtype)

@@ -6,6 +6,7 @@ DECLARE_APP(MainApp)
 //    #include "../../sample.xpm"
 //#endif
 
+wxDEFINE_EVENT(FigureClass_EVT_PlotFinished, wxCommandEvent);
 
 wxBEGIN_EVENT_TABLE(MyFigure2d, wxPanel)
     EVT_PAINT(MyFigure2d::OnPaint)
@@ -18,17 +19,26 @@ wxBEGIN_EVENT_TABLE(MyFigure2d, wxPanel)
     EVT_RIGHT_UP(MyFigure2d::OnMouseRightUp)
     EVT_MIDDLE_DOWN(MyFigure2d::OnMouseMiddleDown)
     EVT_MIDDLE_UP(MyFigure2d::OnMouseMiddleUp)
-    EVT_MENU(wxID_COPY,MyFigure2d::OnSaveRasterImage)
+    EVT_MENU(wx3ID_Save,MyFigure2d::OnSaveRasterImage)
 wxEND_EVENT_TABLE()
 
-MyFigure2d::MyFigure2d(wxWindow *parent, Sec30* sec30Var, int MyID) : wxPanel(parent)
+MyFigure2d::MyFigure2d(wxWindow *parent, Sec30* &sec30Var, int MyID) : wxPanel(parent)
 {
+    Parent = parent;
     ObjectID = MyID;
     sec30 = sec30Var;
 }
 
+void MyFigure2d::myRefresh()
+{
+    Refresh(false);
+    //Update();
+}
+
 void MyFigure2d::OnPaint(wxPaintEvent& WXUNUSED(event))
 {
+    //wxMessageBox(wxT("I am in OnPaint event."));//This line throw an exception (illegall instruction 4)
+    
     // This is required even though dc is not used otherwise.
     wxPaintDC dc(this);
 	
@@ -79,7 +89,7 @@ void MyFigure2d::OnPaint(wxPaintEvent& WXUNUSED(event))
 	if (canvasRefreshCnt<3)
 	{
 		canvasRefreshCnt++;
-		this->Refresh(false);
+		this->myRefresh();
 	}
 	else
 	{
@@ -93,6 +103,15 @@ void MyFigure2d::OnPaint(wxPaintEvent& WXUNUSED(event))
 	//wxBitmap bmp2(wxT("C:\\GCloth.png"), wxBITMAP_TYPE_PNG);
 	//dc.DrawBitmap(bmp2,0,0,false);
 	//dc.DrawBitmap(bmp,0,0,false);
+    
+    //SendPlotFinishedEvent();
+    sec30->isPlotting = false;
+}
+
+void MyFigure2d::SendPlotFinishedEvent()
+{
+    wxCommandEvent* event = new wxCommandEvent(FigureClass_EVT_PlotFinished);
+    wxQueueEvent(Parent,event);
 }
 
 void MyFigure2d::GetDirection(int i0, int j0, int i, int j, float& x, float& y, float& Theta)
@@ -158,7 +177,7 @@ void MyFigure2d::OnMouseWheel(wxMouseEvent& event)
 		
 		double y0 = (y2 + y1) / 2.0;
 		double r = (y2 - y1) / 2.0;
-		float delta = (r*0.1)*0.01f*event.GetWheelDelta(); //Zoom dependent delta (It seems better)
+		float delta = (r*0.1)*deltawheelfactor2d*event.GetWheelDelta(); //Zoom dependent delta (It seems better)
 		if (scrldwn)
 			r = r + delta;
 		else
@@ -177,7 +196,7 @@ void MyFigure2d::OnMouseWheel(wxMouseEvent& event)
 		}
 	}
 
-    Refresh(false);
+    myRefresh();
 }
 
 void MyFigure2d::OnMouseLeftDown(wxMouseEvent& event)
@@ -239,7 +258,7 @@ void MyFigure2d::OnMouseMove(wxMouseEvent& event)
 		}
             
 		isPaintCursur = true;
-		Refresh(false);
+		myRefresh();
     }
     else if (isMouseRightDown)
     {
@@ -284,7 +303,7 @@ void MyFigure2d::OnMouseRightUp(wxMouseEvent& event)
     {
         wxMenu *pmenuPopUp = new wxMenu;
         wxMenuItem* pItem;
-        pItem = new wxMenuItem(pmenuPopUp,wxID_COPY, wxT("Save as image"));
+        pItem = new wxMenuItem(pmenuPopUp,wx3ID_Save, wxT("Save as image"));
         pmenuPopUp->Append(pItem);
         PopupMenu(pmenuPopUp,event.GetPosition());
         delete pmenuPopUp;
@@ -344,7 +363,7 @@ void MyFigure2d::DoMove2d(float l, float m)
         //sec30->ArraysOf0DDouble[8] = OldxMax + dx;
     }
         
-    Refresh(false);
+    myRefresh();
 }
 
 void MyFigure2d::OnSaveRasterImage(wxCommandEvent &WXUNUSED(event))
@@ -468,7 +487,7 @@ void MyFigure2d::SetWeight(float x, float y, float w, float h, float coef)
         }
     }
     
-    Refresh(false);
+    myRefresh();
 }
 
 int MyFigure2d::PlotBand(mglGraph *gr, int w, int h, Sec30* sec30, int MyID)

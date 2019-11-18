@@ -20,7 +20,8 @@
 
 class WXDLLIMPEXP_CHECKTREE wxCheckTree : public wxTreeCtrl
 {
-    public:
+public:
+        wxImageList *states;
         wxCheckTree(wxWindow *parent, const wxWindowID id,
                    const wxPoint& pos, const wxSize& size,
                    long style = wxTR_DEFAULT_STYLE);

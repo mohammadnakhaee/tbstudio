@@ -23,8 +23,8 @@ public:
     int nShowingAtoms = -1;
     int nShowingBonds = -1;
     void CreateAtomicStructure(Sec30* sec30var, bool IsNewAllocate = true);
-    void Update2d0();
-    void Update2d();
+    void myRefresh3d();
+    void myRefresh2d();
     void GetBondInfo(const wxString& bondtextvar, int& i, int& n, int& j, int& m, int& bondtype);
     void GetUnitcellInfo(const wxString& unitcelltextvar, int& l, int& m, int& n);
     void FindEssentials();

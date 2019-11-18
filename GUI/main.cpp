@@ -1,11 +1,19 @@
 #include "main.h"
 #include "GridClass.h"
+#include <wx/sysopt.h>
 
 bool MainApp::OnInit()
 {
+    //In MacOS and in the case of the languages their decimal separator is comma we should force TBStudio to use dot as decimal separtor
+    //setlocale(LC_NUMERIC, "C");
+    wxLocale* locale = new wxLocale();
+    locale->Init(wxLANGUAGE_ENGLISH, wxLOCALE_LOAD_DEFAULT);
+    
     // Add the common image handlers
     wxImage::AddHandler( new wxPNGHandler );
     wxImage::AddHandler( new wxJPEGHandler );
+    
+    wxSystemOptions::SetOption	("msw.notebook.themed-background", 0);
     
     MainFrame *mainFrame = new MainFrame(NULL);
     SetTopWindow(mainFrame);

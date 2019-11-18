@@ -98,6 +98,7 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
     // Connect events
     this->Connect(wxEVT_SIZE, wxSizeEventHandler(MainFrameBaseClass::MainFrameBaseClass_Resize), NULL, this);
     this->Connect(wxEVT_MOVE, wxMoveEventHandler(MainFrameBaseClass::MainFrameBaseClass_Move), NULL, this);
+    this->Connect(wxEVT_CLOSE_WINDOW, wxCloseEventHandler(MainFrameBaseClass::MainFrameClose), NULL, this);
     
 }
 
@@ -105,6 +106,7 @@ MainFrameBaseClass::~MainFrameBaseClass()
 {
     this->Disconnect(wxEVT_SIZE, wxSizeEventHandler(MainFrameBaseClass::MainFrameBaseClass_Resize), NULL, this);
     this->Disconnect(wxEVT_MOVE, wxMoveEventHandler(MainFrameBaseClass::MainFrameBaseClass_Move), NULL, this);
+    this->Disconnect(wxEVT_CLOSE_WINDOW, wxCloseEventHandler(MainFrameBaseClass::MainFrameClose), NULL, this);
     
 }
 

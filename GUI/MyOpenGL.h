@@ -11,19 +11,38 @@
 #ifndef _WX_CUBE_H_
 #define _WX_CUBE_H_
 
+
 #include "wx/glcanvas.h"
 #include <wx/timer.h>
 #include <mgl2/mgl.h>
+
+#if defined(__APPLE__)
+#define GL_SILENCE_DEPRECATION
+#include <OpenGL/gl.h>
+#include <OpenGL/glu.h>
+#include <OpenGL/glext.h>
+#include <GLUT/glut.h>
+#else
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <GL/glext.h>
 #include <GL/glut.h>
+#endif
+
 #include <math.h>
 #include <exception>
 #include "Sec30.h"
 
+#if defined(__APPLE__)
+const float deltawheelfactor3d = 0.03f;
+#else
+const float deltawheelfactor3d = 0.01f;
+#endif
 
-
+enum mymenuid2
+{
+    wx2ID_Save = wxID_HIGHEST + 21
+};
 
 // It just declares MY_EVENT event type
 /******************************************************************************/
@@ -48,6 +67,7 @@ public:
     void background();
     void Draw2D(int w, int h, Sec30* sec30, int MyID);
     void Draw3D(int nColDArray, int* nDArray, double** DArray, int nColIArray, int* nIArray, int** IArray, double Coordinate[3][3], float xMove, float yMove, float XCam, float YCam, float zoom, float zoomCam, float w, float h);
+
 private:
     // textures for the cube faces
     GLuint m_textures[1];
@@ -100,6 +120,7 @@ public:
     void Reload();
     void SetDirection(double Xl, double Xm, double Xn, double Yl, double Ym, double Yn, double Zl, double Zm, double Zn);
     void RotateCam(double l, double m, double theta);
+    void myRefresh();
     
 private:
     float TheLastXAngle = 0;
@@ -145,6 +166,7 @@ private:
     void OnMouseMiddleUp(wxMouseEvent& event);
     void OnSaveRasterImage(wxCommandEvent &WXUNUSED(event));
     void SaveImageFromData(wxImage image, wxString filepath, wxString OutputFileType);
+    void OnReSize(wxSizeEvent& event);
     
     void CreateDoubleArray1();
     void RotationMatrix(double Theta, double lmn[3][3]);

@@ -13,7 +13,8 @@ BondsClass::BondsClass(wxWindow* parent, Sec30* sec30var, wxWindowID id, const w
     /**********************************************************************************************************************************************/
     wxBoxSizer* BaseSizer = new wxBoxSizer(wxVERTICAL);
     SetSizer(BaseSizer);
-    SetBackgroundColour(wxColour(wxT("rgb(255,255,255)")));
+    //SetBackgroundColour(wxColour(wxT("rgb(255,255,255)")));
+    SetBackgroundColour(sec30->ThemeMenuColour);
     SetName(wxT("BondsClass"));
     SetSize(wxDLG_UNIT(this, wxSize(-1,-1)));
     GetSizer()->Fit(this);
@@ -29,9 +30,9 @@ BondsClass::BondsClass(wxWindow* parent, Sec30* sec30var, wxWindowID id, const w
     wxString Names2[1] = {_("PickAtomBtn")};
     wxObjectEventFunction Funcs2[1] = { wxCommandEventHandler(BondsClass::Btn_Pick_OnClick)};
     sec30->AddButton(this, 1, Names2, Labels2, Funcs2);
-    sec30->AddGroupBox(this,_("Atom index and shell number in cell (0,0,0):"),wxColour(wxT("rgb(255,255,255)")));
+    sec30->AddGroupBox(this,_("Atom index and shell number in cell (0,0,0):"),sec30->ThemeMenuColour);
     sec30->AddVarVector(this, 2, _("AtomIndex1"), _("int"), _("(i,n)"), 70, 50, false);
-    sec30->AddGroupBox(this,_("Atom index and shell number in selected cell:"),wxColour(wxT("rgb(255,255,255)")));
+    sec30->AddGroupBox(this,_("Atom index and shell number in selected cell:"),sec30->ThemeMenuColour);
     sec30->AddVarVector(this, 2, _("AtomIndex2"), _("int"), _("(j,m)"), 70, 50, false);
     sec30->SetVar(_("AtomIndex1[0]"),1,false);
     sec30->SetVar(_("AtomIndex1[1]"),1,false);

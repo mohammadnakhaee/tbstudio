@@ -6,14 +6,15 @@ wxDEFINE_EVENT(Sec30EVT_Grid_Updated, wxCommandEvent);
 
 /******************************************************************************/
 BEGIN_EVENT_TABLE(myGrid,wxGrid)
-    EVT_MENU(wxID_COPY,myGrid::OnCopy)
-    EVT_MENU(wxID_CUT,myGrid::OnCut)
-    EVT_MENU(wxID_PASTE,myGrid::OnPaste)
-    EVT_MENU(wxID_DELETE,myGrid::OnDelete)
+    EVT_MENU(wx0ID_COPY,myGrid::OnCopy)
+    EVT_MENU(wx0ID_CUT,myGrid::OnCut)
+    EVT_MENU(wx0ID_PASTE,myGrid::OnPaste)
+    EVT_MENU(wx0ID_DELETE,myGrid::OnDelete)
     EVT_GRID_CELL_RIGHT_CLICK(myGrid::OnRightMouseDown)
     EVT_GRID_CELL_CHANGED(myGrid::OnCellChanged)
     //EVT_GRID_CELL_CHANGE(myGrid::OnCellCursorChange)
     EVT_KEY_DOWN(myGrid::myOnKeyDown)
+    EVT_GRID_EDITOR_SHOWN(myGrid::onGridEditorShown)
 END_EVENT_TABLE()
 /******************************************************************************/
 
@@ -176,16 +177,16 @@ void myGrid::OnRightMouseDown(wxGridEvent &event)
     wxMenu *pmenuPopUp = new wxMenu;
     wxMenuItem* pItem;
     
-    pItem = new wxMenuItem(pmenuPopUp,wxID_COPY, wxT("Copy"));
+    pItem = new wxMenuItem(pmenuPopUp,wx0ID_COPY, wxT("Copy"));
     pmenuPopUp->Append(pItem);
     
-    pItem = new wxMenuItem(pmenuPopUp,wxID_CUT, wxT("Cut"));
+    pItem = new wxMenuItem(pmenuPopUp,wx0ID_CUT, wxT("Cut"));
     pmenuPopUp->Append(pItem);
     
-    pItem = new wxMenuItem(pmenuPopUp,wxID_PASTE, wxT("Paste"));
+    pItem = new wxMenuItem(pmenuPopUp,wx0ID_PASTE, wxT("Paste"));
     pmenuPopUp->Append(pItem);
     
-    pItem = new wxMenuItem(pmenuPopUp,wxID_DELETE, wxT("Delete"));
+    pItem = new wxMenuItem(pmenuPopUp,wx0ID_DELETE, wxT("Delete"));
     pmenuPopUp->Append(pItem);
     
     if(!CanEnableCellControl()) 
@@ -206,6 +207,15 @@ void myGrid::UpdateGrid()
     SendUpdateEvent();
 }
 
+void myGrid::onGridEditorShown(wxGridEvent &event)
+{
+    //wxGridCellEditor* s = GetDefaultEditor();
+    //wxString fff = s->GetValue();
+    int Col0 = GetGridCursorCol();
+    int Row0 = GetGridCursorRow();
+    //GetSelectedCells();
+    //wxGridCellEditor* s = GetCellEditor(Row0,Col0);
+}
 /******************************************************************************/
 void myGrid::myOnKeyDown(wxKeyEvent &event)
 {

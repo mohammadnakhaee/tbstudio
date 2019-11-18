@@ -55,6 +55,7 @@ protected:
 protected:
     virtual void MainFrameBaseClass_Resize(wxSizeEvent& event) { event.Skip(); }
     virtual void MainFrameBaseClass_Move(wxMoveEvent& event) { event.Skip(); }
+    virtual void MainFrameClose(wxCloseEvent& event) { event.Skip(); }
 
 public:
     wxRibbonBar* GetMainRibbon() { return MainRibbon; }
