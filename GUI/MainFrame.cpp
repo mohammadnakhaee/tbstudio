@@ -253,13 +253,11 @@ ThemeMenuColour.Set(255,255,255,255);
         this->SetTitle(SoftwareName + _(" <") + LicenseOwner + _(">"));
     }
     
-#if defined(__APPLE__)
-//At the begining MainFrame does not raise in MacOS and this code does not work in Ubuntu (bad behaviuor in Layout)
+    //At the begining it does not raise in MacOS
     this->Iconize();
     this->Maximize();
+    //wxTopLevelWindow::Iconize()
     this->Raise();
-#endif
-
 }
 
 MainFrame::~MainFrame()
