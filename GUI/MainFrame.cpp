@@ -50,7 +50,12 @@ MainFrame::MainFrame(wxWindow* parent)
     : MainFrameBaseClass(parent)
 {
     //wxColour MenueColour = wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT);
-    ThemeMenuColour.Set(93,111,142,255);
+
+#if defined(__APPLE__)
+ThemeMenuColour.Set(93,111,142,255);
+#else
+ThemeMenuColour.Set(255,255,255,255);
+#endif
     
     /*
     //1.5.0
@@ -168,7 +173,7 @@ MainFrame::MainFrame(wxWindow* parent)
     LoadBondsPanel();
     LoadSKPanel();
     LoadSetupPanel();
-    //LeftPanel->GetPage(0)->SetBackgroundColour(*wxBLACK);
+    //LeftPanel->GetPage(0)->SetBackgroundColour(ThemeMenuColour);
     //////////////////////////////////////////////////////////////
     //Strange problem in run-time out side of the codelite. We should have selected one time the SK tab and it works fine.
     //It seems when we select the tab the objects will be opened.
@@ -2761,7 +2766,9 @@ void MainFrame::LoadIcons()
     //wxColour c2 = wxColour(wxT("rgb(13,98,124)"));
     wxColour c2 = wxColour(wxT("rgb(48,97,180)"));
     //MainRibbon->GetArtProvider()->SetColourScheme(c1, c2, c2);
-    MainRibbon->GetArtProvider()->SetColourScheme(ThemeMenuColour, c2, c1);
+    wxColour c3 = wxColour(wxT("rgb(93,111,142)"));
+    MainRibbon->GetArtProvider()->SetColourScheme(c3, c2, c1);
+    
     
     wxLog::SetLogLevel(0);
     
