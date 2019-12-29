@@ -709,4 +709,25 @@ void GraphClass::GetAtoms_Selection(int* &Atoms)
     }
 }
 
-    
+void GraphClass::SetCamDir(wxString direction)
+{
+    //y glc->SetDirection(0.0,1.0,0.0, 0.0,0.0,1.0, 1.0,0.0,0.0);
+    if (direction == _("x"))
+        glc->SetDirection(0.0,0.0,1.0, 1.0,0.0,0.0, 0.0,1.0,0.0);
+    else if (direction == _("y"))
+        glc->SetDirection(-1.0,0.0,0.0, 0.0,0.0,1.0, 0.0,1.0,0.0);
+    else if (direction == _("z"))
+        glc->SetDirection(1.0,0.0,0.0, 0.0,1.0,0.0, 0.0,0.0,1.0);
+}
+
+void GraphClass::RotateCam(wxString direction)
+{
+    if (direction == _("u"))
+        glc->RotateCam(0.0, 1.0, -10.0);
+    else if (direction == _("d"))
+        glc->RotateCam(0.0, 1.0, 10.0);
+    else if (direction == _("l"))
+        glc->RotateCam(1.0, 0.0, 10.0);
+    else if (direction == _("r"))
+        glc->RotateCam(1.0, 0.0, -10.0);
+}

@@ -1021,8 +1021,6 @@ void MyGLContext::Draw_Lattice(int nColDArray, int* nDArray, double** DArray, in
             }
         }
     }
-    
-
 }
 
 void MyGLContext::Draw3D(int nColDArray, int* nDArray, double** DArray, int nColIArray, int* nIArray, int** IArray, double Coordinate[3][3], float xMove, float yMove, float XCam, float YCam, float zoom, float zoomCam, float w, float h)
@@ -1806,30 +1804,72 @@ void MyGLCanvas::DiscardDoubleArrays1()
     NumberOfDoubleArrays=0;
 }
 
+void MyGLCanvas::SetDirection(double Xl, double Xm, double Xn, double Yl, double Ym, double Yn, double Zl, double Zm, double Zn)
+{
+    Coordinate0[0][0] = Xl;
+    Coordinate0[0][1] = Xm;
+    Coordinate0[0][2] = Xn;
+    
+    Coordinate0[1][0] = Yl;
+    Coordinate0[1][1] = Ym;
+    Coordinate0[1][2] = Yn;
+    
+    Coordinate0[2][0] = Zl;
+    Coordinate0[2][1] = Zm;
+    Coordinate0[2][2] = Zn;
+    
+    Coordinate1[0][0] = Xl;
+    Coordinate1[0][1] = Xm;
+    Coordinate1[0][2] = Xn;
+    
+    Coordinate1[1][0] = Yl;
+    Coordinate1[1][1] = Ym;
+    Coordinate1[1][2] = Yn;
+    
+    Coordinate1[2][0] = Zl;
+    Coordinate1[2][1] = Zm;
+    Coordinate1[2][2] = Zn;
+    
+    
+    //DoRotate(1,0,10*3.141592/180);
+    
+    LoadToCanvas();
+    //Reload();
+    Refresh();
+}
+
+void MyGLCanvas::RotateCam(double l, double m, double theta)
+{
+    double PI=3.14159265359;
+    DoRotate(l,m,theta*PI/180.0);
+    Reload();
+    Refresh();
+}
+
 void MyGLCanvas::RotationMatrix(double Theta, double lmn[3][3])
 {
     double l = Coordinate0[2][0];
     double m = Coordinate0[2][1];
     double n = Coordinate0[2][2];
-    if (n >=0.0 && n<0.0000001)
+    if (n >=0.0 && n<0.000001)
     {
-        n=0.0000001;
+        n=0.000001;
     }
-    if (n <0.0 && n>-0.0000001)
+    if (n <0.0 && n>-0.000001)
     {
-        n=-0.0000001;
+        n=-0.000001;
     }
-    if (n>0.9999999)
+    if (n>0.999999)
     {
-        l=0.0000001;
-        m=0.0000001;
-        n=0.9999999;
+        l=0.000001;
+        m=0.000001;
+        n=0.999999;
     }
-    if (n<-0.9999999)
+    if (n<-0.999999)
     {
-        l=0.0000001;
-        m=0.0000001;
-        n=-0.9999999;
+        l=0.000001;
+        m=0.000001;
+        n=-0.999999;
     }
     double lmnnorm = sqrt(l*l + m*m + n*n);
     l = l/lmnnorm;

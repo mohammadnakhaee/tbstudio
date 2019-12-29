@@ -18,12 +18,6 @@ StructureClass::StructureClass(wxWindow* parent, Sec30* sec30var, wxWindowID id,
     sec30->AddVarVector(this, 2, _("ma"), _("int"), _("a range"), 70, 100);
     sec30->AddVarVector(this, 2, _("mb"), _("int"), _("b range"), 70, 100);
     sec30->AddVarVector(this, 2, _("mc"), _("int"), _("c range"), 70, 100);
-    sec30->SetVar(_("ma[0]"), 0, false);
-    sec30->SetVar(_("ma[1]"), 0, false);
-    sec30->SetVar(_("mb[0]"), 0, false);
-    sec30->SetVar(_("mb[1]"), 0, false);
-    sec30->SetVar(_("mc[0]"), 0, false);
-    sec30->SetVar(_("mc[1]"), 0, false);
     /**********************************************************************************************************************************************/
     sec30->AddGroupBox(this,_("TB model Ranges (Nearest-Neighbor Unit-Cells)"),wxColour(wxT("rgb(153,180,209)")));
     sec30->AddRadioButton(this, _("TBViewmode"), _("Show TB Model"));

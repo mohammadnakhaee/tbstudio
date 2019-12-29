@@ -46,6 +46,7 @@ wxGLContext* m_context;
 MainFrame::MainFrame(wxWindow* parent)
     : MainFrameBaseClass(parent)
 {
+    this->SetTitle(_("Jacuzzi"));
     LoadIcons();
     RButtonMouse->ToggleButton(wxID_RETRY, true);//Rotate
     //tbmodel = new TBModel();
@@ -1904,8 +1905,103 @@ void MainFrame::BtnScale_OnClick(wxRibbonButtonBarEvent& event)
     graph3d->SetLeftMouseMode(3);//Scale
 }
 
+void MainFrame::BtnX_OnClick(wxRibbonButtonBarEvent& event)
+{
+    graph3d->SetCamDir(_("x"));
+}
+
+void MainFrame::BtnY_OnClick(wxRibbonButtonBarEvent& event)
+{
+    graph3d->SetCamDir(_("y"));
+}
+
+void MainFrame::BtnZ_OnClick(wxRibbonButtonBarEvent& event)
+{
+    graph3d->SetCamDir(_("z"));
+}
+
+void MainFrame::BtnA_OnClick(wxRibbonButtonBarEvent& event)
+{
+    graph3d->SetCamDir(_("a"));
+}
+
+void MainFrame::BtnB_OnClick(wxRibbonButtonBarEvent& event)
+{
+    graph3d->SetCamDir(_("b"));
+}
+
+void MainFrame::BtnC_OnClick(wxRibbonButtonBarEvent& event)
+{
+    graph3d->SetCamDir(_("c"));
+}
+
+void MainFrame::BtnUp_OnClick(wxRibbonButtonBarEvent& event)
+{
+    graph3d->RotateCam(_("u"));
+}
+
+void MainFrame::BtnDown_OnClick(wxRibbonButtonBarEvent& event)
+{
+    graph3d->RotateCam(_("d"));
+}
+
+void MainFrame::BtnLeft_OnClick(wxRibbonButtonBarEvent& event)
+{
+    graph3d->RotateCam(_("l"));
+}
+
+void MainFrame::BtnRight_OnClick(wxRibbonButtonBarEvent& event)
+{
+    graph3d->RotateCam(_("r"));
+}
+
+void MainFrame::BtnAbout_OnClick(wxRibbonButtonBarEvent& event)
+{
+    
+}
+
+void MainFrame::BtnTutorials_OnClick(wxRibbonButtonBarEvent& event)
+{
+    
+}
+
+void MainFrame::BtnWebsite_OnClick(wxRibbonButtonBarEvent& event)
+{
+    
+}
+
 void MainFrame::LoadIcons()
 {
+    wxLog::SetLogLevel(0);
+    
+    wxIconBundle app_icons;
+    {
+        wxIcon icn;
+        icn.CopyFromBitmap(GetPng(icon16_png,icon16_png_size));
+        app_icons.AddIcon( icn );
+    }
+    {
+        wxIcon icn;
+        icn.CopyFromBitmap(GetPng(icon32_png,icon32_png_size));
+        app_icons.AddIcon( icn );
+    }
+    {
+        wxIcon icn;
+        icn.CopyFromBitmap(GetPng(icon64_png,icon64_png_size));
+        app_icons.AddIcon( icn );
+    }
+    {
+        wxIcon icn;
+        icn.CopyFromBitmap(GetPng(icon128_png,icon128_png_size));
+        app_icons.AddIcon( icn );
+    }
+    {
+        wxIcon icn;
+        icn.CopyFromBitmap(GetPng(icon256_png,icon256_png_size));
+        app_icons.AddIcon( icn );
+    }
+    SetIcons( app_icons );
+    
     int myID;
     
     wxRibbonPage* RPageFile1 = new wxRibbonPage(MainRibbon, wxID_ANY, _("File"), wxNullBitmap, 0);
@@ -1959,43 +2055,81 @@ void MainFrame::LoadIcons()
     
     
     
-    wxRibbonPage* RPageView = new wxRibbonPage(MainRibbon, wxID_ANY, _("View"), wxNullBitmap, 0);
-    wxRibbonPanel* RPanelCart = new wxRibbonPanel(RPageView, wxID_ANY, _("Cartesian"), wxNullBitmap, wxDefaultPosition, wxDLG_UNIT(RPageView, wxSize(-1,-1)), wxRIBBON_PANEL_DEFAULT_STYLE);
+    //wxRibbonPage* RPageView = new wxRibbonPage(MainRibbon, wxID_ANY, _("View"), wxNullBitmap, 0);
+    wxRibbonPanel* RPanelCart = new wxRibbonPanel(RPageTools, wxID_ANY, _("Cartesian"), wxNullBitmap, wxDefaultPosition, wxDLG_UNIT(RPageTools, wxSize(-1,-1)), wxRIBBON_PANEL_DEFAULT_STYLE);
     wxRibbonButtonBar* RButtonBar3 = new wxRibbonButtonBar(RPanelCart, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(RPanelCart, wxSize(-1,-1)), 0);
     
     myID = wxID_FILE1;
     RButtonBar3->AddButton(myID, _(""), GetPng(x_png,x_png_size), _(""), wxRIBBON_BUTTON_NORMAL);
-    RButtonBar3->Connect(myID, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrame::BtnScale_OnClick), NULL, this);
+    RButtonBar3->Connect(myID, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrame::BtnX_OnClick), NULL, this);
     
     myID = wxID_FILE2;
     RButtonBar3->AddButton(myID, _(""), GetPng(y_png,y_png_size), _(""), wxRIBBON_BUTTON_NORMAL);
-    RButtonBar3->Connect(myID, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrame::BtnScale_OnClick), NULL, this);
+    RButtonBar3->Connect(myID, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrame::BtnY_OnClick), NULL, this);
     
     myID = wxID_FILE3;
     RButtonBar3->AddButton(myID, _(""), GetPng(z_png,z_png_size), _(""), wxRIBBON_BUTTON_NORMAL);
-    RButtonBar3->Connect(myID, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrame::BtnScale_OnClick), NULL, this);
+    RButtonBar3->Connect(myID, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrame::BtnZ_OnClick), NULL, this);
     
     RButtonBar3->Realize();
     
-    wxRibbonPanel* RPanelUnitcell = new wxRibbonPanel(RPageView, wxID_ANY, _("Unit-cell"), wxNullBitmap, wxDefaultPosition, wxDLG_UNIT(RPageView, wxSize(-1,-1)), wxRIBBON_PANEL_DEFAULT_STYLE);
+    /*wxRibbonPanel* RPanelUnitcell = new wxRibbonPanel(RPageTools, wxID_ANY, _("Unit-cell"), wxNullBitmap, wxDefaultPosition, wxDLG_UNIT(RPageTools, wxSize(-1,-1)), wxRIBBON_PANEL_DEFAULT_STYLE);
     wxRibbonButtonBar* RButtonBar4 = new wxRibbonButtonBar(RPanelUnitcell, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(RPanelUnitcell, wxSize(-1,-1)), 0);
     
     myID = wxID_FILE1;
     RButtonBar4->AddButton(myID, _(""), GetPng(a_png,a_png_size), _(""), wxRIBBON_BUTTON_NORMAL);
-    RButtonBar4->Connect(myID, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrame::BtnScale_OnClick), NULL, this);
+    RButtonBar4->Connect(myID, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrame::BtnA_OnClick), NULL, this);
     
     myID = wxID_FILE2;
     RButtonBar4->AddButton(myID, _(""), GetPng(b_png,b_png_size), _(""), wxRIBBON_BUTTON_NORMAL);
-    RButtonBar4->Connect(myID, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrame::BtnScale_OnClick), NULL, this);
+    RButtonBar4->Connect(myID, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrame::BtnB_OnClick), NULL, this);
     
     myID = wxID_FILE3;
     RButtonBar4->AddButton(myID, _(""), GetPng(c_png,c_png_size), _(""), wxRIBBON_BUTTON_NORMAL);
-    RButtonBar4->Connect(myID, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrame::BtnScale_OnClick), NULL, this);
+    RButtonBar4->Connect(myID, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrame::BtnC_OnClick), NULL, this);
     
-    RButtonBar4->Realize();
+    RButtonBar4->Realize();*/
+    
+    wxRibbonPanel* RPanelRotation = new wxRibbonPanel(RPageTools, wxID_ANY, _("Rotation"), wxNullBitmap, wxDefaultPosition, wxDLG_UNIT(RPageTools, wxSize(-1,-1)), wxRIBBON_PANEL_DEFAULT_STYLE);
+    wxRibbonButtonBar* RButtonBar5 = new wxRibbonButtonBar(RPanelRotation, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(RPanelRotation, wxSize(-1,-1)), 0);
+    
+    myID = wxID_FILE1;
+    RButtonBar5->AddButton(myID, _(""), GetPng(up_png,up_png_size), _(""), wxRIBBON_BUTTON_NORMAL);
+    RButtonBar5->Connect(myID, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrame::BtnUp_OnClick), NULL, this);
+    
+    myID = wxID_FILE2;
+    RButtonBar5->AddButton(myID, _(""), GetPng(down_png,down_png_size), _(""), wxRIBBON_BUTTON_NORMAL);
+    RButtonBar5->Connect(myID, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrame::BtnDown_OnClick), NULL, this);
+    
+    myID = wxID_FILE3;
+    RButtonBar5->AddButton(myID, _(""), GetPng(left_png,left_png_size), _(""), wxRIBBON_BUTTON_NORMAL);
+    RButtonBar5->Connect(myID, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrame::BtnLeft_OnClick), NULL, this);
+    
+    myID = wxID_FILE4;
+    RButtonBar5->AddButton(myID, _(""), GetPng(right_png,right_png_size), _(""), wxRIBBON_BUTTON_NORMAL);
+    RButtonBar5->Connect(myID, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrame::BtnRight_OnClick), NULL, this);
+    
+    RButtonBar5->Realize();
+    
+    wxRibbonPage* RPageHelp = new wxRibbonPage(MainRibbon, wxID_ANY, _("Help"), wxNullBitmap, 0);
+    wxRibbonPanel* RPanelHelp = new wxRibbonPanel(RPageHelp, wxID_ANY, _("Help"), wxNullBitmap, wxDefaultPosition, wxDLG_UNIT(RPageHelp, wxSize(-1,-1)), wxRIBBON_PANEL_DEFAULT_STYLE);
+    wxRibbonButtonBar* RButtonBar6 = new wxRibbonButtonBar(RPanelHelp, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(RPanelHelp, wxSize(-1,-1)), 0);
+    
+    myID = wxID_ABOUT;
+    RButtonBar6->AddButton(myID, _("About"), GetPng(icon32_png,icon32_png_size), _(""), wxRIBBON_BUTTON_NORMAL);
+    RButtonBar6->Connect(myID, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrame::BtnAbout_OnClick), NULL, this);
+    
+    myID = wxID_HELP;
+    RButtonBar6->AddButton(myID, _("Tutorials"), GetPng(tutorials_png,tutorials_png_size), _(""), wxRIBBON_BUTTON_NORMAL);
+    RButtonBar6->Connect(myID, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrame::BtnTutorials_OnClick), NULL, this);
+    
+    myID = wxID_HELP_SEARCH;
+    RButtonBar6->AddButton(myID, _("Update"), GetPng(update_png,update_png_size), _(""), wxRIBBON_BUTTON_NORMAL);
+    RButtonBar6->Connect(myID, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrame::BtnWebsite_OnClick), NULL, this);
+    
+    RButtonBar6->Realize();
     
     MainRibbon->SetActivePage(RPageFile1);
-    
     MainRibbon->Realize();
 }
 

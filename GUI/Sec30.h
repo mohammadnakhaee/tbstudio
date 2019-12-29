@@ -77,6 +77,8 @@ public:
     Aint2D ArraysOf2DInt;
     Aint3D ArraysOf3DInt;
     Adouble0D ArraysOf0DDouble;
+
+    /*    
     Adouble1D ArraysOf1DDouble;
     Adouble2D ArraysOf2DDouble;
     Adouble3D ArraysOf3DDouble;
@@ -84,7 +86,8 @@ public:
     Astring1D ArraysOf1DString;
     Astring2D ArraysOf2DString;
     Astring3D ArraysOf3DString;
-    
+    */
+
     void AddGroupBox(wxWindow *parent, wxString Caption, wxColour BGColor);
     void AddButton(wxWindow *parent, int ButtonCnt, wxString* Labels, wxObjectEventFunction* Funcs);
     void AddButton(wxWindow *parent, int ButtonCnt, wxString* ButtonNames, wxString* Labels, wxObjectEventFunction* Funcs);

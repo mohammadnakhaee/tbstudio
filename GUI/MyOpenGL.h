@@ -93,6 +93,8 @@ public:
     void DiscardIntArrays();
     void LoadToCanvas();
     void Reload();
+    void SetDirection(double Xl, double Xm, double Xn, double Yl, double Ym, double Yn, double Zl, double Zm, double Zn);
+    void RotateCam(double l, double m, double theta);
     
 private:
     float TheLastXAngle = 0;
