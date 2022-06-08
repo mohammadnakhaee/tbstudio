@@ -2,7 +2,6 @@ set CodeLiteDir=C:\Users\mohammad\Documents\Codelite\pecsjunc\wxconfig
 set WXWIN=C:\wxWidgets-3.1.1
 set GCC_DIR=C:\TDM-GCC-64
 set GFORTRAN_DIR=C:\TDM-GCC-64\gcc-5.1.0-tdm64-1-fortran
-set MathGL2_DIR=C:\Users\mohammad\Documents\cppworkspace\3rdparty\Installed\MathGL2-TDM-GCC-64
 set WXCFG=gcc_dll\mswu
 set Opengl_DIR=%GCC_DIR%\x86_64-w64-mingw32\lib
 set MathGL_DIR=..\MathGL64LGPL
