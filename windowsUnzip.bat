@@ -1,0 +1,1 @@
+.\7zip\32\7z.exe x .\WindowsDependencies.zip.001 -tzip.split
