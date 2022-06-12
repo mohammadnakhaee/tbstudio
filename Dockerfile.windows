@@ -1,0 +1,10 @@
+#More info here
+#https://github.com/dockcross/dockcross
+
+FROM mcr.microsoft.com/windows/nanoserver:ltsc2022
+
+
+#ADD ./ /root/code
+#WORKDIR /root/code
+#CMD ["/usr/bin/mongod", "--config", "/etc/mongodb.conf"]
+

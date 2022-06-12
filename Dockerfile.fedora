@@ -1,0 +1,10 @@
+#More info here
+#https://github.com/dockcross/dockcross
+
+FROM fedora:latest
+
+
+#ADD ./ /root/code
+#WORKDIR /root/code
+#CMD ["/usr/bin/mongod", "--config", "/etc/mongodb.conf"]
+
