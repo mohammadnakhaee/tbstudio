@@ -69,5 +69,9 @@ sudo make install
  Read the wxWindows Licence on licencing conditions.
  
  ------------------------------------------------------
+ 
+ cd $tbstudioDIR
+ source ./ubuntu_env.sh
+ make -e
 
 
