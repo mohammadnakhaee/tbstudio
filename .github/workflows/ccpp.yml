@@ -9,11 +9,26 @@ jobs:
     
     steps:
     - uses: actions/checkout@v1
-    - name: configure
-      run: ./configure
-    - name: make
-      run: make
-    - name: make check
-      run: make check
-    - name: make distcheck
-      run: make distcheck
+    - name: set tbstudio top DIR
+      run: echo "tbstudioDIR=$GITHUB_WORKSPACE" >> $GITHUB_ENV
+    - name: update apt
+      run: sudo apt-get -y update
+    - name: install packages
+      run: sudo apt-get install libgtk-3-dev build-essential checkinstall gfortran
+    - name: install OpenGL libraries
+      run: sudo apt-get install mesa-utils
+    - name: install freeGlut
+      run: sudo apt-get install freeglut3-dev
+    - name: install mathgl
+      run: sudo apt-get install mathgl libmgl-dev
+    - name: install lapack
+      run: sudo apt-get install liblapack3 liblapack-dev libopenblas-base libopenblas-dev liblapack-dev liblapacke-dev
+    - name: set WX DIR
+      run: echo "WXDIRInclude=/usr/local/include/wx-3.0" >> $GITHUB_ENV
+    - name: set RapidXML DIR
+      run: echo "RapidXML_DIR=$tbstudioDIR/rapidxml-1.13" >> $GITHUB_ENV
+    - name: set PATH
+      run: echo "PATH=$WXDIRInclude:$PATH" >> $GITHUB_ENV
+    - name: compile tbstudio
+      working-directory: $tbstudioDIR
+      run: make -e
