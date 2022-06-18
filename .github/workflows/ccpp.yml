@@ -9,8 +9,6 @@ jobs:
     
     steps:
     - uses: actions/checkout@v1
-    - name: set tbstudio top DIR
-      run: echo "tbstudioDIR=$GITHUB_WORKSPACE" >> $GITHUB_ENV
     - name: update apt
       run: sudo apt-get -y update
     - name: install packages
@@ -26,23 +24,20 @@ jobs:
     - name: extract WX
       run: tar -xvjf wxWidgets-3.0.5.tar.bz2
     - name: create WXBuildDIR
-      working-directory: $tbstudioDIR/wxWidgets-3.0.5
+      working-directory: wxWidgets-3.0.5
       run: mkdir gtk-build
     - name: configure WX
-      working-directory: $tbstudioDIR/wxWidgets-3.0.5/gtk-build
+      working-directory: wxWidgets-3.0.5/gtk-build
       run: ../configure --enable-unicode --with-opengl --with-libpng
     - name: compile WX
-      working-directory: $tbstudioDIR/wxWidgets-3.0.5/gtk-build
+      working-directory: wxWidgets-3.0.5/gtk-build
       run: make
     - name: install WX
-      working-directory: $tbstudioDIR/wxWidgets-3.0.5/gtk-build
+      working-directory: wxWidgets-3.0.5/gtk-build
       run: sudo make install
-    - name: set WX DIR
-      run: echo "WXDIRInclude=/usr/local/include/wx-3.0" >> $GITHUB_ENV
     - name: set RapidXML DIR
-      run: echo "RapidXML_DIR=$tbstudioDIR/rapidxml-1.13" >> $GITHUB_ENV
+      run: echo "RapidXML_DIR=${GITHUB_WORKSPACE}/rapidxml-1.13" >> $GITHUB_ENV
     - name: set PATH
-      run: echo "PATH=$WXDIRInclude:$PATH" >> $GITHUB_ENV
+      run: echo "PATH=/usr/local/include/wx-3.0:$PATH" >> $GITHUB_ENV
     - name: compile tbstudio
-      working-directory: $tbstudioDIR
       run: make -e
