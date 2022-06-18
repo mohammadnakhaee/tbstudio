@@ -39,5 +39,7 @@ jobs:
       run: echo "RapidXML_DIR=${GITHUB_WORKSPACE}/rapidxml-1.13" >> $GITHUB_ENV
     - name: set PATH
       run: echo "PATH=/usr/local/include/wx-3.0:$PATH" >> $GITHUB_ENV
+    - name: copy ubuntu Makefile
+      run: cp ./GUI/UbuntuGUI.mk ./GUI/GUI.mk
     - name: compile tbstudio
-      run: make
+      run: make -e
