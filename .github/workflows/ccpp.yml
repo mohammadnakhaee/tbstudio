@@ -40,4 +40,4 @@ jobs:
     - name: set PATH
       run: echo "PATH=/usr/local/include/wx-3.0:$PATH" >> $GITHUB_ENV
     - name: compile tbstudio
-      run: make -e
+      run: make
