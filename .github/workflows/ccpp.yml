@@ -35,6 +35,8 @@ jobs:
     - name: install WX
       working-directory: wxWidgets-3.0.5/gtk-build
       run: sudo make install
+    - name: set WX Include DIR
+      run: echo "WXDIRInclude=/usr/local/include/wx-3.0" >> $GITHUB_ENV
     - name: set RapidXML DIR
       run: echo "RapidXML_DIR=${GITHUB_WORKSPACE}/rapidxml-1.13" >> $GITHUB_ENV
     - name: set PATH
