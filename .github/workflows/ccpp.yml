@@ -45,6 +45,25 @@ jobs:
       run: cp ./GUI/UbuntuGUI.mk ./GUI/GUI.mk
     - name: compile tbstudio
       run: make -e
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: executable
+        path: ./GUI/Release/GUI
+
+
+  release:
+
+    runs-on: ubuntu-latest
+    needs: build
+        
+    steps:
+    - uses: actions/checkout@v1
+    - name: Download build artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: executable
+        path: ./Packaging/debian/tbstudio/usr/bin
     - name: create debian package
       run: |
         working-directory: Packaging/debian/tbstudio/DEBIAN
