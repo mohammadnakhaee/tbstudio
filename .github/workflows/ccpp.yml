@@ -64,10 +64,12 @@ jobs:
       with:
         name: executable
         path: ./Packaging/debian/tbstudio/usr/bin
+    - name: set debian package version
+      working-directory: Packaging/debian/tbstudio/DEBIAN
+      run: sed -i 's/%version/${{ github.ref }}/g' control
     - name: create debian package
+      working-directory: Packaging/debian
       run: |
-        working-directory: Packaging/debian/tbstudio/DEBIAN
-        sed -i 's/%version/${{ github.ref }}/g' control
         sudo dpkg-deb --build tbstudio
         sudo chmod 777 tbstudio.deb
     - name: Create Release
