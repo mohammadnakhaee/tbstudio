@@ -97,6 +97,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./Packaging/debian/tbstudio/DEBIAN/tbstudio.deb
+        asset_path: ./Packaging/debian/tbstudio.deb
         asset_name: tbstudio-${{ steps.version.outputs.tag }}.${{ github.run_number }}.deb
         asset_content_type: application/vnd.debian.binary-package
