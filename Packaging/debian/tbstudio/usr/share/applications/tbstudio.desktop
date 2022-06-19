@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=TBStudio
+Version=1.0
+Exec=tbstudio
+Comment=Tight-Binding Hamiltonian
+Icon=tbstudio
+Type=Application
+Terminal=false
+StartupNotify=false
+Encoding=UTF-8
+Categories=Application;

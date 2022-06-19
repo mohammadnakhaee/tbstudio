@@ -1,0 +1,9 @@
+Package: tbstudio
+Version: %version
+Maintainer: Mohammad-Nakhaee <developer.support@tight-binding.com>
+Section: x11
+Homepage: https://tight-binding.com
+Architecture: amd64
+Priority: required
+Depends: freeglut3, mathgl, liblapack3, libopenblas-base, liblapacke, libgtk-3-0, libmgl7.5.0, libc6, libwxgtk3.0-gtk3-0v5
+Description: Tight Binding Studio is a quantum technical software application for constructing Tight Binding (TB) model for nano-scale materials. Starting from the simplified linear combination of atomic orbitals method in combination with first-principles calculations (such as OpenMX or Vasp packages), one can construct a TB model in the two-center approximation. Using Slater and Koster approach we calculate the TB Hamiltonian of the system and use a nonlinear fitting algorithm to find the best entries for both Hamiltonian and overlap matrices to reproduce the first-principles data. One can obtain expressions for the Hamiltonian and overlap matrix elements between different orbitals (s, p and d orbitals with or without spin-orbit coupling) for the different atoms and present the SK coefficients in an orthogonal or nonorthogonal basis set. Furthermore, by using TBStudio you can generate your own code in your preferred programming language ie. C++, C, Fortran, Mathematica, Matlab, and Python.
