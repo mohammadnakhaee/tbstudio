@@ -47,12 +47,14 @@ jobs:
     - name: copy ubuntu Makefile
       run: cp ./GUI/UbuntuGUI.mk ./GUI/GUI.mk
     - name: compile tbstudio
-      run: make -e
+      run: |
+        make -e
+        mv ./GUI/Release/GUI ./GUI/Release/tbstudio
     - name: Upload build artifacts
       uses: actions/upload-artifact@v3
       with:
         name: executable
-        path: ./GUI/Release/GUI
+        path: ./GUI/Release/tbstudio
 
 
   release:
