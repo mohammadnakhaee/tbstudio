@@ -65,8 +65,11 @@ jobs:
         name: executable
         path: ./Packaging/debian/tbstudio/usr/bin
     - name: set debian package version
-      working-directory: Packaging/debian/tbstudio/DEBIAN
-      run: sed -i 's/%version/${{ github.ref }}/g' control
+      uses: jacobtomlinson/gha-find-replace@v2
+      with:
+        find: "%version"
+        replace: ${{ github.ref }}
+        include: "Packaging/debian/tbstudio/DEBIAN/control"
     - name: create debian package
       working-directory: Packaging/debian
       run: |
