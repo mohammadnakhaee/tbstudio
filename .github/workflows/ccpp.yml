@@ -72,6 +72,9 @@ jobs:
       with:
         name: executable
         path: ./Packaging/debian/tbstudio/usr/bin
+    - name: Change permission
+      working-directory: Packaging/debian/tbstudio/usr/bin
+      run: sudo chmod 777 tbstudio
     - name: set debian package version
       uses: jacobtomlinson/gha-find-replace@v2
       with:
