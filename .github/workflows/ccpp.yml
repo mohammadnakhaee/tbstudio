@@ -59,6 +59,11 @@ jobs:
         
     steps:
     - uses: actions/checkout@v1
+    - name: Get Version
+      id: version
+      uses: "WyriHaximus/github-action-get-previous-tag@v1"
+      with:
+        fallback: 1.0
     - name: Download build artifacts
       uses: actions/download-artifact@v3
       with:
@@ -68,7 +73,7 @@ jobs:
       uses: jacobtomlinson/gha-find-replace@v2
       with:
         find: "%version"
-        replace: ${{ github.ref }}
+        replace: ${{ steps.version.outputs.tag }}.${{ github.run_number }}
         include: "Packaging/debian/tbstudio/DEBIAN/control"
     - name: create debian package
       working-directory: Packaging/debian
@@ -82,7 +87,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
+        release_name: Release ${{ steps.version.outputs.tag }}.${{ github.run_number }}
         draft: false
         prerelease: true
     - name: Upload Release Asset
@@ -93,5 +98,5 @@ jobs:
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: ./Packaging/debian/tbstudio/DEBIAN/tbstudio.deb
-        asset_name: tbstudio-${{ github.ref }}.deb
+        asset_name: tbstudio-${{ steps.version.outputs.tag }}.${{ github.run_number }}.deb
         asset_content_type: application/vnd.debian.binary-package
