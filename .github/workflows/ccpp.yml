@@ -45,3 +45,29 @@ jobs:
       run: cp ./GUI/UbuntuGUI.mk ./GUI/GUI.mk
     - name: compile tbstudio
       run: make -e
+    - name: create debian package
+      run: |
+        working-directory: Packaging/debian/tbstudio/DEBIAN
+        sed -i 's/%version/${{ github.ref }}/g' control
+        sudo dpkg-deb --build tbstudio
+        sudo chmod 777 tbstudio.deb
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        draft: false
+        prerelease: true
+    - name: Upload Release Asset
+      id: upload-release-asset 
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./Packaging/debian/tbstudio/DEBIAN/tbstudio.deb
+        asset_name: tbstudio-${{ github.ref }}.deb
+        asset_content_type: application/vnd.debian.binary-package
