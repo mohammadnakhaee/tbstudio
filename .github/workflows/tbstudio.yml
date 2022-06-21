@@ -6,7 +6,7 @@ on:
       - 'v*.*.*'
 
 jobs:
-  build-ubuntu-20.04:
+  build-ubuntu-2004:
 
     runs-on: ubuntu-20.04
     
@@ -57,10 +57,10 @@ jobs:
         path: ./GUI/Release/tbstudio
 
 
-  release-ubuntu-20.04:
+  release-ubuntu-2004:
 
     runs-on: ubuntu-20.04
-    needs: build
+    needs: build-ubuntu-2004
         
     steps:
     - uses: actions/checkout@v1
@@ -167,7 +167,7 @@ jobs:
   release-fedora-30:
 
     runs-on: fedora-30
-    needs: build
+    needs: build-fedora-30
         
     steps:
     - uses: actions/checkout@v1
@@ -213,3 +213,4 @@ jobs:
         asset_path: ./Packaging/debian/tbstudio.deb
         asset_name: tbstudio-fedora-30-x64-${{ steps.version.outputs.version-without-v }}.deb
         asset_content_type: application/vnd.debian.binary-package
+
