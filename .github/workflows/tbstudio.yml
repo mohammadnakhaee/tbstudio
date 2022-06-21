@@ -13,6 +13,8 @@ jobs:
     
     steps:
     - uses: actions/checkout@v1
+    - name: unzip dependencies
+      run: .\7zip\32\7z.exe x .\WindowsDependencies.zip.001 -tzip.split
     - name: set CodeLiteDir DIR
       run: echo "CodeLiteDir=${GITHUB_WORKSPACE}\wxconfig" >> $env:GITHUB_ENV
     - name: set RapidXML DIR
