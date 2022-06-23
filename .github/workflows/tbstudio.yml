@@ -13,8 +13,64 @@ jobs:
     
     steps:
     - uses: actions/checkout@v1
+    - uses: suisei-cn/actions-download-file@v1
+      id: freeglut64id
+      name: Download the file
+      with:
+        url: "https://dl.dropboxusercontent.com/s/drapc4swnga1285/freeglut64.7z?dl=0"
+        target: windowsDeps/
+    - uses: suisei-cn/actions-download-file@v1
+      id: fortranid
+      name: Download the file
+      with:
+        url: "https://dl.dropboxusercontent.com/s/lrj3g2w564d0mok/gcc-5.1.0-tdm64-1-fortran.7z?dl=0"
+        target: windowsDeps/
+    - uses: suisei-cn/actions-download-file@v1
+      id: gemmiid
+      name: Download the file
+      with:
+        url: "https://dl.dropboxusercontent.com/s/zym925kz2yvrlr5/gemmi-master.7z?dl=0"
+        target: windowsDeps/
+    - uses: suisei-cn/actions-download-file@v1
+      id: lapackid
+      name: Download the file
+      with:
+        url: "https://dl.dropboxusercontent.com/s/u7vnxn77a87i9le/LAPACKE-X64.7z?dl=0"
+        target: windowsDeps/
+    - uses: suisei-cn/actions-download-file@v1
+      id: mathglid
+      name: Download the file
+      with:
+        url: "https://dl.dropboxusercontent.com/s/7u841sclxxjztmf/MathGL32LGPL.7z?dl=0"
+        target: windowsDeps/
+    - uses: suisei-cn/actions-download-file@v1
+      id: tdmgccid
+      name: Download the file
+      with:
+        url: "https://dl.dropboxusercontent.com/s/siy11m4rxo1oj2t/TDM-GCC-64.7z?dl=0"
+        target: windowsDeps/
+    - uses: suisei-cn/actions-download-file@v1
+      id: wxwidgetid
+      name: Download the file
+      with:
+        url: "https://dl.dropboxusercontent.com/s/uoh7y7b296mf1lj/wxWidgets-3.1.1.7z?dl=0"
+        target: windowsDeps/
+    - name: dir
+      working-directory: windowsDeps
+      run: dir
     - name: unzip dependencies
-      run: .\7zip\32\7z.exe x .\WindowsDependencies.zip.001 -tzip.split
+      working-directory: windowsDeps
+      run: |
+        .\7zip\32\7z.exe x .\freeglut64.7z
+        .\7zip\32\7z.exe x .\gcc-5.1.0-tdm64-1-fortran.7z
+        .\7zip\32\7z.exe x .\gemmi-master.7z
+        .\7zip\32\7z.exe x .\LAPACKE-X64.7z
+        .\7zip\32\7z.exe x .\MathGL32LGPL.7z
+        .\7zip\32\7z.exe x .\TDM-GCC-64.7z
+        .\7zip\32\7z.exe x .\wxWidgets-3.1.1.7z
+    - name: dir
+      working-directory: windowsDeps
+      run: dir
     - name: set CodeLiteDir DIR
       run: echo "CodeLiteDir=${GITHUB_WORKSPACE}\wxconfig" >> $env:GITHUB_ENV
     - name: set RapidXML DIR
