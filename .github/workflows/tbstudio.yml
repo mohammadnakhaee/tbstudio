@@ -61,13 +61,13 @@ jobs:
     - name: unzip dependencies
       working-directory: windowsDeps
       run: |
-        .\7zip\32\7z.exe x .\freeglut64.7z
-        .\7zip\32\7z.exe x .\gcc-5.1.0-tdm64-1-fortran.7z
-        .\7zip\32\7z.exe x .\gemmi-master.7z
-        .\7zip\32\7z.exe x .\LAPACKE-X64.7z
-        .\7zip\32\7z.exe x .\MathGL32LGPL.7z
-        .\7zip\32\7z.exe x .\TDM-GCC-64.7z
-        .\7zip\32\7z.exe x .\wxWidgets-3.1.1.7z
+        ..\7zip\32\7z.exe x .\freeglut64.7z
+        ..\7zip\32\7z.exe x .\gcc-5.1.0-tdm64-1-fortran.7z
+        ..\7zip\32\7z.exe x .\gemmi-master.7z
+        ..\7zip\32\7z.exe x .\LAPACKE-X64.7z
+        ..\7zip\32\7z.exe x .\MathGL32LGPL.7z
+        ..\7zip\32\7z.exe x .\TDM-GCC-64.7z
+        ..\7zip\32\7z.exe x .\wxWidgets-3.1.1.7z
     - name: dir
       working-directory: windowsDeps
       run: dir
