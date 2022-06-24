@@ -83,39 +83,59 @@ jobs:
       working-directory: windowsDeps
       run: dir
     - name: set wxconfig DIR
-      run: echo "wxconfigDir=${GITHUB_WORKSPACE}\windowsDeps\wxconfig" >> $env:GITHUB_ENV
+      run: |
+        chcp 65001
+        echo "wxconfigDir=${GITHUB_WORKSPACE}\windowsDeps\wxconfig" >> $env:GITHUB_ENV
     - name: set RapidXML DIR
-      run: echo "RapidXML_DIR=${GITHUB_WORKSPACE}\windowsDeps\rapidxml-1.13" >> $env:GITHUB_ENV
+      run: |
+        chcp 65001
+        echo "RapidXML_DIR=${GITHUB_WORKSPACE}\windowsDeps\rapidxml-1.13" >> $env:GITHUB_ENV
     - name: set WXWIN
-      run: echo "WXWIN=${GITHUB_WORKSPACE}\windowsDeps\wxWidgets-3.1.1" >> $env:GITHUB_ENV
+      run: |
+        chcp 65001
+        echo "WXWIN=${GITHUB_WORKSPACE}\windowsDeps\wxWidgets-3.1.1" >> $env:GITHUB_ENV
     - name: set TDM-GCC-64
-      run: echo "GCC_DIR=${GITHUB_WORKSPACE}\windowsDeps\TDM-GCC-64" >> $env:GITHUB_ENV
+      run: |
+        chcp 65001
+        echo "GCC_DIR=${GITHUB_WORKSPACE}\windowsDeps\TDM-GCC-64" >> $env:GITHUB_ENV
     - name: set GFORTRAN_DIR
-      run: echo "GFORTRAN_DIR=${GITHUB_WORKSPACE}\windowsDeps\TDM-GCC-64\gcc-5.1.0-tdm64-1-fortran" >> $env:GITHUB_ENV
+      run: |
+        chcp 65001
+        echo "GFORTRAN_DIR=${GITHUB_WORKSPACE}\windowsDeps\TDM-GCC-64\gcc-5.1.0-tdm64-1-fortran" >> $env:GITHUB_ENV
     - name: set WXCFG
-      run: echo "WXCFG=gcc_dll\mswu" >> $env:GITHUB_ENV
+      run: |
+        chcp 65001
+        echo "WXCFG=gcc_dll\mswu" >> $env:GITHUB_ENV
     - name: set Opengl_DIR
-      run: echo "Opengl_DIR=${GITHUB_WORKSPACE}\windowsDeps\TDM-GCC-64\x86_64-w64-mingw32\lib" >> $env:GITHUB_ENV
+      run: |
+        chcp 65001
+        echo "Opengl_DIR=${GITHUB_WORKSPACE}\windowsDeps\TDM-GCC-64\x86_64-w64-mingw32\lib" >> $env:GITHUB_ENV
     - name: set MathGL_DIR
-      run: echo "MathGL_DIR=${GITHUB_WORKSPACE}\windowsDeps\MathGL64LGPL" >> $env:GITHUB_ENV
+      run: |
+        chcp 65001
+        echo "MathGL_DIR=${GITHUB_WORKSPACE}\windowsDeps\MathGL64LGPL" >> $env:GITHUB_ENV
     - name: set LAPACKE_DIR
-      run: echo "LAPACKE_DIR=${GITHUB_WORKSPACE}\windowsDeps\LAPACKE-X64" >> $env:GITHUB_ENV
+      run: |
+        chcp 65001
+        echo "LAPACKE_DIR=${GITHUB_WORKSPACE}\windowsDeps\LAPACKE-X64" >> $env:GITHUB_ENV
     - name: set Glut_DIR
-      run: echo "Glut_DIR=${GITHUB_WORKSPACE}\windowsDeps\freeglut64" >> $env:GITHUB_ENV
+      run: |
+        chcp 65001
+        echo "Glut_DIR=${GITHUB_WORKSPACE}\windowsDeps\freeglut64" >> $env:GITHUB_ENV
     - name: set Gemmi_DIR
-      run: echo "Gemmi_DIR=${GITHUB_WORKSPACE}\windowsDeps\gemmi-master" >> $env:GITHUB_ENV
+      run: |
+        chcp 65001
+        echo "Gemmi_DIR=${GITHUB_WORKSPACE}\windowsDeps\gemmi-master" >> $env:GITHUB_ENV
     - name: set path1
-      run: echo "PATH=%wxconfigDir%;%PATH%" >> $env:GITHUB_ENV
-    - name: set path2
-      run: echo "PATH=%WXWIN%\lib\gcc_dll;%GCC_DIR%\bin;%PATH%" >> $env:GITHUB_ENV
-    - name: set path3
-      run: echo "PATH=%MathGL_DIR%\bin;%PATH%" >> $env:GITHUB_ENV
-    - name: set path4
-      run: echo "PATH=%Glut_DIR%\bin;%PATH%" >> $env:GITHUB_ENV
-    - name: set path5
-      run: echo "PATH=%LAPACKE_DIR%;%PATH%" >> $env:GITHUB_ENV
-    - name: set path6
-      run: echo "PATH=%GFORTRAN_DIR%\bin;%PATH%" >> $env:GITHUB_ENV
+      run: |
+        chcp 65001
+        echo %wxconfigDir% | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        echo %WXWIN%\lib\gcc_dll | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        echo %GCC_DIR%\bin | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        echo %MathGL_DIR%\bin | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        echo %Glut_DIR%\bin | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        echo %LAPACKE_DIR% | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        echo %GFORTRAN_DIR%\bin | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
     - name: copy Windows Makefile
       run: cp .\GUI\WindowsGUI.mk .\GUI\GUI.mk
     - name: echo path
