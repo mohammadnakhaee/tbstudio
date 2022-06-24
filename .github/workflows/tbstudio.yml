@@ -118,6 +118,8 @@ jobs:
       run: echo "PATH=%GFORTRAN_DIR%\bin;%PATH%" >> $env:GITHUB_ENV
     - name: copy Windows Makefile
       run: cp .\GUI\WindowsGUI.mk .\GUI\GUI.mk
+    - name: echo path
+      run: echo %PATH%
     - name: compile tbstudio
       run: |
         mingw32-make -e
