@@ -14,6 +14,12 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - uses: suisei-cn/actions-download-file@v1
+      id: wxconfigid
+      name: Download the file
+      with:
+        url: "https://dl.dropboxusercontent.com/s/jrxjmnuoav3t0vj/wxconfig.7z?dl=0"
+        target: windowsDeps/
+    - uses: suisei-cn/actions-download-file@v1
       id: freeglut64id
       name: Download the file
       with:
@@ -61,6 +67,7 @@ jobs:
     - name: unzip dependencies
       working-directory: windowsDeps
       run: |
+        ..\7zip\32\7z.exe x .\wxconfig.7z
         ..\7zip\32\7z.exe x .\freeglut64.7z
         ..\7zip\32\7z.exe x .\gemmi-master.7z
         ..\7zip\32\7z.exe x .\LAPACKE-X64.7z
@@ -75,8 +82,8 @@ jobs:
     - name: dir
       working-directory: windowsDeps
       run: dir
-    - name: set CodeLiteDir DIR
-      run: echo "CodeLiteDir=${GITHUB_WORKSPACE}\wxconfig" >> $env:GITHUB_ENV
+    - name: set wxconfig DIR
+      run: echo "wxconfigDir=${GITHUB_WORKSPACE}\windowsDeps\wxconfig" >> $env:GITHUB_ENV
     - name: set RapidXML DIR
       run: echo "RapidXML_DIR=${GITHUB_WORKSPACE}\windowsDeps\rapidxml-1.13" >> $env:GITHUB_ENV
     - name: set WXWIN
@@ -98,7 +105,7 @@ jobs:
     - name: set Gemmi_DIR
       run: echo "Gemmi_DIR=${GITHUB_WORKSPACE}\windowsDeps\gemmi-master" >> $env:GITHUB_ENV
     - name: set path1
-      run: echo "PATH=%CodeLiteDir%;%PATH%" >> $env:GITHUB_ENV
+      run: echo "PATH=%wxconfigDir%;%PATH%" >> $env:GITHUB_ENV
     - name: set path2
       run: echo "PATH=%WXWIN%\lib\gcc_dll;%GCC_DIR%\bin;%PATH%" >> $env:GITHUB_ENV
     - name: set path3
@@ -114,8 +121,11 @@ jobs:
     - name: compile tbstudio
       run: |
         mingw32-make -e
+    - name: dir
+      working-directory: GUI\Release
+      run: dir
     - name: Upload build artifacts
       uses: actions/upload-artifact@v3
       with:
         name: executable
-        path: .\GUI\Release\tbstudio
+        path: .\GUI\Release\tbstudio.exe
