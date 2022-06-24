@@ -62,37 +62,41 @@ jobs:
       working-directory: windowsDeps
       run: |
         ..\7zip\32\7z.exe x .\freeglut64.7z
-        ..\7zip\32\7z.exe x .\gcc-5.1.0-tdm64-1-fortran.7z
         ..\7zip\32\7z.exe x .\gemmi-master.7z
         ..\7zip\32\7z.exe x .\LAPACKE-X64.7z
         ..\7zip\32\7z.exe x .\MathGL32LGPL.7z
         ..\7zip\32\7z.exe x .\TDM-GCC-64.7z
         ..\7zip\32\7z.exe x .\wxWidgets-3.1.1.7z
+    - name: unzip dependencies
+      working-directory: windowsDeps\TDM-GCC-64
+      run: |
+        move ..\gcc-5.1.0-tdm64-1-fortran.7z .\gcc-5.1.0-tdm64-1-fortran.7z
+        ..\..\7zip\32\7z.exe x .\gcc-5.1.0-tdm64-1-fortran.7z
     - name: dir
       working-directory: windowsDeps
       run: dir
     - name: set CodeLiteDir DIR
       run: echo "CodeLiteDir=${GITHUB_WORKSPACE}\wxconfig" >> $env:GITHUB_ENV
     - name: set RapidXML DIR
-      run: echo "RapidXML_DIR=${GITHUB_WORKSPACE}\rapidxml-1.13" >> $env:GITHUB_ENV
+      run: echo "RapidXML_DIR=${GITHUB_WORKSPACE}\windowsDeps\rapidxml-1.13" >> $env:GITHUB_ENV
     - name: set WXWIN
-      run: echo "WXWIN=${GITHUB_WORKSPACE}\wxWidgets-3.1.1" >> $env:GITHUB_ENV
+      run: echo "WXWIN=${GITHUB_WORKSPACE}\windowsDeps\wxWidgets-3.1.1" >> $env:GITHUB_ENV
     - name: set TDM-GCC-64
-      run: echo "GCC_DIR=${GITHUB_WORKSPACE}\TDM-GCC-64" >> $env:GITHUB_ENV
+      run: echo "GCC_DIR=${GITHUB_WORKSPACE}\windowsDeps\TDM-GCC-64" >> $env:GITHUB_ENV
     - name: set GFORTRAN_DIR
-      run: echo "GFORTRAN_DIR=${GITHUB_WORKSPACE}\TDM-GCC-64\gcc-5.1.0-tdm64-1-fortran" >> $env:GITHUB_ENV
+      run: echo "GFORTRAN_DIR=${GITHUB_WORKSPACE}\windowsDeps\TDM-GCC-64\gcc-5.1.0-tdm64-1-fortran" >> $env:GITHUB_ENV
     - name: set WXCFG
       run: echo "WXCFG=gcc_dll\mswu" >> $env:GITHUB_ENV
     - name: set Opengl_DIR
-      run: echo "Opengl_DIR=${GITHUB_WORKSPACE}\TDM-GCC-64\x86_64-w64-mingw32\lib" >> $env:GITHUB_ENV
+      run: echo "Opengl_DIR=${GITHUB_WORKSPACE}\windowsDeps\TDM-GCC-64\x86_64-w64-mingw32\lib" >> $env:GITHUB_ENV
     - name: set MathGL_DIR
-      run: echo "MathGL_DIR=${GITHUB_WORKSPACE}\WindowsDependencies\MathGL64LGPL" >> $env:GITHUB_ENV
+      run: echo "MathGL_DIR=${GITHUB_WORKSPACE}\windowsDeps\MathGL64LGPL" >> $env:GITHUB_ENV
     - name: set LAPACKE_DIR
-      run: echo "LAPACKE_DIR=${GITHUB_WORKSPACE}\WindowsDependencies\LAPACKE-X64" >> $env:GITHUB_ENV
+      run: echo "LAPACKE_DIR=${GITHUB_WORKSPACE}\windowsDeps\LAPACKE-X64" >> $env:GITHUB_ENV
     - name: set Glut_DIR
-      run: echo "Glut_DIR=${GITHUB_WORKSPACE}\WindowsDependencies\freeglut64" >> $env:GITHUB_ENV
+      run: echo "Glut_DIR=${GITHUB_WORKSPACE}\windowsDeps\freeglut64" >> $env:GITHUB_ENV
     - name: set Gemmi_DIR
-      run: echo "Gemmi_DIR=${GITHUB_WORKSPACE}\WindowsDependencies\gemmi-master" >> $env:GITHUB_ENV
+      run: echo "Gemmi_DIR=${GITHUB_WORKSPACE}\windowsDeps\gemmi-master" >> $env:GITHUB_ENV
     - name: set path1
       run: echo "PATH=%CodeLiteDir%;%PATH%" >> $env:GITHUB_ENV
     - name: set path2
@@ -109,7 +113,7 @@ jobs:
       run: cp .\GUI\WindowsGUI.mk .\GUI\GUI.mk
     - name: compile tbstudio
       run: |
-        make -e
+        mingw32-make -e
     - name: Upload build artifacts
       uses: actions/upload-artifact@v3
       with:
