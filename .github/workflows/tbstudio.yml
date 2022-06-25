@@ -144,7 +144,7 @@ jobs:
       run: echo ${env:GITHUB_PATH}
     - name: compile tbstudio
       run: |
-        mingw32-make -e
+        mingw32-make
     - name: dir
       working-directory: GUI\Release
       run: dir
