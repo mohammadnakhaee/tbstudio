@@ -142,8 +142,6 @@ jobs:
       run: echo %PATH%
     - name: echo path2
       run: echo ${env:GITHUB_PATH}
-    - name: Setup tmate session
-      uses: mxschmitt/action-tmate@v3
     - name: compile tbstudio
       run: mingw32-make
     - name: dir
