@@ -129,17 +129,17 @@ jobs:
     - name: set path1
       run: |
         chcp 65001
-        echo %wxconfigDir% | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-        echo %WXWIN%\lib\gcc_dll | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-        echo %GCC_DIR%\bin | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-        echo %MathGL_DIR%\bin | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-        echo %Glut_DIR%\bin | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-        echo %LAPACKE_DIR% | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-        echo %GFORTRAN_DIR%\bin | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        echo ${env:wxconfigDir} | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        echo ${env:WXWIN}\lib\gcc_dll | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        echo ${env:GCC_DIR}\bin | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        echo ${env:MathGL_DIR}\bin | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        echo ${env:Glut_DIR}\bin | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        echo ${env:LAPACKE_DIR} | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        echo ${env:GFORTRAN_DIR}\bin | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
     - name: copy Windows Makefile
       run: cp .\GUI\WindowsGUI.mk .\GUI\GUI.mk
     - name: echo path1
-      run: echo %PATH%
+      run: echo ${env:PATH}
     - name: echo path2
       run: echo ${env:GITHUB_PATH}
     - name: compile tbstudio
