@@ -34,7 +34,7 @@ ArchiveOutputSwitch    :=
 PreprocessOnlySwitch   :=-E
 ObjectsFileList        :="GUI.txt"
 PCHCompileFlags        :=
-MakeDirCommand         :=makedir
+MakeDirCommand         :=mkdir
 RcCmpOptions           := $(shell wx-config --rcflags)
 RcCompilerName         :=C:/TDM-GCC-64/bin/windres.exe
 LinkOptions            :=  -mwindows $(shell wx-config --libs std,gl,ribbon) -mwindows -std=gnu++11 -pthread -liphlpapi
@@ -49,29 +49,29 @@ LibPath                := $(LibraryPathSwitch). $(LibraryPathSwitch)$(Opengl_DIR
 ## Common variables
 ## AR, CXX, CC, AS, CXXFLAGS and CFLAGS can be overriden using an environment variables
 ##
-AR       := C:/TDM-GCC-64/bin/ar.exe rcu
-CXX      := C:/TDM-GCC-64/bin/g++.exe
-CC       := C:/TDM-GCC-64/bin/gcc.exe
+AR       := ar.exe rcu
+CXX      := g++.exe
+CC       := gcc.exe
 CXXFLAGS :=  -O2 -Wall $(shell wx-config --cxxflags --gl-libs) $(Preprocessors)
 CFLAGS   :=  -O2 -Wall $(Preprocessors)
 ASFLAGS  := 
-AS       := C:/TDM-GCC-64/bin/as.exe
+AS       := as.exe
 
 
 ##
 ## User defined environment variables
 ##
-CodeLiteDir:=C:\Program Files\CodeLite
-WXWIN:=C:\wxWidgets-3.1.1
-GCC_DIR:=C:\TDM-GCC-64
-GFORTRAN_DIR:=C:\TDM-GCC-64\gcc-5.1.0-tdm64-1-fortran
-WXCFG:=gcc_dll\mswu
+CodeLiteDir:=$(wxconfigDir)
+WXWIN:=$(WXWIN)
+GCC_DIR:=$(GCC_DIR)
+GFORTRAN_DIR:=$(GFORTRAN_DIR)
+WXCFG:=$(WXCFG)
 Opengl_DIR:=$(GCC_DIR)\x86_64-w64-mingw32\lib
-MathGL_DIR:=..\MathGL64LGPL
-LAPACKE_DIR:=C:\Users\mohammad\Documents\Codelite\pecsjunc\LAPACKE-X64
-Glut_DIR:=C:\Users\mohammad\Documents\Codelite\pecsjunc\freeglut64
-Gemmi_DIR:=C:\Users\mohammad\Documents\Codelite\pecsjunc\gemmi-master
-RapidXML_DIR:=C:\Users\mohammad\Documents\Codelite\pecsjunc\rapidxml-1.13
+MathGL_DIR:=$(MathGL_DIR)
+LAPACKE_DIR:=$(LAPACKE_DIR)
+Glut_DIR:=$(Glut_DIR)
+Gemmi_DIR:=$(Gemmi_DIR)
+RapidXML_DIR:=$(RapidXML_DIR)
 PATH:=$(WXWIN)\lib\gcc_dll;$(GCC_DIR)\bin;$(PATH)
 PATH:=C:\Users\mohammad\Documents\Codelite\pecsjunc\MathGL64LGPL\bin;$(PATH)
 PATH:=$(Glut_DIR)\bin;$(PATH)
