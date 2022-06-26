@@ -128,7 +128,6 @@ jobs:
         echo "Gemmi_DIR=${env:GITHUB_WORKSPACE}\windowsDeps\gemmi-master" >> $env:GITHUB_ENV
     - name: set path1
       run: |
-        chcp 65001
         echo ${env:wxconfigDir} | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
         echo ${env:WXWIN}\lib\gcc_dll | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
         echo ${env:GCC_DIR}\bin | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
