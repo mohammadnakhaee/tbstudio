@@ -47,7 +47,7 @@ jobs:
       id: mathglid
       name: Download the file
       with:
-        url: "https://dl.dropboxusercontent.com/s/7u841sclxxjztmf/MathGL32LGPL.7z?dl=0"
+        url: "https://dl.dropboxusercontent.com/s/spjbfmx2lkvcuw4/MathGL64LGPL.7z?dl=0"
         target: windowsDeps/
     - uses: suisei-cn/actions-download-file@v1
       id: tdmgccid
@@ -71,7 +71,7 @@ jobs:
         ..\7zip\32\7z.exe x .\freeglut64.7z
         ..\7zip\32\7z.exe x .\gemmi-master.7z
         ..\7zip\32\7z.exe x .\LAPACKE-X64.7z
-        ..\7zip\32\7z.exe x .\MathGL32LGPL.7z
+        ..\7zip\32\7z.exe x .\MathGL64LGPL.7z
         ..\7zip\32\7z.exe x .\TDM-GCC-64.7z
         ..\7zip\32\7z.exe x .\wxWidgets-3.1.1.7z
     - name: unzip dependencies
@@ -89,7 +89,7 @@ jobs:
     - name: set RapidXML DIR
       run: |
         chcp 65001
-        echo "RapidXML_DIR=${env:GITHUB_WORKSPACE}\windowsDeps\rapidxml-1.13" >> $env:GITHUB_ENV
+        echo "RapidXML_DIR=${env:GITHUB_WORKSPACE}\rapidxml-1.13" >> $env:GITHUB_ENV
     - name: set WXWIN
       run: |
         chcp 65001
