@@ -142,7 +142,7 @@ jobs:
     - name: echo path2
       run: echo ${env:GITHUB_PATH}
     - name: compile tbstudio
-      run: mingw32-make
+      run: mingw32-make envGITHUB_WORKSPACE=$env:GITHUB_WORKSPACE
     - name: dir
       working-directory: GUI\Release
       run: dir
