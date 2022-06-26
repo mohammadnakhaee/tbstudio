@@ -5,8 +5,8 @@
 ## Release
 ProjectName            :=GUI
 ConfigurationName      :=Release
-WorkspacePath          :=C:/Users/mohammad/Documents/Codelite/pecsjunc
-ProjectPath            :=C:/Users/mohammad/Documents/Codelite/pecsjunc/GUI
+WorkspacePath          :=${GITHUB_WORKSPACE}
+ProjectPath            :=${GITHUB_WORKSPACE}/pecsjunc/GUI
 IntermediateDirectory  :=./Release
 OutDir                 := $(IntermediateDirectory)
 CurrentFileName        :=
@@ -14,9 +14,9 @@ CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=mohammad
 Date                   :=08/06/2022
-CodeLitePath           :="C:/Program Files/CodeLite"
-LinkerName             :=C:/TDM-GCC-64/bin/g++.exe
-SharedObjectLinkerName :=C:/TDM-GCC-64/g++.exe -shared -fPIC
+CodeLitePath           :=$(wxconfigDir)
+LinkerName             :=g++.exe
+SharedObjectLinkerName :=g++.exe -shared -fPIC
 ObjectSuffix           :=.o
 DependSuffix           :=.o.d
 PreprocessSuffix       :=.i
@@ -36,7 +36,7 @@ ObjectsFileList        :="GUI.txt"
 PCHCompileFlags        :=
 MakeDirCommand         :=mkdir
 RcCmpOptions           := $(shell wx-config --rcflags)
-RcCompilerName         :=C:/TDM-GCC-64/bin/windres.exe
+RcCompilerName         :=windres.exe
 LinkOptions            :=  -mwindows $(shell wx-config --libs std,gl,ribbon) -mwindows -std=gnu++11 -pthread -liphlpapi
 IncludePath            :=  $(IncludeSwitch). $(IncludeSwitch). $(IncludeSwitch)$(MathGL_DIR)/include $(IncludeSwitch)$(Glut_DIR)/include $(IncludeSwitch)$(LAPACKE_DIR) $(IncludeSwitch)$(Gemmi_DIR)/include $(IncludeSwitch)$(RapidXML_DIR) 
 IncludePCH             := 
