@@ -99,7 +99,7 @@ jobs:
         echo "GFORTRAN_DIR=${env:GITHUB_WORKSPACE}\windowsDeps\TDM-GCC-64\gcc-5.1.0-tdm64-1-fortran" >> $env:GITHUB_ENV
         echo "WXCFG=gcc_dll\mswu" >> $env:GITHUB_ENV
         echo "Opengl_DIR=${env:GITHUB_WORKSPACE}\windowsDeps\TDM-GCC-64\x86_64-w64-mingw32\lib" >> $env:GITHUB_ENV
-        echo "MathGL_DIR=${env:GITHUB_WORKSPACE}\windowsDeps\MathGL64LGPL" >> $env:GITHUB_ENV
+        echo "MathGL_DIR=${env:GITHUB_WORKSPACE}/windowsDeps/MathGL64LGPL" >> $env:GITHUB_ENV
         echo "LAPACKE_DIR=${env:GITHUB_WORKSPACE}\windowsDeps\LAPACKE-X64" >> $env:GITHUB_ENV
         echo "Glut_DIR=${env:GITHUB_WORKSPACE}\windowsDeps\freeglut64" >> $env:GITHUB_ENV
         echo "Gemmi_DIR=${env:GITHUB_WORKSPACE}\windowsDeps\gemmi-master" >> $env:GITHUB_ENV
@@ -109,8 +109,8 @@ jobs:
         echo ${env:WXWIN}\lib\gcc_dll | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
         echo ${env:GCC_DIR}\bin | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
         echo ${env:MathGL_DIR} | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-        echo ${env:MathGL_DIR}\bin | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-        echo ${env:MathGL_DIR}\include | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        echo ${env:MathGL_DIR}/bin | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        echo ${env:MathGL_DIR}/include | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
         echo ${env:Glut_DIR}\bin | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
         echo ${env:LAPACKE_DIR} | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
         echo ${env:GFORTRAN_DIR}\bin | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
