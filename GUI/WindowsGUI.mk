@@ -38,7 +38,7 @@ MakeDirCommand         :=mkdir
 RcCmpOptions           := $(shell wx-config --rcflags)
 RcCompilerName         :=windres.exe
 LinkOptions            :=  -mwindows $(shell wx-config --libs std,gl,ribbon) -mwindows -std=gnu++11 -pthread -liphlpapi
-IncludePath            :=  $(IncludeSwitch). $(IncludeSwitch). $(IncludeSwitch)$(MathGL_DIR)/include $(IncludeSwitch)$(Glut_DIR)/include $(IncludeSwitch)$(LAPACKE_DIR) $(IncludeSwitch)$(Gemmi_DIR)/include $(IncludeSwitch)$(RapidXML_DIR) 
+IncludePath            :=  $(IncludeSwitch). -ID:/a/tbstudio/tbstudio/windowsDeps/MathGL64LGPL/include $(IncludeSwitch)$(Glut_DIR)/include $(IncludeSwitch)$(LAPACKE_DIR) $(IncludeSwitch)$(Gemmi_DIR)/include $(IncludeSwitch)$(RapidXML_DIR) 
 IncludePCH             := 
 RcIncludePath          := 
 Libs                   := $(LibrarySwitch)mgl-glut $(LibrarySwitch)mgl $(LibrarySwitch)freeglut $(LibrarySwitch)lapacke $(LibrarySwitch)lapack $(LibrarySwitch)blas $(LibrarySwitch)m 
