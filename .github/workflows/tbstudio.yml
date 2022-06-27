@@ -91,29 +91,29 @@ jobs:
     - name: env vars
       run: |
         chcp 65001
-        echo "envGITHUB_WORKSPACE=$env:GITHUB_WORKSPACE" >> $env:GITHUB_ENV
-        echo "wxconfigDir=${env:GITHUB_WORKSPACE}\windowsDeps\wxconfig" >> $env:GITHUB_ENV
-        echo "RapidXML_DIR=${env:GITHUB_WORKSPACE}\rapidxml-1.13" >> $env:GITHUB_ENV
-        echo "WXWIN=${env:GITHUB_WORKSPACE}\windowsDeps\wxWidgets-3.1.1" >> $env:GITHUB_ENV
-        echo "GCC_DIR=${env:GITHUB_WORKSPACE}\windowsDeps\TDM-GCC-64" >> $env:GITHUB_ENV
-        echo "GFORTRAN_DIR=${env:GITHUB_WORKSPACE}\windowsDeps\TDM-GCC-64\gcc-5.1.0-tdm64-1-fortran" >> $env:GITHUB_ENV
-        echo "WXCFG=gcc_dll\mswu" >> $env:GITHUB_ENV
-        echo "Opengl_DIR=${env:GITHUB_WORKSPACE}\windowsDeps\TDM-GCC-64\x86_64-w64-mingw32\lib" >> $env:GITHUB_ENV
-        echo "MathGL_DIR=${env:GITHUB_WORKSPACE}/windowsDeps/MathGL64LGPL" >> $env:GITHUB_ENV
-        echo "LAPACKE_DIR=${env:GITHUB_WORKSPACE}\windowsDeps\LAPACKE-X64" >> $env:GITHUB_ENV
-        echo "Glut_DIR=${env:GITHUB_WORKSPACE}\windowsDeps\freeglut64" >> $env:GITHUB_ENV
-        echo "Gemmi_DIR=${env:GITHUB_WORKSPACE}\windowsDeps\gemmi-master" >> $env:GITHUB_ENV
+        echo "envGITHUB_WORKSPACE=$env:GITHUB_WORKSPACE.Replace('\','/')" >> $env:GITHUB_ENV
+        echo "wxconfigDir=${env:GITHUB_WORKSPACE}.Replace('\','/')/windowsDeps/wxconfig" >> $env:GITHUB_ENV
+        echo "RapidXML_DIR=${env:GITHUB_WORKSPACE}.Replace('\','/')/rapidxml-1.13" >> $env:GITHUB_ENV
+        echo "WXWIN=${env:GITHUB_WORKSPACE}.Replace('\','/')/windowsDeps/wxWidgets-3.1.1" >> $env:GITHUB_ENV
+        echo "GCC_DIR=${env:GITHUB_WORKSPACE}.Replace('\','/')/windowsDeps/TDM-GCC-64" >> $env:GITHUB_ENV
+        echo "GFORTRAN_DIR=${env:GITHUB_WORKSPACE}.Replace('\','/')/windowsDeps/TDM-GCC-64/gcc-5.1.0-tdm64-1-fortran" >> $env:GITHUB_ENV
+        echo "WXCFG=gcc_dll/mswu" >> $env:GITHUB_ENV
+        echo "Opengl_DIR=${env:GITHUB_WORKSPACE}.Replace('\','/')/windowsDeps/TDM-GCC-64/x86_64-w64-mingw32/lib" >> $env:GITHUB_ENV
+        echo "MathGL_DIR=${env:GITHUB_WORKSPACE}.Replace('\','/')/windowsDeps/MathGL64LGPL" >> $env:GITHUB_ENV
+        echo "LAPACKE_DIR=${env:GITHUB_WORKSPACE}.Replace('\','/')/windowsDeps/LAPACKE-X64" >> $env:GITHUB_ENV
+        echo "Glut_DIR=${env:GITHUB_WORKSPACE}.Replace('\','/')/windowsDeps/freeglut64" >> $env:GITHUB_ENV
+        echo "Gemmi_DIR=${env:GITHUB_WORKSPACE}.Replace('\','/')/windowsDeps/gemmi-master" >> $env:GITHUB_ENV
     - name: set paths
       run: |
         echo ${env:wxconfigDir} | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-        echo ${env:WXWIN}\lib\gcc_dll | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-        echo ${env:GCC_DIR}\bin | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        echo ${env:WXWIN}/lib/gcc_dll | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        echo ${env:GCC_DIR}/bin | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
         echo ${env:MathGL_DIR} | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
         echo ${env:MathGL_DIR}/bin | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
         echo ${env:MathGL_DIR}/include | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-        echo ${env:Glut_DIR}\bin | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        echo ${env:Glut_DIR}/bin | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
         echo ${env:LAPACKE_DIR} | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-        echo ${env:GFORTRAN_DIR}\bin | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        echo ${env:GFORTRAN_DIR}/bin | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
     - name: copy Windows Makefile
       run: cp .\GUI\WindowsGUI.mk .\GUI\GUI.mk
     - name: echo path1
