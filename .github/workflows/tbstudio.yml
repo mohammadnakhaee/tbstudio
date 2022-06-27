@@ -82,6 +82,9 @@ jobs:
     - name: dir
       working-directory: windowsDeps
       run: dir
+    - name: dir in MathGL64LGPL
+      working-directory: windowsDeps\MathGL64LGPL
+      run: dir
     - name: set wxconfig DIR
       run: |
         chcp 65001
