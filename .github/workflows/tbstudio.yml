@@ -85,6 +85,9 @@ jobs:
     - name: dir in MathGL64LGPL
       working-directory: windowsDeps\MathGL64LGPL
       run: dir
+    - name: dir in MathGL64LGPL include
+      working-directory: windowsDeps\MathGL64LGPL\include
+      run: dir
     - name: set wxconfig DIR
       run: |
         chcp 65001
@@ -136,6 +139,7 @@ jobs:
         echo ${env:GCC_DIR}\bin | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
         echo ${env:MathGL_DIR} | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
         echo ${env:MathGL_DIR}\bin | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        echo ${env:MathGL_DIR}\include | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
         echo ${env:Glut_DIR}\bin | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
         echo ${env:LAPACKE_DIR} | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
         echo ${env:GFORTRAN_DIR}\bin | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
