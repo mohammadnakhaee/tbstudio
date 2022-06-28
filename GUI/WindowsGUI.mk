@@ -99,12 +99,12 @@ $(OutputFile): $(IntermediateDirectory)/.d $(Objects)
 PostBuild:
 	@echo Executing Post Build commands ...
 	@$(MakeDirCommand) TBStudio
-	copy .\Release\* .\TBStudio
-	copy ..\windowsDeps\DLL\* .\TBStudio
-	del .\TBStudio\*.o
-	del .\TBStudio\*.d
-	copy TBStudio.ico TBStudio
-	copy Readme.txt TBStudio
+	cp .\Release\* .\TBStudio
+	cp ..\windowsDeps\DLL\* .\TBStudio
+	rm .\TBStudio\*.o
+	rm .\TBStudio\*.d
+	cp TBStudio.ico TBStudio
+	cp Readme.txt TBStudio
 	@echo Done
 
 MakeIntermediateDirs:
