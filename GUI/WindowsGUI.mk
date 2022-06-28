@@ -98,13 +98,12 @@ $(OutputFile): $(IntermediateDirectory)/.d $(Objects)
 
 PostBuild:
 	@echo Executing Post Build commands ...
-	@$(MakeDirCommand) TBStudio
-	cp .\Release\* .\TBStudio
-	cp ..\windowsDeps\DLL\* .\TBStudio
-	rm .\TBStudio\*.o
-	rm .\TBStudio\*.d
-	cp TBStudio.ico TBStudio
-	cp Readme.txt TBStudio
+	@$(MakeDirCommand) ${envGITHUB_WORKSPACE}/TBStudio
+	cp ${envGITHUB_WORKSPACE}/GUI/Release/* ${envGITHUB_WORKSPACE}/TBStudio
+	cp ${envGITHUB_WORKSPACE}/windowsDeps/DLL/* ${envGITHUB_WORKSPACE}/TBStudio
+	rm ${envGITHUB_WORKSPACE}/TBStudio/*.o
+	rm ${envGITHUB_WORKSPACE}/TBStudio/*.d
+	cp ${envGITHUB_WORKSPACE}/GUI/TBStudio.ico ${envGITHUB_WORKSPACE}/TBStudio
 	@echo Done
 
 MakeIntermediateDirs:
