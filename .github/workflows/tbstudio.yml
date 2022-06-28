@@ -153,13 +153,13 @@ jobs:
       working-directory: Packaging/windows
       run: |
         dir
-        ${env:GITHUB_WORKSPACE}/7zip/32/7z.exe x ./tbstudio.7z
+        ../../7zip/32/7z.exe x ./tbstudio.7z
 #     - name: sign
 #       working-directory: Packaging/windows
 #       run:
     - name: zip package
       working-directory: Packaging/windows/tbstudio
-      run: ${env:GITHUB_WORKSPACE}/7zip/32/7z.exe a tbstudio.zip
+      run: ../../../7zip/32/7z.exe a tbstudio.zip
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
