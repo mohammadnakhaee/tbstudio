@@ -38,12 +38,12 @@ MakeDirCommand         :=mkdir
 RcCmpOptions           := $(shell wx-config --rcflags)
 RcCompilerName         :=windres.exe
 LinkOptions            :=  -mwindows $(shell wx-config --libs std,gl,ribbon) -mwindows -std=gnu++11 -pthread -liphlpapi
-IncludePath            :=  $(IncludeSwitch). $(IncludeSwitch). $(IncludeSwitch)$(MathGL_DIR)\include $(IncludeSwitch)$(Glut_DIR)\include $(IncludeSwitch)$(LAPACKE_DIR) $(IncludeSwitch)$(Gemmi_DIR)\include $(IncludeSwitch)$(RapidXML_DIR) 
+IncludePath            :=  $(IncludeSwitch). $(IncludeSwitch)$(MathGL_DIR)/include $(IncludeSwitch)$(Glut_DIR)/include $(IncludeSwitch)$(LAPACKE_DIR) $(IncludeSwitch)$(Gemmi_DIR)/include $(IncludeSwitch)$(RapidXML_DIR)
 IncludePCH             := 
 RcIncludePath          := 
 Libs                   := $(LibrarySwitch)mgl-glut $(LibrarySwitch)mgl $(LibrarySwitch)freeglut $(LibrarySwitch)lapacke $(LibrarySwitch)lapack $(LibrarySwitch)blas $(LibrarySwitch)m 
 ArLibs                 :=  "libmgl-glut.a" "libmgl.a" "libfreeglut.a" "liblapacke" "liblapack" "libblas" "m" 
-LibPath                := $(LibraryPathSwitch). $(LibraryPathSwitch)$(Opengl_DIR) $(LibraryPathSwitch)$(MathGL_DIR)\lib $(LibraryPathSwitch)${envGITHUB_WORKSPACE}\windowsDeps\TDM-GCC-64\x86_64-w64-mingw32\lib $(LibraryPathSwitch)$(Glut_DIR)\lib $(LibraryPathSwitch)$(LAPACKE_DIR) $(LibraryPathSwitch)${envGITHUB_WORKSPACE}\windowsDeps\TDM-GCC-64\gcc-5.1.0-tdm64-1-fortran\bin 
+LibPath                := $(LibraryPathSwitch). $(LibraryPathSwitch)$(Opengl_DIR) $(LibraryPathSwitch)$(MathGL_DIR)/lib $(LibraryPathSwitch)${envGITHUB_WORKSPACE}/windowsDeps/TDM-GCC-64/x86_64-w64-mingw32/lib $(LibraryPathSwitch)$(Glut_DIR)/lib $(LibraryPathSwitch)$(LAPACKE_DIR) $(LibraryPathSwitch)${envGITHUB_WORKSPACE}/windowsDeps/TDM-GCC-64/gcc-5.1.0-tdm64-1-fortran/bin
 
 ##
 ## Common variables
