@@ -61,6 +61,12 @@ jobs:
       with:
         url: "https://dl.dropboxusercontent.com/s/uoh7y7b296mf1lj/wxWidgets-3.1.1.7z?dl=0"
         target: windowsDeps/
+    - uses: suisei-cn/actions-download-file@v1
+      id: DLLs
+      name: Download the file
+      with:
+        url: "https://dl.dropboxusercontent.com/s/jt8t26qwre4w0me/DLL.7z?dl=0"
+        target: windowsDeps/
     - name: dir
       working-directory: windowsDeps
       run: dir
@@ -74,20 +80,12 @@ jobs:
         ..\7zip\32\7z.exe x .\MathGL64LGPL.7z
         ..\7zip\32\7z.exe x .\TDM-GCC-64.7z
         ..\7zip\32\7z.exe x .\wxWidgets-3.1.1.7z
+        ..\7zip\32\7z.exe x .\DLL.7z
     - name: unzip dependencies
       working-directory: windowsDeps\TDM-GCC-64
       run: |
         move ..\gcc-5.1.0-tdm64-1-fortran.7z .\gcc-5.1.0-tdm64-1-fortran.7z
         ..\..\7zip\32\7z.exe x .\gcc-5.1.0-tdm64-1-fortran.7z
-    - name: dir
-      working-directory: windowsDeps
-      run: dir
-    - name: dir in MathGL64LGPL
-      working-directory: windowsDeps\MathGL64LGPL
-      run: dir
-    - name: dir in MathGL64LGPL include
-      working-directory: windowsDeps\MathGL64LGPL\include
-      run: dir
     - name: env vars
       run: |
         chcp 65001
@@ -122,11 +120,56 @@ jobs:
       run: echo ${env:GITHUB_PATH}
     - name: compile tbstudio
       run: mingw32-make
-    - name: dir
-      working-directory: GUI\Release
-      run: dir
+    - name: zip tbstudio
+      working-directory: GUI\TBStudio
+      run: ..\..\7zip\32\7z.exe a tbstudio
     - name: Upload build artifacts
       uses: actions/upload-artifact@v3
       with:
         name: executable
-        path: .\GUI\Release\tbstudio.exe
+        path: .\GUI\TBStudio\tbstudio.7z
+        
+  release-windows-latest:
+
+    runs-on: ubuntu-18.04
+    needs: build-windows-latest
+        
+    steps:
+    - uses: actions/checkout@v1
+    - name: Get Version
+      id: version
+      uses: battila7/get-version-action@v2
+    - name: Download build artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: executable
+        path: ./Packaging/windows
+    - name: unzip package
+      working-directory: Packaging/windows
+      run: ..\..\7zip\32\7z.exe x .\tbstudio.7z
+#     - name: sign
+#       working-directory: Packaging/windows
+#       run:
+    - name: zip package
+      working-directory: Packaging/windows/tbstudio
+      run: ..\..\..\7zip\32\7z.exe a tbstudio.zip
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.version.outputs.version-without-v }}
+        release_name: Release ${{ steps.version.outputs.version-without-v }}
+        draft: false
+        prerelease: true
+    - name: Upload Release Asset
+      id: upload-release-asset 
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./Packaging/windows/tbstudio/tbstudio.zip
+        asset_name: tbstudio-windows-latest-${{ steps.version.outputs.version-without-v }}.zip
+        asset_content_type: application/zip
