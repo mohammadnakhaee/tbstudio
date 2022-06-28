@@ -38,12 +38,12 @@ MakeDirCommand         :=mkdir
 RcCmpOptions           := $(shell wx-config --rcflags)
 RcCompilerName         :=windres.exe
 LinkOptions            :=  -mwindows $(shell wx-config --libs std,gl,ribbon) -mwindows -std=gnu++11 -pthread -liphlpapi
-IncludePath            :=  $(IncludeSwitch). $(IncludeSwitch)$(MathGL_DIR)/include $(IncludeSwitch)$(Glut_DIR)/include $(IncludeSwitch)$(LAPACKE_DIR) $(IncludeSwitch)$(Gemmi_DIR)/include $(IncludeSwitch)$(RapidXML_DIR) 
+IncludePath            :=  $(IncludeSwitch). $(IncludeSwitch). $(IncludeSwitch)$(MathGL_DIR)\include $(IncludeSwitch)$(Glut_DIR)\include $(IncludeSwitch)$(LAPACKE_DIR) $(IncludeSwitch)$(Gemmi_DIR)\include $(IncludeSwitch)$(RapidXML_DIR) 
 IncludePCH             := 
 RcIncludePath          := 
 Libs                   := $(LibrarySwitch)mgl-glut $(LibrarySwitch)mgl $(LibrarySwitch)freeglut $(LibrarySwitch)lapacke $(LibrarySwitch)lapack $(LibrarySwitch)blas $(LibrarySwitch)m 
 ArLibs                 :=  "libmgl-glut.a" "libmgl.a" "libfreeglut.a" "liblapacke" "liblapack" "libblas" "m" 
-LibPath                := $(LibraryPathSwitch). $(LibraryPathSwitch)$(Opengl_DIR) $(LibraryPathSwitch)$(MathGL_DIR)/lib $(LibraryPathSwitch)${envGITHUB_WORKSPACE}/windowsDeps/TDM-GCC-64/x86_64-w64-mingw32/lib $(LibraryPathSwitch)$(Glut_DIR)/lib $(LibraryPathSwitch)$(LAPACKE_DIR) $(LibraryPathSwitch)${envGITHUB_WORKSPACE}/windowsDeps/TDM-GCC-64/gcc-5.1.0-tdm64-1-fortran/bin 
+LibPath                := $(LibraryPathSwitch). $(LibraryPathSwitch)$(Opengl_DIR) $(LibraryPathSwitch)$(MathGL_DIR)\lib $(LibraryPathSwitch)${envGITHUB_WORKSPACE}\windowsDeps\TDM-GCC-64\x86_64-w64-mingw32\lib $(LibraryPathSwitch)$(Glut_DIR)\lib $(LibraryPathSwitch)$(LAPACKE_DIR) $(LibraryPathSwitch)${envGITHUB_WORKSPACE}\windowsDeps\TDM-GCC-64\gcc-5.1.0-tdm64-1-fortran\bin 
 
 ##
 ## Common variables
@@ -61,6 +61,22 @@ AS       := as.exe
 ##
 ## User defined environment variables
 ##
+CodeLiteDir:=$(wxconfigDir)
+WXWIN:=$(WXWIN)
+GCC_DIR:=$(GCC_DIR)
+GFORTRAN_DIR:=$(GFORTRAN_DIR)
+WXCFG:=$(WXCFG)
+Opengl_DIR:=$(GCC_DIR)\x86_64-w64-mingw32\lib
+MathGL_DIR:=$(MathGL_DIR)
+LAPACKE_DIR:=$(LAPACKE_DIR)
+Glut_DIR:=$(Glut_DIR)
+Gemmi_DIR:=$(Gemmi_DIR)
+RapidXML_DIR:=$(RapidXML_DIR)
+PATH:=$(WXWIN)\lib\gcc_dll;$(GCC_DIR)\bin;$(PATH)
+PATH:=${envGITHUB_WORKSPACE}\windowsDeps\MathGL64LGPL\bin;$(PATH)
+PATH:=$(Glut_DIR)\bin;$(PATH)
+PATH:=$(LAPACKE_DIR);$(PATH)
+PATH:=$(GFORTRAN_DIR)\bin;$(PATH)
 Objects0=$(IntermediateDirectory)/win_resources.rc$(ObjectSuffix) $(IntermediateDirectory)/MyMatrix.cpp$(ObjectSuffix) $(IntermediateDirectory)/BondsClass.cpp$(ObjectSuffix) $(IntermediateDirectory)/MyOpenGL.cpp$(ObjectSuffix) $(IntermediateDirectory)/mygrid.cpp$(ObjectSuffix) $(IntermediateDirectory)/MainFrame.cpp$(ObjectSuffix) $(IntermediateDirectory)/sec30TextCtrl.cpp$(ObjectSuffix) $(IntermediateDirectory)/Sec30.cpp$(ObjectSuffix) $(IntermediateDirectory)/GridClass.cpp$(ObjectSuffix) $(IntermediateDirectory)/StructureClass.cpp$(ObjectSuffix) \
 	$(IntermediateDirectory)/UpdateClass.cpp$(ObjectSuffix) $(IntermediateDirectory)/checktree.cpp$(ObjectSuffix) $(IntermediateDirectory)/UnitcellClass.cpp$(ObjectSuffix) $(IntermediateDirectory)/Regression.cpp$(ObjectSuffix) $(IntermediateDirectory)/ColorsClass.cpp$(ObjectSuffix) $(IntermediateDirectory)/MyFigureClass.cpp$(ObjectSuffix) $(IntermediateDirectory)/SKClass.cpp$(ObjectSuffix) $(IntermediateDirectory)/SetupClass.cpp$(ObjectSuffix) $(IntermediateDirectory)/GraphClass.cpp$(ObjectSuffix) $(IntermediateDirectory)/WelcomeClass.cpp$(ObjectSuffix) \
 	$(IntermediateDirectory)/main.cpp$(ObjectSuffix) $(IntermediateDirectory)/wxcrafter.cpp$(ObjectSuffix) $(IntermediateDirectory)/wxcrafter_bitmaps.cpp$(ObjectSuffix) $(IntermediateDirectory)/OrbitalsClass.cpp$(ObjectSuffix) 
@@ -75,22 +91,18 @@ Objects=$(Objects0)
 .PHONY: all clean PreBuild PrePreBuild PostBuild MakeIntermediateDirs
 all: $(OutputFile)
 
-$(OutputFile): $(IntermediateDirectory)/.d $(Objects) 
-	@$(MakeDirCommand) $(@D)
+$(OutputFile): $(IntermediateDirectory)/.d $(Objects)
 	@echo "" > $(IntermediateDirectory)/.d
 	@echo $(Objects0)  > $(ObjectsFileList)
 	$(LinkerName) $(OutputSwitch)$(OutputFile) @$(ObjectsFileList) $(LibPath) $(Libs) $(LinkOptions)
 
 PostBuild:
 	@echo Executing Post Build commands ...
-	rmdir TBStudio /s /q
-	mkdir TBStudio
+	@$(MakeDirCommand) TBStudio
 	copy .\Release\* .\TBStudio
-	copy .\DLL\* .\TBStudio
+	copy ..\windowsDeps\DLL\* .\TBStudio
 	del .\TBStudio\*.o
 	del .\TBStudio\*.d
-	mkdir .\TBStudio\Examples
-	xcopy .\Examples .\TBStudio\Examples /E
 	copy TBStudio.ico TBStudio
 	copy Readme.txt TBStudio
 	@echo Done
