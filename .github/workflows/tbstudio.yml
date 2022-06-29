@@ -153,7 +153,7 @@ jobs:
 #       working-directory: Packaging/windows
 #       run:
     - name: zip package
-      working-directory: Packaging/windows/tbstudio
+      working-directory: Packaging/windows/TBStudio
       run: ../../../7zip/32/7z.exe a tbstudio.zip
     - name: Create Release
       id: create_release
