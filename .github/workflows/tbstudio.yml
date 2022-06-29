@@ -150,7 +150,6 @@ jobs:
       uses: DanaBear/code-sign-action@v4
       with:
           certificate: "${{ secrets.CERTIFICATE }}"
-          certificatesha1: "${{ secrets.CERTIFICATE_HASH }}"
           password: "${{ secrets.CERTIFICATE_PASS }}"
           folder: Packaging/windows/sign
           recursive: false
