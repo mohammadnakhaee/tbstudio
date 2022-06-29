@@ -120,14 +120,11 @@ jobs:
       run: echo ${env:GITHUB_PATH}
     - name: compile tbstudio
       run: mingw32-make
-    - name: zip tbstudio
-      working-directory: GUI\TBStudio
-      run: ..\..\7zip\32\7z.exe a tbstudio
     - name: Upload build artifacts
       uses: actions/upload-artifact@v3
       with:
         name: executable
-        path: .\GUI\TBStudio\tbstudio.7z
+        path: .\GUI\TBStudio
         
   release-windows-latest:
 
@@ -149,11 +146,9 @@ jobs:
     - name: dir
       working-directory: Packaging
       run: dir
-    - name: unzip package
+    - name: dir
       working-directory: Packaging/windows
-      run: |
-        chmod 777 ./tbstudio.7z
-        ../../7zip/32/7z.exe x ./tbstudio.7z
+      run: dir
 #     - name: sign
 #       working-directory: Packaging/windows
 #       run:
