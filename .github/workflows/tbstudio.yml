@@ -152,7 +152,7 @@ jobs:
     - name: unzip package
       working-directory: Packaging/windows
       run: |
-        dir
+        chmod 777 ./tbstudio.7z
         ../../7zip/32/7z.exe x ./tbstudio.7z
 #     - name: sign
 #       working-directory: Packaging/windows
