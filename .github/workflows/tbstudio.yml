@@ -140,20 +140,25 @@ jobs:
       uses: actions/download-artifact@v3
       with:
         name: executable
-        path: ./Packaging/windows
-    - name: dir
-      run: dir
-    - name: dir
-      working-directory: Packaging
-      run: dir
-    - name: dir
+        path: ./Packaging/windows/tbstudio
+    - name: move to sign
       working-directory: Packaging/windows
-      run: dir
-#     - name: sign
-#       working-directory: Packaging/windows
-#       run:
+      run: |
+        mkdir sign
+        mv ./tbstudio/GUI.exe ./sign/tbstudio.exe
+    - name: sign exe
+      uses: DanaBear/code-sign-action@v4
+      with:
+          certificate: "${{ secrets.CERTIFICATE }}"
+          certificatesha1: "${{ secrets.CERTIFICATE_HASH }}"
+          password: "${{ secrets.CERTIFICATE_PASS }}"
+          folder: Packaging/windows/sign
+          recursive: false
+    - name: move to sign
+      working-directory: Packaging/windows
+      run: mv ./sign/tbstudio.exe ./tbstudio/tbstudio.exe
     - name: zip package
-      working-directory: Packaging/windows/TBStudio
+      working-directory: Packaging/windows/tbstudio
       run: ../../../7zip/32/7z.exe a tbstudio.zip
     - name: Create Release
       id: create_release
