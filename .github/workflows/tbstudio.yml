@@ -131,7 +131,7 @@ jobs:
       with:
         certificate: '${{ secrets.CERTIFICATE }}'
         password: '${{ secrets.CERTIFICATE_PASS }}'
-        folder: 'GUI/sign'
+        folder: 'GUI/dummy'
     - name: prepare certificate
       working-directory: GUI/sign
       run: echo "$KEY" > .\cert.txt
@@ -141,12 +141,21 @@ jobs:
       working-directory: GUI/sign
       run: |
         certutil -decode .\cert.txt .\cert.pfx
-        signtool sign /f ".\cert.pfx" /p '${{ secrets.CERTIFICATE_PASS }}' /fd sha256 /tr http://sha256timestamp.ws.symantec.com/sha256/timestamp /v ".\tbstudio.exe"
+        "C:/Program Files (x86)/Windows Kits/10/bin/10.0.17763.0/x86/signtool.exe" sign /f ".\cert.pfx" /p '${{ secrets.CERTIFICATE_PASS }}' /fd sha256 /tr http://sha256timestamp.ws.symantec.com/sha256/timestamp /v ".\tbstudio.exe"
+    - name: move to tbstudio
+      working-directory: GUI
+      run: |
+        mkdir sign
+        mkdir dummy
+        mv ./sign/tbstudio.exe ./TBStudio/tbstudio.exe
+    - name: zip package
+      working-directory: GUI/TBStudio
+      run: ../../7zip/32/7z.exe a tbstudio.zip
     - name: Upload build artifacts
       uses: actions/upload-artifact@v3
       with:
         name: executable
-        path: .\GUI\TBStudio
+        path: .\GUI\TBStudio\tbstudio.zip
         
   release-windows-latest:
 
@@ -163,22 +172,6 @@ jobs:
       with:
         name: executable
         path: ./Packaging/windows/tbstudio
-    - name: move to sign
-      working-directory: Packaging/windows
-      run: mv ./sign/tbstudio.exe ./tbstudio/tbstudio.exe
-    - name: zip package
-      working-directory: Packaging/windows/tbstudio
-      run: ../../../7zip/32/7z.exe a tbstudio.zip
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ steps.version.outputs.version-without-v }}
-        release_name: Release ${{ steps.version.outputs.version-without-v }}
-        draft: false
-        prerelease: true
     - name: Upload Release Asset
       id: upload-release-asset 
       uses: actions/upload-release-asset@v1
