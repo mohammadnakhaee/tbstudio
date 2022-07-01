@@ -129,6 +129,7 @@ jobs:
       uses: dlemstra/code-sign-action@v1
       with:
         certificate: '${{ secrets.CERTIFICATE }}'
+        password: '${{ secrets.CERTIFICATE_PASS }}'
         folder: 'GUI/sign'
     - name: Upload build artifacts
       uses: actions/upload-artifact@v3
