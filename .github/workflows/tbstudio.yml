@@ -137,10 +137,13 @@ jobs:
       run: echo "$KEY" > .\cert.txt
       env:
         KEY: ${{secrets.CERTIFICATE}}
+    - name: decode
+      working-directory: GUI/sign
+      run: certutil -decode .\cert.txt .\cert.pfx
     - name: sign exe
       working-directory: GUI/sign
+      shell: cmd
       run: |
-        certutil -decode .\cert.txt .\cert.pfx
         "C:/Program Files (x86)/Windows Kits/10/bin/10.0.17763.0/x86/signtool.exe" sign /f ".\cert.pfx" /p '${{ secrets.CERTIFICATE_PASS }}' /fd sha256 /tr http://sha256timestamp.ws.symantec.com/sha256/timestamp /v ".\tbstudio.exe"
     - name: move to tbstudio
       working-directory: GUI
