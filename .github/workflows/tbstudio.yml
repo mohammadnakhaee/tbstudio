@@ -121,7 +121,7 @@ jobs:
     - name: compile tbstudio
       run: mingw32-make
     - name: move to sign
-      working-directory: GUI\TBStudio
+      working-directory: GUI
       run: |
         mkdir sign
         mv ./TBStudio/GUI.exe ./sign/tbstudio.exe
