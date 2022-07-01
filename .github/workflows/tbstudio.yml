@@ -124,7 +124,7 @@ jobs:
       working-directory: GUI\TBStudio
       run: |
         mkdir sign
-        mv ./tbstudio/GUI.exe ./sign/tbstudio.exe
+        mv ./TBStudio/GUI.exe ./sign/tbstudio.exe
     - name: sign exe
       uses: dlemstra/code-sign-action@v1
       with:
