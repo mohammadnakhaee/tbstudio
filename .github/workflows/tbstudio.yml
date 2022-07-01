@@ -21,6 +21,8 @@ jobs:
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
         wget https://github.com/macports/macports-base/releases/download/v2.7.1/MacPorts-2.7.1-11-BigSur.pkg
         sudo installer -pkg ./MacPorts-2.7.1-11-BigSur.pkg -target /
+    - name: set PATH
+      run: echo "/opt/local/bin" >> $GITHUB_PATH
     - name: install packages
       run: |
         port install mathgl
