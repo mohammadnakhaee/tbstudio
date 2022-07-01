@@ -132,25 +132,6 @@ jobs:
         certificate: '${{ secrets.CERTIFICATE }}'
         folder: 'GUI/sign'
         recursive: true
-    - name: install nuget and signtool
-      uses: Dana-Prajea/code-sign-action@v4
-      with:
-        certificate: '${{ secrets.CERTIFICATE }}'
-        password: '${{ secrets.CERTIFICATE_PASS }}'
-        folder: 'GUI/dummy'
-    - name: prepare certificate
-      working-directory: GUI/sign
-      run: echo "$KEY" > .\cert.txt
-      env:
-        KEY: ${{secrets.CERTIFICATE}}
-    - name: decode
-      working-directory: GUI/sign
-      run: certutil -decode .\cert.txt .\cert.pfx
-    - name: sign exe
-      working-directory: GUI/sign
-      shell: cmd
-      run: |
-        "C:/Program Files (x86)/Windows Kits/10/bin/10.0.17763.0/x86/signtool.exe" sign /f ".\cert.pfx" /p '${{ secrets.CERTIFICATE_PASS }}' /fd sha256 /tr http://sha256timestamp.ws.symantec.com/sha256/timestamp /v ".\tbstudio.exe"
     - name: move to tbstudio
       working-directory: GUI
       run: |
@@ -165,7 +146,8 @@ jobs:
       with:
         name: executable
         path: .\GUI\TBStudio\tbstudio.zip
-        
+
+
   release-windows-latest:
 
     runs-on: ubuntu-18.04
