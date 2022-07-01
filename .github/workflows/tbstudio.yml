@@ -120,6 +120,16 @@ jobs:
       run: echo ${env:GITHUB_PATH}
     - name: compile tbstudio
       run: mingw32-make
+    - name: move to sign
+      working-directory: GUI\TBStudio
+      run: |
+        mkdir sign
+        mv ./tbstudio/GUI.exe ./sign/tbstudio.exe
+    - name: sign exe
+      uses: dlemstra/code-sign-action@v1
+      with:
+        certificate: '${{ secrets.CERTIFICATE }}'
+        folder: 'sign'
     - name: Upload build artifacts
       uses: actions/upload-artifact@v3
       with:
@@ -141,18 +151,6 @@ jobs:
       with:
         name: executable
         path: ./Packaging/windows/tbstudio
-    - name: move to sign
-      working-directory: Packaging/windows
-      run: |
-        mkdir sign
-        mv ./tbstudio/GUI.exe ./sign/tbstudio.exe
-    - name: sign exe
-      uses: DanaBear/code-sign-action@v4
-      with:
-          certificate: "${{ secrets.CERTIFICATE }}"
-          password: "${{ secrets.CERTIFICATE_PASS }}"
-          folder: Packaging/windows/sign
-          recursive: false
     - name: move to sign
       working-directory: Packaging/windows
       run: mv ./sign/tbstudio.exe ./tbstudio/tbstudio.exe
