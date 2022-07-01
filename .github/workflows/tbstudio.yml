@@ -124,15 +124,24 @@ jobs:
       working-directory: GUI
       run: |
         mkdir sign
+        mkdir dummy
         mv ./TBStudio/GUI.exe ./sign/tbstudio.exe
     - name: sign exe
       uses: Dana-Prajea/code-sign-action@v4
       with:
         certificate: '${{ secrets.CERTIFICATE }}'
         password: '${{ secrets.CERTIFICATE_PASS }}'
-        certificatesha1: '${{ secrets.CERTIFICATE_HASH }}'
-        timestampurl: 'http://sha256timestamp.ws.symantec.com/sha256/timestamp'
-        folder: 'GUI/sign'
+        folder: 'GUI/dummy'
+    - name: prepare certificate
+      working-directory: GUI/sign
+      run: echo "$KEY" > .\cert.txt
+      env:
+        KEY: ${{secrets.CERTIFICATE}}
+    - name: prepare certificate
+      working-directory: GUI/sign
+      run: |
+        certutil -decode .\cert.txt .\cert.pfx
+        signtool.exe sign /f ".\cert.pfx" /p '${{ secrets.CERTIFICATE_PASS }}' /fd sha256 /tr http://sha256timestamp.ws.symantec.com/sha256/timestamp /v ".\tbstudio.exe"
     - name: Upload build artifacts
       uses: actions/upload-artifact@v3
       with:
