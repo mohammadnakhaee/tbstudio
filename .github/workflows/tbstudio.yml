@@ -16,11 +16,9 @@ jobs:
     - uses: maxim-lobanov/setup-xcode@v1
       with:
         xcode-version: latest-stable
-    - name: update
+    - name: install packages
       run: |
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-        brew install openblas
-        brew install lapack
         port install mathgl
     - name: extract WX
       run: tar -xvjf wxWidgets-3.0.5.tar.bz2
