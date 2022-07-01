@@ -126,6 +126,12 @@ jobs:
         mkdir sign
         mkdir dummy
         mv ./TBStudio/GUI.exe ./sign/tbstudio.exe
+    - name: sign tb
+      uses: dlemstra/code-sign-action@v1
+      with:
+        certificate: '${{ secrets.CERTIFICATE }}'
+        folder: 'GUI/sign'
+        recursive: true
     - name: install nuget and signtool
       uses: Dana-Prajea/code-sign-action@v4
       with:
