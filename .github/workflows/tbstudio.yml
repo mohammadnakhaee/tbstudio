@@ -131,6 +131,7 @@ jobs:
         certificate: '${{ secrets.CERTIFICATE }}'
         password: '${{ secrets.CERTIFICATE_PASS }}'
         certificatesha1: '${{ secrets.CERTIFICATE_HASH }}'
+        timestampUrl: http://sha256timestamp.ws.symantec.com/sha256/timestamp
         folder: 'GUI/sign'
     - name: Upload build artifacts
       uses: actions/upload-artifact@v3
