@@ -25,7 +25,7 @@ jobs:
       run: echo "/opt/local/bin" >> $GITHUB_PATH
     - name: install packages
       run: |
-        port install mathgl
+        sudo port install mathgl
     - name: extract WX
       run: tar -xvjf wxWidgets-3.0.5.tar.bz2
     - name: compile WX
