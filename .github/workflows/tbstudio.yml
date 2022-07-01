@@ -16,9 +16,13 @@ jobs:
     - uses: maxim-lobanov/setup-xcode@v1
       with:
         xcode-version: latest-stable
-    - name: install packages
+    - name: install package managers
       run: |
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+        wget https://github.com/macports/macports-base/releases/download/v2.7.1/MacPorts-2.7.1-11-BigSur.pkg
+        sudo installer -pkg ./MacPorts-2.7.1-11-BigSur.pkg -target /
+    - name: install packages
+      run: |
         port install mathgl
     - name: extract WX
       run: tar -xvjf wxWidgets-3.0.5.tar.bz2
