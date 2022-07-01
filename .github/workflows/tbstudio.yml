@@ -13,5 +13,19 @@ jobs:
     
     steps:
     - uses: actions/checkout@v1
-    - name: update apt
-      run: sudo apt-get -y update
+    - name: update
+      run: |
+        port install mathgl
+        /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+        brew  install wxmac
+        brew install openblas
+        brew install lapack
+    - name: extract WX
+      run: tar -xvjf wxWidgets-3.0.5.tar.bz2
+    - name: compile WX
+      run: |
+        ../configure --enable-unicode --with-opengl --with-libpng --with-macosx-version-min=10.11
+        make
+        sudo make install
+        sudo update_dyld_shared_cache
+      
