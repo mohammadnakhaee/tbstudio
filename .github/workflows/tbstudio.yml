@@ -124,7 +124,6 @@ jobs:
       working-directory: GUI
       run: |
         mkdir sign
-        mkdir dummy
         mv ./TBStudio/GUI.exe ./sign/tbstudio.exe
     - name: sign tb
       uses: dlemstra/code-sign-action@v1
@@ -134,10 +133,7 @@ jobs:
         recursive: true
     - name: move to tbstudio
       working-directory: GUI
-      run: |
-        mkdir sign
-        mkdir dummy
-        mv ./sign/tbstudio.exe ./TBStudio/tbstudio.exe
+      run: mv ./sign/tbstudio.exe ./TBStudio/tbstudio.exe
     - name: zip package
       working-directory: GUI/TBStudio
       run: ../../7zip/32/7z.exe a tbstudio.zip
