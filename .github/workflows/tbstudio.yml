@@ -18,8 +18,7 @@ jobs:
         xcode-version: latest-stable
     - name: update
       run: |
-        /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-        brew  install wxmac
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
         brew install openblas
         brew install lapack
         port install mathgl
