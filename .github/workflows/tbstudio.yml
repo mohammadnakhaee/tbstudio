@@ -13,13 +13,16 @@ jobs:
     
     steps:
     - uses: actions/checkout@v1
+    - uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: latest-stable
     - name: update
       run: |
-        #port install mathgl
         /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
         brew  install wxmac
         brew install openblas
         brew install lapack
+        port install mathgl
     - name: extract WX
       run: tar -xvjf wxWidgets-3.0.5.tar.bz2
     - name: compile WX
