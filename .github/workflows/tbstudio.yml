@@ -141,7 +141,7 @@ jobs:
       working-directory: GUI/sign
       run: |
         certutil -decode .\cert.txt .\cert.pfx
-        signtool.exe sign /f ".\cert.pfx" /p '${{ secrets.CERTIFICATE_PASS }}' /fd sha256 /tr http://sha256timestamp.ws.symantec.com/sha256/timestamp /v ".\tbstudio.exe"
+        signtool sign /f ".\cert.pfx" /p '${{ secrets.CERTIFICATE_PASS }}' /fd sha256 /tr http://sha256timestamp.ws.symantec.com/sha256/timestamp /v ".\tbstudio.exe"
     - name: Upload build artifacts
       uses: actions/upload-artifact@v3
       with:
