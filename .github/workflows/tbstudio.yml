@@ -15,7 +15,7 @@ jobs:
     - uses: actions/checkout@v1
     - name: update
       run: |
-        port install mathgl
+        #port install mathgl
         /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
         brew  install wxmac
         brew install openblas
