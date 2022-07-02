@@ -24,18 +24,18 @@ jobs:
     - name: set PATH
       run: echo "/opt/local/bin" >> $GITHUB_PATH
     - name: install packages
-      run: |
-        sudo port install mathgl
-    - name: extract WX
-      run: tar -xvjf wxWidgets-3.0.5.tar.bz2
-    - name: create WXBuildDIR
-      working-directory: wxWidgets-3.0.5
-      run: mkdir gtk-build
-    - name: compile WX
-      working-directory: wxWidgets-3.0.5/gtk-build
-      run: |
-        ../configure --enable-unicode --with-opengl --with-libpng --with-macosx-version-min=10.11
-        make
-        sudo make install
-        sudo update_dyld_shared_cache
-      
+      run: sudo port install mathgl
+#     - name: extract WX
+#       run: tar -xvjf wxWidgets-3.0.5.tar.bz2
+#     - name: create WXBuildDIR
+#       working-directory: wxWidgets-3.0.5
+#       run: mkdir gtk-build
+#     - name: compile WX
+#       working-directory: wxWidgets-3.0.5/gtk-build
+#       run: |
+#         ../configure --enable-unicode --with-opengl --with-libpng --with-macosx-version-min=10.11
+#         make
+#         sudo make install
+#         sudo update_dyld_shared_cache
+    - name: install packages
+      run: ls /usr/local/opt/lapack
