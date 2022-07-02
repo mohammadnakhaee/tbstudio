@@ -36,9 +36,9 @@ jobs:
       run: mkdir gtk-build
     - name: compile WX
       working-directory: wxWidgets-3.0.5/gtk-build
-      #../configure --enable-unicode --with-opengl --with-libpng --with-macosx-version-min=11.7
+      #../configure --enable-unicode --with-opengl --with-libpng --with-macosx-version-min=12.1
       run: |
-        ../configure --enable-unicode --with-opengl --with-libpng --with-macosx-version-min=11.7 --with-macosx-sdk=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.7.sdk/ --disable-debug --disable-debug_flag
+        ../configure --enable-unicode --with-opengl --with-libpng --with-macosx-version-min=12.1 --with-macosx-sdk=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.1.sdk/ --disable-debug --disable-debug_flag
         make
         sudo make install
         sudo update_dyld_shared_cache
