@@ -31,20 +31,20 @@ jobs:
       run: brew install lapack
     - name: install llvm clang
       run: brew install llvm
-#     - name: extract WX
-#       run: tar -xvjf wxWidgets-3.0.5.tar.bz2
-#     - name: create WXBuildDIR
-#       working-directory: wxWidgets-3.0.5
-#       run: mkdir gtk-build
-#     - name: compile WX
-#       working-directory: wxWidgets-3.0.5/gtk-build
-#       #../configure --enable-unicode --with-opengl --with-libpng --with-macosx-version-min=12.1 --with-macosx-sdk=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.1.sdk/ CC=clang CXX=clang --disable-debug --disable-debug_flag
-#       #../configure --enable-unicode --with-opengl --with-libpng --with-macosx-version-min=12.1
-#       run: |
-#         ../configure --enable-unicode --with-opengl --with-libpng --with-macosx-version-min=12.1
-#         make
-#         sudo make install
-#         sudo update_dyld_shared_cache
+    - name: extract WX
+      run: tar -xvjf wxWidgets-3.0.5.tar.bz2
+    - name: create WXBuildDIR
+      working-directory: wxWidgets-3.0.5
+      run: mkdir gtk-build
+    - name: compile WX
+      working-directory: wxWidgets-3.0.5/gtk-build
+      #../configure --enable-unicode --with-opengl --with-libpng --with-macosx-version-min=12.1 --with-macosx-sdk=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.1.sdk/ CC=clang CXX=clang --disable-debug --disable-debug_flag
+      #../configure --enable-unicode --with-opengl --with-libpng --with-macosx-version-min=12.1
+      run: |
+        ../configure --enable-unicode --with-opengl --with-libpng --with-macosx-version-min=12.1
+        make
+        sudo make install
+        sudo update_dyld_shared_cache
     - name: dir packages
       run: |
         ls /usr/local/opt/lapack
@@ -61,5 +61,16 @@ jobs:
         echo "PATH=/usr/local/bin:$PATH" >> $GITHUB_ENV
         echo "PATH=/usr/local/opt/llvm/bin:$PATH" >> $GITHUB_ENV
         echo "PATH=/usr/local/opt/lapack/bin:$PATH" >> $GITHUB_ENV
+    - name: copy ubuntu Makefile
+      run: cp ./GUI/MacOSGUI.mk ./GUI/GUI.mk
+    - name: compile tbstudio
+      run: |
+        make -e
+        mv ./GUI/Release/GUI ./GUI/Release/tbstudio
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: executable
+        path: ./GUI/Release/tbstudio
 
         
