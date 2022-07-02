@@ -78,7 +78,12 @@ jobs:
       run: |
         chmod 777 TBStudio
         echo ${{ secrets.CERTIFICATE }} | base64 —decode > tbstudio.cer
-        /usr/bin/codesign -s ./tbstudio.cer ./TBStudio
+    - name: sign tbstudio
+      working-directory: Packaging/sign
+      run: ls
+    - name: sign tbstudio
+      working-directory: Packaging/sign
+      run: /usr/bin/codesign -s ./tbstudio.cer ./TBStudio
     - name: Upload build artifacts
       uses: actions/upload-artifact@v3
       with:
