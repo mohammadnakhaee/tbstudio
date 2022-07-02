@@ -41,7 +41,7 @@ jobs:
       #../configure --enable-unicode --with-opengl --with-libpng --with-macosx-version-min=12.1 --with-macosx-sdk=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.1.sdk/ CC=clang CXX=clang --disable-debug --disable-debug_flag
       #../configure --enable-unicode --with-opengl --with-libpng --with-macosx-version-min=12.1
       run: |
-        ../configure --enable-unicode --with-opengl --with-libpng --with-macosx-version-min=12.1
+        ../configure --enable-unicode --with-opengl --with-libpng --with-macosx-version-min=10.11
         make
         sudo make install
         sudo update_dyld_shared_cache
