@@ -29,18 +29,37 @@ jobs:
       run: sudo port install mathgl
     - name: install lapack
       run: brew install lapack
-    - name: extract WX
-      run: tar -xvjf wxWidgets-3.0.5.tar.bz2
-    - name: create WXBuildDIR
-      working-directory: wxWidgets-3.0.5
-      run: mkdir gtk-build
-    - name: compile WX
-      working-directory: wxWidgets-3.0.5/gtk-build
-      #../configure --enable-unicode --with-opengl --with-libpng --with-macosx-version-min=12.1
+    - name: install llvm clang
+      run: brew install llvm
+#     - name: extract WX
+#       run: tar -xvjf wxWidgets-3.0.5.tar.bz2
+#     - name: create WXBuildDIR
+#       working-directory: wxWidgets-3.0.5
+#       run: mkdir gtk-build
+#     - name: compile WX
+#       working-directory: wxWidgets-3.0.5/gtk-build
+#       #../configure --enable-unicode --with-opengl --with-libpng --with-macosx-version-min=12.1 --with-macosx-sdk=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.1.sdk/ CC=clang CXX=clang --disable-debug --disable-debug_flag
+#       #../configure --enable-unicode --with-opengl --with-libpng --with-macosx-version-min=12.1
+#       run: |
+#         ../configure --enable-unicode --with-opengl --with-libpng --with-macosx-version-min=12.1
+#         make
+#         sudo make install
+#         sudo update_dyld_shared_cache
+    - name: dir packages
       run: |
-        ../configure --enable-unicode --with-opengl --with-libpng --with-macosx-version-min=12.1 --with-macosx-sdk=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.1.sdk/ CC=clang CXX=clang --disable-debug --disable-debug_flag
-        make
-        sudo make install
-        sudo update_dyld_shared_cache
-    - name: install packages
-      run: ls /usr/local/opt/lapack
+        ls /usr/local/opt/lapack
+        ls /usr/local/opt/llvm
+    - name: set env vars
+      run: |
+        echo "WXDIRInclude=/usr/local/include/wx-3.0" >> $GITHUB_ENV
+        echo "RapidXML_DIR=${GITHUB_WORKSPACE}/rapidxml-1.13" >> $GITHUB_ENV
+        echo "MATHGL_INCLUDE=/opt/local/include" >> $GITHUB_ENV
+        echo "LAPACKE_INCLUDE=/usr/local/opt/lapack/include" >> $GITHUB_ENV
+    - name: set PATH
+      run: |
+        echo "PATH=/usr/local/include/wx-3.0:$PATH" >> $GITHUB_ENV
+        echo "PATH=/usr/local/bin:$PATH" >> $GITHUB_ENV
+        echo "PATH=/usr/local/opt/llvm/bin:$PATH" >> $GITHUB_ENV
+        echo "PATH=/usr/local/opt/lapack/bin:$PATH" >> $GITHUB_ENV
+
+        
