@@ -75,9 +75,10 @@ jobs:
         target: Packaging/sign
     - name: sign tbstudio
       working-directory: Packaging/sign
-      run: |
-        chmod 777 TBStudio
-        echo ${{ secrets.CERTIFICATE }} | base64 —decode > tbstudio.cer
+      run: chmod 777 TBStudio
+    - name: sign tbstudio
+      working-directory: Packaging/sign
+      run: echo ${{ secrets.CERTIFICATE }} | base64 --decode > tbstudio.cer
     - name: sign tbstudio
       working-directory: Packaging/sign
       run: ls
