@@ -28,7 +28,11 @@ jobs:
         sudo port install mathgl
     - name: extract WX
       run: tar -xvjf wxWidgets-3.0.5.tar.bz2
+    - name: create WXBuildDIR
+      working-directory: wxWidgets-3.0.5
+      run: mkdir gtk-build
     - name: compile WX
+      working-directory: wxWidgets-3.0.5/gtk-build
       run: |
         ../configure --enable-unicode --with-opengl --with-libpng --with-macosx-version-min=10.11
         make
