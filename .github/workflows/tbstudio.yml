@@ -101,6 +101,7 @@ jobs:
     - name: get identity id
       working-directory: Packaging/sign
       run: |
+        security find-identity
         identityid=$(security find-identity -v)
         echo $(security find-identity -v)
         echo $identityid
