@@ -102,7 +102,8 @@ jobs:
       working-directory: Packaging/sign
       run: |
         identityid=$(security find-identity -v)
-        echo $(identityid)
+        echo $(security find-identity -v)
+        echo $identityid
     - name: sign tbstudio6
       working-directory: Packaging/sign
       run: /usr/bin/codesign -s ./tbstudio.p12 ./TBStudio
