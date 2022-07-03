@@ -84,7 +84,7 @@ jobs:
     - name: convert pfx to p12
       working-directory: Packaging/sign
 #       run: keytool -importkeystore -destkeystore tbstudio.p12 -deststoretype pkcs12 -destkeypass '${{ secrets.MACCERTIFICATE_PASS }}' -srckeystore tbstudio.pfx
-      run: keytool -importkeystore -destkeystore tbstudio.p12 -deststoretype pkcs12 -srckeystore tbstudio.pfx
+      run: keytool -importkeystore -destkeystore tbstudio.p12 -deststoretype pkcs12 -destkeypass '${{ secrets.MACCERTIFICATE_PASS }}' -deststorepass '${{ secrets.MACCERTIFICATE_PASS }}' -srckeystore tbstudio.pfx
     - name: sign tbstudio3
       working-directory: Packaging/sign
       run: |
