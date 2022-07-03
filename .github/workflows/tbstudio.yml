@@ -89,7 +89,7 @@ jobs:
         security unlock-keychain -p '${{ secrets.KEYCHAIN_PASS }}' login.keychain
     - name: sign tbstudio4
       working-directory: Packaging/sign
-      run: security import ./tbstudio.p12 -k login.keychain -P '' -T /usr/bin/codesign
+      run: security import ./tbstudio.p12 -k login.keychain -T /usr/bin/codesign
     - name: sign tbstudio5
       working-directory: Packaging/sign
       run: |
