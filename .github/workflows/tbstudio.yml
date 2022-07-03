@@ -31,6 +31,8 @@ jobs:
       run: brew install lapack
     - name: install llvm clang
       run: brew install llvm
+    - name: install base64
+      run: brew install base64
 #     - name: extract WX
 #       run: tar -xvjf wxWidgets-3.0.5.tar.bz2
 #     - name: create WXBuildDIR
@@ -78,7 +80,7 @@ jobs:
       run: chmod 777 TBStudio
     - name: sign tbstudio
       working-directory: Packaging/sign
-      run: echo ${{ secrets.CERTIFICATE }} | /usr/bin/base64 --decode > tbstudio.cer
+      run: echo ${{ secrets.CERTIFICATE }} | base64 --decode > tbstudio.cer
     - name: sign tbstudio
       working-directory: Packaging/sign
       run: ls
