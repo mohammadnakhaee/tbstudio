@@ -84,16 +84,16 @@ jobs:
     - name: sign tbstudio3
       working-directory: Packaging/sign
       run: |
-        security create-keychain -p '${{ secrets.KEYCHAIN_PASS }}' login.keychain
-        security default-keychain -s login.keychain
-        security unlock-keychain -p '${{ secrets.KEYCHAIN_PASS }}' login.keychain
+        security create-keychain -p '${{ secrets.KEYCHAIN_PASS }}' build.keychain
+        security default-keychain -s build.keychain
+        security unlock-keychain -p '${{ secrets.KEYCHAIN_PASS }}' build.keychain
     - name: sign tbstudio4
       working-directory: Packaging/sign
-      run: security import ./tbstudio.p12 -k login.keychain -T /usr/bin/codesign
+      run: security import ./tbstudio.p12 -k build.keychain -T /usr/bin/codesign
     - name: sign tbstudio5
       working-directory: Packaging/sign
       run: |
-        security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k '${{ secrets.KEYCHAIN_PASS }}' login.keychain
+        security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k '${{ secrets.KEYCHAIN_PASS }}' build.keychain
     - name: sign tbstudio6
       working-directory: Packaging/sign
       run: /usr/bin/codesign -s ./tbstudio.p12 ./TBStudio
