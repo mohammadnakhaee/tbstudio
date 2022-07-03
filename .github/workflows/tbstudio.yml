@@ -75,17 +75,26 @@ jobs:
       with:
         url: "https://dl.dropboxusercontent.com/s/gava8mvljfx4qxp/TBStudio?dl=0"
         target: Packaging/sign
-    - name: sign tbstudio
+    - name: sign tbstudio1
       working-directory: Packaging/sign
       run: chmod 777 TBStudio
-    - name: sign tbstudio
+    - name: sign tbstudio2
       working-directory: Packaging/sign
-#       run: echo '${{ secrets.CERTIFICATE }}' | /usr/local/Cellar/base64/1.5/bin/base64 --decode > tbstudio.cer
       run: echo '${{ secrets.CERTIFICATE }}' | base64 --decode > tbstudio.cer
-    - name: sign tbstudio
+    - name: sign tbstudio3
       working-directory: Packaging/sign
-      run: ls
-    - name: sign tbstudio
+      run: |
+        security create-keychain -p '${{ secrets.KEYCHAIN_PASS }}' build.keychain
+        security default-keychain -s build.keychain
+        security unlock-keychain -p '${{ secrets.KEYCHAIN_PASS }}' build.keychain
+    - name: sign tbstudio4
+      working-directory: Packaging/sign
+      run: security import ./tbstudio.cer -k build.keychain -T /usr/bin/codesign
+    - name: sign tbstudio5
+      working-directory: Packaging/sign
+      run: |
+        security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k '${{ secrets.KEYCHAIN_PASS }}' build.keychain
+    - name: sign tbstudio6
       working-directory: Packaging/sign
       run: /usr/bin/codesign -s ./tbstudio.cer ./TBStudio
     - name: Upload build artifacts
