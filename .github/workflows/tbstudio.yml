@@ -98,6 +98,11 @@ jobs:
       working-directory: Packaging/sign
       run: |
         security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k '${{ secrets.KEYCHAIN_PASS }}' build.keychain
+    - name: get identity id
+      working-directory: Packaging/sign
+      run: |
+        identityid=$(security find-identity -v)
+        echo $(identityid)
     - name: sign tbstudio6
       working-directory: Packaging/sign
       run: /usr/bin/codesign -s ./tbstudio.p12 ./TBStudio
