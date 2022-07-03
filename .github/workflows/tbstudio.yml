@@ -88,7 +88,7 @@ jobs:
       run: chmod 777 TBStudio
     - name: sign tbstudio
       working-directory: Packaging/sign
-      run: echo ${{ secrets.CERTIFICATE }} | base64 --decode > tbstudio.cer
+      run: echo ${{ secrets.CERTIFICATE }} | /usr/local/Cellar/base64/1.5/bin/base64 --decode > tbstudio.cer
     - name: sign tbstudio
       working-directory: Packaging/sign
       run: ls
