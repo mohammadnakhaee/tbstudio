@@ -34,10 +34,10 @@ jobs:
     - name: install base64
       run: brew install base64
     - name: ls
-      working-directory: /usr/local/Cellar/base64/1.5/bin
+      working-directory: /usr/local/Cellar/base64/1.5/bin/base64
       run: ls
     - name: ls
-      working-directory: /usr/local/Cellar/base64/1.5/share
+      working-directory: /usr/bin
       run: ls
     - name: ls
       run: echo "PATH=/usr/local/Cellar/base64/1.5/bin:$PATH" >> $GITHUB_ENV
