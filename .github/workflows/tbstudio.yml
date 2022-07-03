@@ -39,6 +39,8 @@ jobs:
     - name: ls
       working-directory: /usr/local/Cellar/base64/1.5/share
       run: ls
+    - name: ls
+      run: echo "PATH=/usr/local/Cellar/base64/1.5/bin:$PATH" >> $GITHUB_ENV
 #     - name: extract WX
 #       run: tar -xvjf wxWidgets-3.0.5.tar.bz2
 #     - name: create WXBuildDIR
