@@ -37,10 +37,7 @@ jobs:
       working-directory: /usr/local/Cellar/base64/1.5/bin
       run: ls
     - name: ls
-      working-directory: /usr/local/Cellar/base64
-      run: ls
-    - name: ls
-      working-directory: /usr/local/Cellar
+      working-directory: /usr/local/Cellar/base64/1.5/share
       run: ls
 #     - name: extract WX
 #       run: tar -xvjf wxWidgets-3.0.5.tar.bz2
