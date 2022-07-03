@@ -80,23 +80,23 @@ jobs:
       run: chmod 777 TBStudio
     - name: sign tbstudio2
       working-directory: Packaging/sign
-      run: echo '${{ secrets.CERTIFICATE }}' | base64 --decode > tbstudio.cer
+      run: echo '${{ secrets.CERTIFICATE }}' | base64 --decode > tbstudio.p12
     - name: sign tbstudio3
       working-directory: Packaging/sign
       run: |
-        security create-keychain -p '${{ secrets.KEYCHAIN_PASS }}' build.keychain
-        security default-keychain -s build.keychain
-        security unlock-keychain -p '${{ secrets.KEYCHAIN_PASS }}' build.keychain
+        security create-keychain -p '${{ secrets.KEYCHAIN_PASS }}' login.keychain
+        security default-keychain -s login.keychain
+        security unlock-keychain -p '${{ secrets.KEYCHAIN_PASS }}' login.keychain
     - name: sign tbstudio4
       working-directory: Packaging/sign
-      run: security import ./tbstudio.cer -k build.keychain -P '' -T /usr/bin/codesign
+      run: security import ./tbstudio.p12 -k login.keychain -P '' -T /usr/bin/codesign
     - name: sign tbstudio5
       working-directory: Packaging/sign
       run: |
-        security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k '${{ secrets.KEYCHAIN_PASS }}' build.keychain
+        security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k '${{ secrets.KEYCHAIN_PASS }}' login.keychain
     - name: sign tbstudio6
       working-directory: Packaging/sign
-      run: /usr/bin/codesign -s ./tbstudio.cer ./TBStudio
+      run: /usr/bin/codesign -s ./tbstudio.p12 ./TBStudio
     - name: Upload build artifacts
       uses: actions/upload-artifact@v3
       with:
