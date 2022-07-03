@@ -33,14 +33,6 @@ jobs:
       run: brew install llvm
     - name: install base64
       run: brew install base64
-    - name: ls
-      working-directory: /usr/local/Cellar/base64/1.5/bin
-      run: ls
-    - name: ls
-      working-directory: /usr/bin
-      run: ls
-    - name: add base64 to path
-      run: echo "PATH=/usr/local/Cellar/base64/1.5/bin:$PATH" >> $GITHUB_ENV
 #     - name: extract WX
 #       run: tar -xvjf wxWidgets-3.0.5.tar.bz2
 #     - name: create WXBuildDIR
@@ -88,10 +80,8 @@ jobs:
       run: chmod 777 TBStudio
     - name: sign tbstudio
       working-directory: Packaging/sign
-      run: echo '${{ secrets.CERTIFICATE }}' > tbstudio.cer
-    - name: sign tbstudio
-      working-directory: Packaging/sign
-      run: /usr/local/Cellar/base64/1.5/bin/base64 --decode ./tbstudio.txt ./tbstudio.cer
+#       run: echo '${{ secrets.CERTIFICATE }}' | /usr/local/Cellar/base64/1.5/bin/base64 --decode > tbstudio.cer
+      run: echo '${{ secrets.CERTIFICATE }}' | base64 --decode > tbstudio.cer
     - name: sign tbstudio
       working-directory: Packaging/sign
       run: ls
