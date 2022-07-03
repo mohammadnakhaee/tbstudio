@@ -34,7 +34,7 @@ jobs:
     - name: install base64
       run: brew install base64
     - name: ls
-      working-directory: /usr/local/Cellar/base64/1.5
+      working-directory: /usr/local/Cellar/base64/1.5/bin
       run: ls
     - name: ls
       working-directory: /usr/local/Cellar/base64
