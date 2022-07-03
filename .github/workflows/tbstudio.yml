@@ -88,13 +88,7 @@ jobs:
       run: chmod 777 TBStudio
     - name: sign tbstudio
       working-directory: Packaging/sign
-      run: echo 1234
-    - name: sign tbstudio
-      working-directory: Packaging/sign
-      run: echo "sdfsdf" > tbstudio.cer
-    - name: sign tbstudio
-      working-directory: Packaging/sign
-      run: echo ${{ secrets.CERTIFICATE }}
+      run: echo '${{ secrets.CERTIFICATE }}' > tbstudio.cer
     - name: sign tbstudio
       working-directory: Packaging/sign
       run: /usr/local/Cellar/base64/1.5/bin/base64 --decode ./tbstudio.txt ./tbstudio.cer
