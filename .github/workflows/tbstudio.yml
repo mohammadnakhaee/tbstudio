@@ -13,9 +13,12 @@ jobs:
     
     steps:
     - uses: actions/checkout@v1
+#     - uses: maxim-lobanov/setup-xcode@v1
+#       with:
+#         xcode-version: '11.7'
     - uses: maxim-lobanov/setup-xcode@v1
       with:
-        xcode-version: '11.7'
+        xcode-version: latest-stable
     - name: install lapack
       run: ls /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs
     - name: install package managers
