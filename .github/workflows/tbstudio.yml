@@ -78,6 +78,9 @@ jobs:
       with:
         url: "https://dl.dropboxusercontent.com/s/gava8mvljfx4qxp/TBStudio?dl=0"
         target: Packaging/sign
+    - name: copy apple certificate
+      working-directory: Packaging/sign
+      run: cp ../macos/AppleIncRootCertificate.cer ./AppleIncRootCertificate.cer
     - name: sign tbstudio1
       working-directory: Packaging/sign
       run: chmod 777 TBStudio
@@ -94,6 +97,9 @@ jobs:
         security create-keychain -p '${{ secrets.KEYCHAIN_PASS }}' build.keychain
         security default-keychain -s build.keychain
         security unlock-keychain -p '${{ secrets.KEYCHAIN_PASS }}' build.keychain
+    - name: add apple developer certificate to the keychain
+      working-directory: Packaging/sign
+      run: security add-trusted-cert -d -r trustRoot -k build.keychain AppleIncRootCertificate.cer
     - name: sign tbstudio4
       working-directory: Packaging/sign
       run: security import ./tbstudio.p12 -k build.keychain -P '${{ secrets.MACCERTIFICATE_PASS }}' -T /usr/bin/codesign
