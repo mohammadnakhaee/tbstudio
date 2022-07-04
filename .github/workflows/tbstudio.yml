@@ -106,7 +106,7 @@ jobs:
         security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k '${{ secrets.KEYCHAIN_PASS }}' build.keychain
     - name: add apple developer certificate to the keychain
       working-directory: Packaging/sign
-      run: security add-trusted-cert -d -r trustRoot -k build.keychain AppleIncRootCertificate.cer
+      run: echo '${{ secrets.KEYCHAIN_PASS }}' | security add-trusted-cert -d -r trustRoot -k build.keychain AppleIncRootCertificate.cer
     - name: get identity id
       working-directory: Packaging/sign
       run: |
