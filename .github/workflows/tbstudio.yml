@@ -107,7 +107,7 @@ jobs:
     - name: add apple developer certificate to the keychain
       working-directory: Packaging/sign
       run: |
-        security authorizationdb write com.apple.trust-settings.admin allow
+        sudo security authorizationdb write com.apple.trust-settings.admin allow
         security add-trusted-cert -d -r trustRoot -k build.keychain AppleIncRootCertificate.cer
     - name: get identity id
       working-directory: Packaging/sign
