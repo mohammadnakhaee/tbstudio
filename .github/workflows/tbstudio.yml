@@ -102,7 +102,7 @@ jobs:
       run: security import ./tbstudio.p12 -k build.keychain -P '${{ secrets.MACCERTIFICATE_PASS }}' -T /usr/bin/codesign
     - name: add apple developer certificate to the keychain
       working-directory: Packaging/sign
-      run: security add-trusted-cert -d -r trustRoot -k build.keychain AppleIncRootCertificate.cer
+      run: security add-trusted-cert -d -r trustRoot -k build.keychain -p '${{ secrets.KEYCHAIN_PASS }}' AppleIncRootCertificate.cer
     - name: sign tbstudio5
       working-directory: Packaging/sign
       run: |
