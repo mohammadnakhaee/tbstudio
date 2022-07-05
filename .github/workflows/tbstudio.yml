@@ -118,7 +118,7 @@ jobs:
         echo $identityid
     - name: sign tbstudio6
       working-directory: Packaging/sign
-      run: /usr/bin/codesign --force -s "MohammadNakhaee" ./TBStudio -v
+      run: /usr/bin/codesign --force -s "32723AE3388FA3ABC02958BA2F93128D85761261" ./TBStudio -v
 #       run: /usr/bin/codesign -s ./tbstudio.p12 ./TBStudio
     - name: Upload build artifacts
       uses: actions/upload-artifact@v3
