@@ -80,7 +80,9 @@ jobs:
         target: Packaging/sign
     - name: copy apple certificate
       working-directory: Packaging/sign
-      run: cp ../macos/AppleIncRootCertificate.cer ./AppleIncRootCertificate.cer
+      run: |
+        cp ../macos/AppleIncRootCertificate.cer ./AppleIncRootCertificate.cer
+        cp ../macos/AppleWWDRCAG3.cer ./AppleWWDRCAG3.cer
     - name: sign tbstudio1
       working-directory: Packaging/sign
       run: chmod 777 TBStudio
@@ -99,16 +101,20 @@ jobs:
         security unlock-keychain -p '${{ secrets.KEYCHAIN_PASS }}' build.keychain
     - name: sign tbstudio4
       working-directory: Packaging/sign
-      run: security import ./tbstudio.p12 -k build.keychain -P '${{ secrets.MACCERTIFICATE_PASS }}' -T /usr/bin/codesign
+      run: security import ./tbstudio.p12 -k build.keychain -P '${{ secrets.MACCERTIFICATE_PASS }}' -T /usr/bin/codesign -T /usr/bin/security -T /usr/bin/productbuild
     - name: sign tbstudio5
       working-directory: Packaging/sign
       run: |
-        security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k '${{ secrets.KEYCHAIN_PASS }}' build.keychain
+        sudo security import ./AppleWWDRCAG3.cer -k build.keychain -T /usr/bin/codesign -T /usr/bin/security -T /usr/bin/productbuild
     - name: add apple developer certificate to the keychain
       working-directory: Packaging/sign
       run: |
         sudo security authorizationdb write com.apple.trust-settings.admin allow
         security add-trusted-cert -d -r trustRoot -k build.keychain AppleIncRootCertificate.cer
+    - name: sign tbstudio5
+      working-directory: Packaging/sign
+      run: |
+        security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k '${{ secrets.KEYCHAIN_PASS }}' build.keychain
     - name: get identity id
       working-directory: Packaging/sign
       run: |
