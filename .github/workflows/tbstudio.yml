@@ -83,6 +83,8 @@ jobs:
       run: |
         cp ../macos/AppleIncRootCertificate.cer ./AppleIncRootCertificate.cer
         cp ../macos/AppleWWDRCAG3.cer ./AppleWWDRCAG3.cer
+        cp ../macos/DigiCertHighAssuranceCodeSigningCA-1.cer ./DigiCertHighAssuranceCodeSigningCA-1.cer
+        cp ../macos/DigiCertAssuredIDCodeSigningCA-1.cer ./DigiCertAssuredIDCodeSigningCA-1.cer
     - name: sign tbstudio1
       working-directory: Packaging/sign
       run: chmod 777 TBStudio
