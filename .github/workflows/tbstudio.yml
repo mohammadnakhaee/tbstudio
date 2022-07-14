@@ -36,103 +36,118 @@ jobs:
       run: brew install llvm
     - name: install base64
       run: brew install base64
-#     - name: extract WX
-#       run: tar -xvjf wxWidgets-3.0.5.tar.bz2
-#     - name: create WXBuildDIR
-#       working-directory: wxWidgets-3.0.5
-#       run: mkdir gtk-build
-#     - name: compile WX
-#       working-directory: wxWidgets-3.0.5/gtk-build
-#       #../configure --enable-unicode --with-opengl --with-libpng --with-macosx-version-min=12.1 --with-macosx-sdk=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.1.sdk/ CC=clang CXX=clang --disable-debug --disable-debug_flag
-#       #../configure --enable-unicode --with-opengl --with-libpng --with-macosx-version-min=12.1
+    - name: extract WX
+      run: tar -xvjf wxWidgets-3.0.5.tar.bz2
+    - name: create WXBuildDIR
+      working-directory: wxWidgets-3.0.5
+      run: mkdir gtk-build
+    - name: compile WX
+      working-directory: wxWidgets-3.0.5/gtk-build
+      #../configure --enable-unicode --with-opengl --with-libpng --with-macosx-version-min=12.1 --with-macosx-sdk=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.1.sdk/ CC=clang CXX=clang --disable-debug --disable-debug_flag
+      #../configure --enable-unicode --with-opengl --with-libpng --with-macosx-version-min=12.1
+      run: |
+        ../configure --enable-unicode --with-opengl --with-libpng --with-macosx-version-min=10.11
+        make
+        sudo make install
+        sudo update_dyld_shared_cache
+    - name: dir packages
+      run: |
+        ls /usr/local/opt/lapack
+        ls /usr/local/opt/llvm
+    - name: set env vars
+      run: |
+        echo "WXDIRInclude=/usr/local/include/wx-3.0" >> $GITHUB_ENV
+        echo "RapidXML_DIR=${GITHUB_WORKSPACE}/rapidxml-1.13" >> $GITHUB_ENV
+        echo "MATHGL_INCLUDE=/opt/local/include" >> $GITHUB_ENV
+        echo "LAPACKE_INCLUDE=/usr/local/opt/lapack/include" >> $GITHUB_ENV
+    - name: set PATH
+      run: |
+        echo "PATH=/usr/local/include/wx-3.0:$PATH" >> $GITHUB_ENV
+        echo "PATH=/usr/local/bin:$PATH" >> $GITHUB_ENV
+        echo "PATH=/usr/local/opt/llvm/bin:$PATH" >> $GITHUB_ENV
+        echo "PATH=/usr/local/opt/lapack/bin:$PATH" >> $GITHUB_ENV
+    - name: copy ubuntu Makefile
+      run: cp ./GUI/MacOSGUI.mk ./GUI/GUI.mk
+    - name: compile tbstudio
+      run: |
+        make -e
+        mv ./GUI/Release/GUI ./GUI/Release/tbstudio
+#     - name: copy apple certificate
+#       working-directory: Packaging/sign
 #       run: |
-#         ../configure --enable-unicode --with-opengl --with-libpng --with-macosx-version-min=10.11
-#         make
-#         sudo make install
-#         sudo update_dyld_shared_cache
-#     - name: dir packages
+#         cp ../macos/AppleIncRootCertificate.cer ./AppleIncRootCertificate.cer
+#         cp ../macos/AppleWWDRCAG3.cer ./AppleWWDRCAG3.cer
+#         cp ../macos/DigiCertHighAssuranceCodeSigningCA-1.crt ./DigiCertHighAssuranceCodeSigningCA-1.crt
+#         cp ../macos/DigiCertAssuredIDCodeSigningCA-1.crt ./DigiCertAssuredIDCodeSigningCA-1.crt
+#     - name: sign tbstudio1
+#       working-directory: Packaging/sign
+#       run: chmod 777 TBStudio
+#     - name: sign tbstudio2
+#       working-directory: Packaging/sign
+#       run: echo '${{ secrets.MACCERTIFICATE }}' | base64 --decode > tbstudio.pfx
+#     - name: convert pfx to p12
+#       working-directory: Packaging/sign
+# #       run: keytool -importkeystore -destkeystore tbstudio.p12 -deststoretype pkcs12 -destkeypass '${{ secrets.MACCERTIFICATE_PASS }}' -srckeystore tbstudio.pfx
+#       run: keytool -importkeystore -destkeystore tbstudio.p12 -deststoretype pkcs12 -destkeypass '${{ secrets.MACCERTIFICATE_PASS }}' -deststorepass '${{ secrets.MACCERTIFICATE_PASS }}' -srckeystore tbstudio.pfx -srcstorepass '${{ secrets.MACCERTIFICATE_PASS }}'
+#     - name: sign tbstudio3
+#       working-directory: Packaging/sign
 #       run: |
-#         ls /usr/local/opt/lapack
-#         ls /usr/local/opt/llvm
-#     - name: set env vars
+#         security create-keychain -p '${{ secrets.KEYCHAIN_PASS }}' build.keychain
+#         security default-keychain -s build.keychain
+#         security unlock-keychain -p '${{ secrets.KEYCHAIN_PASS }}' build.keychain
+#     - name: sign tbstudio4
+#       working-directory: Packaging/sign
+#       run: security import ./tbstudio.p12 -k build.keychain -P '${{ secrets.MACCERTIFICATE_PASS }}' -T /usr/bin/codesign -T /usr/bin/security -T /usr/bin/productbuild
+#     - name: sign tbstudio5
+#       working-directory: Packaging/sign
 #       run: |
-#         echo "WXDIRInclude=/usr/local/include/wx-3.0" >> $GITHUB_ENV
-#         echo "RapidXML_DIR=${GITHUB_WORKSPACE}/rapidxml-1.13" >> $GITHUB_ENV
-#         echo "MATHGL_INCLUDE=/opt/local/include" >> $GITHUB_ENV
-#         echo "LAPACKE_INCLUDE=/usr/local/opt/lapack/include" >> $GITHUB_ENV
-#     - name: set PATH
+#         sudo security import ./AppleWWDRCAG3.cer -k build.keychain -T /usr/bin/codesign -T /usr/bin/security -T /usr/bin/productbuild
+#         sudo security import ./DigiCertHighAssuranceCodeSigningCA-1.crt -k build.keychain -T /usr/bin/codesign -T /usr/bin/security -T /usr/bin/productbuild
+#         sudo security import ./DigiCertAssuredIDCodeSigningCA-1.crt -k build.keychain -T /usr/bin/codesign -T /usr/bin/security -T /usr/bin/productbuild
+#     - name: add apple developer certificate to the keychain
+#       working-directory: Packaging/sign
 #       run: |
-#         echo "PATH=/usr/local/include/wx-3.0:$PATH" >> $GITHUB_ENV
-#         echo "PATH=/usr/local/bin:$PATH" >> $GITHUB_ENV
-#         echo "PATH=/usr/local/opt/llvm/bin:$PATH" >> $GITHUB_ENV
-#         echo "PATH=/usr/local/opt/lapack/bin:$PATH" >> $GITHUB_ENV
-#     - name: copy ubuntu Makefile
-#       run: cp ./GUI/MacOSGUI.mk ./GUI/GUI.mk
-#     - name: compile tbstudio
+#         sudo security authorizationdb write com.apple.trust-settings.admin allow
+#         security add-trusted-cert -d -r trustRoot -k build.keychain AppleIncRootCertificate.cer
+#     - name: sign tbstudio5
+#       working-directory: Packaging/sign
 #       run: |
-#         make -e
-#         mv ./GUI/Release/GUI ./GUI/Release/tbstudio
+#         security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k '${{ secrets.KEYCHAIN_PASS }}' build.keychain
+#     - name: get identity id
+#       working-directory: Packaging/sign
+#       run: |
+#         security find-identity
+#         identityid=$(security find-identity -v)
+#         echo $(security find-identity -v)
+#         echo $identityid
+#     - name: sign tbstudio6
+#       working-directory: Packaging/sign
+#       run: /usr/bin/codesign --force -s "MohammadNakhaee" ./TBStudio -v
+# #       run: /usr/bin/codesign -s ./tbstudio.p12 ./TBStudio
     - uses: suisei-cn/actions-download-file@v1
-      id: example
-      name: Download the file
+      id: app
+      name: Download empty app package
       with:
-        url: "https://dl.dropboxusercontent.com/s/gava8mvljfx4qxp/TBStudio?dl=0"
-        target: Packaging/sign
-    - name: copy apple certificate
-      working-directory: Packaging/sign
+        url: "https://dl.dropboxusercontent.com/s/tqg6el51c8hi523/TBStudio.app.tar.gz?dl=0"
+        target: Packaging/macos/app
+    - uses: suisei-cn/actions-download-file@v1
+      id: dylib
+      name: Download compiled dylibs
+      with:
+        url: "https://dl.dropboxusercontent.com/s/900v4mhv3huyzcv/dylibs.tar.gz?dl=0"
+        target: Packaging/macos/app
+    - name: extract
+      working-directory: Packaging/macos/app
       run: |
-        cp ../macos/AppleIncRootCertificate.cer ./AppleIncRootCertificate.cer
-        cp ../macos/AppleWWDRCAG3.cer ./AppleWWDRCAG3.cer
-        cp ../macos/DigiCertHighAssuranceCodeSigningCA-1.crt ./DigiCertHighAssuranceCodeSigningCA-1.crt
-        cp ../macos/DigiCertAssuredIDCodeSigningCA-1.crt ./DigiCertAssuredIDCodeSigningCA-1.crt
-    - name: sign tbstudio1
-      working-directory: Packaging/sign
-      run: chmod 777 TBStudio
-    - name: sign tbstudio2
-      working-directory: Packaging/sign
-      run: echo '${{ secrets.MACCERTIFICATE }}' | base64 --decode > tbstudio.pfx
-    - name: convert pfx to p12
-      working-directory: Packaging/sign
-#       run: keytool -importkeystore -destkeystore tbstudio.p12 -deststoretype pkcs12 -destkeypass '${{ secrets.MACCERTIFICATE_PASS }}' -srckeystore tbstudio.pfx
-      run: keytool -importkeystore -destkeystore tbstudio.p12 -deststoretype pkcs12 -destkeypass '${{ secrets.MACCERTIFICATE_PASS }}' -deststorepass '${{ secrets.MACCERTIFICATE_PASS }}' -srckeystore tbstudio.pfx -srcstorepass '${{ secrets.MACCERTIFICATE_PASS }}'
-    - name: sign tbstudio3
-      working-directory: Packaging/sign
-      run: |
-        security create-keychain -p '${{ secrets.KEYCHAIN_PASS }}' build.keychain
-        security default-keychain -s build.keychain
-        security unlock-keychain -p '${{ secrets.KEYCHAIN_PASS }}' build.keychain
-    - name: sign tbstudio4
-      working-directory: Packaging/sign
-      run: security import ./tbstudio.p12 -k build.keychain -P '${{ secrets.MACCERTIFICATE_PASS }}' -T /usr/bin/codesign -T /usr/bin/security -T /usr/bin/productbuild
-    - name: sign tbstudio5
-      working-directory: Packaging/sign
-      run: |
-        sudo security import ./AppleWWDRCAG3.cer -k build.keychain -T /usr/bin/codesign -T /usr/bin/security -T /usr/bin/productbuild
-        sudo security import ./DigiCertHighAssuranceCodeSigningCA-1.crt -k build.keychain -T /usr/bin/codesign -T /usr/bin/security -T /usr/bin/productbuild
-        sudo security import ./DigiCertAssuredIDCodeSigningCA-1.crt -k build.keychain -T /usr/bin/codesign -T /usr/bin/security -T /usr/bin/productbuild
-    - name: add apple developer certificate to the keychain
-      working-directory: Packaging/sign
-      run: |
-        sudo security authorizationdb write com.apple.trust-settings.admin allow
-        security add-trusted-cert -d -r trustRoot -k build.keychain AppleIncRootCertificate.cer
-    - name: sign tbstudio5
-      working-directory: Packaging/sign
-      run: |
-        security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k '${{ secrets.KEYCHAIN_PASS }}' build.keychain
-    - name: get identity id
-      working-directory: Packaging/sign
-      run: |
-        security find-identity
-        identityid=$(security find-identity -v)
-        echo $(security find-identity -v)
-        echo $identityid
-    - name: sign tbstudio6
-      working-directory: Packaging/sign
-      run: /usr/bin/codesign --force -s "MohammadNakhaee" ./TBStudio -v
-#       run: /usr/bin/codesign -s ./tbstudio.p12 ./TBStudio
+        tar -xvf TBStudio.app.tar.gz
+        tar -xvf dylibs.tar.gz
+        ls
+    - name: tar
+      working-directory: Packaging/macos/app
+      run: tar -zcvf TBStudio.app.tar.gz TBStudio.app
     - name: Upload build artifacts
       uses: actions/upload-artifact@v3
       with:
         name: executable
-        path: ./GUI/Release/tbstudio
+        path: ./Packaging/macos/app/TBStudio.app
         
