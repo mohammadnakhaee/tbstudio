@@ -7,6 +7,102 @@ on:
 
 jobs:
 
+  build-ubuntu-2004:
+
+    runs-on: ubuntu-20.04
+    
+    steps:
+    - uses: actions/checkout@v1
+    - name: update apt
+      run: sudo apt-get -y update
+    - name: install packages
+      run: sudo apt-get install libgtk-3-dev build-essential checkinstall gfortran
+    - name: install OpenGL libraries
+      run: sudo apt-get install mesa-utils
+    - name: install freeGlut
+      run: sudo apt-get install freeglut3-dev
+    - name: install mathgl
+      run: sudo apt-get install mathgl libmgl-dev
+    - name: install lapack
+      run: sudo apt-get install liblapack3 liblapack-dev libopenblas-base libopenblas-dev liblapack-dev liblapacke-dev
+    - name: extract WX
+      run: tar -xvjf wxWidgets-3.0.5.tar.bz2
+    - name: create WXBuildDIR
+      working-directory: wxWidgets-3.0.5
+      run: mkdir gtk-build
+    - name: configure WX
+      working-directory: wxWidgets-3.0.5/gtk-build
+      run: ../configure --enable-unicode --with-opengl --with-libpng
+    - name: compile WX
+      working-directory: wxWidgets-3.0.5/gtk-build
+      run: make
+    - name: install WX
+      working-directory: wxWidgets-3.0.5/gtk-build
+      run: sudo make install
+    - name: set WX Include DIR
+      run: echo "WXDIRInclude=/usr/local/include/wx-3.0" >> $GITHUB_ENV
+    - name: set RapidXML DIR
+      run: echo "RapidXML_DIR=${GITHUB_WORKSPACE}/rapidxml-1.13" >> $GITHUB_ENV
+    - name: set PATH
+      run: echo "PATH=/usr/local/include/wx-3.0:$PATH" >> $GITHUB_ENV
+    - name: copy ubuntu Makefile
+      run: cp ./GUI/UbuntuGUI.mk ./GUI/GUI.mk
+    - name: compile tbstudio
+      run: |
+        make -e
+        mv ./GUI/Release/GUI ./GUI/Release/tbstudio
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: executable
+        path: ./GUI/Release/tbstudio
+
+
+  release-ubuntu-2004:
+
+    runs-on: ubuntu-20.04
+    needs: build-ubuntu-2004
+        
+    steps:
+    - uses: actions/checkout@v1
+    - name: Get Version
+      id: version
+      uses: battila7/get-version-action@v2
+    - name: Download build artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: executable
+        path: ./Packaging/debian/tbstudio/usr/bin
+    - name: Change permission
+      working-directory: Packaging/debian/tbstudio/usr/bin
+      run: sudo chmod 777 tbstudio
+    - name: set debian package version
+      uses: jacobtomlinson/gha-find-replace@v2
+      with:
+        find: "%version"
+        replace: ${{ steps.version.outputs.version-without-v }}
+        include: "Packaging/debian/tbstudio/DEBIAN/control"
+    - name: create debian package
+      working-directory: Packaging/debian
+      run: |
+        sudo dpkg-deb --build tbstudio
+        sudo chmod 777 tbstudio.deb
+    - name: Get release
+      id: get_release
+      uses: bruceadams/get-release@v1.2.3
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+    - name: Upload Release Asset
+      id: upload-release-asset 
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.get_release.outputs.upload_url }}
+        asset_path: ./Packaging/debian/tbstudio.deb
+        asset_name: tbstudio-ubuntu-20.04-x64-${{ steps.version.outputs.version-without-v }}.deb
+        asset_content_type: application/vnd.debian.binary-package
+
   build-ubuntu-1804:
 
     runs-on: ubuntu-18.04
