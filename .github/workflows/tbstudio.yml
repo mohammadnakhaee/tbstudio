@@ -69,9 +69,41 @@ jobs:
     - name: copy ubuntu Makefile
       run: cp ./GUI/MacOSGUI.mk ./GUI/GUI.mk
     - name: compile tbstudio
+      run: make -e
+    - uses: suisei-cn/actions-download-file@v1
+      id: app
+      name: Download empty app package
+      with:
+        url: "https://dl.dropboxusercontent.com/s/tqg6el51c8hi523/TBStudio.app.tar.gz?dl=0"
+        target: Packaging/macos/app
+    - uses: suisei-cn/actions-download-file@v1
+      id: dylib
+      name: Download compiled dylibs
+      with:
+        url: "https://dl.dropboxusercontent.com/s/900v4mhv3huyzcv/dylibs.tar.gz?dl=0"
+        target: Packaging/macos/app/dll
+    - name: extract
+      working-directory: Packaging/macos/app
       run: |
-        make -e
-        mv ./GUI/Release/GUI ./GUI/Release/tbstudio
+        tar -xvf TBStudio.app.tar.gz
+        sudo chmod -R +rw TBStudio.app
+    - name: extract
+      working-directory: Packaging/macos/app/dll
+      run: |
+        tar -xvf dylibs.tar.gz
+        rm dylibs.tar.gz
+        cp * ../TBStudio.app/Contents/Frameworks
+    - name: extract
+      run: cp ./GUI/Release/GUI Packaging/macos/app/TBStudio.app/Contents/MacOS/tbstudio
+    - name: tar
+      working-directory: Packaging/macos/app
+      run: tar -zcvf TBStudio.app.tar.gz TBStudio.app
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: executable
+        path: ./Packaging/macos/app/TBStudio.app.tar.gz
+#############To sign#############################
 #     - name: copy apple certificate
 #       working-directory: Packaging/sign
 #       run: |
@@ -124,30 +156,34 @@ jobs:
 #       working-directory: Packaging/sign
 #       run: /usr/bin/codesign --force -s "MohammadNakhaee" ./TBStudio -v
 # #       run: /usr/bin/codesign -s ./tbstudio.p12 ./TBStudio
-    - uses: suisei-cn/actions-download-file@v1
-      id: app
-      name: Download empty app package
-      with:
-        url: "https://dl.dropboxusercontent.com/s/tqg6el51c8hi523/TBStudio.app.tar.gz?dl=0"
-        target: Packaging/macos/app
-    - uses: suisei-cn/actions-download-file@v1
-      id: dylib
-      name: Download compiled dylibs
-      with:
-        url: "https://dl.dropboxusercontent.com/s/900v4mhv3huyzcv/dylibs.tar.gz?dl=0"
-        target: Packaging/macos/app
-    - name: extract
-      working-directory: Packaging/macos/app
-      run: |
-        tar -xvf TBStudio.app.tar.gz
-        tar -xvf dylibs.tar.gz
-        ls
-    - name: tar
-      working-directory: Packaging/macos/app
-      run: tar -zcvf TBStudio.app.tar.gz TBStudio.app
-    - name: Upload build artifacts
-      uses: actions/upload-artifact@v3
+
+  release-macos-11:
+
+    runs-on: macos-11
+    needs: build-macos-11
+        
+    steps:
+    - uses: actions/checkout@v1
+    - name: Get Version
+      id: version
+      uses: battila7/get-version-action@v2
+    - name: Download build artifacts
+      uses: actions/download-artifact@v3
       with:
         name: executable
-        path: ./Packaging/macos/app/TBStudio.app
-        
+        path: ./Packaging/macos/release
+    - name: Get release
+      id: get_release
+      uses: bruceadams/get-release@v1.2.3
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+    - name: Upload Release Asset
+      id: upload-release-asset 
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.get_release.outputs.upload_url }}
+        asset_path: ./Packaging/macos/release/TBStudio.app.tar.gz
+        asset_name: tbstudio-macos-11-x64-${{ steps.version.outputs.version-without-v }}.app.tar.gz
+        asset_content_type: application/x-gzip
