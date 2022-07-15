@@ -7,6 +7,272 @@ on:
 
 jobs:
 
+  build-ubuntu-1804:
+
+    runs-on: ubuntu-18.04
+    
+    steps:
+    - uses: actions/checkout@v1
+    - name: update apt
+      run: sudo apt-get -y update
+    - name: install packages
+      run: sudo apt-get install libgtk-3-dev build-essential checkinstall gfortran
+    - name: install OpenGL libraries
+      run: sudo apt-get install mesa-utils
+    - name: install freeGlut
+      run: sudo apt-get install freeglut3-dev
+    - name: install mathgl
+      run: sudo apt-get install mathgl libmgl-dev
+    - name: install lapack
+      run: sudo apt-get install liblapack3 liblapack-dev libopenblas-base libopenblas-dev liblapack-dev liblapacke-dev
+    - name: extract WX
+      run: tar -xvjf wxWidgets-3.0.5.tar.bz2
+    - name: create WXBuildDIR
+      working-directory: wxWidgets-3.0.5
+      run: mkdir gtk-build
+    - name: configure WX
+      working-directory: wxWidgets-3.0.5/gtk-build
+      run: ../configure --enable-unicode --with-opengl --with-libpng
+    - name: compile WX
+      working-directory: wxWidgets-3.0.5/gtk-build
+      run: make
+    - name: install WX
+      working-directory: wxWidgets-3.0.5/gtk-build
+      run: sudo make install
+    - name: set WX Include DIR
+      run: echo "WXDIRInclude=/usr/local/include/wx-3.0" >> $GITHUB_ENV
+    - name: set RapidXML DIR
+      run: echo "RapidXML_DIR=${GITHUB_WORKSPACE}/rapidxml-1.13" >> $GITHUB_ENV
+    - name: set PATH
+      run: echo "PATH=/usr/local/include/wx-3.0:$PATH" >> $GITHUB_ENV
+    - name: copy ubuntu Makefile
+      run: cp ./GUI/UbuntuGUI.mk ./GUI/GUI.mk
+    - name: compile tbstudio
+      run: |
+        make -e
+        mv ./GUI/Release/GUI ./GUI/Release/tbstudio
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: executable
+        path: ./GUI/Release/tbstudio
+
+
+  release-ubuntu-1804:
+
+    runs-on: ubuntu-18.04
+    needs: build-ubuntu-1804
+        
+    steps:
+    - uses: actions/checkout@v1
+    - name: Get Version
+      id: version
+      uses: battila7/get-version-action@v2
+    - name: Download build artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: executable
+        path: ./Packaging/debian/tbstudio/usr/bin
+    - name: Change permission
+      working-directory: Packaging/debian/tbstudio/usr/bin
+      run: sudo chmod 777 tbstudio
+    - name: set debian package version
+      uses: jacobtomlinson/gha-find-replace@v2
+      with:
+        find: "%version"
+        replace: ${{ steps.version.outputs.version-without-v }}
+        include: "Packaging/debian/tbstudio/DEBIAN/control"
+    - name: create debian package
+      working-directory: Packaging/debian
+      run: |
+        sudo dpkg-deb --build tbstudio
+        sudo chmod 777 tbstudio.deb
+    - name: Get release
+      id: get_release
+      uses: bruceadams/get-release@v1.2.3
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+    - name: Upload Release Asset
+      id: upload-release-asset 
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.get_release.outputs.upload_url }}
+        asset_path: ./Packaging/debian/tbstudio.deb
+        asset_name: tbstudio-ubuntu-18.04-x64-${{ steps.version.outputs.version-without-v }}.deb
+        asset_content_type: application/vnd.debian.binary-package
+
+
+
+  build-windows-latest:
+
+    runs-on: windows-latest
+    
+    steps:
+    - uses: actions/checkout@v1
+    - uses: suisei-cn/actions-download-file@v1
+      id: wxconfigid
+      name: Download the file
+      with:
+        url: "https://dl.dropboxusercontent.com/s/jrxjmnuoav3t0vj/wxconfig.7z?dl=0"
+        target: windowsDeps/
+    - uses: suisei-cn/actions-download-file@v1
+      id: freeglut64id
+      name: Download the file
+      with:
+        url: "https://dl.dropboxusercontent.com/s/drapc4swnga1285/freeglut64.7z?dl=0"
+        target: windowsDeps/
+    - uses: suisei-cn/actions-download-file@v1
+      id: fortranid
+      name: Download the file
+      with:
+        url: "https://dl.dropboxusercontent.com/s/lrj3g2w564d0mok/gcc-5.1.0-tdm64-1-fortran.7z?dl=0"
+        target: windowsDeps/
+    - uses: suisei-cn/actions-download-file@v1
+      id: gemmiid
+      name: Download the file
+      with:
+        url: "https://dl.dropboxusercontent.com/s/zym925kz2yvrlr5/gemmi-master.7z?dl=0"
+        target: windowsDeps/
+    - uses: suisei-cn/actions-download-file@v1
+      id: lapackid
+      name: Download the file
+      with:
+        url: "https://dl.dropboxusercontent.com/s/u7vnxn77a87i9le/LAPACKE-X64.7z?dl=0"
+        target: windowsDeps/
+    - uses: suisei-cn/actions-download-file@v1
+      id: mathglid
+      name: Download the file
+      with:
+        url: "https://dl.dropboxusercontent.com/s/spjbfmx2lkvcuw4/MathGL64LGPL.7z?dl=0"
+        target: windowsDeps/
+    - uses: suisei-cn/actions-download-file@v1
+      id: tdmgccid
+      name: Download the file
+      with:
+        url: "https://dl.dropboxusercontent.com/s/siy11m4rxo1oj2t/TDM-GCC-64.7z?dl=0"
+        target: windowsDeps/
+    - uses: suisei-cn/actions-download-file@v1
+      id: wxwidgetid
+      name: Download the file
+      with:
+        url: "https://dl.dropboxusercontent.com/s/uoh7y7b296mf1lj/wxWidgets-3.1.1.7z?dl=0"
+        target: windowsDeps/
+    - uses: suisei-cn/actions-download-file@v1
+      id: DLLs
+      name: Download the file
+      with:
+        url: "https://dl.dropboxusercontent.com/s/jt8t26qwre4w0me/DLL.7z?dl=0"
+        target: windowsDeps/
+    - name: dir
+      working-directory: windowsDeps
+      run: dir
+    - name: unzip dependencies
+      working-directory: windowsDeps
+      run: |
+        ..\7zip\32\7z.exe x .\wxconfig.7z
+        ..\7zip\32\7z.exe x .\freeglut64.7z
+        ..\7zip\32\7z.exe x .\gemmi-master.7z
+        ..\7zip\32\7z.exe x .\LAPACKE-X64.7z
+        ..\7zip\32\7z.exe x .\MathGL64LGPL.7z
+        ..\7zip\32\7z.exe x .\TDM-GCC-64.7z
+        ..\7zip\32\7z.exe x .\wxWidgets-3.1.1.7z
+        ..\7zip\32\7z.exe x .\DLL.7z
+    - name: unzip dependencies
+      working-directory: windowsDeps\TDM-GCC-64
+      run: |
+        move ..\gcc-5.1.0-tdm64-1-fortran.7z .\gcc-5.1.0-tdm64-1-fortran.7z
+        ..\..\7zip\32\7z.exe x .\gcc-5.1.0-tdm64-1-fortran.7z
+    - name: env vars
+      run: |
+        chcp 65001
+        echo "envGITHUB_WORKSPACE=$env:GITHUB_WORKSPACE".Replace('\','/') >> $env:GITHUB_ENV
+        echo "wxconfigDir=${env:GITHUB_WORKSPACE}/windowsDeps/wxconfig".Replace('\','/') >> $env:GITHUB_ENV
+        echo "RapidXML_DIR=${env:GITHUB_WORKSPACE}/rapidxml-1.13".Replace('\','/') >> $env:GITHUB_ENV
+        echo "WXWIN=${env:GITHUB_WORKSPACE}/windowsDeps/wxWidgets-3.1.1".Replace('\','/') >> $env:GITHUB_ENV
+        echo "GCC_DIR=${env:GITHUB_WORKSPACE}/windowsDeps/TDM-GCC-64".Replace('\','/') >> $env:GITHUB_ENV
+        echo "GFORTRAN_DIR=${env:GITHUB_WORKSPACE}/windowsDeps/TDM-GCC-64/gcc-5.1.0-tdm64-1-fortran".Replace('\','/') >> $env:GITHUB_ENV
+        echo "WXCFG=gcc_dll/mswu" >> $env:GITHUB_ENV
+        echo "Opengl_DIR=${env:GITHUB_WORKSPACE}/windowsDeps/TDM-GCC-64/x86_64-w64-mingw32/lib".Replace('\','/') >> $env:GITHUB_ENV
+        echo "MathGL_DIR=${env:GITHUB_WORKSPACE}/windowsDeps/MathGL64LGPL".Replace('\','/') >> $env:GITHUB_ENV
+        echo "LAPACKE_DIR=${env:GITHUB_WORKSPACE}/windowsDeps/LAPACKE-X64".Replace('\','/') >> $env:GITHUB_ENV
+        echo "Glut_DIR=${env:GITHUB_WORKSPACE}/windowsDeps/freeglut64".Replace('\','/') >> $env:GITHUB_ENV
+        echo "Gemmi_DIR=${env:GITHUB_WORKSPACE}/windowsDeps/gemmi-master".Replace('\','/') >> $env:GITHUB_ENV
+    - name: set paths
+      run: |
+        echo ${env:wxconfigDir} | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        echo ${env:WXWIN}/lib/gcc_dll | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        echo ${env:GCC_DIR}/bin | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        echo ${env:MathGL_DIR} | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        echo ${env:MathGL_DIR}/bin | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        echo ${env:MathGL_DIR}/include | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        echo ${env:Glut_DIR}/bin | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        echo ${env:LAPACKE_DIR} | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        echo ${env:GFORTRAN_DIR}/bin | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+    - name: copy Windows Makefile
+      run: cp .\GUI\WindowsGUI.mk .\GUI\GUI.mk
+    - name: echo path1
+      run: echo ${env:PATH}
+    - name: echo path2
+      run: echo ${env:GITHUB_PATH}
+    - name: compile tbstudio
+      run: mingw32-make
+    - name: move to sign
+      working-directory: GUI
+      run: |
+        mkdir sign
+        mv ./TBStudio/GUI.exe ./sign/tbstudio.exe
+    - name: sign tb
+      uses: dlemstra/code-sign-action@v1
+      with:
+        certificate: '${{ secrets.CERTIFICATE }}'
+        folder: 'GUI/sign'
+        recursive: true
+    - name: move to tbstudio
+      working-directory: GUI
+      run: mv ./sign/tbstudio.exe ./TBStudio/tbstudio.exe
+    - name: zip package
+      working-directory: GUI/TBStudio
+      run: ../../7zip/32/7z.exe a tbstudio.zip
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: executable
+        path: .\GUI\TBStudio\tbstudio.zip
+
+
+  release-windows-latest:
+
+    runs-on: ubuntu-18.04
+    needs: build-windows-latest
+        
+    steps:
+    - uses: actions/checkout@v1
+    - name: Get Version
+      id: version
+      uses: battila7/get-version-action@v2
+    - name: Download build artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: executable
+        path: ./Packaging/windows/tbstudio
+    - name: Get release
+      id: get_release
+      uses: bruceadams/get-release@v1.2.3
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+    - name: Upload Release Asset
+      id: upload-release-asset 
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.get_release.outputs.upload_url }}
+        asset_path: ./Packaging/windows/tbstudio/tbstudio.zip
+        asset_name: tbstudio-windows-latest-${{ steps.version.outputs.version-without-v }}.zip
+        asset_content_type: application/zip
+
   build-macos-11:
 
     runs-on: macos-11
