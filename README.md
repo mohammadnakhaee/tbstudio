@@ -25,11 +25,13 @@ sudo dpkg -i tbstudio-1.5.0-amd64.deb
 tbstudio-1.5.3.fc30.x86_64.rpm (Compatible with Fedora 30 Workstation)
 
 #### MacOS
-1. Double click on TBStudio-1.5.3-64bit.app.tar.gz to extract the app
+1. Double click on TBStudio-macos-11-1.5.3-64bit.app.tar.gz to extract the app
 2. Drag and drop the TBStudio app into Applications folder located in the left toolbar.
+(TBStudio.app has not been signed and you may need to solve it for your computer by yourself)
 
 #### Other platforms
 For more information visit [tight-binding.com/download](https://tight-binding.com/download)
+Check also [Github Releases](https://github.com/mohammadnakhaee/tbstudio/releases)
 
 ### Example for Graphene
 1. Launch TBStudio
