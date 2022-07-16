@@ -11,7 +11,9 @@ Getting Started
 ===
 
 ### Installation
-TBStudio is provided you as a pre-compiled released. So there is no need to compile TBStudio.
+1. Downoad from here [tight-binding.com/download](https://tight-binding.com/download). Check also [Github Releases](https://github.com/mohammadnakhaee/tbstudio/releases).
+2. TBStudio is provided as a pre-compiled package. So there is no need to compile TBStudio.
+3. You can also compile it. Just follow the steps in [github workflow](https://github.com/mohammadnakhaee/tbstudio/tree/master/.github/workflows).
 
 #### Windows
 TBStudio for windows is a portable version and there is no need to install it.
@@ -30,7 +32,7 @@ tbstudio-1.5.3.fc30.x86_64.rpm (Compatible with Fedora 30 Workstation)
 (TBStudio.app has not been signed and you may need to solve it for your computer by yourself)
 
 #### Other platforms
-For more information visit [tight-binding.com/download](https://tight-binding.com/download)
+For more information visit [tight-binding.com/download](https://tight-binding.com/download).
 Check also [Github Releases](https://github.com/mohammadnakhaee/tbstudio/releases)
 
 ### Example for Graphene
