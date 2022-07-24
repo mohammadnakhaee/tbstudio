@@ -8,6 +8,7 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="src">
+    <File Name="Nomad.cpp"/>
     <File Name="MyFigureClass.cpp"/>
     <File Name="UpdateClass.cpp"/>
     <File Name="WelcomeClass.cpp"/>
@@ -33,6 +34,7 @@
     <File Name="wxcrafter_bitmaps.cpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="include">
+    <File Name="Nomad.h"/>
     <File Name="MyFigureClass.h"/>
     <File Name="UpdateClass.h"/>
     <File Name="welcome650325.h"/>
@@ -180,8 +182,6 @@
         <Command Enabled="yes">copy .\DLL\* .\TBStudio</Command>
         <Command Enabled="yes">del .\TBStudio\*.o</Command>
         <Command Enabled="yes">del .\TBStudio\*.d</Command>
-        <Command Enabled="yes">mkdir .\TBStudio\Examples</Command>
-        <Command Enabled="yes">xcopy .\Examples .\TBStudio\Examples /E</Command>
         <Command Enabled="yes">copy TBStudio.ico TBStudio</Command>
         <Command Enabled="yes">copy Readme.txt TBStudio</Command>
       </PostBuild>

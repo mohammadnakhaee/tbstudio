@@ -23,6 +23,7 @@
 #include <wx/ribbon/buttonbar.h>
 #include <thread>
 #include <Regression.h>
+#include <Nomad.h>
 #include "UpdateClass.h"
 #include <wx/aui/auibook.h>
 //#include <memory>
@@ -79,6 +80,7 @@ public:
     bool is_cnst = false;
     bool is_UpperSymMatrixHf = false;
     
+    Nomad* nomad;
     Regression* regression;
     //std::thread* FittingThread;
     bool isFittingThreadBusy = false;
@@ -242,6 +244,10 @@ private:
     void regressionEVT_OnFinished(wxCommandEvent& event);
     void regressionEVT_OnStarted(wxCommandEvent& event);
     void figureClass_EVT_PlotFinished(wxCommandEvent& event);
+    void nomadEVT_OnQueryStarted(wxCommandEvent& event);
+    void nomadEVT_OnQueryDataReceived(wxCommandEvent& event);
+    void nomadEVT_OnQueryErrorReceived(wxCommandEvent& event);
+    void nomadEVT_OnQueryFinished(wxCommandEvent& event);
     void LoadIcons();
     wxBitmap GetPng(const void* data, size_t length);
 	//typedef std::unordered_map<std::string, pthread_t> ThreadMap;

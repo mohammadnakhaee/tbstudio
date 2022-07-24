@@ -84,6 +84,11 @@ ThemeMenuColour.Set(255,255,255,255);
     this->Connect(RegressionEVT_OnStarted, wxCommandEventHandler(MainFrame::regressionEVT_OnStarted), NULL, this);
     this->Connect(FigureClass_EVT_PlotFinished, wxCommandEventHandler(MainFrame::figureClass_EVT_PlotFinished), NULL, this);
 	
+    this->Connect(NomadEVT_OnQueryStarted, wxCommandEventHandler(MainFrame::nomadEVT_OnQueryStarted), NULL, this);
+    this->Connect(NomadEVT_OnQueryDataReceived, wxCommandEventHandler(MainFrame::nomadEVT_OnQueryDataReceived), NULL, this);
+    this->Connect(NomadEVT_OnQueryErrorReceived, wxCommandEventHandler(MainFrame::nomadEVT_OnQueryErrorReceived), NULL, this);
+    this->Connect(NomadEVT_OnQueryFinished, wxCommandEventHandler(MainFrame::nomadEVT_OnQueryFinished), NULL, this);
+    
     InitializeSec30Arrays();
     
     /*
@@ -197,7 +202,7 @@ ThemeMenuColour.Set(255,255,255,255);
 	
 	
     regression = new Regression();
-    
+    nomad = new Nomad(this);
     
     WelcomeClass* welcome = new WelcomeClass(NULL);
     welcome->CenterOnScreen();
@@ -273,6 +278,7 @@ MainFrame::~MainFrame()
     //if (is_UpperSymMatrixHf) {delete [] UpperSymMatrixHf; is_UpperSymMatrixHf=false;}
     
     delete regression;
+    delete nomad;
     //delete FittingThread;
     
     delete sec30;
@@ -890,6 +896,12 @@ void MainFrame::BtnGrid_OnClick(wxRibbonButtonBarEvent& event)
 
 void MainFrame::BtnOpen_OnClick(wxRibbonButtonBarEvent& event)
 {
+    nomad->elements.push_back(wxString("C"));
+//    nomad->types.push_back(wxString("2D"));
+    nomad->spins.push_back(wxString("false"));
+    nomad->gapTypes.push_back(wxString("indirect"));
+    nomad->startQuery();
+
     wxFileDialog* OpenDialog = new wxFileDialog(
 		this, _("Open TB model"), wxEmptyString, wxEmptyString, 
 		_("TBM File (*.tbm)|*.tbm")
@@ -4018,6 +4030,35 @@ void MainFrame::figureClass_EVT_PlotFinished(wxCommandEvent& event)
     {
         wxMessageBox(wxT("MainFrame: sec30->isPlotting = false"));
     }*/
+}
+
+
+void MainFrame::nomadEVT_OnQueryStarted(wxCommandEvent& event)
+{
+    wxMessageBox(wxT("I am in OnQueryStarted event."));
+}
+
+void MainFrame::nomadEVT_OnQueryDataReceived(wxCommandEvent& event)
+{
+    wxMessageBox(wxT("I am in OnQueryDataReceived event."));
+    logfile->AppendText(event.GetString());
+	logfile->ShowPosition(logfile->GetLastPosition());
+    //10000sec30->isPrinting = false;
+	//logfile->SetScrollPos(wxVERTICAL,logfile->GetScrollRange(wxVERTICAL));
+}
+
+void MainFrame::nomadEVT_OnQueryErrorReceived(wxCommandEvent& event)
+{
+    wxMessageBox(wxT("I am in OnQueryErrorReceived event."));
+    logfile->AppendText(event.GetString());
+	logfile->ShowPosition(logfile->GetLastPosition());
+    //10000sec30->isPrinting = false;
+	//logfile->SetScrollPos(wxVERTICAL,logfile->GetScrollRange(wxVERTICAL));
+}
+
+void MainFrame::nomadEVT_OnQueryFinished(wxCommandEvent& event)
+{
+    wxMessageBox(wxT("I am in OnQueryFinished event."));
 }
 
 void MainFrame::ExportMatrices(wxString filepath, wxString BaseName, int MyID_Initial0Final1)
