@@ -351,3 +351,657 @@ UpdateClassBase::~UpdateClassBase()
     m_button1114->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(UpdateClassBase::ActivateOnClick), NULL, this);
     
 }
+
+NomadGUIBase::NomadGUIBase(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style)
+    : wxDialog(parent, id, title, pos, size, style)
+{
+    if ( !bBitmapLoaded ) {
+        // We need to initialise the default bitmap handler
+        wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
+        wxC9ED9InitBitmapResources();
+        bBitmapLoaded = true;
+    }
+    
+    wxBoxSizer* boxSizer1139 = new wxBoxSizer(wxVERTICAL);
+    this->SetSizer(boxSizer1139);
+    
+    mainSearchPage = new wxSimplebook(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxBK_DEFAULT);
+    mainSearchPage->SetName(wxT("mainSearchPage"));
+    mainSearchPage->SetEffect(wxSHOW_EFFECT_NONE);
+    
+    boxSizer1139->Add(mainSearchPage, 1, wxEXPAND, WXC_FROM_DIP(5));
+    
+    m_panel1445 = new wxPanel(mainSearchPage, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(mainSearchPage, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    mainSearchPage->AddPage(m_panel1445, _("Page"), false);
+    
+    wxBoxSizer* boxSizer1449 = new wxBoxSizer(wxVERTICAL);
+    m_panel1445->SetSizer(boxSizer1449);
+    
+    m_panel1143 = new wxPanel(m_panel1445, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel1445, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_panel1143->SetBackgroundColour(wxColour(wxT("rgb(255,255,255)")));
+    
+    boxSizer1449->Add(m_panel1143, 0, wxEXPAND, WXC_FROM_DIP(5));
+    
+    wxFlexGridSizer* flexGridSizer1431 = new wxFlexGridSizer(0, 6, 0, 0);
+    flexGridSizer1431->SetFlexibleDirection( wxBOTH );
+    flexGridSizer1431->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer1431->AddGrowableCol(1);
+    m_panel1143->SetSizer(flexGridSizer1431);
+    
+    ctlNomadLogo = new wxStaticBitmap(m_panel1143, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("nomad")), wxDefaultPosition, wxDLG_UNIT(m_panel1143, wxSize(-1,-1)), 0 );
+    
+    flexGridSizer1431->Add(ctlNomadLogo, 0, wxRIGHT, WXC_FROM_DIP(5));
+    
+    m_panel1439 = new wxPanel(m_panel1143, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel1143, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    
+    flexGridSizer1431->Add(m_panel1439, 1, wxEXPAND, WXC_FROM_DIP(5));
+    
+    btnMyProjects = new wxButton(m_panel1143, wxID_ANY, _("My projects"), wxDefaultPosition, wxDLG_UNIT(m_panel1143, wxSize(-1,-1)), 0);
+    
+    flexGridSizer1431->Add(btnMyProjects, 0, wxALL|wxALIGN_CENTER_VERTICAL, WXC_FROM_DIP(5));
+    
+    searchPanel = new wxScrolledWindow(m_panel1445, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel1445, wxSize(-1,-1)), wxVSCROLL);
+    searchPanel->SetBackgroundColour(wxColour(wxT("rgb(190,200,220)")));
+    searchPanel->SetScrollRate(5, 5);
+    
+    boxSizer1449->Add(searchPanel, 1, wxEXPAND, WXC_FROM_DIP(5));
+    
+    wxBoxSizer* boxSizer1387 = new wxBoxSizer(wxVERTICAL);
+    searchPanel->SetSizer(boxSizer1387);
+    
+    m_panel1389526 = new wxPanel(searchPanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(searchPanel, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_panel1389526->SetBackgroundColour(wxColour(wxT("rgb(190,200,220)")));
+    
+    boxSizer1387->Add(m_panel1389526, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    wxFlexGridSizer* flexGridSizer1755 = new wxFlexGridSizer(0, 2, 0, 0);
+    flexGridSizer1755->SetFlexibleDirection( wxBOTH );
+    flexGridSizer1755->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer1755->AddGrowableCol(0);
+    m_panel1389526->SetSizer(flexGridSizer1755);
+    
+    m_panel14399 = new wxPanel(m_panel1389526, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel1389526, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    
+    flexGridSizer1755->Add(m_panel14399, 1, wxEXPAND, WXC_FROM_DIP(5));
+    
+    btnSearch = new wxButton(m_panel1389526, wxID_ANY, _("Search"), wxDefaultPosition, wxDLG_UNIT(m_panel1389526, wxSize(-1,-1)), 0);
+    
+    flexGridSizer1755->Add(btnSearch, 0, wxALL|wxALIGN_CENTER_VERTICAL, WXC_FROM_DIP(5));
+    
+    m_panel138952 = new wxPanel(searchPanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(searchPanel, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_panel138952->SetBackgroundColour(wxColour(wxT("rgb(255,255,255)")));
+    
+    boxSizer1387->Add(m_panel138952, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    wxBoxSizer* boxSizer139553 = new wxBoxSizer(wxHORIZONTAL);
+    m_panel138952->SetSizer(boxSizer139553);
+    
+    m_staticText139754 = new wxStaticText(m_panel138952, wxID_ANY, _("Elements"), wxDefaultPosition, wxDLG_UNIT(m_panel138952, wxSize(-1,-1)), 0);
+    
+    boxSizer139553->Add(m_staticText139754, 0, wxALL, WXC_FROM_DIP(5));
+    
+    m_panel1412 = new wxPanel(searchPanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(searchPanel, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    
+    boxSizer1387->Add(m_panel1412, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    wxBoxSizer* boxSizer13955659 = new wxBoxSizer(wxVERTICAL);
+    m_panel1412->SetSizer(boxSizer13955659);
+    
+    CheckBoxExclusivelyComponents = new wxCheckBox(m_panel1412, wxID_ANY, _("only compositions that exclusively contain these atoms"), wxDefaultPosition, wxDLG_UNIT(m_panel1412, wxSize(-1,-1)), 0);
+    CheckBoxExclusivelyComponents->SetValue(false);
+    
+    boxSizer13955659->Add(CheckBoxExclusivelyComponents, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, WXC_FROM_DIP(5));
+    
+    periodicTable = new wxPanel(searchPanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(searchPanel, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    
+    boxSizer1387->Add(periodicTable, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, WXC_FROM_DIP(5));
+    
+    wxGridSizer* gridSizer1475 = new wxGridSizer(0, 18, 0, 0);
+    periodicTable->SetSizer(gridSizer1475);
+    
+    m_panel138955 = new wxPanel(searchPanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(searchPanel, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_panel138955->SetBackgroundColour(wxColour(wxT("rgb(255,255,255)")));
+    
+    boxSizer1387->Add(m_panel138955, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    wxBoxSizer* boxSizer139556 = new wxBoxSizer(wxHORIZONTAL);
+    m_panel138955->SetSizer(boxSizer139556);
+    
+    m_staticText139757 = new wxStaticText(m_panel138955, wxID_ANY, _("Structural Type"), wxDefaultPosition, wxDLG_UNIT(m_panel138955, wxSize(-1,-1)), 0);
+    
+    boxSizer139556->Add(m_staticText139757, 0, wxALL, WXC_FROM_DIP(5));
+    
+    MaterialTypePanel = new wxPanel(searchPanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(searchPanel, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    
+    boxSizer1387->Add(MaterialTypePanel, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    wxBoxSizer* boxSizer1510 = new wxBoxSizer(wxHORIZONTAL);
+    MaterialTypePanel->SetSizer(boxSizer1510);
+    
+    m_checkBox1481 = new wxCheckBox(MaterialTypePanel, wxID_ANY, _("bulk"), wxDefaultPosition, wxDLG_UNIT(MaterialTypePanel, wxSize(-1,-1)), 0);
+    m_checkBox1481->SetValue(false);
+    
+    boxSizer1510->Add(m_checkBox1481, 0, wxALL, WXC_FROM_DIP(5));
+    
+    m_checkBox1483 = new wxCheckBox(MaterialTypePanel, wxID_ANY, _("surface"), wxDefaultPosition, wxDLG_UNIT(MaterialTypePanel, wxSize(-1,-1)), 0);
+    m_checkBox1483->SetValue(false);
+    
+    boxSizer1510->Add(m_checkBox1483, 0, wxALL, WXC_FROM_DIP(5));
+    
+    m_checkBox1485 = new wxCheckBox(MaterialTypePanel, wxID_ANY, _("2D"), wxDefaultPosition, wxDLG_UNIT(MaterialTypePanel, wxSize(-1,-1)), 0);
+    m_checkBox1485->SetValue(false);
+    
+    boxSizer1510->Add(m_checkBox1485, 0, wxALL, WXC_FROM_DIP(5));
+    
+    m_checkBox1487 = new wxCheckBox(MaterialTypePanel, wxID_ANY, _("1D"), wxDefaultPosition, wxDLG_UNIT(MaterialTypePanel, wxSize(-1,-1)), 0);
+    m_checkBox1487->SetValue(false);
+    
+    boxSizer1510->Add(m_checkBox1487, 0, wxALL, WXC_FROM_DIP(5));
+    
+    m_panel138961 = new wxPanel(searchPanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(searchPanel, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_panel138961->SetBackgroundColour(wxColour(wxT("rgb(255,255,255)")));
+    
+    boxSizer1387->Add(m_panel138961, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    wxBoxSizer* boxSizer139562 = new wxBoxSizer(wxHORIZONTAL);
+    m_panel138961->SetSizer(boxSizer139562);
+    
+    m_staticText139763 = new wxStaticText(m_panel138961, wxID_ANY, _("Gap Type"), wxDefaultPosition, wxDLG_UNIT(m_panel138961, wxSize(-1,-1)), 0);
+    
+    boxSizer139562->Add(m_staticText139763, 0, wxALL, WXC_FROM_DIP(5));
+    
+    MaterialTypePanel7 = new wxPanel(searchPanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(searchPanel, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    
+    boxSizer1387->Add(MaterialTypePanel7, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    wxBoxSizer* boxSizer1504 = new wxBoxSizer(wxHORIZONTAL);
+    MaterialTypePanel7->SetSizer(boxSizer1504);
+    
+    m_checkBox148913 = new wxCheckBox(MaterialTypePanel7, wxID_ANY, _("direct"), wxDefaultPosition, wxDLG_UNIT(MaterialTypePanel7, wxSize(-1,-1)), 0);
+    m_checkBox148913->SetValue(false);
+    
+    boxSizer1504->Add(m_checkBox148913, 0, wxALL, WXC_FROM_DIP(5));
+    
+    m_checkBox149114 = new wxCheckBox(MaterialTypePanel7, wxID_ANY, _("indirect"), wxDefaultPosition, wxDLG_UNIT(MaterialTypePanel7, wxSize(-1,-1)), 0);
+    m_checkBox149114->SetValue(false);
+    
+    boxSizer1504->Add(m_checkBox149114, 0, wxALL, WXC_FROM_DIP(5));
+    
+    m_panel1389 = new wxPanel(searchPanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(searchPanel, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_panel1389->SetBackgroundColour(wxColour(wxT("rgb(255,255,255)")));
+    
+    boxSizer1387->Add(m_panel1389, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    wxBoxSizer* boxSizer1395 = new wxBoxSizer(wxHORIZONTAL);
+    m_panel1389->SetSizer(boxSizer1395);
+    
+    m_staticText1397 = new wxStaticText(m_panel1389, wxID_ANY, _("Spin"), wxDefaultPosition, wxDLG_UNIT(m_panel1389, wxSize(-1,-1)), 0);
+    
+    boxSizer1395->Add(m_staticText1397, 0, wxALL, WXC_FROM_DIP(5));
+    
+    MaterialTypePanel716 = new wxPanel(searchPanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(searchPanel, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    
+    boxSizer1387->Add(MaterialTypePanel716, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    wxBoxSizer* boxSizer150417 = new wxBoxSizer(wxHORIZONTAL);
+    MaterialTypePanel716->SetSizer(boxSizer150417);
+    
+    m_checkBox14891318 = new wxCheckBox(MaterialTypePanel716, wxID_ANY, _("spin polarized"), wxDefaultPosition, wxDLG_UNIT(MaterialTypePanel716, wxSize(-1,-1)), 0);
+    m_checkBox14891318->SetValue(false);
+    
+    boxSizer150417->Add(m_checkBox14891318, 0, wxALL, WXC_FROM_DIP(5));
+    
+    m_checkBox14911419 = new wxCheckBox(MaterialTypePanel716, wxID_ANY, _("not spin polarized"), wxDefaultPosition, wxDLG_UNIT(MaterialTypePanel716, wxSize(-1,-1)), 0);
+    m_checkBox14911419->SetValue(false);
+    
+    boxSizer150417->Add(m_checkBox14911419, 0, wxALL, WXC_FROM_DIP(5));
+    
+    m_panel13894 = new wxPanel(searchPanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(searchPanel, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_panel13894->SetBackgroundColour(wxColour(wxT("rgb(255,255,255)")));
+    
+    boxSizer1387->Add(m_panel13894, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    wxBoxSizer* boxSizer13955 = new wxBoxSizer(wxHORIZONTAL);
+    m_panel13894->SetSizer(boxSizer13955);
+    
+    m_staticText13976 = new wxStaticText(m_panel13894, wxID_ANY, _("Author"), wxDefaultPosition, wxDLG_UNIT(m_panel13894, wxSize(-1,-1)), 0);
+    
+    boxSizer13955->Add(m_staticText13976, 0, wxALL, WXC_FROM_DIP(5));
+    
+    MaterialTypePanel7167 = new wxPanel(searchPanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(searchPanel, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    
+    boxSizer1387->Add(MaterialTypePanel7167, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    wxBoxSizer* boxSizer1504178 = new wxBoxSizer(wxHORIZONTAL);
+    MaterialTypePanel7167->SetSizer(boxSizer1504178);
+    
+    m_staticText1691 = new wxStaticText(MaterialTypePanel7167, wxID_ANY, _("Owner:"), wxDefaultPosition, wxDLG_UNIT(MaterialTypePanel7167, wxSize(-1,-1)), 0);
+    
+    boxSizer1504178->Add(m_staticText1691, 0, wxALL|wxALIGN_CENTER_VERTICAL, WXC_FROM_DIP(5));
+    
+    UserNamePrefix = new wxSearchCtrl(MaterialTypePanel7167, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(MaterialTypePanel7167, wxSize(250,-1)), wxTE_PROCESS_ENTER);
+    UserNamePrefix->ShowSearchButton(false);
+    UserNamePrefix->ShowCancelButton(false);
+    
+    boxSizer1504178->Add(UserNamePrefix, 0, wxALL, WXC_FROM_DIP(5));
+    UserNamePrefix->SetMinSize(wxSize(250,-1));
+    
+    m_panel1447 = new wxPanel(mainSearchPage, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(mainSearchPage, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    mainSearchPage->AddPage(m_panel1447, _("Page"), false);
+    
+    wxBoxSizer* boxSizer1451 = new wxBoxSizer(wxVERTICAL);
+    m_panel1447->SetSizer(boxSizer1451);
+    
+    m_panel11438 = new wxPanel(m_panel1447, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel1447, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_panel11438->SetBackgroundColour(wxColour(wxT("rgb(255,255,255)")));
+    
+    boxSizer1451->Add(m_panel11438, 0, wxEXPAND, WXC_FROM_DIP(5));
+    
+    wxFlexGridSizer* flexGridSizer14319 = new wxFlexGridSizer(0, 6, 0, 0);
+    flexGridSizer14319->SetFlexibleDirection( wxBOTH );
+    flexGridSizer14319->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer14319->AddGrowableCol(4);
+    m_panel11438->SetSizer(flexGridSizer14319);
+    
+    ctlBack = new wxBitmapButton(m_panel11438, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("backArrow")), wxDefaultPosition, wxDLG_UNIT(m_panel11438, wxSize(55,55)), wxBU_AUTODRAW);
+    
+    flexGridSizer14319->Add(ctlBack, 0, 0, WXC_FROM_DIP(5));
+    ctlBack->SetMinSize(wxSize(55,55));
+    
+    resultsPanel = new wxPanel(m_panel1447, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel1447, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    
+    boxSizer1451->Add(resultsPanel, 1, wxEXPAND, WXC_FROM_DIP(5));
+    
+    wxFlexGridSizer* resultsFlexGridSizer = new wxFlexGridSizer(0, 2, 0, 0);
+    resultsFlexGridSizer->SetFlexibleDirection( wxBOTH );
+    resultsFlexGridSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    resultsFlexGridSizer->AddGrowableCol(1);
+    resultsFlexGridSizer->AddGrowableRow(0);
+    resultsPanel->SetSizer(resultsFlexGridSizer);
+    
+    leftPanel = new wxPanel(resultsPanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(resultsPanel, wxSize(350,-1)), wxTAB_TRAVERSAL);
+    leftPanel->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DLIGHT));
+    
+    resultsFlexGridSizer->Add(leftPanel, 0, wxRIGHT|wxTOP|wxBOTTOM|wxEXPAND, WXC_FROM_DIP(5));
+    
+    wxBoxSizer* boxSizer1247 = new wxBoxSizer(wxVERTICAL);
+    leftPanel->SetSizer(boxSizer1247);
+    
+    m_panel1249 = new wxPanel(leftPanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(leftPanel, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_panel1249->SetBackgroundColour(wxColour(wxT("rgb(255,255,255)")));
+    
+    boxSizer1247->Add(m_panel1249, 0, wxEXPAND, WXC_FROM_DIP(5));
+    
+    wxBoxSizer* boxSizer1253 = new wxBoxSizer(wxHORIZONTAL);
+    m_panel1249->SetSizer(boxSizer1253);
+    
+    ctlLeftPage = new wxBitmapButton(m_panel1249, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("leftArrow")), wxDefaultPosition, wxDLG_UNIT(m_panel1249, wxSize(-1,-1)), wxBU_AUTODRAW);
+    
+    boxSizer1253->Add(ctlLeftPage, 0, wxALL|wxALIGN_CENTER_VERTICAL, WXC_FROM_DIP(5));
+    
+    ctlRightPage = new wxBitmapButton(m_panel1249, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("rightArrow")), wxDefaultPosition, wxDLG_UNIT(m_panel1249, wxSize(-1,-1)), wxBU_AUTODRAW);
+    
+    boxSizer1253->Add(ctlRightPage, 0, wxRIGHT|wxTOP|wxBOTTOM|wxALIGN_CENTER_VERTICAL, WXC_FROM_DIP(5));
+    
+    ctl_pagination_info = new wxStaticText(m_panel1249, wxID_ANY, _("0/0"), wxDefaultPosition, wxDLG_UNIT(m_panel1249, wxSize(-1,-1)), 0);
+    
+    boxSizer1253->Add(ctl_pagination_info, 0, wxRIGHT|wxTOP|wxBOTTOM|wxALIGN_CENTER_VERTICAL, WXC_FROM_DIP(5));
+    
+    m_staticText1149 = new wxStaticText(m_panel1249, wxID_ANY, _("Sort by:"), wxDefaultPosition, wxDLG_UNIT(m_panel1249, wxSize(-1,-1)), 0);
+    
+    boxSizer1253->Add(m_staticText1149, 0, wxALL|wxALIGN_CENTER_VERTICAL, WXC_FROM_DIP(5));
+    
+    wxArrayString ctlSortByArr;
+    ctlSortBy = new wxChoice(m_panel1249, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel1249, wxSize(120,-1)), ctlSortByArr, 0);
+    
+    boxSizer1253->Add(ctlSortBy, 0, wxALIGN_CENTER_VERTICAL, WXC_FROM_DIP(5));
+    
+    rightPanel = new wxPanel(resultsPanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(resultsPanel, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    
+    resultsFlexGridSizer->Add(rightPanel, 1, wxTOP|wxBOTTOM|wxEXPAND, WXC_FROM_DIP(5));
+    
+    wxFlexGridSizer* flexGridSizer1583 = new wxFlexGridSizer(3, 0, 0, 0);
+    flexGridSizer1583->SetFlexibleDirection( wxBOTH );
+    flexGridSizer1583->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer1583->AddGrowableCol(0);
+    flexGridSizer1583->AddGrowableRow(2);
+    rightPanel->SetSizer(flexGridSizer1583);
+    
+    panelentry = new wxPanel(rightPanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(rightPanel, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    panelentry->SetBackgroundColour(wxColour(wxT("rgb(190,200,220)")));
+    
+    flexGridSizer1583->Add(panelentry, 1, wxRIGHT|wxBOTTOM|wxEXPAND, WXC_FROM_DIP(5));
+    
+    wxFlexGridSizer* EntryID_flexGridSizer = new wxFlexGridSizer(0, 3, 0, 0);
+    EntryID_flexGridSizer->SetFlexibleDirection( wxBOTH );
+    EntryID_flexGridSizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    EntryID_flexGridSizer->AddGrowableCol(1);
+    panelentry->SetSizer(EntryID_flexGridSizer);
+    
+    EntryID_staticText = new wxStaticText(panelentry, wxID_ANY, _("Entry ID:"), wxDefaultPosition, wxDLG_UNIT(panelentry, wxSize(-1,-1)), 0);
+    
+    EntryID_flexGridSizer->Add(EntryID_staticText, 0, wxALL|wxALIGN_CENTER_VERTICAL, WXC_FROM_DIP(5));
+    
+    EntryID = new wxSearchCtrl(panelentry, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(panelentry, wxSize(250,-1)), wxTE_PROCESS_ENTER);
+    EntryID->ShowSearchButton(true);
+    EntryID->ShowCancelButton(false);
+    
+    EntryID_flexGridSizer->Add(EntryID, 0, wxALL, WXC_FROM_DIP(5));
+    EntryID->SetMinSize(wxSize(250,-1));
+    
+    EntryID_Load_in_TBStudio = new wxButton(panelentry, wxID_ANY, _("Load in TBStudio"), wxDefaultPosition, wxDLG_UNIT(panelentry, wxSize(-1,-1)), 0);
+    
+    EntryID_flexGridSizer->Add(EntryID_Load_in_TBStudio, 0, wxALL, WXC_FROM_DIP(5));
+    
+    entryInfo = new wxPanel(rightPanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(rightPanel, wxSize(-1,350)), wxTAB_TRAVERSAL);
+    entryInfo->SetBackgroundColour(wxColour(wxT("rgb(255,255,255)")));
+    
+    flexGridSizer1583->Add(entryInfo, 1, wxRIGHT|wxBOTTOM|wxEXPAND, WXC_FROM_DIP(5));
+    
+    wxFlexGridSizer* flexGridSizer1661 = new wxFlexGridSizer(0, 9, 2, 1);
+    flexGridSizer1661->SetFlexibleDirection( wxBOTH );
+    flexGridSizer1661->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer1661->AddGrowableCol(10);
+    entryInfo->SetSizer(flexGridSizer1661);
+    entryInfo->SetMinSize(wxSize(-1,350));
+    
+    entryVisual = new wxPanel(rightPanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(rightPanel, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    entryVisual->SetBackgroundColour(wxColour(wxT("rgb(255,255,255)")));
+    
+    flexGridSizer1583->Add(entryVisual, 1, wxRIGHT|wxEXPAND, WXC_FROM_DIP(5));
+    
+    wxBoxSizer* boxSizer1589 = new wxBoxSizer(wxVERTICAL);
+    entryVisual->SetSizer(boxSizer1589);
+    
+    m_panel1702 = new wxPanel(mainSearchPage, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(mainSearchPage, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    mainSearchPage->AddPage(m_panel1702, _("Page"), false);
+    
+    wxBoxSizer* boxSizer1712 = new wxBoxSizer(wxVERTICAL);
+    m_panel1702->SetSizer(boxSizer1712);
+    
+    m_panel1143816 = new wxPanel(m_panel1702, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel1702, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_panel1143816->SetBackgroundColour(wxColour(wxT("rgb(255,255,255)")));
+    
+    boxSizer1712->Add(m_panel1143816, 0, wxEXPAND, WXC_FROM_DIP(5));
+    
+    wxFlexGridSizer* flexGridSizer1431917 = new wxFlexGridSizer(0, 10, 0, 0);
+    flexGridSizer1431917->SetFlexibleDirection( wxBOTH );
+    flexGridSizer1431917->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer1431917->AddGrowableCol(1);
+    m_panel1143816->SetSizer(flexGridSizer1431917);
+    
+    ctlNomadLogo1119 = new wxStaticBitmap(m_panel1143816, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("nomad")), wxDefaultPosition, wxDLG_UNIT(m_panel1143816, wxSize(-1,-1)), 0 );
+    
+    flexGridSizer1431917->Add(ctlNomadLogo1119, 0, wxRIGHT, WXC_FROM_DIP(5));
+    
+    m_panel14395 = new wxPanel(m_panel1143816, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel1143816, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    
+    flexGridSizer1431917->Add(m_panel14395, 1, wxEXPAND, WXC_FROM_DIP(5));
+    
+    btnExplore = new wxButton(m_panel1143816, wxID_ANY, _("Explore"), wxDefaultPosition, wxDLG_UNIT(m_panel1143816, wxSize(-1,-1)), 0);
+    
+    flexGridSizer1431917->Add(btnExplore, 0, wxALL|wxALIGN_CENTER_VERTICAL, WXC_FROM_DIP(5));
+    
+    m_panel1722 = new wxPanel(m_panel1702, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel1702, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_panel1722->SetBackgroundColour(wxColour(wxT("rgb(190,200,220)")));
+    
+    boxSizer1712->Add(m_panel1722, 1, wxEXPAND, WXC_FROM_DIP(5));
+    
+    wxBoxSizer* boxSizer1742 = new wxBoxSizer(wxVERTICAL);
+    m_panel1722->SetSizer(boxSizer1742);
+    
+    m_panel13895226110 = new wxPanel(m_panel1722, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel1722, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_panel13895226110->SetBackgroundColour(wxColour(wxT("rgb(255,255,255)")));
+    
+    boxSizer1742->Add(m_panel13895226110, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    wxBoxSizer* boxSizer13955327211 = new wxBoxSizer(wxHORIZONTAL);
+    m_panel13895226110->SetSizer(boxSizer13955327211);
+    
+    m_staticText13975428312 = new wxStaticText(m_panel13895226110, wxID_ANY, _("Login"), wxDefaultPosition, wxDLG_UNIT(m_panel13895226110, wxSize(-1,-1)), 0);
+    
+    boxSizer13955327211->Add(m_staticText13975428312, 0, wxALL, WXC_FROM_DIP(5));
+    
+    m_panel138952616 = new wxPanel(m_panel1722, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel1722, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_panel138952616->SetBackgroundColour(wxColour(wxT("rgb(190,200,220)")));
+    
+    boxSizer1742->Add(m_panel138952616, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    wxFlexGridSizer* flexGridSizer175517 = new wxFlexGridSizer(0, 4, 0, 0);
+    flexGridSizer175517->SetFlexibleDirection( wxBOTH );
+    flexGridSizer175517->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer175517->AddGrowableCol(2);
+    m_panel138952616->SetSizer(flexGridSizer175517);
+    
+    m_staticText1772 = new wxStaticText(m_panel138952616, wxID_ANY, _("User name:"), wxDefaultPosition, wxDLG_UNIT(m_panel138952616, wxSize(-1,-1)), 0);
+    
+    flexGridSizer175517->Add(m_staticText1772, 0, wxALL|wxALIGN_CENTER_VERTICAL, WXC_FROM_DIP(5));
+    
+    ctrl_nomad_user = new wxSearchCtrl(m_panel138952616, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panel138952616, wxSize(200,-1)), wxTE_PROCESS_ENTER);
+    ctrl_nomad_user->ShowSearchButton(false);
+    ctrl_nomad_user->ShowCancelButton(false);
+    
+    flexGridSizer175517->Add(ctrl_nomad_user, 0, wxALL, WXC_FROM_DIP(5));
+    ctrl_nomad_user->SetMinSize(wxSize(200,-1));
+    
+    m_panel143991824 = new wxPanel(m_panel138952616, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel138952616, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    
+    flexGridSizer175517->Add(m_panel143991824, 1, wxEXPAND, WXC_FROM_DIP(5));
+    
+    m_panel1439918 = new wxPanel(m_panel138952616, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel138952616, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    
+    flexGridSizer175517->Add(m_panel1439918, 1, wxEXPAND, WXC_FROM_DIP(5));
+    
+    m_staticText177225 = new wxStaticText(m_panel138952616, wxID_ANY, _("Password:"), wxDefaultPosition, wxDLG_UNIT(m_panel138952616, wxSize(-1,-1)), 0);
+    
+    flexGridSizer175517->Add(m_staticText177225, 0, wxALL|wxALIGN_CENTER_VERTICAL, WXC_FROM_DIP(5));
+    
+    ctrl_nomad_pass = new wxSearchCtrl(m_panel138952616, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panel138952616, wxSize(200,-1)), wxTE_PROCESS_ENTER);
+    ctrl_nomad_pass->ShowSearchButton(false);
+    ctrl_nomad_pass->ShowCancelButton(false);
+    
+    flexGridSizer175517->Add(ctrl_nomad_pass, 0, wxALL, WXC_FROM_DIP(5));
+    ctrl_nomad_pass->SetMinSize(wxSize(200,-1));
+    
+    m_panel1439918242728293031 = new wxPanel(m_panel138952616, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel138952616, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    
+    flexGridSizer175517->Add(m_panel1439918242728293031, 1, wxEXPAND, WXC_FROM_DIP(5));
+    
+    m_panel14399182427282930 = new wxPanel(m_panel138952616, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel138952616, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    
+    flexGridSizer175517->Add(m_panel14399182427282930, 1, wxEXPAND, WXC_FROM_DIP(5));
+    
+    m_panel143991824272829 = new wxPanel(m_panel138952616, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel138952616, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    
+    flexGridSizer175517->Add(m_panel143991824272829, 1, wxEXPAND, WXC_FROM_DIP(5));
+    
+    ctrl_nomad_user_pass_remember = new wxCheckBox(m_panel138952616, wxID_ANY, _("Remember me"), wxDefaultPosition, wxDLG_UNIT(m_panel138952616, wxSize(-1,-1)), 0);
+    ctrl_nomad_user_pass_remember->SetValue(false);
+    
+    flexGridSizer175517->Add(ctrl_nomad_user_pass_remember, 0, wxALL|wxALIGN_CENTER_VERTICAL, WXC_FROM_DIP(5));
+    
+    m_panel1439918242728 = new wxPanel(m_panel138952616, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel138952616, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    
+    flexGridSizer175517->Add(m_panel1439918242728, 1, wxEXPAND, WXC_FROM_DIP(5));
+    
+    btnLogin = new wxButton(m_panel138952616, wxID_ANY, _("Login"), wxDefaultPosition, wxDLG_UNIT(m_panel138952616, wxSize(-1,-1)), 0);
+    
+    flexGridSizer175517->Add(btnLogin, 0, wxALL|wxALIGN_CENTER_VERTICAL, WXC_FROM_DIP(5));
+    
+    m_panel138952261 = new wxPanel(m_panel1722, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel1722, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_panel138952261->SetBackgroundColour(wxColour(wxT("rgb(255,255,255)")));
+    
+    boxSizer1742->Add(m_panel138952261, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    wxBoxSizer* boxSizer139553272 = new wxBoxSizer(wxHORIZONTAL);
+    m_panel138952261->SetSizer(boxSizer139553272);
+    
+    myProjectsTitle = new wxStaticText(m_panel138952261, wxID_ANY, _("My Projects"), wxDefaultPosition, wxDLG_UNIT(m_panel138952261, wxSize(-1,-1)), 0);
+    
+    boxSizer139553272->Add(myProjectsTitle, 0, wxALL, WXC_FROM_DIP(5));
+    
+    panelUploadsList = new wxPanel(m_panel1722, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel1722, wxSize(-1,-1)), wxTAB_TRAVERSAL|wxVSCROLL);
+    panelUploadsList->SetBackgroundColour(wxColour(wxT("rgb(190,200,220)")));
+    
+    boxSizer1742->Add(panelUploadsList, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    wxBoxSizer* panelUploadsListSizer = new wxBoxSizer(wxVERTICAL);
+    panelUploadsList->SetSizer(panelUploadsListSizer);
+    
+    
+    #if wxVERSION_NUMBER >= 2900
+    if(!wxPersistenceManager::Get().Find(mainSearchPage)){
+        wxPersistenceManager::Get().RegisterAndRestore(mainSearchPage);
+    } else {
+        wxPersistenceManager::Get().Restore(mainSearchPage);
+    }
+    #endif
+    
+    SetName(wxT("NomadGUIBase"));
+    SetMinClientSize(wxSize(1200,800));
+    SetSize(wxDLG_UNIT(this, wxSize(1200,800)));
+    if (GetSizer()) {
+         GetSizer()->Fit(this);
+    }
+    if(GetParent()) {
+        CentreOnParent(wxBOTH);
+    } else {
+        CentreOnScreen(wxBOTH);
+    }
+#if wxVERSION_NUMBER >= 2900
+    if(!wxPersistenceManager::Get().Find(this)) {
+        wxPersistenceManager::Get().RegisterAndRestore(this);
+    } else {
+        wxPersistenceManager::Get().Restore(this);
+    }
+#endif
+    // Connect events
+    btnMyProjects->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(NomadGUIBase::btnMyProjects_OnClick), NULL, this);
+    CheckBoxExclusivelyComponents->Connect(wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler(NomadGUIBase::exclusively_composition_onChanged), NULL, this);
+    m_checkBox1481->Connect(wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler(NomadGUIBase::bulk_onChanged), NULL, this);
+    m_checkBox1483->Connect(wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler(NomadGUIBase::surface_onChanged), NULL, this);
+    m_checkBox1485->Connect(wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler(NomadGUIBase::dim_2d_onChanged), NULL, this);
+    m_checkBox1487->Connect(wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler(NomadGUIBase::dim_1d_onChanged), NULL, this);
+    m_checkBox148913->Connect(wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler(NomadGUIBase::direct_onChanged), NULL, this);
+    m_checkBox149114->Connect(wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler(NomadGUIBase::indirect_onChanged), NULL, this);
+    m_checkBox14891318->Connect(wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler(NomadGUIBase::spin_onChanged), NULL, this);
+    m_checkBox14911419->Connect(wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler(NomadGUIBase::not_spin_onChanged), NULL, this);
+    UserNamePrefix->Connect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(NomadGUIBase::UserNamePrefix_OnUpdated), NULL, this);
+    EntryID_Load_in_TBStudio->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(NomadGUIBase::LoadEntry_In_TBStudio_OnClick), NULL, this);
+    btnExplore->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(NomadGUIBase::btnExplore_OnClick), NULL, this);
+    
+}
+
+NomadGUIBase::~NomadGUIBase()
+{
+    btnMyProjects->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(NomadGUIBase::btnMyProjects_OnClick), NULL, this);
+    CheckBoxExclusivelyComponents->Disconnect(wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler(NomadGUIBase::exclusively_composition_onChanged), NULL, this);
+    m_checkBox1481->Disconnect(wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler(NomadGUIBase::bulk_onChanged), NULL, this);
+    m_checkBox1483->Disconnect(wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler(NomadGUIBase::surface_onChanged), NULL, this);
+    m_checkBox1485->Disconnect(wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler(NomadGUIBase::dim_2d_onChanged), NULL, this);
+    m_checkBox1487->Disconnect(wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler(NomadGUIBase::dim_1d_onChanged), NULL, this);
+    m_checkBox148913->Disconnect(wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler(NomadGUIBase::direct_onChanged), NULL, this);
+    m_checkBox149114->Disconnect(wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler(NomadGUIBase::indirect_onChanged), NULL, this);
+    m_checkBox14891318->Disconnect(wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler(NomadGUIBase::spin_onChanged), NULL, this);
+    m_checkBox14911419->Disconnect(wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler(NomadGUIBase::not_spin_onChanged), NULL, this);
+    UserNamePrefix->Disconnect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(NomadGUIBase::UserNamePrefix_OnUpdated), NULL, this);
+    EntryID_Load_in_TBStudio->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(NomadGUIBase::LoadEntry_In_TBStudio_OnClick), NULL, this);
+    btnExplore->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(NomadGUIBase::btnExplore_OnClick), NULL, this);
+    
+}
+
+LoginBaseClass::LoginBaseClass(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style)
+    : wxDialog(parent, id, title, pos, size, style)
+{
+    if ( !bBitmapLoaded ) {
+        // We need to initialise the default bitmap handler
+        wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
+        wxC9ED9InitBitmapResources();
+        bBitmapLoaded = true;
+    }
+    
+    wxBoxSizer* boxSizer1840 = new wxBoxSizer(wxVERTICAL);
+    this->SetSizer(boxSizer1840);
+    
+    m_staticText1842 = new wxStaticText(this, wxID_ANY, _("Login using your NOMAD account"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    
+    boxSizer1840->Add(m_staticText1842, 0, wxALL, WXC_FROM_DIP(5));
+    
+    wxBoxSizer* boxSizer1881 = new wxBoxSizer(wxVERTICAL);
+    
+    boxSizer1840->Add(boxSizer1881, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    m_panel1901 = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,20)), wxTAB_TRAVERSAL);
+    
+    boxSizer1881->Add(m_panel1901, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    m_panel1901->SetMinSize(wxSize(-1,20));
+    
+    UserNamePanel = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    
+    boxSizer1881->Add(UserNamePanel, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, WXC_FROM_DIP(5));
+    
+    wxBoxSizer* boxSizer1885 = new wxBoxSizer(wxHORIZONTAL);
+    UserNamePanel->SetSizer(boxSizer1885);
+    
+    m_staticText1891 = new wxStaticText(UserNamePanel, wxID_ANY, _("User name:"), wxDefaultPosition, wxDLG_UNIT(UserNamePanel, wxSize(-1,-1)), 0);
+    
+    boxSizer1885->Add(m_staticText1891, 0, wxALL|wxALIGN_CENTER_VERTICAL, WXC_FROM_DIP(5));
+    
+    PasswordPanel = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    
+    boxSizer1881->Add(PasswordPanel, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, WXC_FROM_DIP(5));
+    
+    wxBoxSizer* boxSizer18895 = new wxBoxSizer(wxHORIZONTAL);
+    PasswordPanel->SetSizer(boxSizer18895);
+    
+    m_staticText18956 = new wxStaticText(PasswordPanel, wxID_ANY, _("  Password:"), wxDefaultPosition, wxDLG_UNIT(PasswordPanel, wxSize(-1,-1)), 0);
+    
+    boxSizer18895->Add(m_staticText18956, 0, wxALL|wxALIGN_CENTER_VERTICAL, WXC_FROM_DIP(5));
+    
+    wxBoxSizer* boxSizer1889 = new wxBoxSizer(wxHORIZONTAL);
+    
+    boxSizer1881->Add(boxSizer1889, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL, WXC_FROM_DIP(5));
+    
+    m_checkBox1909 = new wxCheckBox(this, wxID_ANY, _("Remember me"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    m_checkBox1909->SetValue(false);
+    
+    boxSizer1889->Add(m_checkBox1909, 0, wxALL, WXC_FROM_DIP(5));
+    
+    wxBoxSizer* boxSizer1899 = new wxBoxSizer(wxVERTICAL);
+    
+    boxSizer1840->Add(boxSizer1899, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    wxBoxSizer* boxSizer1904 = new wxBoxSizer(wxHORIZONTAL);
+    
+    boxSizer1899->Add(boxSizer1904, 1, wxALL|wxEXPAND|wxALIGN_RIGHT, WXC_FROM_DIP(5));
+    
+    m_button1911 = new wxButton(this, wxID_ANY, _("Cancel"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    
+    boxSizer1904->Add(m_button1911, 0, wxALL|wxALIGN_CENTER_VERTICAL, WXC_FROM_DIP(5));
+    
+    m_button1913 = new wxButton(this, wxID_ANY, _("Login"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    
+    boxSizer1904->Add(m_button1913, 0, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, WXC_FROM_DIP(5));
+    
+    SetName(wxT("LoginBaseClass"));
+    SetSize(wxDLG_UNIT(this, wxSize(500,300)));
+    if (GetSizer()) {
+         GetSizer()->Fit(this);
+    }
+    if(GetParent()) {
+        CentreOnParent(wxBOTH);
+    } else {
+        CentreOnScreen(wxBOTH);
+    }
+#if wxVERSION_NUMBER >= 2900
+    if(!wxPersistenceManager::Get().Find(this)) {
+        wxPersistenceManager::Get().RegisterAndRestore(this);
+    } else {
+        wxPersistenceManager::Get().Restore(this);
+    }
+#endif
+}
+
+LoginBaseClass::~LoginBaseClass()
+{
+}

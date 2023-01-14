@@ -26,10 +26,10 @@ BondsClass::BondsClass(wxWindow* parent, Sec30* sec30var, wxWindowID id, const w
     esslistctr->Connect(wxEVT_COMMAND_LISTBOX_SELECTED, wxCommandEventHandler(BondsClass::EssList_OnSelected), NULL, this);
     /**********************************************************************************************************************************************/
     sec30->AddGroupBox(this,_("Connect Two Atoms"),wxColour(wxT("rgb(153,180,209)")));
-    wxString Labels2[1] = {_("Pick the selected pair of atoms")};
-    wxString Names2[1] = {_("PickAtomBtn")};
-    wxObjectEventFunction Funcs2[1] = { wxCommandEventHandler(BondsClass::Btn_Pick_OnClick)};
-    sec30->AddButton(this, 1, Names2, Labels2, Funcs2);
+//    wxString Labels2[1] = {_("Pick the selected pair of atoms")};
+//    wxString Names2[1] = {_("PickAtomBtn")};
+//    wxObjectEventFunction Funcs2[1] = { wxCommandEventHandler(BondsClass::Btn_Pick_OnClick)};
+//    sec30->AddButton(this, 1, Names2, Labels2, Funcs2);
     sec30->AddGroupBox(this,_("Atom index and shell number in cell (0,0,0):"),sec30->ThemeMenuColour);
     sec30->AddVarVector(this, 2, _("AtomIndex1"), _("int"), _("(i,n)"), 70, 50, false);
     sec30->AddGroupBox(this,_("Atom index and shell number in selected cell:"),sec30->ThemeMenuColour);
@@ -50,9 +50,12 @@ BondsClass::BondsClass(wxWindow* parent, Sec30* sec30var, wxWindowID id, const w
     choicectr->SetEditable(false);
     choicectr->SetBackgroundColour(*wxWHITE);
     choicectr->Select(0);
-    wxString Labels1[1] = {_("Set Bond")};
-    wxObjectEventFunction Funcs1[1] = { wxCommandEventHandler(BondsClass::Btn_Set_OnClick)};
-    sec30->AddButton(this, 1, Labels1, Funcs1);
+    wxStaticText* bond_status = sec30->AddGroupBox(this, _("BondStatus"), _("Select two atoms to create a bond."), wxColour(wxT("rgb(255,255,255)")));
+    bond_status->SetForegroundColour(*wxBLUE);
+    wxString Labels1[2] = {_("Set Bond"), _("Delete Bond")};
+    wxString Names1[2] = {_("SetBondBtn"), _("DeleteBondBtn")};
+    wxObjectEventFunction Funcs1[2] = { wxCommandEventHandler(BondsClass::Btn_Set_OnClick) , wxCommandEventHandler(BondsClass::Btn_Delete_OnClick)};
+    sec30->AddButton(this, 2, Names1, Labels1, Funcs1);
     /**********************************************************************************************************************************************/
     sec30->AddGroupBox(this,_("List of Bonds in TB Model"),wxColour(wxT("rgb(153,180,209)")));
     wxCheckTree* treectr = sec30->AddTreeCtrl(this, _("Bonds"), 340, 500, true);
@@ -71,6 +74,11 @@ BondsClass::~BondsClass()
 }
 
 void BondsClass::Btn_Set_OnClick(wxCommandEvent& event)
+{
+    CreateTheBond();
+}
+
+void BondsClass::CreateTheBond()
 {
     int i000,sh000;
     int ilmn,shlmn;
@@ -138,6 +146,71 @@ void BondsClass::Btn_Set_OnClick(wxCommandEvent& event)
     //wxCommandEvent* event0 = new wxCommandEvent(Sec30EVT_OnUpdated);
     //event0->SetString(this->GetName());
     //wxQueueEvent(this->GetParent(),event0);
+}
+
+wxTreeItemId BondsClass::GetTheBondID()
+{
+    int i000,sh000;
+    int ilmn,shlmn;
+    wxTreeItemId NullID = wxTreeItemId();
+    if (!sec30->GetVar(_("AtomIndex1[0]"),i000)) return NullID;
+    if (!sec30->GetVar(_("AtomIndex1[1]"),sh000)) return NullID;
+    if (!sec30->GetVar(_("AtomIndex2[0]"),ilmn)) return NullID;
+    if (!sec30->GetVar(_("AtomIndex2[1]"),shlmn)) return NullID;
+    if (i000 < 1 || ilmn < 1) return NullID;
+    if (sh000 < 1 || shlmn < 1) return NullID;
+    int maxIndex=0;
+    sec30->GetVar(_("nAtoms[0]"),maxIndex);
+    if (i000 > maxIndex || ilmn > maxIndex) return NullID;
+    
+    wxListBox* listctr = sec30->GetListObject(_("EssentialUnitcellList"));
+    if (listctr->GetCount() < 1) return NullID;
+    int lmn = listctr->GetSelection();
+    if (lmn < 0) return NullID;
+    wxString listucell = listctr->GetString(lmn);
+    wxString ucell = _("(0,0,0)-") + listucell;
+    
+    wxComboBox* bondctr =  sec30->GetComboObject(_("BondLabel"));
+    int btypind = bondctr->GetSelection();
+    if (btypind < 0) return NullID;
+    
+    wxCheckTree* treectr = sec30->GetTreeObject(_("Bonds"));
+    wxTreeItemId rootID = treectr->GetRootItem();
+    wxTreeItemId lmnID = treectr->FindItemIn(rootID,ucell);
+    
+    if (!lmnID)
+    {
+        treectr->tree_add(rootID,ucell,true,true);
+        lmnID = treectr->FindItemIn(rootID,ucell);
+    }
+    
+    if( listucell.CompareTo(_("(0,0,0)")) == 0 )
+    {
+        if (i000 == ilmn) return NullID;
+        if (i000 > ilmn)
+        {
+            int dummy = i000;
+            i000 = ilmn;
+            ilmn = dummy;
+            
+            dummy = sh000;
+            sh000 = shlmn;
+            shlmn = dummy;
+        }
+    }
+    
+    wxString bondinfotest = _("[ (i,n)=") + wxString::Format(wxT("(%d,%d)"), i000, sh000) + _(" , (j,m)=") + wxString::Format(wxT("(%d,%d)"), ilmn, shlmn);
+    wxTreeItemId testID = treectr->ContainsItemIn(lmnID,bondinfotest);
+    return testID;
+}
+
+void BondsClass::Btn_Delete_OnClick(wxCommandEvent& event)
+{
+    wxCheckTree* treectr = sec30->GetTreeObject(_("Bonds"));
+    wxTreeItemId BondID = GetTheBondID();
+    treectr->Delete(BondID);
+    treectr->Update();
+    treectr->Refresh(true);  
 }
 
 void BondsClass::Btn_Pick_OnClick(wxCommandEvent& event)

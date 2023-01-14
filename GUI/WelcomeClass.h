@@ -9,7 +9,8 @@
 class WelcomeClass : public WelcomeClassBase
 {
 public:
-    int WelcomeTime = 12;//sec
+//    int WelcomeTime = 12;//sec
+    int WelcomeTime = 1;//sec
     int Time = 0;//ses
     WelcomeClass(wxWindow* parent);
     virtual ~WelcomeClass();

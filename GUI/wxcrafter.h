@@ -4,8 +4,8 @@
 // Do not modify this file by hand!
 //////////////////////////////////////////////////////////////////////
 
-#ifndef _PECSJUNC_GUI_WXCRAFTER_BASE_CLASSES_H
-#define _PECSJUNC_GUI_WXCRAFTER_BASE_CLASSES_H
+#ifndef _TBSTUDIO_GUI_WXCRAFTER_BASE_CLASSES_H
+#define _TBSTUDIO_GUI_WXCRAFTER_BASE_CLASSES_H
 
 #include <wx/settings.h>
 #include <wx/xrc/xmlres.h>
@@ -25,6 +25,14 @@
 #include <wx/hyperlink.h>
 #include <wx/richtext/richtextctrl.h>
 #include <wx/button.h>
+#include <wx/simplebook.h>
+#include <wx/imaglist.h>
+#include <wx/scrolwin.h>
+#include <wx/checkbox.h>
+#include <wx/srchctrl.h>
+#include <wx/bmpbuttn.h>
+#include <wx/choice.h>
+#include <wx/arrstr.h>
 #if wxVERSION_NUMBER >= 2900
 #include <wx/persist.h>
 #include <wx/persist/toplevel.h>
@@ -153,6 +161,219 @@ public:
     wxButton* GetButton1114() { return m_button1114; }
     UpdateClassBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Update"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxDEFAULT_DIALOG_STYLE|wxSTAY_ON_TOP);
     virtual ~UpdateClassBase();
+};
+
+
+class NomadGUIBase : public wxDialog
+{
+protected:
+    wxSimplebook* mainSearchPage;
+    wxPanel* m_panel1445;
+    wxPanel* m_panel1143;
+    wxStaticBitmap* ctlNomadLogo;
+    wxPanel* m_panel1439;
+    wxButton* btnMyProjects;
+    wxScrolledWindow* searchPanel;
+    wxPanel* m_panel1389526;
+    wxPanel* m_panel14399;
+    wxButton* btnSearch;
+    wxPanel* m_panel138952;
+    wxStaticText* m_staticText139754;
+    wxPanel* m_panel1412;
+    wxCheckBox* CheckBoxExclusivelyComponents;
+    wxPanel* periodicTable;
+    wxPanel* m_panel138955;
+    wxStaticText* m_staticText139757;
+    wxPanel* MaterialTypePanel;
+    wxCheckBox* m_checkBox1481;
+    wxCheckBox* m_checkBox1483;
+    wxCheckBox* m_checkBox1485;
+    wxCheckBox* m_checkBox1487;
+    wxPanel* m_panel138961;
+    wxStaticText* m_staticText139763;
+    wxPanel* MaterialTypePanel7;
+    wxCheckBox* m_checkBox148913;
+    wxCheckBox* m_checkBox149114;
+    wxPanel* m_panel1389;
+    wxStaticText* m_staticText1397;
+    wxPanel* MaterialTypePanel716;
+    wxCheckBox* m_checkBox14891318;
+    wxCheckBox* m_checkBox14911419;
+    wxPanel* m_panel13894;
+    wxStaticText* m_staticText13976;
+    wxPanel* MaterialTypePanel7167;
+    wxStaticText* m_staticText1691;
+    wxSearchCtrl* UserNamePrefix;
+    wxPanel* m_panel1447;
+    wxPanel* m_panel11438;
+    wxBitmapButton* ctlBack;
+    wxPanel* resultsPanel;
+    wxPanel* leftPanel;
+    wxPanel* m_panel1249;
+    wxBitmapButton* ctlLeftPage;
+    wxBitmapButton* ctlRightPage;
+    wxStaticText* ctl_pagination_info;
+    wxStaticText* m_staticText1149;
+    wxChoice* ctlSortBy;
+    wxPanel* rightPanel;
+    wxPanel* panelentry;
+    wxStaticText* EntryID_staticText;
+    wxSearchCtrl* EntryID;
+    wxButton* EntryID_Load_in_TBStudio;
+    wxPanel* entryInfo;
+    wxPanel* entryVisual;
+    wxPanel* m_panel1702;
+    wxPanel* m_panel1143816;
+    wxStaticBitmap* ctlNomadLogo1119;
+    wxPanel* m_panel14395;
+    wxButton* btnExplore;
+    wxPanel* m_panel1722;
+    wxPanel* m_panel13895226110;
+    wxStaticText* m_staticText13975428312;
+    wxPanel* m_panel138952616;
+    wxStaticText* m_staticText1772;
+    wxSearchCtrl* ctrl_nomad_user;
+    wxPanel* m_panel143991824;
+    wxPanel* m_panel1439918;
+    wxStaticText* m_staticText177225;
+    wxSearchCtrl* ctrl_nomad_pass;
+    wxPanel* m_panel1439918242728293031;
+    wxPanel* m_panel14399182427282930;
+    wxPanel* m_panel143991824272829;
+    wxCheckBox* ctrl_nomad_user_pass_remember;
+    wxPanel* m_panel1439918242728;
+    wxButton* btnLogin;
+    wxPanel* m_panel138952261;
+    wxStaticText* myProjectsTitle;
+    wxPanel* panelUploadsList;
+
+protected:
+    virtual void btnMyProjects_OnClick(wxCommandEvent& event) { event.Skip(); }
+    virtual void exclusively_composition_onChanged(wxCommandEvent& event) { event.Skip(); }
+    virtual void bulk_onChanged(wxCommandEvent& event) { event.Skip(); }
+    virtual void surface_onChanged(wxCommandEvent& event) { event.Skip(); }
+    virtual void dim_2d_onChanged(wxCommandEvent& event) { event.Skip(); }
+    virtual void dim_1d_onChanged(wxCommandEvent& event) { event.Skip(); }
+    virtual void direct_onChanged(wxCommandEvent& event) { event.Skip(); }
+    virtual void indirect_onChanged(wxCommandEvent& event) { event.Skip(); }
+    virtual void spin_onChanged(wxCommandEvent& event) { event.Skip(); }
+    virtual void not_spin_onChanged(wxCommandEvent& event) { event.Skip(); }
+    virtual void UserNamePrefix_OnUpdated(wxCommandEvent& event) { event.Skip(); }
+    virtual void LoadEntry_In_TBStudio_OnClick(wxCommandEvent& event) { event.Skip(); }
+    virtual void btnExplore_OnClick(wxCommandEvent& event) { event.Skip(); }
+
+public:
+    wxStaticBitmap* GetCtlNomadLogo() { return ctlNomadLogo; }
+    wxPanel* GetPanel1439() { return m_panel1439; }
+    wxButton* GetBtnMyProjects() { return btnMyProjects; }
+    wxPanel* GetPanel1143() { return m_panel1143; }
+    wxPanel* GetPanel14399() { return m_panel14399; }
+    wxButton* GetBtnSearch() { return btnSearch; }
+    wxPanel* GetPanel1389526() { return m_panel1389526; }
+    wxStaticText* GetStaticText139754() { return m_staticText139754; }
+    wxPanel* GetPanel138952() { return m_panel138952; }
+    wxCheckBox* GetCheckBoxExclusivelyComponents() { return CheckBoxExclusivelyComponents; }
+    wxPanel* GetPanel1412() { return m_panel1412; }
+    wxPanel* GetPeriodicTable() { return periodicTable; }
+    wxStaticText* GetStaticText139757() { return m_staticText139757; }
+    wxPanel* GetPanel138955() { return m_panel138955; }
+    wxCheckBox* GetCheckBox1481() { return m_checkBox1481; }
+    wxCheckBox* GetCheckBox1483() { return m_checkBox1483; }
+    wxCheckBox* GetCheckBox1485() { return m_checkBox1485; }
+    wxCheckBox* GetCheckBox1487() { return m_checkBox1487; }
+    wxPanel* GetMaterialTypePanel() { return MaterialTypePanel; }
+    wxStaticText* GetStaticText139763() { return m_staticText139763; }
+    wxPanel* GetPanel138961() { return m_panel138961; }
+    wxCheckBox* GetCheckBox148913() { return m_checkBox148913; }
+    wxCheckBox* GetCheckBox149114() { return m_checkBox149114; }
+    wxPanel* GetMaterialTypePanel7() { return MaterialTypePanel7; }
+    wxStaticText* GetStaticText1397() { return m_staticText1397; }
+    wxPanel* GetPanel1389() { return m_panel1389; }
+    wxCheckBox* GetCheckBox14891318() { return m_checkBox14891318; }
+    wxCheckBox* GetCheckBox14911419() { return m_checkBox14911419; }
+    wxPanel* GetMaterialTypePanel716() { return MaterialTypePanel716; }
+    wxStaticText* GetStaticText13976() { return m_staticText13976; }
+    wxPanel* GetPanel13894() { return m_panel13894; }
+    wxStaticText* GetStaticText1691() { return m_staticText1691; }
+    wxSearchCtrl* GetUserNamePrefix() { return UserNamePrefix; }
+    wxPanel* GetMaterialTypePanel7167() { return MaterialTypePanel7167; }
+    wxScrolledWindow* GetSearchPanel() { return searchPanel; }
+    wxPanel* GetPanel1445() { return m_panel1445; }
+    wxBitmapButton* GetCtlBack() { return ctlBack; }
+    wxPanel* GetPanel11438() { return m_panel11438; }
+    wxBitmapButton* GetCtlLeftPage() { return ctlLeftPage; }
+    wxBitmapButton* GetCtlRightPage() { return ctlRightPage; }
+    wxStaticText* GetCtl_pagination_info() { return ctl_pagination_info; }
+    wxStaticText* GetStaticText1149() { return m_staticText1149; }
+    wxChoice* GetCtlSortBy() { return ctlSortBy; }
+    wxPanel* GetPanel1249() { return m_panel1249; }
+    wxPanel* GetLeftPanel() { return leftPanel; }
+    wxStaticText* GetEntryID_staticText() { return EntryID_staticText; }
+    wxSearchCtrl* GetEntryID() { return EntryID; }
+    wxButton* GetEntryID_Load_in_TBStudio() { return EntryID_Load_in_TBStudio; }
+    wxPanel* GetPanelentry() { return panelentry; }
+    wxPanel* GetEntryInfo() { return entryInfo; }
+    wxPanel* GetEntryVisual() { return entryVisual; }
+    wxPanel* GetRightPanel() { return rightPanel; }
+    wxPanel* GetResultsPanel() { return resultsPanel; }
+    wxPanel* GetPanel1447() { return m_panel1447; }
+    wxStaticBitmap* GetCtlNomadLogo1119() { return ctlNomadLogo1119; }
+    wxPanel* GetPanel14395() { return m_panel14395; }
+    wxButton* GetBtnExplore() { return btnExplore; }
+    wxPanel* GetPanel1143816() { return m_panel1143816; }
+    wxStaticText* GetStaticText13975428312() { return m_staticText13975428312; }
+    wxPanel* GetPanel13895226110() { return m_panel13895226110; }
+    wxStaticText* GetStaticText1772() { return m_staticText1772; }
+    wxSearchCtrl* GetCtrl_nomad_user() { return ctrl_nomad_user; }
+    wxPanel* GetPanel143991824() { return m_panel143991824; }
+    wxPanel* GetPanel1439918() { return m_panel1439918; }
+    wxStaticText* GetStaticText177225() { return m_staticText177225; }
+    wxSearchCtrl* GetCtrl_nomad_pass() { return ctrl_nomad_pass; }
+    wxPanel* GetPanel1439918242728293031() { return m_panel1439918242728293031; }
+    wxPanel* GetPanel14399182427282930() { return m_panel14399182427282930; }
+    wxPanel* GetPanel143991824272829() { return m_panel143991824272829; }
+    wxCheckBox* GetCtrl_nomad_user_pass_remember() { return ctrl_nomad_user_pass_remember; }
+    wxPanel* GetPanel1439918242728() { return m_panel1439918242728; }
+    wxButton* GetBtnLogin() { return btnLogin; }
+    wxPanel* GetPanel138952616() { return m_panel138952616; }
+    wxStaticText* GetMyProjectsTitle() { return myProjectsTitle; }
+    wxPanel* GetPanel138952261() { return m_panel138952261; }
+    wxPanel* GetPanelUploadsList() { return panelUploadsList; }
+    wxPanel* GetPanel1722() { return m_panel1722; }
+    wxPanel* GetPanel1702() { return m_panel1702; }
+    wxSimplebook* GetMainSearchPage() { return mainSearchPage; }
+    NomadGUIBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("NOMAD"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(1200,800), long style = wxDEFAULT_DIALOG_STYLE|wxCAPTION|wxRESIZE_BORDER|wxMAXIMIZE_BOX|wxCLOSE_BOX);
+    virtual ~NomadGUIBase();
+};
+
+
+class LoginBaseClass : public wxDialog
+{
+protected:
+    wxStaticText* m_staticText1842;
+    wxPanel* m_panel1901;
+    wxPanel* UserNamePanel;
+    wxStaticText* m_staticText1891;
+    wxPanel* PasswordPanel;
+    wxStaticText* m_staticText18956;
+    wxCheckBox* m_checkBox1909;
+    wxButton* m_button1911;
+    wxButton* m_button1913;
+
+protected:
+
+public:
+    wxStaticText* GetStaticText1842() { return m_staticText1842; }
+    wxPanel* GetPanel1901() { return m_panel1901; }
+    wxStaticText* GetStaticText1891() { return m_staticText1891; }
+    wxPanel* GetUserNamePanel() { return UserNamePanel; }
+    wxStaticText* GetStaticText18956() { return m_staticText18956; }
+    wxPanel* GetPasswordPanel() { return PasswordPanel; }
+    wxCheckBox* GetCheckBox1909() { return m_checkBox1909; }
+    wxButton* GetButton1911() { return m_button1911; }
+    wxButton* GetButton1913() { return m_button1913; }
+    LoginBaseClass(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Login"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,300), long style = wxDEFAULT_DIALOG_STYLE);
+    virtual ~LoginBaseClass();
 };
 
 #endif

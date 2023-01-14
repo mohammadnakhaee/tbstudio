@@ -15,7 +15,6 @@
 #include "SKClass.h"
 #include "ColorsClass.h"
 #include "unistd.h"
-#include "Embeded.h"
 #include <wx/ribbon/bar.h>
 #include <wx/ribbon/art.h>
 #include <wx/ribbon/page.h>
@@ -23,9 +22,9 @@
 #include <wx/ribbon/buttonbar.h>
 #include <thread>
 #include <Regression.h>
-#include <Nomad.h>
 #include "UpdateClass.h"
 #include <wx/aui/auibook.h>
+#include "NomadGUI.h"
 //#include <memory>
 /**********************************************************************************/
 
@@ -61,7 +60,8 @@ public:
 	
     bool IsLicensed = false;
     wxString LicenseOwner = _("");
-    
+    Aint0D selectedAtomsIndex;
+    Adouble1D selectedAtomsPositions;
     Sec30* sec30;
     //std::shared_ptr<Sec30> sec30;
     double* p;
@@ -80,17 +80,17 @@ public:
     bool is_cnst = false;
     bool is_UpperSymMatrixHf = false;
     
-    Nomad* nomad;
     Regression* regression;
     //std::thread* FittingThread;
     bool isFittingThreadBusy = false;
 	
     wxRibbonButtonBar* RButtonMouse;
-    
+    NomadGUI* nomadGUI;
     
     void ShowAbout();
     void OnExit(wxCommandEvent& event);
     void OnAbout(wxCommandEvent& event);
+    
 protected:
     virtual void MainFrameClose(wxCloseEvent& event);
     bool CheckLicense(wxString &UserName);
@@ -127,6 +127,7 @@ protected:
     virtual void BtnOpen_OnClick(wxRibbonButtonBarEvent& event);
     virtual void BtnSave_OnClick(wxRibbonButtonBarEvent& event);
 	virtual void BtnSaveAs_OnClick(wxRibbonButtonBarEvent& event);
+    virtual void BtnCloud_OnClick(wxRibbonButtonBarEvent& event);
     virtual void BtnGrid_OnClick(wxRibbonButtonBarEvent& event);
     virtual void BtnMain_OnClick(wxRibbonButtonBarEvent& event);
     virtual void BtnTerminal_OnClick(wxRibbonButtonBarEvent& event);
@@ -244,10 +245,6 @@ private:
     void regressionEVT_OnFinished(wxCommandEvent& event);
     void regressionEVT_OnStarted(wxCommandEvent& event);
     void figureClass_EVT_PlotFinished(wxCommandEvent& event);
-    void nomadEVT_OnQueryStarted(wxCommandEvent& event);
-    void nomadEVT_OnQueryDataReceived(wxCommandEvent& event);
-    void nomadEVT_OnQueryErrorReceived(wxCommandEvent& event);
-    void nomadEVT_OnQueryFinished(wxCommandEvent& event);
     void LoadIcons();
     wxBitmap GetPng(const void* data, size_t length);
 	//typedef std::unordered_map<std::string, pthread_t> ThreadMap;

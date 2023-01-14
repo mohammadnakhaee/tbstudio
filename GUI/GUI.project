@@ -8,6 +8,9 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="src">
+    <File Name="LoginClass.cpp"/>
+    <File Name="BondsClass.cpp"/>
+    <File Name="NomadGUI.cpp"/>
     <File Name="Nomad.cpp"/>
     <File Name="MyFigureClass.cpp"/>
     <File Name="UpdateClass.cpp"/>
@@ -15,7 +18,6 @@
     <File Name="Regression.cpp"/>
     <File Name="SetupClass.cpp"/>
     <File Name="SKClass.cpp"/>
-    <File Name="BondsClass.cpp"/>
     <File Name="ColorsClass.cpp"/>
     <File Name="OrbitalsClass.cpp"/>
     <File Name="checktree.cpp"/>
@@ -34,6 +36,8 @@
     <File Name="wxcrafter_bitmaps.cpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="include">
+    <File Name="LoginClass.h"/>
+    <File Name="NomadGUI.h"/>
     <File Name="Nomad.h"/>
     <File Name="MyFigureClass.h"/>
     <File Name="UpdateClass.h"/>
@@ -90,6 +94,8 @@
         <IncludePath Value="$(LAPACKE_DIR)"/>
         <IncludePath Value="$(Gemmi_DIR)/include"/>
         <IncludePath Value="$(RapidXML_DIR)"/>
+        <IncludePath Value="$(SimpleJSON_DIR)"/>
+        <IncludePath Value="$(RapidJSON_DIR)"/>
       </Compiler>
       <Linker Options="-mwindows;$(shell wx-config --libs std,gl,ribbon);-mwindows;-std=gnu++11 -pthread -liphlpapi -IC:\Users\mohammad\Documents\Codelite\pecsjunc\LAPACKE-X64 -llapacke" Required="yes">
         <LibraryPath Value="$(Opengl_DIR)"/>
@@ -97,7 +103,7 @@
         <LibraryPath Value="C:\TDM-GCC-64\x86_64-w64-mingw32\lib"/>
         <LibraryPath Value="$(Glut_DIR)\lib"/>
         <LibraryPath Value="$(LAPACKE_DIR)"/>
-        <LibraryPath Value="C:\TDM-GCC-64\gcc-5.1.0-tdm64-1-fortran\bin"/>
+        <LibraryPath Value="C:\TDM-GCC-64\gcc-10.3.0-tdm64-1-fortran\bin"/>
         <Library Value="libmgl-glut.a"/>
         <Library Value="libmgl.a"/>
         <Library Value="libfreeglut.a"/>
@@ -146,15 +152,17 @@
         <IncludePath Value="$(LAPACKE_DIR)"/>
         <IncludePath Value="$(Gemmi_DIR)/include"/>
         <IncludePath Value="$(RapidXML_DIR)"/>
+        <IncludePath Value="$(SimpleJSON_DIR)"/>
+        <IncludePath Value="$(RapidJSON_DIR)"/>
         <Preprocessor Value="NDEBUG"/>
       </Compiler>
-      <Linker Options="-mwindows;$(shell wx-config --libs std,gl,ribbon);-mwindows;-std=gnu++11 -pthread -liphlpapi" Required="yes">
+      <Linker Options="-mwindows;$(shell wx-config --libs std,gl,ribbon,webview);-mwindows;-std=gnu++11 -pthread -liphlpapi" Required="yes">
         <LibraryPath Value="$(Opengl_DIR)"/>
         <LibraryPath Value="$(MathGL_DIR)\lib"/>
         <LibraryPath Value="C:\TDM-GCC-64\x86_64-w64-mingw32\lib"/>
         <LibraryPath Value="$(Glut_DIR)\lib"/>
         <LibraryPath Value="$(LAPACKE_DIR)"/>
-        <LibraryPath Value="C:\TDM-GCC-64\gcc-5.1.0-tdm64-1-fortran\bin"/>
+        <LibraryPath Value="C:\gcc-10.3.0-tdm64-1-fortran\bin"/>
         <Library Value="libmgl-glut.a"/>
         <Library Value="libmgl.a"/>
         <Library Value="libfreeglut.a"/>

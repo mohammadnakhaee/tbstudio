@@ -11,7 +11,7 @@
 #include <wx/msgdlg.h>
 #include <WelcomeClass.h>
 #include <wx/dir.h>
-
+#include "Embeded.h"
 #include "main.h"
 
 /*
@@ -83,11 +83,6 @@ ThemeMenuColour.Set(255,255,255,255);
     this->Connect(RegressionEVT_OnFinished, wxCommandEventHandler(MainFrame::regressionEVT_OnFinished), NULL, this);
     this->Connect(RegressionEVT_OnStarted, wxCommandEventHandler(MainFrame::regressionEVT_OnStarted), NULL, this);
     this->Connect(FigureClass_EVT_PlotFinished, wxCommandEventHandler(MainFrame::figureClass_EVT_PlotFinished), NULL, this);
-	
-    this->Connect(NomadEVT_OnQueryStarted, wxCommandEventHandler(MainFrame::nomadEVT_OnQueryStarted), NULL, this);
-    this->Connect(NomadEVT_OnQueryDataReceived, wxCommandEventHandler(MainFrame::nomadEVT_OnQueryDataReceived), NULL, this);
-    this->Connect(NomadEVT_OnQueryErrorReceived, wxCommandEventHandler(MainFrame::nomadEVT_OnQueryErrorReceived), NULL, this);
-    this->Connect(NomadEVT_OnQueryFinished, wxCommandEventHandler(MainFrame::nomadEVT_OnQueryFinished), NULL, this);
     
     InitializeSec30Arrays();
     
@@ -202,8 +197,9 @@ ThemeMenuColour.Set(255,255,255,255);
 	
 	
     regression = new Regression();
-    nomad = new Nomad(this);
-    
+    nomadGUI = new NomadGUI(this, sec30, graph2d0, graph2d);
+//    nomadGUI->Destroy();
+
     WelcomeClass* welcome = new WelcomeClass(NULL);
     welcome->CenterOnScreen();
     //welcome->CenterOnParent();
@@ -278,7 +274,6 @@ MainFrame::~MainFrame()
     //if (is_UpperSymMatrixHf) {delete [] UpperSymMatrixHf; is_UpperSymMatrixHf=false;}
     
     delete regression;
-    delete nomad;
     //delete FittingThread;
     
     delete sec30;
@@ -295,7 +290,7 @@ MainFrame::~MainFrame()
     delete skPanel;
     delete ColorsForm;
     delete RButtonMouse;
-    
+//    delete nomadGUI;
 }
 
 
@@ -410,10 +405,10 @@ GLuint LoadTexture()
 {
     unsigned char data[] = { 255,0,0, 0,255,0, 0,0,255, 255,255,255 };
 
-    glGenTextures( 1, &texture ); 
-    glBindTexture( GL_TEXTURE_2D, texture ); 
+    glGenTextures( 1, &texture );
+    glBindTexture( GL_TEXTURE_2D, texture );
     glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
-    glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE ); 
+    glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
 
     //even better quality, but this will do for now.
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,GL_NEAREST);
@@ -738,80 +733,7 @@ void MainFrame::BtnTerminal_OnClick(wxRibbonButtonBarEvent& event)
 
 void MainFrame::InitializeSec30Arrays()
 {
-    int nArraysOf0DDouble = 9;
-    int nArraysOf0DInt = 10;
-    int nArraysOf2DInt = 3;
-    int nArraysOf1DDouble = 4;
-    int nArraysOf1DString = 3;
-    int nArraysOf2DDouble = 5;
-    int nArraysOf3DDouble = 6;
-    sec30->ArraysOf0DDouble.clear();
-    sec30->ArraysOf0DInt.clear();
-    sec30->ArraysOf2DInt.clear();
-    sec30->ArraysOf1DDouble.clear();
-    sec30->ArraysOf1DString.clear();
-    sec30->ArraysOf2DDouble.clear();
-    sec30->ArraysOf3DDouble.clear();
-    for (int i=0; i<nArraysOf0DDouble; i++) sec30->ArraysOf0DDouble.push_back(0.0);
-    for (int i=0; i<nArraysOf0DInt; i++) sec30->ArraysOf0DInt.push_back(0);
-    for (int i=0; i<nArraysOf2DInt; i++) sec30->ArraysOf2DInt.push_back(Aint1D());
-    for (int i=0; i<nArraysOf1DDouble; i++) sec30->ArraysOf1DDouble.push_back(Adouble0D());
-    for (int i=0; i<nArraysOf1DString; i++) sec30->ArraysOf1DString.push_back(Astring0D());
-    for (int i=0; i<nArraysOf2DDouble; i++) sec30->ArraysOf2DDouble.push_back(Adouble1D());
-    for (int i=0; i<nArraysOf3DDouble; i++) sec30->ArraysOf3DDouble.push_back(Adouble2D());
-    /////////////////////////////0D Int///////////////////////////////////////////////////////
-    sec30->ArraysOf0DInt[0] = 0;//bool isBandLoaded;
-    sec30->ArraysOf0DInt[1] = 0;//int nKPoint;
-    sec30->ArraysOf0DInt[2] = 0;//int maxneig;
-    sec30->ArraysOf0DInt[3] = 0;//int mspin;
-    sec30->ArraysOf0DInt[4] = 0;//int DFTnBandMin;
-    sec30->ArraysOf0DInt[5] = 0;//int DFTnBandMax;
-    sec30->ArraysOf0DInt[6] = 0;//bool isSelectMode;
-    sec30->ArraysOf0DInt[7] = 0;//bool isTBBand_i;
-    sec30->ArraysOf0DInt[8] = 0;//bool isTBBand_f;
-    sec30->ArraysOf0DInt[9] = 0;//bool notUsed
-    
-    /////////////////////////////2D Int///////////////////////////////////////////////////////
-    sec30->ArraysOf2DInt[0] = Aint1D();//int** HamiltonianDimMap;
-    sec30->ArraysOf2DInt[1] = Aint1D();//int** SKListInfo;
-    sec30->ArraysOf2DInt[2] = Aint1D();//int** FitPoints;
-    
-    /////////////////////////////0D Double///////////////////////////////////////////////////////
-    sec30->ArraysOf0DDouble[0] = 0.0;//double ChemP;
-    sec30->ArraysOf0DDouble[1] = 0.0;//double DFTyMin2d0;
-    sec30->ArraysOf0DDouble[2] = 0.0;//double DFTyMax2d0;
-    sec30->ArraysOf0DDouble[3] = 0.0;//double DFTyMin2d;
-    sec30->ArraysOf0DDouble[4] = 0.0;//double DFTyMax2d;
-    sec30->ArraysOf0DDouble[5] = 0.0;//double DFTxMin2d0;
-    sec30->ArraysOf0DDouble[6] = 0.0;//double DFTxMax2d0;
-    sec30->ArraysOf0DDouble[7] = 0.0;//double DFTxMin2d;
-    sec30->ArraysOf0DDouble[8] = 0.0;//double DFTxMax2d;
-    
-    /////////////////////////////1D Double///////////////////////////////////////////////////////
-    sec30->ArraysOf1DDouble[0] = Adouble0D();//double* dkLabel;
-    sec30->ArraysOf1DDouble[1] = Adouble0D();//double akDFT[3];
-    sec30->ArraysOf1DDouble[2] = Adouble0D();//double bkDFT[3];
-    sec30->ArraysOf1DDouble[3] = Adouble0D();//double ckDFT[3];
-    
-    /////////////////////////////1D String///////////////////////////////////////////////////////
-    sec30->ArraysOf1DString[0] = Astring0D();//wxString* kLabel;
-    sec30->ArraysOf1DString[1] = Astring0D();//wxString* HamiltonianMap;
-    sec30->ArraysOf1DString[2] = Astring0D();//wxString* HamiltonianShellMap;
-    
-    /////////////////////////////2D Double///////////////////////////////////////////////////////
-    sec30->ArraysOf2DDouble[0] = Adouble1D();//double** KPoints; [ka,kb,kc,kx,ky,kz,d_path]
-    sec30->ArraysOf2DDouble[1] = Adouble1D();//double** DFTEigVal;
-    sec30->ArraysOf2DDouble[2] = Adouble1D();//double** iTBEigVal;
-    sec30->ArraysOf2DDouble[3] = Adouble1D();//double** fTBEigVal;
-    sec30->ArraysOf2DDouble[4] = Adouble1D();//double** DFTEigValWeight;
-    
-    /////////////////////////////3D Double///////////////////////////////////////////////////////
-    sec30->ArraysOf3DDouble[0] = Adouble2D();//double*** Hi; Vi_{0,0,0}, Vi_{1,0,0}, Vi_{0,1,0}, Vi_{1,1,0}, Vi_{1,-1,0}
-    sec30->ArraysOf3DDouble[1] = Adouble2D();//double*** Hf; Vf_{0,0,0}, Vf_{1,0,0}, Vf_{0,1,0}, Vf_{1,1,0}, Vf_{1,-1,0}
-    sec30->ArraysOf3DDouble[2] = Adouble2D();//double*** Si; Si_{0,0,0}, Si_{1,0,0}, Si_{0,1,0}, Si_{1,1,0}, Si_{1,-1,0}
-    sec30->ArraysOf3DDouble[3] = Adouble2D();//double*** Sf; Sf_{0,0,0}, Sf_{1,0,0}, Sf_{0,1,0}, Sf_{1,1,0}, Sf_{1,-1,0}
-    sec30->ArraysOf3DDouble[4] = Adouble2D();//double*** SOCi; SOCi_Re, SOCi_Im
-    sec30->ArraysOf3DDouble[5] = Adouble2D();//double*** SOCf; SOCf_Re, SOCf_Im
+    sec30->init();
 }
 
 void MainFrame::Init_Notebook()
@@ -896,12 +818,6 @@ void MainFrame::BtnGrid_OnClick(wxRibbonButtonBarEvent& event)
 
 void MainFrame::BtnOpen_OnClick(wxRibbonButtonBarEvent& event)
 {
-    nomad->elements.push_back(wxString("C"));
-//    nomad->types.push_back(wxString("2D"));
-    nomad->spins.push_back(wxString("false"));
-    nomad->gapTypes.push_back(wxString("indirect"));
-    nomad->startQuery();
-
     wxFileDialog* OpenDialog = new wxFileDialog(
 		this, _("Open TB model"), wxEmptyString, wxEmptyString, 
 		_("TBM File (*.tbm)|*.tbm")
@@ -955,6 +871,11 @@ void MainFrame::BtnSave_OnClick(wxRibbonButtonBarEvent& event)
 void MainFrame::BtnSaveAs_OnClick(wxRibbonButtonBarEvent& event)
 {
     SaveAs();
+}
+
+void MainFrame::BtnCloud_OnClick(wxRibbonButtonBarEvent& event)
+{
+    nomadGUI->ShowModal();
 }
 
 void MainFrame::SaveAs()
@@ -1065,10 +986,16 @@ void MainFrame::sec30_OnUpdated(wxCommandEvent& event)
         if (redraw == 1) ClearGraph3D();
         EvaluateOrbitalsPanel(redraw);
     }
-    else if (info == _("BondsClass"))
+    else if (info == _("AtomsSelected"))
     {
         if (redraw == 1) ClearGraph3D();
         EvaluateBondsPanel(redraw);
+    }
+    else if (info == _("BondsClass"))
+    {
+        if (redraw == 1) ClearGraph3D();
+//        EvaluateBondsPanel(redraw);
+        if (ValidateBondsPanel()) ShowGraph3D();
     }
     else if (info == _("ColorsClass"))
     {
@@ -1081,6 +1008,10 @@ void MainFrame::sec30_OnUpdated(wxCommandEvent& event)
 void MainFrame::myOpenGL_EVT_SelectionChanged(wxCommandEvent& event)
 {
     int nList = graph3d->GetSelectedCount();
+    if (nList == 0) {
+        selectedAtomsIndex.clear();
+        selectedAtomsPositions.clear();
+    }
     int nShowingAtoms = graph3d->GetShowingAtomsCount();
     
     myGrid* gridctr = sec30->GetGridObject(_("KABC_Coords"));
@@ -1093,6 +1024,7 @@ void MainFrame::myOpenGL_EVT_SelectionChanged(wxCommandEvent& event)
             for (int j=0; j != nCol;j++)
                 gridctr->SetCellBackgroundColour(i, j, *wxWHITE);
         gridctr->Refresh(true);
+        sec30->SendUpdateEvent(wxT("AtomsSelected"), 0);
         return;
     }
     
@@ -1105,6 +1037,16 @@ void MainFrame::myOpenGL_EVT_SelectionChanged(wxCommandEvent& event)
     int first = true;
     for (int i=0; i != nShowingAtoms;i++)
     {
+        bool isFound = false;
+        int selectedIndex = -1;
+        for(Aint0D::iterator it = std::begin(selectedAtomsIndex); it != std::end(selectedAtomsIndex); ++it) {
+            selectedIndex++;
+            if (*it == i) {
+                isFound = true;
+                break;
+            }
+        }
+        
         if (Atoms[i] == 1)
         {
             float x=graph3d->glc->DoubleArray[0][i];
@@ -1117,6 +1059,16 @@ void MainFrame::myOpenGL_EVT_SelectionChanged(wxCommandEvent& event)
             int kind=graph3d->glc->IntArray[15][i];
             
             logfile->AppendText(wxString::Format(wxT("%s\tIndex: %d\tCell: (%d,%d,%d)\tr = (%.6f,%.6f,%.6f)\n"), sec30->GetAtomLable(kind), indexcell000 + 1, icell, jcell, kcell, x, y, z));
+            
+            Adouble0D pos;
+            pos.push_back(x);
+            pos.push_back(y);
+            pos.push_back(z);
+            
+            if (!isFound) {
+                selectedAtomsIndex.push_back(i);
+                selectedAtomsPositions.push_back(pos);
+            }
             
             for (int j=0; j != 4;j++)
             {
@@ -1144,6 +1096,11 @@ void MainFrame::myOpenGL_EVT_SelectionChanged(wxCommandEvent& event)
         }
         else
         {
+            if (isFound) {
+                selectedAtomsIndex.erase(selectedAtomsIndex.begin() + selectedIndex);
+                selectedAtomsPositions.erase(selectedAtomsPositions.begin() + selectedIndex);
+            }
+            
             for (int j=0; j != 4;j++)
             {
                 gridctr->SetCellBackgroundColour(i, j, *wxWHITE);
@@ -1222,9 +1179,31 @@ void MainFrame::myOpenGL_EVT_SelectionChanged(wxCommandEvent& event)
                 bond = treectr->GetNextSibling(bond);
             }
         }
+        
+        Adouble0D pos1 = selectedAtomsPositions.at(0);
+        Adouble0D pos2 = selectedAtomsPositions.at(1);
+        double vec1[3] = {pos1.at(0), pos1.at(1), pos1.at(2)};
+        double vec2[3] = {pos2.at(0), pos2.at(1), pos2.at(2)};
+        double distance = sec30->norm(vec1, vec2);
+        logfile->AppendText(wxString::Format(wxT("Distance: %.8f"), distance) + _("\n"));
+    }
+    
+    if (nList == 3) {
+        double PI=3.14159265359;
+        Adouble0D pos1 = selectedAtomsPositions.at(0);
+        Adouble0D pos2 = selectedAtomsPositions.at(1);
+        Adouble0D pos3 = selectedAtomsPositions.at(2);
+        double vec1[3] = {pos1.at(0) - pos2.at(0), pos1.at(1) - pos2.at(1), pos1.at(2) - pos2.at(2)};
+        double vec2[3] = {pos3.at(0) - pos2.at(0), pos3.at(1) - pos2.at(1), pos3.at(2) - pos2.at(2)};
+        double dot12 = sec30->dot(vec1, vec2);
+        double norm1 = sec30->norm(vec1);
+        double norm2 = sec30->norm(vec2);
+        double angle = acos(dot12 / norm1 / norm2) / PI * 180.0;
+        logfile->AppendText(wxString::Format(wxT("Angle: %.8f"), angle) + _("\n"));
     }
     
     gridctr->Refresh(true);
+    sec30->SendUpdateEvent(wxT("AtomsSelected"), 0);
     delete [] Atoms;
 }
 /****************************************************************************************************************************************************************/
@@ -1380,118 +1359,148 @@ void MainFrame::EvaluateBondsPanel(int redraw)
 {
     if (ValidateBondsPanel())
     {
-        wxButton* btnctr =  sec30->GetButtonObject(_("PickAtomBtn"));
-        if (btnctr->GetForegroundColour() == *wxRED)
+        wxButton* set_btnctr =  sec30->GetButtonObject(_("SetBondBtn"));
+        wxButton* delete_btnctr =  sec30->GetButtonObject(_("DeleteBondBtn"));
+        wxStaticText* bond_status =  sec30->GetStaticTextObject(_("BondStatus"));
+        
+//        wxButton* btnctr =  sec30->GetButtonObject(_("PickAtomBtn"));
+//        if (btnctr->GetForegroundColour() == *wxRED)
+//        {
+//            
+//        }
+//        else
+//            btnctr->SetForegroundColour(*wxBLACK);
+        
+        int n = graph3d->GetSelectedCount();
+        if (n == 2)
         {
-            int n = graph3d->GetSelectedCount();
-            if (n == 2)
+            int nShowingAtoms = graph3d->GetShowingAtomsCount();
+            int* Atoms = new int[nShowingAtoms];
+            graph3d->GetAtoms_Selection(Atoms);
+            int icell1,jcell1,kcell1,icell2,jcell2,kcell2,i1000,i2000;
+            int first = true;
+            for (int i=0; i != nShowingAtoms;i++)
             {
-                int nShowingAtoms = graph3d->GetShowingAtomsCount();
-                int* Atoms = new int[nShowingAtoms];
-                graph3d->GetAtoms_Selection(Atoms);
-                int icell1,jcell1,kcell1,icell2,jcell2,kcell2,i1000,i2000;
-                int first = true;
-                for (int i=0; i != nShowingAtoms;i++)
+                if (Atoms[i] == 1)
                 {
-                    if (Atoms[i] == 1)
+                    int icell=graph3d->glc->IntArray[11][i];
+                    int jcell=graph3d->glc->IntArray[12][i];
+                    int kcell=graph3d->glc->IntArray[13][i];
+                    int indexcell000=graph3d->glc->IntArray[14][i];
+            
+                    if (first)
                     {
-                        int icell=graph3d->glc->IntArray[11][i];
-                        int jcell=graph3d->glc->IntArray[12][i];
-                        int kcell=graph3d->glc->IntArray[13][i];
-                        int indexcell000=graph3d->glc->IntArray[14][i];
-                
-                        if (first)
-                        {
-                            first = false;
-                            icell1 = icell;
-                            jcell1 = jcell;
-                            kcell1 = kcell;
-                            i1000 = indexcell000;
-                        }
-                        else
-                        {
-                            icell2 = icell;
-                            jcell2 = jcell;
-                            kcell2 = kcell;
-                            i2000 = indexcell000;
-                        }
+                        first = false;
+                        icell1 = icell;
+                        jcell1 = jcell;
+                        kcell1 = kcell;
+                        i1000 = indexcell000;
                     }
-                }
-                
-                delete [] Atoms;
-                int iMyess = icell2 - icell1;
-                int jMyess = jcell2 - jcell1;
-                int kMyess = kcell2 - kcell1;
-                int ind000,indlmn;
-                bool plusFound=false;
-                bool minusFound=false;
-                int plusEssInd = -1;
-                int minusEssInd = -1;
-                wxListBox* esslistctr= sec30->GetListObject(_("EssentialUnitcellList"));
-                int nesslist = esslistctr->GetCount();
-                int EssInd = -1;
-                
-                wxString cellItem1 = wxString::Format(wxT("(%d,%d,%d)"), iMyess, jMyess, kMyess);
-                for (int ii=0; ii!=nesslist; ii++)
-                {
-                    plusEssInd++;
-                    wxString item = esslistctr->GetString(ii);
-                    if(item.CompareTo(cellItem1) == 0 ) {plusFound = true; break;}
-                }
-                
-                wxString cellItem2 = wxString::Format(wxT("(%d,%d,%d)"), -iMyess, -jMyess, -kMyess);
-                for (int ii=0; ii!=nesslist; ii++)
-                {
-                    minusEssInd++;
-                    wxString item = esslistctr->GetString(ii);
-                    if(item.CompareTo(cellItem2) == 0 ) {minusFound = true; break;}
-                }
-                
-                wxString cellItem;
-                wxTreeItemId lmnID;
-                if (plusFound)
-                {
-                    ind000 = i1000;
-                    indlmn = i2000;
-                    EssInd = plusEssInd;
-                }
-                else if (minusFound)
-                {
-                    ind000 = i2000;
-                    indlmn = i1000;
-                    EssInd = minusEssInd;
-                }
-                else
-                    wxMessageBox(_("You can not set a bond between these atoms. You should extend the\nNearest-Neighbor Unit-Cell of the TB model in Structure tab."),_("Error"));
-                
-                if (plusFound & minusFound)
-                {
-                    if (ind000 > indlmn)
+                    else
                     {
-                        int dummy = ind000;
-                        ind000 = indlmn;
-                        indlmn = dummy;
+                        icell2 = icell;
+                        jcell2 = jcell;
+                        kcell2 = kcell;
+                        i2000 = indexcell000;
                     }
-                }
-                
-                if (plusFound || minusFound)
-                {
-                    esslistctr->SetSelection(EssInd);
-                    sec30->SetVar(_("AtomIndex1[0]"), ind000 + 1, false);
-                    sec30->SetVar(_("AtomIndex2[0]"), indlmn + 1, false);
-                    
-                    sec30TextCtrl* ctr1= sec30->GetTextCtrlObject(_("AtomIndex1[0]"));
-                    sec30TextCtrl* ctr2= sec30->GetTextCtrlObject(_("AtomIndex2[0]"));
-                    
-                    btnctr->SetForegroundColour(*wxGREEN);
                 }
             }
+            
+            delete [] Atoms;
+            int iMyess = icell2 - icell1;
+            int jMyess = jcell2 - jcell1;
+            int kMyess = kcell2 - kcell1;
+            int ind000,indlmn;
+            bool plusFound=false;
+            bool minusFound=false;
+            int plusEssInd = -1;
+            int minusEssInd = -1;
+            wxListBox* esslistctr= sec30->GetListObject(_("EssentialUnitcellList"));
+            int nesslist = esslistctr->GetCount();
+            int EssInd = -1;
+            
+            wxString cellItem1 = wxString::Format(wxT("(%d,%d,%d)"), iMyess, jMyess, kMyess);
+            for (int ii=0; ii!=nesslist; ii++)
+            {
+                plusEssInd++;
+                wxString item = esslistctr->GetString(ii);
+                if(item.CompareTo(cellItem1) == 0 ) {plusFound = true; break;}
+            }
+            
+            wxString cellItem2 = wxString::Format(wxT("(%d,%d,%d)"), -iMyess, -jMyess, -kMyess);
+            for (int ii=0; ii!=nesslist; ii++)
+            {
+                minusEssInd++;
+                wxString item = esslistctr->GetString(ii);
+                if(item.CompareTo(cellItem2) == 0 ) {minusFound = true; break;}
+            }
+            
+            wxString cellItem;
+            wxTreeItemId lmnID;
+            if (plusFound)
+            {
+                ind000 = i1000;
+                indlmn = i2000;
+                EssInd = plusEssInd;
+            }
+            else if (minusFound)
+            {
+                ind000 = i2000;
+                indlmn = i1000;
+                EssInd = minusEssInd;
+            }
             else
-                wxMessageBox(_("Please select the two atoms you are going to make a bond between them."),_("Error"));
+            {
+                set_btnctr->Enable(false);
+                delete_btnctr->Enable(false);
+                bond_status->SetLabel(_("TB model in Structure tab should be extended."));
+                bond_status->SetForegroundColour(*wxRED);
+            }
+            
+            if (plusFound & minusFound)
+            {
+                if (ind000 > indlmn)
+                {
+                    int dummy = ind000;
+                    ind000 = indlmn;
+                    indlmn = dummy;
+                }
+            }
+            
+            if (plusFound || minusFound)
+            {
+                esslistctr->SetSelection(EssInd);
+                sec30->SetVar(_("AtomIndex1[0]"), ind000 + 1, false);
+                sec30->SetVar(_("AtomIndex2[0]"), indlmn + 1, false);
+                
+                sec30TextCtrl* ctr1= sec30->GetTextCtrlObject(_("AtomIndex1[0]"));
+                sec30TextCtrl* ctr2= sec30->GetTextCtrlObject(_("AtomIndex2[0]"));
+                
+//                btnctr->SetForegroundColour(*wxGREEN);
+                wxTreeItemId BondID = bondsPanel->GetTheBondID();
+                if (BondID)
+                {
+                    bond_status->SetLabel(_("A bond has been selected."));
+                    bond_status->SetForegroundColour(*wxBLUE);
+                    set_btnctr->Enable(false);
+                    delete_btnctr->Enable(true);
+                } else {
+                    bond_status->SetLabel(_("Selected atoms are valid."));
+                    bond_status->SetForegroundColour(*wxBLUE);
+                    set_btnctr->Enable(true);
+                    delete_btnctr->Enable(false);
+                }
+            }
         }
         else
-            btnctr->SetForegroundColour(*wxBLACK);
-        
+        {
+            set_btnctr->Enable(false);
+            delete_btnctr->Enable(false);
+            bond_status->SetLabel(_("Select two atoms to create a bond."));
+            bond_status->SetForegroundColour(*wxBLUE);
+//            wxMessageBox(_("Please select the two atoms you are going to make a bond between them."),_("Error"));
+        }
+            
         if (redraw == 1) ShowGraph3D();
     }
 }
@@ -1626,7 +1635,8 @@ bool MainFrame::ValidateUnitCellPanel()
             wxString name = wxString::Format(wxT("AtomInd%d"),AtomCnt);
             wxStaticText* lab = sec30->GetComboLabelObject(name);
             wxString label = wxString::Format(wxT("Atom %d"),i+1);
-            lab->SetLabel(label + _(" [") +sec30->GetAtomLable(kind)+ _("]"));
+            lab->SetLabel(label + _(" [") +sec30->GetAtomLable(kind)+ _("]:"));
+            lab->GetParent()->Layout();
         }
     }
     
@@ -2829,6 +2839,9 @@ void MainFrame::LoadIcons()
     RButtonBar1->AddButton(wxID_SAVEAS, _("Save as"), GetPng(save_png,save_png_size), _(""), wxRIBBON_BUTTON_NORMAL);
     RButtonBar1->Connect(wxID_SAVEAS, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrame::BtnSaveAs_OnClick), NULL, this);
     
+    RButtonBar1->AddButton(wxID_FIND, _("Cloud storage"), GetPng(cloud_png,cloud_png_size), _(""), wxRIBBON_BUTTON_NORMAL);
+    RButtonBar1->Connect(wxID_FIND, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, wxRibbonButtonBarEventHandler(MainFrame::BtnCloud_OnClick), NULL, this);
+    
     RButtonBar1->Realize();
     
     wxRibbonPage* RPageTools = new wxRibbonPage(MainRibbon, wxID_ANY, _("Tools"), wxNullBitmap, 0);
@@ -4030,35 +4043,6 @@ void MainFrame::figureClass_EVT_PlotFinished(wxCommandEvent& event)
     {
         wxMessageBox(wxT("MainFrame: sec30->isPlotting = false"));
     }*/
-}
-
-
-void MainFrame::nomadEVT_OnQueryStarted(wxCommandEvent& event)
-{
-    wxMessageBox(wxT("I am in OnQueryStarted event."));
-}
-
-void MainFrame::nomadEVT_OnQueryDataReceived(wxCommandEvent& event)
-{
-    wxMessageBox(wxT("I am in OnQueryDataReceived event."));
-    logfile->AppendText(event.GetString());
-	logfile->ShowPosition(logfile->GetLastPosition());
-    //10000sec30->isPrinting = false;
-	//logfile->SetScrollPos(wxVERTICAL,logfile->GetScrollRange(wxVERTICAL));
-}
-
-void MainFrame::nomadEVT_OnQueryErrorReceived(wxCommandEvent& event)
-{
-    wxMessageBox(wxT("I am in OnQueryErrorReceived event."));
-    logfile->AppendText(event.GetString());
-	logfile->ShowPosition(logfile->GetLastPosition());
-    //10000sec30->isPrinting = false;
-	//logfile->SetScrollPos(wxVERTICAL,logfile->GetScrollRange(wxVERTICAL));
-}
-
-void MainFrame::nomadEVT_OnQueryFinished(wxCommandEvent& event)
-{
-    wxMessageBox(wxT("I am in OnQueryFinished event."));
 }
 
 void MainFrame::ExportMatrices(wxString filepath, wxString BaseName, int MyID_Initial0Final1)
@@ -6848,7 +6832,7 @@ void MainFrame::CreateATabFromFile(wxString filepath, wxString tabname, int nLin
 void MainFrame::LoadSKFileToTable(wxString filepath, myGrid* grid)
 {
 	grid->ClearGrid();
-	std::ifstream infile(filepath);
+	std::ifstream infile(filepath.ToStdString());
 	std::string l;
 	int iRow = -1;
 	while (std::getline(infile, l))
@@ -6879,7 +6863,7 @@ void MainFrame::LoadSKFileToTable(wxString filepath, myGrid* grid)
 
 int MainFrame::GetTheNumberOfLines(wxString filepath)
 {
-	std::ifstream infile(filepath);
+	std::ifstream infile(filepath.ToStdString());
 	std::string l;
 	int iRow = 0;
 	while (std::getline(infile, l))

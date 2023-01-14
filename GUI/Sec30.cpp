@@ -15,6 +15,84 @@ Sec30::Sec30(wxWindow* parent)
     SetParent(parent);
 }
 
+void Sec30::init()
+{
+    int nArraysOf0DDouble = 9;
+    int nArraysOf0DInt = 10;
+    int nArraysOf2DInt = 3;
+    int nArraysOf1DDouble = 4;
+    int nArraysOf1DString = 3;
+    int nArraysOf2DDouble = 5;
+    int nArraysOf3DDouble = 6;
+    ArraysOf0DDouble.clear();
+    ArraysOf0DInt.clear();
+    ArraysOf2DInt.clear();
+    ArraysOf1DDouble.clear();
+    ArraysOf1DString.clear();
+    ArraysOf2DDouble.clear();
+    ArraysOf3DDouble.clear();
+    for (int i=0; i<nArraysOf0DDouble; i++) ArraysOf0DDouble.push_back(0.0);
+    for (int i=0; i<nArraysOf0DInt; i++) ArraysOf0DInt.push_back(0);
+    for (int i=0; i<nArraysOf2DInt; i++) ArraysOf2DInt.push_back(Aint1D());
+    for (int i=0; i<nArraysOf1DDouble; i++) ArraysOf1DDouble.push_back(Adouble0D());
+    for (int i=0; i<nArraysOf1DString; i++) ArraysOf1DString.push_back(Astring0D());
+    for (int i=0; i<nArraysOf2DDouble; i++) ArraysOf2DDouble.push_back(Adouble1D());
+    for (int i=0; i<nArraysOf3DDouble; i++) ArraysOf3DDouble.push_back(Adouble2D());
+    /////////////////////////////0D Int///////////////////////////////////////////////////////
+    ArraysOf0DInt[0] = 0;//bool isBandLoaded;
+    ArraysOf0DInt[1] = 0;//int nKPoint;
+    ArraysOf0DInt[2] = 0;//int maxneig;
+    ArraysOf0DInt[3] = 0;//int mspin;
+    ArraysOf0DInt[4] = 0;//int DFTnBandMin;
+    ArraysOf0DInt[5] = 0;//int DFTnBandMax;
+    ArraysOf0DInt[6] = 0;//bool isSelectMode;
+    ArraysOf0DInt[7] = 0;//bool isTBBand_i;
+    ArraysOf0DInt[8] = 0;//bool isTBBand_f;
+    ArraysOf0DInt[9] = 0;//bool notUsed
+    
+    /////////////////////////////2D Int///////////////////////////////////////////////////////
+    ArraysOf2DInt[0] = Aint1D();//int** HamiltonianDimMap;
+    ArraysOf2DInt[1] = Aint1D();//int** SKListInfo;
+    ArraysOf2DInt[2] = Aint1D();//int** FitPoints;
+    
+    /////////////////////////////0D Double///////////////////////////////////////////////////////
+    ArraysOf0DDouble[0] = 0.0;//double ChemP;
+    ArraysOf0DDouble[1] = 0.0;//double DFTyMin2d0;
+    ArraysOf0DDouble[2] = 0.0;//double DFTyMax2d0;
+    ArraysOf0DDouble[3] = 0.0;//double DFTyMin2d;
+    ArraysOf0DDouble[4] = 0.0;//double DFTyMax2d;
+    ArraysOf0DDouble[5] = 0.0;//double DFTxMin2d0;
+    ArraysOf0DDouble[6] = 0.0;//double DFTxMax2d0;
+    ArraysOf0DDouble[7] = 0.0;//double DFTxMin2d;
+    ArraysOf0DDouble[8] = 0.0;//double DFTxMax2d;
+    
+    /////////////////////////////1D Double///////////////////////////////////////////////////////
+    ArraysOf1DDouble[0] = Adouble0D();//double* dkLabel;
+    ArraysOf1DDouble[1] = Adouble0D();//double akDFT[3];
+    ArraysOf1DDouble[2] = Adouble0D();//double bkDFT[3];
+    ArraysOf1DDouble[3] = Adouble0D();//double ckDFT[3];
+    
+    /////////////////////////////1D String///////////////////////////////////////////////////////
+    ArraysOf1DString[0] = Astring0D();//wxString* kLabel;
+    ArraysOf1DString[1] = Astring0D();//wxString* HamiltonianMap;
+    ArraysOf1DString[2] = Astring0D();//wxString* HamiltonianShellMap;
+    
+    /////////////////////////////2D Double///////////////////////////////////////////////////////
+    ArraysOf2DDouble[0] = Adouble1D();//double** KPoints; [ka,kb,kc,kx,ky,kz,d_path]
+    ArraysOf2DDouble[1] = Adouble1D();//double** DFTEigVal;
+    ArraysOf2DDouble[2] = Adouble1D();//double** iTBEigVal;
+    ArraysOf2DDouble[3] = Adouble1D();//double** fTBEigVal;
+    ArraysOf2DDouble[4] = Adouble1D();//double** DFTEigValWeight;
+    
+    /////////////////////////////3D Double///////////////////////////////////////////////////////
+    ArraysOf3DDouble[0] = Adouble2D();//double*** Hi; Vi_{0,0,0}, Vi_{1,0,0}, Vi_{0,1,0}, Vi_{1,1,0}, Vi_{1,-1,0}
+    ArraysOf3DDouble[1] = Adouble2D();//double*** Hf; Vf_{0,0,0}, Vf_{1,0,0}, Vf_{0,1,0}, Vf_{1,1,0}, Vf_{1,-1,0}
+    ArraysOf3DDouble[2] = Adouble2D();//double*** Si; Si_{0,0,0}, Si_{1,0,0}, Si_{0,1,0}, Si_{1,1,0}, Si_{1,-1,0}
+    ArraysOf3DDouble[3] = Adouble2D();//double*** Sf; Sf_{0,0,0}, Sf_{1,0,0}, Sf_{0,1,0}, Sf_{1,1,0}, Sf_{1,-1,0}
+    ArraysOf3DDouble[4] = Adouble2D();//double*** SOCi; SOCi_Re, SOCi_Im
+    ArraysOf3DDouble[5] = Adouble2D();//double*** SOCf; SOCf_Re, SOCf_Im
+}
+
 Sec30::~Sec30()
 {
 }
@@ -29,6 +107,20 @@ void Sec30::AddGroupBox(wxWindow *parent, wxString Caption, wxColour BGColor)
     wxStaticText* st = new wxStaticText(p, wxID_ANY, Caption, wxDefaultPosition, wxDLG_UNIT(p, wxSize(-1,-1)), 0);
     vsizer->Add(st, 0, wxLEFT, WXC_FROM_DIP(5));
     st->SetForegroundColour(*wxBLACK);
+}
+
+wxStaticText* Sec30::AddGroupBox(wxWindow *parent, wxString name, wxString Caption, wxColour BGColor)
+{
+    wxPanel* p = new wxPanel(parent, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    p->SetBackgroundColour(BGColor);
+    parent->GetSizer()->Add(p, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    wxBoxSizer* vsizer = new wxBoxSizer(wxVERTICAL);
+    p->SetSizer(vsizer);
+    wxStaticText* st = new wxStaticText(p, wxID_ANY, Caption, wxDefaultPosition, wxDLG_UNIT(p, wxSize(-1,-1)), 0);
+    vsizer->Add(st, 0, wxLEFT, WXC_FROM_DIP(5));
+    st->SetName(name);
+    st->SetForegroundColour(*wxBLACK);
+    return st;
 }
 
 void Sec30::AddButton(wxWindow *parent, int ButtonCnt, wxString* Labels, wxObjectEventFunction* Funcs)
@@ -282,7 +374,7 @@ wxComboBox* Sec30::AddComboCtrl(wxWindow *parent, wxString VariableName, wxStrin
     wxBoxSizer* MySizer = new wxBoxSizer(wxHORIZONTAL);
     parent->GetSizer()->Add(MySizer, 0, wxLEFT|wxRIGHT|wxTOP|wxEXPAND, WXC_FROM_DIP(5));
     
-    wxStaticText* st = new wxStaticText(parent, wxID_ANY, MyLabel + wxT(":"), wxDefaultPosition, wxDLG_UNIT(parent, wxSize(-1,-1)), 0);
+    wxStaticText* st = new wxStaticText(parent, wxID_ANY, MyLabel + wxT(":      "), wxDefaultPosition, wxDLG_UNIT(parent, wxSize(-1,-1)), 0);
     st->SetForegroundColour(*wxBLACK);
     MySizer->Add(st, 0, wxLEFT|wxRIGHT|wxTOP, WXC_FROM_DIP(5));
     st->SetMinSize(wxSize(LabelSize,-1));
@@ -696,6 +788,12 @@ wxStaticText* Sec30::GetComboLabelObject(wxString VariableName)
     return ctr;
 }
 
+wxStaticText* Sec30::GetStaticTextObject(wxString VariableName)
+{
+    wxStaticText* ctr= (wxStaticText*)FindWindowByName(VariableName,GetParent());
+    return ctr;
+}
+
 wxColourPickerCtrl* Sec30::GetColorObject(wxString VariableName)
 {
     wxColourPickerCtrl* ctr= (wxColourPickerCtrl*)FindWindowByName(VariableName,GetParent());
@@ -717,7 +815,7 @@ sec30TextCtrl* Sec30::GetTextCtrlObject(wxString VariableName)
 void Sec30::SaveToFile(wxString filepath, wxString filename)
 {
     wxString fname1 = filepath + wxFileName::GetPathSeparator() + filename;
-    std::ofstream out(fname1, std::ios::out | std::ios::binary);
+    std::ofstream out(fname1.ToStdString(), std::ios::out | std::ios::binary);
     
     if (out.is_open())
     {
@@ -1212,7 +1310,7 @@ void Sec30::SaveToFile(wxString filepath, wxString filename)
 void Sec30::LoadFromFile(wxString filepath, wxString filename)
 {
     wxString fname1 = filepath + wxFileName::GetPathSeparator() + filename;
-    std::ifstream infile(fname1, std::ios::in | std::ios::binary);
+    std::ifstream infile(fname1.ToStdString(), std::ios::in | std::ios::binary);
     
     if (infile.is_open())
     {
@@ -2555,6 +2653,20 @@ void Sec30::FracToAbs(double a[3], double b[3], double c[3], double frac[3], dou
     absol[0] = frac[0] * a[0] + frac[1] * b[0] + frac[2] * c[0];
     absol[1] = frac[0] * a[1] + frac[1] * b[1] + frac[2] * c[1];
     absol[2] = frac[0] * a[2] + frac[1] * b[2] + frac[2] * c[2];
+}
+
+void Sec30::AbsToFrac(double a[3], double b[3], double c[3], double absol[3], double (&frac)[3])
+{
+    double vol = a[2]*b[1]*c[0] - a[1]*b[2]*c[0] - a[2]*b[0]*c[1] + a[0]*b[2]*c[1] + a[1]*b[0]*c[2] - a[0]*b[1]*c[2];
+    if (isMatch(vol, 0.0, 1.0e-4)) {
+        frac[0] = 0.0;
+        frac[1] = 0.0;
+        frac[2] = 0.0;
+        return;
+    }
+    frac[0] = -(-(absol[2]*b[1]*c[0]) + absol[1]*b[2]*c[0] + absol[2]*b[0]*c[1] - absol[0]*b[2]*c[1] - absol[1]*b[0]*c[2] + absol[0]*b[1]*c[2]) / vol;
+    frac[1] = -(-(a[2]*absol[1]*c[0]) + a[1]*absol[2]*c[0] + a[2]*absol[0]*c[1] - a[0]*absol[2]*c[1] - a[1]*absol[0]*c[2] + a[0]*absol[1]*c[2]) / vol;
+    frac[2] = (-(a[2]*absol[1]*b[0]) + a[1]*absol[2]*b[0] + a[2]*absol[0]*b[1] - a[0]*absol[2]*b[1] - a[1]*absol[0]*b[2] + a[0]*absol[1]*b[2]) / vol;
 }
 
 void Sec30::vk_rtv(double vk[3], double rtv[3][3], double v[3])
@@ -4475,6 +4587,14 @@ bool Sec30::IsSKPanelFilled()
 		if (!output2) d2 = 0.0;
 		if ((d1 != 0.0) || (d2 != 0.0)) return true;
     }
+}
+
+wxBitmap Sec30::GetPng(const void* data, size_t length)
+{
+    wxMemoryInputStream memIStream(data, length);
+    wxImage image(memIStream, wxBITMAP_TYPE_PNG );
+    wxBitmap bmp( image );
+    return bmp;
 }
 
 /*

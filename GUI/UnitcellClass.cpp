@@ -345,7 +345,7 @@ void UnitcellClass::ImportFromCIF(wxString filepath, wxString filename)
                 reading a CIF file
     *********************************************/
     wxString fname1 = filepath + wxFileName::GetPathSeparator() + filename;
-    std::ifstream infile(fname1);
+    std::ifstream infile(fname1.ToStdString());
     std::string line;
     bool cell_length_a = false;
     bool cell_length_b = false;

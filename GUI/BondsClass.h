@@ -19,10 +19,13 @@ public:
 
     BondsClass(wxWindow* parent, Sec30* sec30var, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxTAB_TRAVERSAL|wxBORDER_STATIC);
     virtual ~BondsClass();
+    wxTreeItemId GetTheBondID();
 
 protected:
     wxTreeItemId ClickedID;
+    void CreateTheBond();
     void Btn_Set_OnClick(wxCommandEvent& event);
+    void Btn_Delete_OnClick(wxCommandEvent& event);
     void Btn_Pick_OnClick(wxCommandEvent& event);
     void BondsTree_RightDown(wxMouseEvent& event);
     void OnDelete(wxCommandEvent &event);

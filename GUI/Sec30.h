@@ -117,6 +117,7 @@ public:
 	wxString WorkingFile = wxEmptyString;
 	
     void AddGroupBox(wxWindow *parent, wxString Caption, wxColour BGColor);
+    wxStaticText* AddGroupBox(wxWindow *parent, wxString name, wxString Caption, wxColour BGColor);
     void AddButton(wxWindow *parent, int ButtonCnt, wxString* Labels, wxObjectEventFunction* Funcs);
     void AddButton(wxWindow *parent, int ButtonCnt, wxString* ButtonNames, wxString* Labels, wxObjectEventFunction* Funcs);
     void AddVarVector(wxWindow *parent, int VecCnt, wxString VariableName, wxString VariableType, wxString VecLabel, int LabelSize, int CtrlSize, bool EnableEvent = true, bool ReadOnly = false);
@@ -161,6 +162,7 @@ public:
     wxChoice* GetChoiceObject(wxString VariableName);
     wxComboBox* GetComboObject(wxString VariableName);
     wxStaticText* GetComboLabelObject(wxString VariableName);
+    wxStaticText* GetStaticTextObject(wxString VariableName);
     wxColourPickerCtrl* GetColorObject(wxString VariableName);
     myGrid* GetGridObject(wxString VariableName);
     sec30TextCtrl* GetTextCtrlObject(wxString VariableName);
@@ -184,6 +186,7 @@ public:
     void cross(double a[3], double b[3], double (&c)[3]);
     void VecToReciprocal(double a[3], double b[3], double c[3], double (&ak)[3], double (&bk)[3], double (&ck)[3]);
     void FracToAbs(double a[3], double b[3], double c[3], double frac[3], double (&absol)[3]);
+    void AbsToFrac(double a[3], double b[3], double c[3], double absol[3], double (&frac)[3]);
     void vk_rtv(double vk[3], double rtv[3][3], double v[3]);
     void GetDirectionalCosines(double x1, double y1, double z1, double x2, double y2, double z2, double &l, double &m, double &n);
     double Hopspd(Adouble0D BondSK, double l, double m, double n, wxString o1, wxString o2);
@@ -223,6 +226,8 @@ public:
     static bool SaveLicenseToFolder(wxString SNSeed1);
     static bool GetSNFromLicenseFile(wxString &SNSeed1);
     static bool IsSNSeed1MatchToThisPC(wxString SN1);
+    wxBitmap GetPng(const void* data, size_t length);
+    void init();
     
 private:
     virtual void sec30TextCtrl_OnUpdated(wxCommandEvent &event);
