@@ -1957,8 +1957,6 @@ bool MainFrame::ValidateSKParametersList()
 		if(nos > 2)
 		{
 			wxString str = osgc->GetCellValue(nos - 2, 0);
-            logfile->AppendText(wxString::Format(wxT("str=%s\n"),str));
-            logfile->AppendText(wxString::Format(wxT("isSOC=%d\n"),isSOC));
 			if ((!str.Contains(_("soc")) && isSOC) || (str.Contains(_("soc")) && !isSOC)) AnyProblem = true;
             //logfile->AppendText(wxString::Format(wxT("AnyProblem=%d "),AnyProblem));
 		}
@@ -3628,9 +3626,9 @@ void MainFrame::UpdateTBBand_if()
     sec30->ArraysOf2DDouble[3] = fTBEigVal;
 
     // testing
-    for (int i=0; i<nHamiltonianTot; i++) logfile->AppendText(wxString::Format(wxT("(%d) %f "),i,iTBEigVal[0][i]));
-    logfile->AppendText(_('\n'));
-    for (int i=0; i<nHamiltonianTot; i++) logfile->AppendText(wxString::Format(wxT("(%d) %f "),i,fTBEigVal[0][i]));
+    //for (int i=0; i<nHamiltonianTot; i++) logfile->AppendText(wxString::Format(wxT("(%d) %f "),i,iTBEigVal[0][i]));
+    //logfile->AppendText(_('\n'));
+    //for (int i=0; i<nHamiltonianTot; i++) logfile->AppendText(wxString::Format(wxT("(%d) %f "),i,fTBEigVal[0][i]));
 
     
     //////////////////////////////Deallocate all arrays//////////////////////////////////
