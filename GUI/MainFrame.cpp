@@ -13,8 +13,6 @@
 #include <wx/dir.h>
 
 #include "main.h"
-#include <iostream>
-#include <fstream>
 /*
 #ifdef __WXMAC__
 #include <GLUT/glut.h>
