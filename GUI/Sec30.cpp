@@ -391,6 +391,7 @@ void Sec30::sec30TextCtrl_OnUpdated(wxCommandEvent& event)
     //wxString type = tc->GetHint();
     wxString name = tc->GetParent()->GetName();
     //wxString value = tc->GetValue();
+    //logfile->AppendText(_("sec30:388 TextCtrl_OnUpdated")+wxString::Format(wxT(" %s"),name));
     SendUpdateEvent(name);
 }
 
@@ -398,6 +399,7 @@ void Sec30::TreeCtrlDeleteItem(wxTreeEvent& event)
 {
     wxCheckTree* tc= (wxCheckTree*)event.GetEventObject();
     wxString name = tc->GetParent()->GetName();
+    //logfile->AppendText(_("sec30:398 TreeCtrlDeleteItem")+wxString::Format(wxT(" %s"),name));
     SendUpdateEvent(name);
 }
 
@@ -405,6 +407,7 @@ void Sec30::TreeCtrlLeftClick(wxCommandEvent& event)
 {
     wxCheckTree* tc= (wxCheckTree*)event.GetEventObject();
     wxString name = tc->GetParent()->GetName();
+    //logfile->AppendText(_("sec30:406 TreeCtrlLeftClick"+wxString::Format(wxT(" %s"),name)));
     SendUpdateEvent(name);
 }
 
@@ -414,6 +417,7 @@ void Sec30::Choice_OnChanged(wxCommandEvent& event)
     //wxString type = tc->GetHint();
     wxString name = tc->GetParent()->GetName();
     //wxString value = tc->GetValue();
+    //logfile->AppendText(_("sec30:398 Choice_OnChanged")+wxString::Format(wxT(" %s"),name));
     SendUpdateEvent(name);
 }
 
@@ -423,6 +427,7 @@ void Sec30::ComboBox_OnChanged(wxCommandEvent& event)
     //wxString type = tc->GetHint();
     wxString name = tc->GetParent()->GetName();
     //wxString value = tc->GetValue();
+    //logfile->AppendText(_("sec30:424 ComboBox_OnChanged")+wxString::Format(wxT(" %s"),name));
     SendUpdateEvent(name);
 }
 
@@ -430,6 +435,7 @@ void Sec30::PickerChangeColor(wxColourPickerEvent& event)
 {
     wxColourPickerCtrl* tc= (wxColourPickerCtrl*)event.GetEventObject();
     wxString name = tc->GetParent()->GetName();
+    //logfile->AppendText(_("sec30:433 PickerChangeColor")+wxString::Format(wxT(" %s"),name));
     SendUpdateEvent(name);
 }
 
@@ -437,6 +443,7 @@ void Sec30::MyRadioSelected(wxCommandEvent& event)
 {
     wxRadioButton* ctr= (wxRadioButton*)event.GetEventObject();
     wxString name = ctr->GetParent()->GetName();
+    //logfile->AppendText(_("sec30:441 MyRadioSelected")+wxString::Format(wxT(" %s"),name));
     SendUpdateEvent(name);
 }
 
@@ -444,6 +451,7 @@ void Sec30::MyCheckBoxSelected(wxCommandEvent& event)
 {
     wxCheckBox* ctr= (wxCheckBox*)event.GetEventObject();
     wxString name = ctr->GetParent()->GetName();
+    //logfile->AppendText(_("sec30:447 MyCheckBoxSelected")+wxString::Format(wxT(" %s"),name));
     SendUpdateEvent(name);
 }
 
@@ -453,6 +461,8 @@ void Sec30::SendUpdateEvent(wxString info, int MyID)
     //event->SetEventObject(this);
     event->SetString(info);
     event->SetInt(MyID);
+    //logfile->AppendText(_("sec30:454 SendUpdateEvent"));
+
     wxQueueEvent(this,event);
 }
 
@@ -2421,7 +2431,7 @@ void Sec30::GetOrbitalInfo(wxCheckTree* orbsTree, wxString AtomName, int ShellNu
     Orbs = Orbs + _(")");
 }
 
-void Sec30::GetOrbQuantumNumbers(const wxString& OrbitalName, int& l, int& m)
+void Sec30::GetOrbQuantumNumbers(const wxString& OrbitalName, int& l, int& m)  // Unused 
 {
     if (OrbitalName.StartsWith("s"))
     {
@@ -2435,7 +2445,7 @@ void Sec30::GetOrbQuantumNumbers(const wxString& OrbitalName, int& l, int& m)
             m = -1;
         else if (OrbitalName.Contains("{z}"))
             m = 0;
-        else if (OrbitalName.Contains("{z}"))
+        else if (OrbitalName.Contains("{x}"))
             m = 1;
     }
     else if (OrbitalName.StartsWith("d"))
@@ -2593,7 +2603,8 @@ void Sec30::GetDirectionalCosines(double x1, double y1, double z1, double x2, do
 
 double Sec30::Hopspd(Adouble0D BondSK, double l, double m, double n, wxString o1, wxString o2)
 {
-    double out = Hopspd(BondSK[0], BondSK[1], BondSK[2], BondSK[3], BondSK[4], BondSK[5], BondSK[6], BondSK[7], BondSK[8], BondSK[9], l, m, n, o1, o2);
+    double out = Hopspd(BondSK[0], BondSK[1], BondSK[2], BondSK[3], BondSK[4], BondSK[5], BondSK[6], BondSK[7], BondSK[8], BondSK[9], BondSK[10], BondSK[11], BondSK[12], BondSK[13], BondSK[14], BondSK[15], l, m, n, o1, o2);
+    //double out = Hopspd(BondSK[0], BondSK[1], BondSK[2], BondSK[3], BondSK[4], BondSK[5], BondSK[6], BondSK[7], BondSK[8], BondSK[9], l, m, n, o1, o2);
     return out;
 }
 
@@ -2695,6 +2706,253 @@ double Sec30::Hopspd(double sss, double sps, double sds, double pps, double ppp,
     else if (element == _("d_{xz}:d_{x^2-y^2}")) out = ((-l/2)*nn)*(2*ddp - 3*dds - (4*ddp - 3*dds)*(2*m*m + nn*nn) + ddd*(1 + 2*m*m + nn*nn));
     else if (element == _("d_{x^2-y^2}:d_{xz}")) out = ((-l/2)*nn)*(2*ddp - 3*dds - (4*ddp - 3*dds)*(2*m*m + nn*nn) + ddd*(1 + 2*m*m + nn*nn));
     else if (element == _("d_{x^2-y^2}:d_{x^2-y^2}")) out = (4*ddp)*m*m + ddd*pow(m,4.0) + ddp*nn*nn + (ddd*m*m)*(-1 + nn*nn) + (ddd/4)*pow(1 + nn*nn,2.0) + ((3*dds)/4)*pow(-1 + 2*m*m + nn*nn,2.0) - ddp*pow(2*m*m + nn*nn,2.0);
+
+    return out;
+}
+
+
+double Sec30::Hopspd(double sss, double sps, double sds, double pps, double ppp,
+            double pds, double pdp, double dds, double ddp, double ddd,
+            double sfs, double pfs, double pfp, double dfs, double dfp, double dfd,
+            double l, double m, double n, wxString o1, wxString o2)
+{
+    double out = 0.0;
+    
+    wxString element = o1 + _(":") + o2;
+    double nn=n;
+    if (nn>0.9999)
+    {
+        nn=0.9999;
+    }
+    else if (nn<-0.9999)
+    {
+        nn=-0.9999;
+    }
+    
+    if (element == _("s:s")) out = sss;
+    else if (element == _("s:p_y")) out = sps*m;
+    else if (element == _("p_y:s")) out = (-sps)*m;
+    else if (element == _("s:p_z")) out = sps*nn;
+    else if (element == _("p_z:s")) out = (-sps)*nn;
+    else if (element == _("s:p_x")) out = sps*l;
+    else if (element == _("p_x:s")) out = (-sps)*l;
+    else if (element == _("s:d_{xy}")) out = ((sqrt(3)*sds)*l)*m;
+    else if (element == _("d_{xy}:s")) out = ((sqrt(3)*sds)*l)*m;
+    else if (element == _("s:d_{yz}")) out = ((sqrt(3)*sds)*m)*nn;
+    else if (element == _("d_{yz}:s")) out = ((sqrt(3)*sds)*m)*nn;
+    else if (element == _("s:d_{3z^2-r^2}")) out = (sds/2)*(-1 + 3*nn*nn);
+    else if (element == _("d_{3z^2-r^2}:s")) out = (sds/2)*(-1 + 3*nn*nn);
+    else if (element == _("s:d_{xz}")) out = ((sqrt(3)*sds)*l)*nn;
+    else if (element == _("d_{xz}:s")) out = ((sqrt(3)*sds)*l)*nn;
+    else if (element == _("s:d_{x^2-y^2}")) out = ((-sqrt(3)/2)*sds)*(-1 + 2*m*m + nn*nn);
+    else if (element == _("d_{x^2-y^2}:s")) out = ((-sqrt(3)/2)*sds)*(-1 + 2*m*m + nn*nn);
+    else if (element == _("p_y:p_y")) out = ppp - ppp*m*m + pps*m*m;
+    else if (element == _("p_y:p_z")) out = ((-ppp + pps)*m)*nn;
+    else if (element == _("p_z:p_y")) out = ((-ppp + pps)*m)*nn;
+    else if (element == _("p_y:p_x")) out = ((-ppp + pps)*l)*m;
+    else if (element == _("p_x:p_y")) out = ((-ppp + pps)*l)*m;
+    else if (element == _("p_y:d_{xy}")) out = l*(pdp - (2*pdp)*m*m + (sqrt(3)*pds)*m*m);
+    else if (element == _("d_{xy}:p_y")) out = (-l)*(pdp - (2*pdp)*m*m + (sqrt(3)*pds)*m*m);
+    else if (element == _("p_y:d_{yz}")) out = (pdp - (2*pdp)*m*m + (sqrt(3)*pds)*m*m)*nn;
+    else if (element == _("d_{yz}:p_y")) out = (-(pdp - (2*pdp)*m*m + (sqrt(3)*pds)*m*m))*nn;
+    else if (element == _("p_y:d_{3z^2-r^2}")) out = (-m/2)*(pds + ((2*sqrt(3))*pdp)*nn*nn - (3*pds)*nn*nn);
+    else if (element == _("d_{3z^2-r^2}:p_y")) out = (m/2)*(pds + ((2*sqrt(3))*pdp)*nn*nn - (3*pds)*nn*nn);
+    else if (element == _("p_y:d_{xz}")) out = (((-2*pdp + sqrt(3)*pds)*l)*m)*nn;
+    else if (element == _("d_{xz}:p_y")) out = (((2*pdp - sqrt(3)*pds)*l)*m)*nn;
+    else if (element == _("p_y:d_{x^2-y^2}")) out = (pdp*m)*(-2 + 2*m*m + nn*nn) + (((-sqrt(3)/2)*pds)*m)*(-1 + 2*m*m + nn*nn);
+    else if (element == _("d_{x^2-y^2}:p_y")) out = ((-pdp)*m)*(-2 + 2*m*m + nn*nn) + (((sqrt(3)/2)*pds)*m)*(-1 + 2*m*m + nn*nn);
+    else if (element == _("p_z:p_z")) out = ppp - ppp*nn*nn + pps*nn*nn;
+    else if (element == _("p_z:p_x")) out = ((-ppp + pps)*l)*nn;
+    else if (element == _("p_x:p_z")) out = ((-ppp + pps)*l)*nn;
+    else if (element == _("p_z:d_{xy}")) out = (((-2*pdp + sqrt(3)*pds)*l)*m)*nn;
+    else if (element == _("d_{xy}:p_z")) out = (((2*pdp - sqrt(3)*pds)*l)*m)*nn;
+    else if (element == _("p_z:d_{yz}")) out = m*(pdp - (2*pdp)*nn*nn + (sqrt(3)*pds)*nn*nn);
+    else if (element == _("d_{yz}:p_z")) out = (-m)*(pdp - (2*pdp)*nn*nn + (sqrt(3)*pds)*nn*nn);
+    else if (element == _("p_z:d_{3z^2-r^2}")) out = ((pds/2)*nn)*(-1 + 3*nn*nn) + (sqrt(3)*pdp)*(nn - pow(nn,3.0));
+    else if (element == _("d_{3z^2-r^2}:p_z")) out = ((sqrt(3)*pdp)*nn)*(-1 + nn*nn) + (pds/2)*(nn - 3*pow(nn,3.0));
+    else if (element == _("p_z:d_{xz}")) out = l*(pdp - (2*pdp)*nn*nn + (sqrt(3)*pds)*nn*nn);
+    else if (element == _("d_{xz}:p_z")) out = (-l)*(pdp - (2*pdp)*nn*nn + (sqrt(3)*pds)*nn*nn);
+    else if (element == _("p_z:d_{x^2-y^2}")) out = (((2*pdp - sqrt(3)*pds)/2)*nn)*(-1 + 2*m*m + nn*nn);
+    else if (element == _("d_{x^2-y^2}:p_z")) out = ((-(2*pdp - sqrt(3)*pds)/2)*nn)*(-1 + 2*m*m + nn*nn);
+    else if (element == _("p_x:p_x")) out = (-pps)*(-1 + m*m + nn*nn) + ppp*(m*m + nn*nn);
+    else if (element == _("p_x:d_{xy}")) out = m*(((-sqrt(3))*pds)*(-1 + m*m + nn*nn) + pdp*(-1 + 2*m*m + 2*nn*nn));
+    else if (element == _("d_{xy}:p_x")) out = ((sqrt(3)*pds)*m)*(-1 + m*m + nn*nn) + pdp*(m - 2*pow(m,3.0) - (2*m)*nn*nn);
+    else if (element == _("p_x:d_{yz}")) out = (((-2*pdp + sqrt(3)*pds)*l)*m)*nn;
+    else if (element == _("d_{yz}:p_x")) out = (((2*pdp - sqrt(3)*pds)*l)*m)*nn;
+    else if (element == _("p_x:d_{3z^2-r^2}")) out = (-1./2)*(pds + ((2*sqrt(3))*pdp)*nn*nn - (3*pds)*nn*nn);
+    else if (element == _("d_{3z^2-r^2}:p_x")) out = (1./2)*(pds + ((2*sqrt(3))*pdp)*nn*nn - (3*pds)*nn*nn);
+    else if (element == _("p_x:d_{xz}")) out = nn*(pdp + (2*pdp)*(-1 + m*m + nn*nn) - (sqrt(3)*pds)*(-1 + m*m + nn*nn));
+    else if (element == _("d_{xz}:p_x")) out = (-nn)*(pdp + (2*pdp)*(-1 + m*m + nn*nn) - (sqrt(3)*pds)*(-1 + m*m + nn*nn));
+    else if (element == _("p_x:d_{x^2-y^2}")) out = (((-sqrt(3)/2)*pds)*l)*(-1 + 2*m*m + nn*nn) + (pdp*l)*(2*m*m + nn*nn);
+    else if (element == _("d_{x^2-y^2}:p_x")) out = (((sqrt(3)/2)*pds)*l)*(-1 + 2*m*m + nn*nn) - (pdp*l)*(2*m*m + nn*nn);
+    else if (element == _("d_{xy}:d_{xy}")) out = ddp - ddp*nn*nn + ((4*ddp)*m*m)*(-1 + m*m + nn*nn) - ((3*dds)*m*m)*(-1 + m*m + nn*nn) - (ddd*(-1 + m*m))*(m*m + nn*nn);
+    else if (element == _("d_{xy}:d_{yz}")) out = (l*(-ddd + ddp + (ddd - 4*ddp + 3*dds)*m*m))*nn;
+    else if (element == _("d_{yz}:d_{xy}")) out = (l*(-ddd + ddp + (ddd - 4*ddp + 3*dds)*m*m))*nn;
+    else if (element == _("d_{xy}:d_{3z^2-r^2}")) out = (((sqrt(3)/2)*l)*m)*(ddd - dds + (ddd - 4*ddp + 3*dds)*nn*nn);
+    else if (element == _("d_{3z^2-r^2}:d_{xy}")) out = (((sqrt(3)/2)*l)*m)*(ddd - dds + (ddd - 4*ddp + 3*dds)*nn*nn);
+    else if (element == _("d_{xy}:d_{xz}")) out = ((-m)*nn)*(ddp*(3 - 4*m*m - 4*nn*nn) + (3*dds)*(-1 + m*m + nn*nn) + ddd*(m*m + nn*nn));
+    else if (element == _("d_{xz}:d_{xy}")) out = ((-m)*nn)*(ddp*(3 - 4*m*m - 4*nn*nn) + (3*dds)*(-1 + m*m + nn*nn) + ddd*(m*m + nn*nn));
+    else if (element == _("d_{xy}:d_{x^2-y^2}")) out = (((-(ddd - 4*ddp + 3*dds)/2)*l)*m)*(-1 + 2*m*m + nn*nn);
+    else if (element == _("d_{x^2-y^2}:d_{xy}")) out = (((-(ddd - 4*ddp + 3*dds)/2)*l)*m)*(-1 + 2*m*m + nn*nn);
+    else if (element == _("d_{yz}:d_{yz}")) out = ddp*m*m + (ddp - (4*ddp)*m*m + (3*dds)*m*m)*nn*nn + (ddd*(-1 + m*m))*(-1 + nn*nn);
+    else if (element == _("d_{yz}:d_{3z^2-r^2}")) out = (((sqrt(3)/2)*m)*nn)*(-ddd + 2*ddp - dds + (ddd - 4*ddp + 3*dds)*nn*nn);
+    else if (element == _("d_{3z^2-r^2}:d_{yz}")) out = (((sqrt(3)/2)*m)*nn)*(-ddd + 2*ddp - dds + (ddd - 4*ddp + 3*dds)*nn*nn);
+    else if (element == _("d_{yz}:d_{xz}")) out = (l*m)*(-ddd + ddp + (ddd - 4*ddp + 3*dds)*nn*nn);
+    else if (element == _("d_{xz}:d_{yz}")) out = (l*m)*(-ddd + ddp + (ddd - 4*ddp + 3*dds)*nn*nn);
+    else if (element == _("d_{yz}:d_{x^2-y^2}")) out = ((m/2)*nn)*((-3*dds)*(-1 + 2*m*m + nn*nn) + ddp*(-6 + 8*m*m + 4*nn*nn) + (ddd/(-1 + nn*nn))*(-4 + l*l + 3*m*m + (4 + l*l - m*m)*nn*nn));
+    else if (element == _("d_{x^2-y^2}:d_{yz}")) out = ((m/2)*nn)*((-3*dds)*(-1 + 2*m*m + nn*nn) + ddp*(-6 + 8*m*m + 4*nn*nn) + (ddd/(-1 + nn*nn))*(-4 + l*l + 3*m*m + (4 + l*l - m*m)*nn*nn));
+    else if (element == _("d_{3z^2-r^2}:d_{3z^2-r^2}")) out = (3*ddd + dds - (6*(ddd - 2*ddp + dds))*nn*nn + (3*(ddd - 4*ddp + 3*dds))*pow(nn,4.0))/4;
+    else if (element == _("d_{3z^2-r^2}:d_{xz}")) out = (((sqrt(3)/2)*l)*nn)*(-ddd + 2*ddp - dds + (ddd - 4*ddp + 3*dds)*nn*nn);
+    else if (element == _("d_{xz}:d_{3z^2-r^2}")) out = (((sqrt(3)/2)*l)*nn)*(-ddd + 2*ddp - dds + (ddd - 4*ddp + 3*dds)*nn*nn);
+    else if (element == _("d_{3z^2-r^2}:d_{x^2-y^2}")) out = ((-sqrt(3)/4)*(-1 + 2*m*m + nn*nn))* (ddd - dds + (ddd - 4*ddp + 3*dds)*nn*nn);
+    else if (element == _("d_{x^2-y^2}:d_{3z^2-r^2}")) out = ((-sqrt(3)/4)*(-1 + 2*m*m + nn*nn))* (ddd - dds + (ddd - 4*ddp + 3*dds)*nn*nn);
+    else if (element == _("d_{xz}:d_{xz}")) out = ddp + ddd*m*m - ddp*m*m - ((ddd - 4*ddp + 3*dds)*(-1 + m*m))*nn*nn - (ddd - 4*ddp + 3*dds)*pow(nn,4.0);
+    else if (element == _("d_{xz}:d_{x^2-y^2}")) out = ((-l/2)*nn)*(2*ddp - 3*dds - (4*ddp - 3*dds)*(2*m*m + nn*nn) + ddd*(1 + 2*m*m + nn*nn));
+    else if (element == _("d_{x^2-y^2}:d_{xz}")) out = ((-l/2)*nn)*(2*ddp - 3*dds - (4*ddp - 3*dds)*(2*m*m + nn*nn) + ddd*(1 + 2*m*m + nn*nn));
+    else if (element == _("d_{x^2-y^2}:d_{x^2-y^2}")) out = (4*ddp)*m*m + ddd*pow(m,4.0) + ddp*nn*nn + (ddd*m*m)*(-1 + nn*nn) + (ddd/4)*pow(1 + nn*nn,2.0) + ((3*dds)/4)*pow(-1 + 2*m*m + nn*nn,2.0) - ddp*pow(2*m*m + nn*nn,2.0);
+
+    // s-f
+    else if (element == _("s:f_{y(3x^2-y^2)}")) out = sqrt(15./2)/2*m*(3*l*l-m*m)*sfs;
+    else if (element == _("f_{y(3x^2-y^2)}:s")) out = -sqrt(15./2)/2*m*(3*l*l-m*m)*sfs;
+    else if (element == _("s:f_{xyz}")) out = sqrt(15)*l*m*n*sfs;
+    else if (element == _("f_{xyz}:s")) out = -sqrt(15)*l*m*n*sfs;
+    else if (element == _("s:f_{y(5z^2-r^2)}")) out = sqrt(3./2)/2*m*(5*n*n-1)*sfs;
+    else if (element == _("f_{y(5z^2-r^2)}:s")) out = -sqrt(3./2)/2*m*(5*n*n-1)*sfs;
+    else if (element == _("s:f_{z(5z^2-3r^2)}")) out = (5*n*n-3)*n/2*sfs;
+    else if (element == _("f_{z(5z^2-3r^2)}:s")) out = -(5*n*n-3)*n/2*sfs;
+    else if (element == _("s:f_{x(5z^2-r^2)}")) out = sqrt(3./2)/2*l*(5*n*n-1)*sfs;
+    else if (element == _("f_{x(5z^2-r^2)}:s")) out = -sqrt(3./2)/2*l*(5*n*n-1)*sfs;
+    else if (element == _("s:f_{z(x^2-y^2)}")) out = sqrt(15)/2*n*(l*l-m*m)*sfs;
+    else if (element == _("f_{z(x^2-y^2)}:s")) out = -sqrt(15)/2*n*(l*l-m*m)*sfs;
+    else if (element == _("s:f_{x(x^2-3y^2)}")) out = sqrt(15./2)/2*l*(l*l-3*m*m)*sfs;
+    else if (element == _("f_{x(x^2-3y^2)}:s")) out = -sqrt(15./2)/2*l*(l*l-3*m*m)*sfs;
+    // p_y-f
+    else if (element == _("p_y:f_{y(3x^2-y^2)}")) out = sqrt(5./8)*m*m*(3*l*l-m*m)*pfs-sqrt(15)/4*(m*m*(3*l*l-m*m)+m*m-l*l)*pfp;    //6
+    else if (element == _("f_{y(3x^2-y^2)}:p_y")) out = sqrt(5./8)*m*m*(3*l*l-m*m)*pfs-sqrt(15)/4*(m*m*(3*l*l-m*m)+m*m-l*l)*pfp;
+    else if (element == _("p_y:f_{xyz}")) out = sqrt(15)*l*m*m*n*pfs-sqrt(5./2)*l*n*(3*m*m-1)*pfp; //4
+    else if (element == _("f_{xyz}:p_y")) out = sqrt(15)*l*m*m*n*pfs-sqrt(5./2)*l*n*(3*m*m-1)*pfp;
+    else if (element == _("p_y:f_{y(5z^2-r^2)}")) out = sqrt(3./8)*m*m*(5*n*n-1)*pfs-0.25*((5*n*n-1)*(3*m*m-1)+2*m*m)*pfp; //2
+    else if (element == _("f_{y(5z^2-r^2)}:p_y")) out = sqrt(3./8)*m*m*(5*n*n-1)*pfs-0.25*((5*n*n-1)*(3*m*m-1)+2*m*m)*pfp;
+    else if (element == _("p_y:f_{z(5z^2-3r^2)}")) out = m*n/2*(5*n*n-3)*pfs-sqrt(3./8)*m*n*(5*n*n-1)*pfp;  //0
+    else if (element == _("f_{z(5z^2-3r^2)}:p_y")) out = m*n/2*(5*n*n-3)*pfs-sqrt(3./8)*m*n*(5*n*n-1)*pfp;
+    else if (element == _("p_y:f_{x(5z^2-r^2)}")) out = sqrt(3./8)*l*m*(5*n*n-1)*pfs-l*m/4*(15*n*n-1)*pfp;//1
+    else if (element == _("f_{x(5z^2-r^2)}:p_y")) out = sqrt(3./8)*l*m*(5*n*n-1)*pfs-l*m/4*(15*n*n-1)*pfp;
+    else if (element == _("p_y:f_{z(x^2-y^2)}")) out = sqrt(15)/2*m*n*(l*l-m*m)*pfs-sqrt(5./8)*m*n*(3*(l*l-m*m)+2)*pfp;   //3
+    else if (element == _("f_{z(x^2-y^2)}:p_y")) out = sqrt(15)/2*m*n*(l*l-m*m)*pfs-sqrt(5./8)*m*n*(3*(l*l-m*m)+2)*pfp;
+    else if (element == _("p_y:f_{x(x^2-3y^2)}")) out = sqrt(5./8)*m*l*(l*l-3*m*m)*pfs-sqrt(15)/4*l*m*(l*l-3*m*m+2)*pfp;//5
+    else if (element == _("f_{x(x^2-3y^2)}:p_y")) out = sqrt(5./8)*m*l*(l*l-3*m*m)*pfs-sqrt(15)/4*l*m*(l*l-3*m*m+2)*pfp;
+    // p_z-f
+    else if (element == _("p_z:f_{y(3x^2-y^2)}")) out = sqrt(5./8)*m*n*(3*l*l-m*m)*pfs-sqrt(15)/4*m*n*(3*l*l-m*m)*pfp;   //6
+    else if (element == _("f_{y(3x^2-y^2)}:p_z")) out = sqrt(5./8)*m*n*(3*l*l-m*m)*pfs-sqrt(15)/4*m*n*(3*l*l-m*m)*pfp;
+    else if (element == _("p_z:f_{xyz}")) out = sqrt(15)*l*m*n*n*pfs-sqrt(5./2)*l*m*(3*n*n-1)*pfp;  //4
+    else if (element == _("f_{xyz}:p_y")) out = sqrt(15)*l*m*n*n*pfs-sqrt(5./2)*l*m*(3*n*n-1)*pfp;
+    else if (element == _("p_z:f_{y(5z^2-r^2)}")) out = sqrt(3./8)*m*n*(5*n*n-1)*pfs-m*n/4*(15*n*n-11)*pfp; //2
+    else if (element == _("f_{y(5z^2-r^2)}:p_z")) out = sqrt(3./8)*m*n*(5*n*n-1)*pfs-m*n/4*(15*n*n-11)*pfp;
+    else if (element == _("p_z:f_{z(5z^2-3r^2)}")) out = n*n/2*(5*n*n-3)*pfs-sqrt(3./8)*(5*n*n-1)*(n*n-1)*pfp; //0
+    else if (element == _("f_{z(5z^2-3r^2)}:p_z")) out = n*n/2*(5*n*n-3)*pfs-sqrt(3./8)*(5*n*n-1)*(n*n-1)*pfp;
+    else if (element == _("p_z:f_{x(5z^2-r^2)}")) out = sqrt(3./8)*l*n*(5*n*n-1)*pfs-l*n/4*(15*n*n-11)*pfp;  //1
+    else if (element == _("f_{x(5z^2-r^2)}:p_z")) out = sqrt(3./8)*l*n*(5*n*n-1)*pfs-l*n/4*(15*n*n-11)*pfp; 
+    else if (element == _("p_z:f_{z(x^2-y^2)}")) out = sqrt(15)/2*n*n*(l*l-m*m)*pfs-sqrt(5./8)*(3*n*n-1)*(l*l-m*m)*pfp;   //3
+    else if (element == _("f_{z(x^2-y^2)}:p_z")) out = sqrt(15)/2*n*n*(l*l-m*m)*pfs-sqrt(5./8)*(3*n*n-1)*(l*l-m*m)*pfp;
+    else if (element == _("p_z:f_{x(x^2-3y^2)}")) out = sqrt(5./8)*l*n*(l*l-3*m*m)*pfs-sqrt(15)/4*l*n*(l*l-3*m*m)*pfp;  //5
+    else if (element == _("f_{x(x^2-3y^2)}:p_z")) out = sqrt(5./8)*l*n*(l*l-3*m*m)*pfs-sqrt(15)/4*l*n*(l*l-3*m*m)*pfp;
+
+
+    // p_x-f
+    else if (element == _("p_x:f_{y(3x^2-y^2)}")) out = sqrt(5./8)*l*m*(3*l*l-m*m)*pfs-sqrt(15)/4*l*m*(3*l*l-m*m-2)*pfp; //6
+    else if (element == _("f_{y(3x^2-y^2)}:p_x")) out = sqrt(5./8)*l*m*(3*l*l-m*m)*pfs-sqrt(15)/4*l*m*(3*l*l-m*m-2)*pfp;
+    else if (element == _("p_x:f_{xyz}")) out = sqrt(15)*l*l*m*n*pfs-sqrt(5./2)*m*n*(3*l*l-1)*pfp;//4
+    else if (element == _("f_{xyz}:p_x")) out = sqrt(15)*l*l*m*n*pfs-sqrt(5./2)*m*n*(3*l*l-1)*pfp;
+    else if (element == _("p_x:f_{y(5z^2-r^2)}")) out = sqrt(3./8)*l*m*(5*n*n-1)*pfs-l*m/4*(15*n*n-1)*pfp;//2
+    else if (element == _("f_{y(5z^2-r^2)}:p_x")) out = sqrt(3./8)*l*m*(5*n*n-1)*pfs-l*m/4*(15*n*n-1)*pfp;
+    else if (element == _("p_x:f_{z(5z^2-3r^2)}")) out = l*n/2*(5*n*n-3)*pfs-sqrt(3./8)*l*n*(5*n*n-1)*pfp;  //0
+    else if (element == _("f_{z(5z^2-3r^2)}:p_x")) out = l*n/2*(5*n*n-3)*pfs-sqrt(3./8)*l*n*(5*n*n-1)*pfp;
+    else if (element == _("p_x:f_{x(5z^2-r^2)}")) out = sqrt(3./8)*l*l*(5*n*n-1)*pfs-0.25*((5*n*n-1)*(3*l*l-1)+2*l*l)*pfp;  //1
+    else if (element == _("f_{x(5z^2-r^2)}:p_x")) out = sqrt(3./8)*l*l*(5*n*n-1)*pfs-0.25*((5*n*n-1)*(3*l*l-1)+2*l*l)*pfp;
+    else if (element == _("p_x:f_{z(x^2-y^2)}")) out = sqrt(15)/2*l*n*(l*l-m*m)*pfs-sqrt(5./8)*l*n*(3*(l*l-m*m)-2)*pfp;  //3
+    else if (element == _("f_{z(x^2-y^2)}:p_x")) out = sqrt(15)/2*l*n*(l*l-m*m)*pfs-sqrt(5./8)*l*n*(3*(l*l-m*m)-2)*pfp;
+    else if (element == _("p_x:f_{x(x^2-3y^2)}")) out = sqrt(5./8)*l*l*(l*l-3*m*m)*pfs-sqrt(15)/4*(l*l*(l*l-3*m*m)+m*m-l*l)*pfp; //5
+    else if (element == _("f_{x(x^2-3y^2)}:p_x")) out = sqrt(5./8)*l*l*(l*l-3*m*m)*pfs-sqrt(15)/4*(l*l*(l*l-3*m*m)+m*m-l*l)*pfp;
+
+    // dxy - f  4
+    else if (element == _("d_{xy}:f_{y(3x^2-y^2)}")) out = sqrt(15)/8*l*m*m*(3*l*l-m*m)*dfs-sqrt(15)/4*l*(2*m*m*(3*l*l-m*m)+n*n-1)*dfp+sqrt(3./8)*l*(m*m*(3*l*l-m*m)-2*n*n)*dfd; //6
+    else if (element == _("f_{y(3x^2-y^2)}:d_{xy}")) out = -sqrt(15)/8*l*m*m*(3*l*l-m*m)*dfs+sqrt(15)/4*l*(2*m*m*(3*l*l-m*m)+n*n-1)*dfp-sqrt(3./8)*l*(m*m*(3*l*l-m*m)-2*n*n)*dfd;
+    else if (element == _("d_{xy}:f_{xyz}")) out = sqrt(45)*l*l*m*m*n*dfs-sqrt(5./2)*n*(6*l*l*m*m+n*n-1)*dfp+n*(3*l*l*m*m+2*n*n-1)*dfd;  //4
+    else if (element == _("f_{xyz}:d_{xy}")) out = -sqrt(45)*l*l*m*m*n*dfs+sqrt(5./2)*n*(6*l*l*m*m+n*n-1)*dfp-n*(3*l*l*m*m+2*n*n-1)*dfd;
+    else if (element == _("d_{xy}:f_{y(5z^2-r^2)}")) out = 3/sqrt(8)*l*m*m*(5*n*n-1)*dfs-l/4*((6*m*m-1)*(5*n*n-1)+4*m*m)*dfp+sqrt(5./8)*l*(m*m*(3*n*n+1)-2*n*n)*dfd; //2
+    else if (element == _("f_{y(5z^2-r^2)}:d_{xy}")) out = -(3/sqrt(8)*l*m*m*(5*n*n-1)*dfs-l/4*((6*m*m-1)*(5*n*n-1)+4*m*m)*dfp+sqrt(5./8)*l*(m*m*(3*n*n+1)-2*n*n)*dfd);
+    else if (element == _("d_{xy}:f_{z(5z^2-3r^2)}")) out = sqrt(3)/2*l*m*n*(5*n*n-3)*dfs-sqrt(3./2)*l*m*n*(5*n*n-1)*dfs+sqrt(15)/2*l*m*n*(n*n+1)*dfd;  //0
+    else if (element == _("f_{z(5z^2-3r^2)}:d_{xy}")) out = -( sqrt(3)/2*l*m*n*(5*n*n-3)*dfs-sqrt(3./2)*l*m*n*(5*n*n-1)*dfs+sqrt(15)/2*l*m*n*(n*n+1)*dfd );
+    else if (element == _("d_{xy}:f_{x(5z^2-r^2)}")) out = 3/sqrt(8)*l*l*m*(5*n*n-1)*dfs-m/4*((6*l*l-1)*(5*n*n-1)+4*l*l)*dfp+sqrt(5./8)*m*(l*l*(3*n*n+1)-2*n*n)*dfd; //1
+    else if (element == _("f_{x(5z^2-r^2)}:d_{xy}")) out = -(3/sqrt(8)*l*l*m*(5*n*n-1)*dfs-m/4*((6*l*l-1)*(5*n*n-1)+4*l*l)*dfp+sqrt(5./8)*m*(l*l*(3*n*n+1)-2*n*n)*dfd);
+    else if (element == _("d_{xy}:f_{z(x^2-y^2)}")) out = sqrt(45)/2*l*m*n*(l*l-m*m)*dfs-sqrt(45)/2*l*m*n*(l*l-m*m)*dfp+3./2*l*m*n*(l*l-m*m)*dfd;   //3
+    else if (element == _("f_{z(x^2-y^2)}:d_{xy}")) out = -(sqrt(45)/2*l*m*n*(l*l-m*m)*dfs-sqrt(45)/2*l*m*n*(l*l-m*m)*dfp+3./2*l*m*n*(l*l-m*m)*dfd);
+    else if (element == _("d_{xy}:f_{x(x^2-3y^2)}")) out = sqrt(15./8)*l*l*m*(l*l-3*m*m)*dfs-sqrt(15)/4*m*(2*l*l*(l*l-3*m*m)-n*n+1)*dfp+sqrt(3./8)*m*(l*l*(l*l-3*m*m)-2*n*n)*dfd;  //5
+    else if (element == _("f_{x(x^2-3y^2)}:d_{xy}")) out = -(sqrt(15./8)*l*l*m*(l*l-3*m*m)*dfs-sqrt(15)/4*m*(2*l*l*(l*l-3*m*m)-n*n+1)*dfp+sqrt(3./8)*m*(l*l*(l*l-3*m*m)-2*n*n)*dfd);
+
+    // dyz - f  2
+    else if (element == _("d_{yz}:f_{y(3x^2-y^2)}")) out = sqrt(15./8)*m*m*n*(3*l*l-m*m)*dfs-sqrt(15)/4*n*(2*m*m*(3*l*l-m*m)-l*l+m*m)*dfp+sqrt(3/8)*n*(m*m*(3*l*l-m*m)-2*l*l+2*m*m)*dfd; //6
+    else if (element == _("f_{y(3x^2-y^2)}:d_{yz}")) out = -(sqrt(15./8)*m*m*n*(3*l*l-m*m)*dfs-sqrt(15)/4*n*(2*m*m*(3*l*l-m*m)-l*l+m*m)*dfp+sqrt(3/8)*n*(m*m*(3*l*l-m*m)-2*l*l+2*m*m)*dfd);
+    else if (element == _("d_{yz}:f_{xyz}")) out = sqrt(45)*l*m*m*n*n*dfs-sqrt(5./2)*l*(6*m*m*n*n+l*l-1)*dfp+l*(3*m*m*n*n+2*l*l-1)*dfd;  //4
+    else if (element == _("f_{xyz}:d_{yz}")) out = -(sqrt(45)*l*m*m*n*n*dfs-sqrt(5./2)*l*(6*m*m*n*n+l*l-1)*dfp+l*(3*m*m*n*n+2*l*l-1)*dfd);
+    else if (element == _("d_{yz}:f_{y(5z^2-r^2)}")) out = 3/sqrt(8)*m*m*n*(5*n*n-1)*dfs-n/4*(m*m*(30*n*n-11)-4*n*n+l*l)*dfp+sqrt(5./8)*n*(n*n-1)*(3*m*m-2)*dfd; //2
+    else if (element == _("f_{y(5z^2-r^2)}:d_{yz}")) out = -(3/sqrt(8)*m*m*n*(5*n*n-1)*dfs-n/4*(m*m*(30*n*n-11)-4*n*n+l*l)*dfp+sqrt(5./8)*n*(n*n-1)*(3*m*m-2)*dfd);
+    else if (element == _("d_{yz}:f_{z(5z^2-3r^2)}")) out = sqrt(3)/2*m*n*n*(5*n*n-3)*dfs-sqrt(3./8)*m*(5*n*n-1)*(2*n*n-1)*dfp+sqrt(15)/2*m*n*n*(n*n-1)*dfd;//0
+    else if (element == _("f_{z(5z^2-3r^2)}:d_{yz}")) out = -(sqrt(3)/2*m*n*n*(5*n*n-3)*dfs-sqrt(3./8)*m*(5*n*n-1)*(2*n*n-1)*dfp+sqrt(15)/2*m*n*n*(n*n-1)*dfd);
+    else if (element == _("d_{yz}:f_{x(5z^2-r^2)}")) out = 3/sqrt(8)*l*m*n*(5*n*n-1)*dfs-3*l*m*n/2*(5*n*n-2)*dfp+sqrt(45)/8*l*m*n*(n*n-1)*dfd; //1
+    else if (element == _("f_{x(5z^2-r^2)}:d_{yz}")) out = -(3/sqrt(8)*l*m*n*(5*n*n-1)*dfs-3*l*m*n/2*(5*n*n-2)*dfp+sqrt(45)/8*l*m*n*(n*n-1)*dfd);
+    else if (element == _("d_{yz}:f_{z(x^2-y^2)}")) out = sqrt(45)/2*m*n*n*(l*l-m*m)*dfs-sqrt(5./8)*m*((6*n*n-1)*(l*l-m*m)+2*n*n)*dfp+m/2*(3*n*n*(l*l-m*m)-4*l*l+2*n*n)*dfd; //3
+    else if (element == _("f_{z(x^2-y^2)}:d_{yz}")) out = -(sqrt(45)/2*m*n*n*(l*l-m*m)*dfs-sqrt(5./8)*m*((6*n*n-1)*(l*l-m*m)+2*n*n)*dfp+m/2*(3*n*n*(l*l-m*m)-4*l*l+2*n*n)*dfd);
+    else if (element == _("d_{yz}:f_{x(x^2-3y^2)}")) out = sqrt(15./8)*l*m*n*(l*l-3*m*m)*dfs-sqrt(15)/2*l*m*n*(l*l-3*m*m+1)*dfp+sqrt(3./8)*l*m*n*(l*l-3*m*m+4)*dfd; //5
+    else if (element == _("f_{x(x^2-3y^2)}:d_{yz}")) out = -(sqrt(15./8)*l*m*n*(l*l-3*m*m)*dfs-sqrt(15)/2*l*m*n*(l*l-3*m*m+1)*dfp+sqrt(3./8)*l*m*n*(l*l-3*m*m+4)*dfd);
+
+    // d 3z2-r2 - f  0
+    else if (element == _("d_{3z^2-r^2}:f_{y(3x^2-y^2)}")) out = sqrt(5./32)*m*(3*n*n-1)*(3*l*l-m*m)*dfs-sqrt(45)/4*m*n*n*(3*l*l-m*m)*dfp+3/sqrt(32)*m*(n*n+1)*(3*l*l-m*m)*dfd; //6
+    else if (element == _("f_{y(3x^2-y^2)}:d_{3z^2-r^2}")) out = -(sqrt(5./32)*m*(3*n*n-1)*(3*l*l-m*m)*dfs-sqrt(45)/4*m*n*n*(3*l*l-m*m)*dfp+3/sqrt(32)*m*(n*n+1)*(3*l*l-m*m)*dfd);
+    else if (element == _("d_{3z^2-r^2}:f_{xyz}")) out = sqrt(15)/2*l*m*n*(3*n*n-l)*dfs-sqrt(15./2)*l*m*n*(3*n*n-1)*dfp+sqrt(3)/2*l*m*n*(3*n*n-1)*dfd;   //4
+    else if (element == _("f_{xyz}:d_{3z^2-r^2}")) out = -(sqrt(15)/2*l*m*n*(3*n*n-l)*dfs-sqrt(15./2)*l*m*n*(3*n*n-1)*dfp+sqrt(3)/2*l*m*n*(3*n*n-1)*dfd);
+    else if (element == _("d_{3z^2-r^2}:f_{y(5z^2-r^2)}")) out = sqrt(3./32)*m*(3*n*n-1)*(5*n*n-1)*dfs-sqrt(3)/4*m*n*n*(15*n*n-11)*dfp+sqrt(15./32)*m*(n*n-1)*(3*n*n-1)*dfd;  //2
+    else if (element == _("f_{y(5z^2-r^2)}:d_{3z^2-r^2}")) out = -(sqrt(3./32)*m*(3*n*n-1)*(5*n*n-1)*dfs-sqrt(3)/4*m*n*n*(15*n*n-11)*dfp+sqrt(15./32)*m*(n*n-1)*(3*n*n-1)*dfd);
+    else if (element == _("d_{3z^2-r^2}:f_{z(5z^2-3r^2)}")) out = n/4*(3*n*n-1)*(5*n*n-3)*dfs-3/sqrt(8)*n*(5*n*n-1)*(n*n-1)*dfp+sqrt(45)/4*n*(n*n-1)*(n*n-1)*dfd;  //0
+    else if (element == _("f_{z(5z^2-3r^2)}:d_{3z^2-r^2}")) out = -(n/4*(3*n*n-1)*(5*n*n-3)*dfs-3/sqrt(8)*n*(5*n*n-1)*(n*n-1)*dfp+sqrt(45)/4*n*(n*n-1)*(n*n-1)*dfd);
+    else if (element == _("d_{3z^2-r^2}:f_{x(5z^2-r^2)}")) out = sqrt(3./32)*l*(3*n*n-1)*(5*n*n-1)*dfs-sqrt(3)/4*l*n*n*(15*n*n-11)*dfp+sqrt(15./32)*l*(n*n-1)*(3*n*n-1)*dfd;   //1
+    else if (element == _("f_{x(5z^2-r^2)}:d_{3z^2-r^2}")) out = -(sqrt(3./32)*l*(3*n*n-1)*(5*n*n-1)*dfs-sqrt(3)/4*l*n*n*(15*n*n-11)*dfp+sqrt(15./32)*l*(n*n-1)*(3*n*n-1)*dfd);
+    else if (element == _("d_{3z^2-r^2}:f_{z(x^2-y^2)}")) out = sqrt(15)/4*n*(3*n*n-1)*(l*l-m*m)*dfs-sqrt(15./8)*n*(3*n*n-1)*(l*l-m*m)*dfp+sqrt(3)/4*n*(3*n*n-1)*(l*l-m*m)*dfd; //3
+    else if (element == _("f_{z(x^2-y^2)}:d_{3z^2-r^2}")) out = -(sqrt(15)/4*n*(3*n*n-1)*(l*l-m*m)*dfs-sqrt(15./8)*n*(3*n*n-1)*(l*l-m*m)*dfp+sqrt(3)/4*n*(3*n*n-1)*(l*l-m*m)*dfd);
+    else if (element == _("d_{3z^2-r^2}:f_{x(x^2-3y^2)}")) out = sqrt(5./32)*l*(3*n*n-1)*(l*l-3*m*m)*dfs-sqrt(45)/4*l*n*n*(l*l-3*m*m)*dfp+3/sqrt(32)*l*(n*n+1)*(l*l-3*m*m)*dfd; //5
+    else if (element == _("f_{x(x^2-3y^2)}:d_{3z^2-r^2}")) out = -(sqrt(5./32)*l*(3*n*n-1)*(l*l-3*m*m)*dfs-sqrt(45)/4*l*n*n*(l*l-3*m*m)*dfp+3/sqrt(32)*l*(n*n+1)*(l*l-3*m*m)*dfd);
+
+    // dxz - f  1
+    else if (element == _("d_{xz}:f_{y(3x^2-y^2)}")) out = sqrt(15./8)*l*m*n*(3*l*l-m*m)*dfs-sqrt(15)/2*l*m*n*(3*l*l-m*m-1)*dfp+sqrt(3/8)*l*m*n*(3*l*l-m*m-4)*dfd; //6
+    else if (element == _("f_{y(3x^2-y^2)}:d_{xz}")) out = -(sqrt(15./8)*l*m*n*(3*l*l-m*m)*dfs-sqrt(15)/2*l*m*n*(3*l*l-m*m-1)*dfp+sqrt(3/8)*l*m*n*(3*l*l-m*m-4)*dfd);
+    else if (element == _("d_{xz}:f_{xyz}")) out = sqrt(45)*l*l*m*n*n*dfs-sqrt(5./2)*m*(6*l*l*n*n+m*m-1)*dfp+m*(3*l*l*n*n+2*m*m-1)*dfd;   //4
+    else if (element == _("f_{xyz}:d_{xz}")) out = -(sqrt(45)*l*l*m*n*n*dfs-sqrt(5./2)*m*(6*l*l*n*n+m*m-1)*dfp+m*(3*l*l*n*n+2*m*m-1)*dfd);
+    else if (element == _("d_{xz}:f_{y(5z^2-r^2)}")) out = 3/sqrt(8)*l*m*n*(5*n*n-1)*dfs-3*l*m*n/2*(5*n*n-2)*dfp+sqrt(45./8)*l*m*n*(n*n-1)*dfd; //2
+    else if (element == _("f_{y(5z^2-r^2)}:d_{xz}")) out = -(3/sqrt(8)*l*m*n*(5*n*n-1)*dfs-3*l*m*n/2*(5*n*n-2)*dfp+sqrt(45./8)*l*m*n*(n*n-1)*dfd);
+    else if (element == _("d_{xz}:f_{z(5z^2-3r^2)}")) out = sqrt(3)/2*l*n*n*(5*n*n-3)*dfs-sqrt(3./8)*l*(5*n*n-1)*(2*n*n-1)*dfp+sqrt(15)/2*l*n*n*(n*n-1)*dfd;  //0
+    else if (element == _("f_{z(5z^2-3r^2)}:d_{xz}")) out = -(sqrt(3)/2*l*n*n*(5*n*n-3)*dfs-sqrt(3./8)*l*(5*n*n-1)*(2*n*n-1)*dfp+sqrt(15)/2*l*n*n*(n*n-1)*dfd);
+    else if (element == _("d_{xz}:f_{x(5z^2-r^2)}")) out = 3/sqrt(8)*l*l*n*(5*n*n-1)*dfs-n/4*(l*l*(30*n*n-11)-4*n*n+m*m)*dfp+sqrt(5./8)*n*(n*n-1)*(3*l*l-2)*dfd;  //1
+    else if (element == _("f_{x(5z^2-r^2)}:d_{xz}")) out = -(3/sqrt(8)*l*l*n*(5*n*n-1)*dfs-n/4*(l*l*(30*n*n-11)-4*n*n+m*m)*dfp+sqrt(5./8)*n*(n*n-1)*(3*l*l-2)*dfd);
+    else if (element == _("d_{xz}:f_{z(x^2-y^2)}")) out = sqrt(45)/2*l*n*n*(l*l-m*m)*dfs-sqrt(5./8)*l*((6*n*n-1)*(l*l-m*m)-2*n*n)*dfp+l/2*(3*n*n*(l*l-m*m)+4*m*m-2*n*n)*dfd; //3
+    else if (element == _("f_{z(x^2-y^2)}:d_{xz}")) out = -(sqrt(45)/2*l*n*n*(l*l-m*m)*dfs-sqrt(5./8)*l*((6*n*n-1)*(l*l-m*m)-2*n*n)*dfp+l/2*(3*n*n*(l*l-m*m)+4*m*m-2*n*n)*dfd);
+    else if (element == _("d_{xz}:f_{x(x^2-3y^2)}")) out = sqrt(15./8)*l*l*n*(l*l-3*m*m)*dfs-sqrt(15)/4*n*(2*l*l*(l*l-3*m*m)-l*l+m*m)*dfp+sqrt(3./8)*n*(l*l*(l*l-3*m*m)-2*l*l+2*m*m)*dfd;//5
+    else if (element == _("f_{x(x^2-3y^2)}:d_{xz}")) out = -(sqrt(15./8)*l*l*n*(l*l-3*m*m)*dfs-sqrt(15)/4*n*(2*l*l*(l*l-3*m*m)-l*l+m*m)*dfp+sqrt(3./8)*n*(l*l*(l*l-3*m*m)-2*l*l+2*m*m)*dfd);
+
+    // d x2-y2 - f  3
+    else if (element == _("d_{x^2-y^2}:f_{y(3x^2-y^2)}")) out = sqrt(15./32)*m*(l*l-m*m)*(3*l*l-m*m)*dfs-sqrt(15)/4*m*((l*l-m*m)*(3*l*l-m*m)+n*n-1)*dfp+sqrt(3./32)*m*((l*l-m*m)*(3*l*l-m*m)+4*n*n)*dfd; //6
+    else if (element == _("f_{y(3x^2-y^2)}:d_{x^2-y^2}")) out = -(sqrt(15./32)*m*(l*l-m*m)*(3*l*l-m*m)*dfs-sqrt(15)/4*m*((l*l-m*m)*(3*l*l-m*m)+n*n-1)*dfp+sqrt(3./32)*m*((l*l-m*m)*(3*l*l-m*m)+4*n*n)*dfd);
+    else if (element == _("d_{x^2-y^2}:f_{xyz}")) out = sqrt(45)/2*l*m*n*(l*l-m*m)*dfs-sqrt(45)/2*l*m*n*(l*l-m*m)*dfp+3/2*l*m*n*(l*l-m*m)*dfd;  //4
+    else if (element == _("f_{xyz}:d_{x^2-y^2}")) out = -(sqrt(45)/2*l*m*n*(l*l-m*m)*dfs-sqrt(45)/2*l*m*n*(l*l-m*m)*dfp+3/2*l*m*n*(l*l-m*m)*dfd);
+    else if (element == _("d_{x^2-y^2}:f_{y(5z^2-r^2)}")) out = 3/sqrt(32)*m*(l*l-m*m)*(5*n*n-1)*dfs-m/4*(15*n*n*(l*l-m*m)+4*n*n-2*l*l)*dfp+sqrt(5./32)*m*((l*l-m*m)*(3*n*n+1)+4*n*n)*dfd;  //2
+    else if (element == _("f_{y(5z^2-r^2)}:d_{x^2-y^2}")) out = -(3/sqrt(32)*m*(l*l-m*m)*(5*n*n-1)*dfs-m/4*(15*n*n*(l*l-m*m)+4*n*n-2*l*l)*dfp+sqrt(5./32)*m*((l*l-m*m)*(3*n*n+1)+4*n*n)*dfd);
+    else if (element == _("p_y:f_{z(5z^2-3r^2)}")) out = sqrt(3)/4*n*(5*n*n-3)*(l*l-m*m)*dfs-sqrt(3./8)*n*(5*n*n-1)*(l*l-m*m)*dfs+sqrt(15)/4*n*(n*n+1)*(l*l-m*m)*dfd;  //0
+    else if (element == _("f_{z(5z^2-3r^2)}:d_{x^2-y^2}")) out = -(sqrt(3)/4*n*(5*n*n-3)*(l*l-m*m)*dfs-sqrt(3./8)*n*(5*n*n-1)*(l*l-m*m)*dfs+sqrt(15)/4*n*(n*n+1)*(l*l-m*m)*dfd);
+    else if (element == _("d_{x^2-y^2}:f_{x(5z^2-r^2)}")) out = 3/sqrt(32)*l*(5*n*n-1)*(l*l-m*m)*dfs-l/4*(15*n*n*(l*l-m*m)+2*m*m-4*n*n)*dfp+sqrt(5./32)*l*((l*l-m*m)*(3*n*n+1)-4*n*n)*dfd;   //1
+    else if (element == _("f_{x(5z^2-r^2)}:d_{x^2-y^2}")) out = -(3/sqrt(32)*l*(5*n*n-1)*(l*l-m*m)*dfs-l/4*(15*n*n*(l*l-m*m)+2*m*m-4*n*n)*dfp+sqrt(5./32)*l*((l*l-m*m)*(3*n*n+1)-4*n*n)*dfd);
+    else if (element == _("d_{x^2-y^2}:f_{z(x^2-y^2)}")) out = sqrt(45)/4*n*(l*l-m*m)*(l*l-m*m)*dfs-sqrt(5./8)*n*(3*(l*l-m*m)*(l*l-m*m)+2*n*n-2)*dfp+n/4*(3*(l*l-m*m)*(l*l-m*m)+8*n*n-4)*dfd; //3
+    else if (element == _("f_{z(x^2-y^2)}:d_{x^2-y^2}")) out = -(sqrt(45)/4*n*(l*l-m*m)*(l*l-m*m)*dfs-sqrt(5./8)*n*(3*(l*l-m*m)*(l*l-m*m)+2*n*n-2)*dfp+n/4*(3*(l*l-m*m)*(l*l-m*m)+8*n*n-4)*dfd);
+    else if (element == _("d_{x^2-y^2}:f_{x(x^2-3y^2)}")) out = sqrt(15./32)*l*(l*l-m*m)*(l*l-3*m*m)*dfs-sqrt(15)/4*l*((l*l-m*m)*(l*l-3*m*m)-n*n+1)*dfp+sqrt(3./32)*l*((l*l-m*m)*(l*l-3*m*m)+4*n*n)*dfd;  //5
+    else if (element == _("f_{x(x^2-3y^2)}:d_{x^2-y^2}")) out = -(sqrt(15./32)*l*(l*l-m*m)*(l*l-3*m*m)*dfs-sqrt(15)/4*l*((l*l-m*m)*(l*l-3*m*m)-n*n+1)*dfp+sqrt(3./32)*l*((l*l-m*m)*(l*l-3*m*m)+4*n*n)*dfd);
 
     return out;
 }
@@ -2981,11 +3239,13 @@ void Sec30::GetCouplingMatrix(myGrid* SKCtr, myGrid* OverlapCtr, wxCheckTree* Bo
             }
             
             Orbs1.Replace(_(" "),_(""));
-            Orbs1.Replace(_("("),_(""));
-            Orbs1.Replace(_(")"),_(""));
+            Orbs1.Replace(_("("),_(""), false);  // only remove the first (
+            //Orbs1.Replace(_(")"),_(""));
+            Orbs1.RemoveLast();                 // only remove the last )
             Orbs2.Replace(_(" "),_(""));
-            Orbs2.Replace(_("("),_(""));
-            Orbs2.Replace(_(")"),_(""));
+            Orbs2.Replace(_("("),_(""), false);  
+            //Orbs2.Replace(_(")"),_(""));
+            Orbs2.RemoveLast();
             int i=-1;
             wxStringTokenizer tokenizer1(Orbs1, ",");
             while (tokenizer1.HasMoreTokens())
@@ -3152,11 +3412,13 @@ void Sec30::GetCouplingMatrix(myGrid* SKCtr, myGrid* OverlapCtr, wxCheckTree* Bo
             }
             
             Orbs1.Replace(_(" "),_(""));
-            Orbs1.Replace(_("("),_(""));
-            Orbs1.Replace(_(")"),_(""));
+            Orbs1.Replace(_("("),_(""), false);
+            //Orbs1.Replace(_(")"),_(""));
+            Orbs1.RemoveLast(); 
             Orbs2.Replace(_(" "),_(""));
-            Orbs2.Replace(_("("),_(""));
-            Orbs2.Replace(_(")"),_(""));
+            Orbs2.Replace(_("("),_(""), false);
+            //Orbs2.Replace(_(")"),_(""));
+            Orbs2.RemoveLast(); 
             int i=-1;
             wxStringTokenizer tokenizer1(Orbs1, ",");
             while (tokenizer1.HasMoreTokens())
@@ -3327,11 +3589,13 @@ void Sec30::GetCouplingMatrixF(myGrid* SKCtr, myGrid* OverlapCtr, wxCheckTree* B
             for(int ii = 0; ii < Dim2; ii++) fHopMatT[ii] = new double[Dim1];
             
             Orbs1.Replace(_(" "),_(""));
-            Orbs1.Replace(_("("),_(""));
-            Orbs1.Replace(_(")"),_(""));
+            Orbs1.Replace(_("("),_(""), false);
+            //Orbs1.Replace(_(")"),_(""));
+            Orbs1.RemoveLast(); 
             Orbs2.Replace(_(" "),_(""));
-            Orbs2.Replace(_("("),_(""));
-            Orbs2.Replace(_(")"),_(""));
+            Orbs2.Replace(_("("),_(""), false);
+            //Orbs2.Replace(_(")"),_(""));
+            Orbs2.RemoveLast(); 
             int i=-1;
             wxStringTokenizer tokenizer1(Orbs1, ",");
             while (tokenizer1.HasMoreTokens())
@@ -3473,11 +3737,13 @@ void Sec30::GetCouplingMatrixF(myGrid* SKCtr, myGrid* OverlapCtr, wxCheckTree* B
             }
             
             Orbs1.Replace(_(" "),_(""));
-            Orbs1.Replace(_("("),_(""));
-            Orbs1.Replace(_(")"),_(""));
+            Orbs1.Replace(_("("),_(""), false);
+            //Orbs1.Replace(_(")"),_(""));
+            Orbs1.RemoveLast(); 
             Orbs2.Replace(_(" "),_(""));
-            Orbs2.Replace(_("("),_(""));
-            Orbs2.Replace(_(")"),_(""));
+            Orbs2.Replace(_("("),_(""), false);
+            //Orbs2.Replace(_(")"),_(""));
+            Orbs2.RemoveLast(); 
             int i=-1;
             wxStringTokenizer tokenizer1(Orbs1, ",");
             while (tokenizer1.HasMoreTokens())
@@ -3597,9 +3863,9 @@ void Sec30::AddOnSiteMatrix(myGrid* OnSiteCtr, wxCheckTree* orbs, Aint1D Hamilto
                 int i0Ham = HamiltonianDimMap[iAtomIndex][iShell - 1];
                 
                 Adouble0D iOnSiteSK, fOnSiteSK;
-                double i_p_soc, i_d_soc, f_p_soc, f_d_soc;
+                double i_p_soc, i_d_soc, f_p_soc, f_d_soc, i_f_soc, f_f_soc;
                 Aint0D Orbital_Patern = Aint0D();
-                GetOnSiteSK(OnSiteCtr, Label, iOnSiteSK, fOnSiteSK, i_p_soc, i_d_soc, f_p_soc, f_d_soc, Orbital_Patern);
+                GetOnSiteSK(OnSiteCtr, Label, iOnSiteSK, fOnSiteSK, i_p_soc, i_d_soc, i_f_soc, f_p_soc, f_d_soc, f_f_soc, Orbital_Patern);
                 
                 for(int ii=0; ii<Dim1; ii++)
                 {
@@ -3624,8 +3890,9 @@ void Sec30::AddOnSiteMatrix(myGrid* OnSiteCtr, wxCheckTree* orbs, Aint1D Hamilto
                         fImSOC[i] = new double[nMSpin];
                     }
                     
-                    GetSOC(i_p_soc, i_d_soc, Orbital_Patern, iReSOC, iImSOC);
-                    GetSOC(f_p_soc, f_d_soc, Orbital_Patern, fReSOC, fImSOC);
+                    GetSOC(i_p_soc, i_d_soc, i_f_soc, Orbital_Patern, iReSOC, iImSOC);
+                    GetSOC(f_p_soc, f_d_soc, f_f_soc, Orbital_Patern, fReSOC, fImSOC);
+                    
                     for(int ii=0; ii<nMSpin; ii++)
                     {
                         int ih = 2*i0Ham + ii;
@@ -3695,9 +3962,9 @@ void Sec30::AddOnSiteMatrix(myGrid* OnSiteCtr, wxCheckTree* orbs, Aint1D Hamilto
                 int i0Ham = HamiltonianDimMap[iAtomIndex][iShell - 1];
                 
                 Adouble0D iOnSiteSK, fOnSiteSK;
-                double i_p_soc, i_d_soc, f_p_soc, f_d_soc;
+                double i_p_soc, i_d_soc, f_p_soc, f_d_soc, i_f_soc, f_f_soc;
                 Aint0D Orbital_Patern = Aint0D();
-                GetOnSiteSK(OnSiteCtr, Label, iOnSiteSK, fOnSiteSK, i_p_soc, i_d_soc, f_p_soc, f_d_soc, Orbital_Patern);
+                GetOnSiteSK(OnSiteCtr, Label, iOnSiteSK, fOnSiteSK, i_p_soc, i_d_soc, i_f_soc, f_p_soc, f_d_soc, f_f_soc, Orbital_Patern);
                 
                 for(int ii=0; ii<Dim1; ii++)
                 {
@@ -3725,8 +3992,8 @@ void Sec30::AddOnSiteMatrix(myGrid* OnSiteCtr, wxCheckTree* orbs, Aint1D Hamilto
                         fImSOC[i] = new double[nMSpin];
                     }
                     
-                    GetSOC(i_p_soc, i_d_soc, Orbital_Patern, iReSOC, iImSOC);
-                    GetSOC(f_p_soc, f_d_soc, Orbital_Patern, fReSOC, fImSOC);
+                    GetSOC(i_p_soc, i_d_soc, i_f_soc, Orbital_Patern, iReSOC, iImSOC);
+                    GetSOC(f_p_soc, f_d_soc, f_f_soc, Orbital_Patern, fReSOC, fImSOC);
                     for(int ii=0; ii<nMSpin; ii++)
                     {
                         int ih = 2*i0Ham + ii;
@@ -3796,9 +4063,9 @@ void Sec30::AddOnSiteMatrixF(myGrid* OnSiteCtr, wxCheckTree* orbs, Aint1D Hamilt
                 int i0Ham = HamiltonianDimMap[iAtomIndex][iShell - 1];
                 
                 Adouble0D iOnSiteSK, fOnSiteSK;
-                double f_p_soc, f_d_soc;
+                double f_p_soc, f_d_soc, f_f_soc;
                 Aint0D Orbital_Patern = Aint0D();
-                GetOnSiteSKF(OnSiteCtr, OSBuffer, Label, iOnSiteSK, fOnSiteSK, f_p_soc, f_d_soc, Orbital_Patern);
+                GetOnSiteSKF(OnSiteCtr, OSBuffer, Label, iOnSiteSK, fOnSiteSK, f_p_soc, f_d_soc, f_f_soc, Orbital_Patern);
                 
                 for(int ii=0; ii<Dim1; ii++)
                 {
@@ -3818,7 +4085,7 @@ void Sec30::AddOnSiteMatrixF(myGrid* OnSiteCtr, wxCheckTree* orbs, Aint1D Hamilt
                         fImSOC[i] = new double[nMSpin];
                     }
                     
-                    GetSOC(f_p_soc, f_d_soc, Orbital_Patern, fReSOC, fImSOC);
+                    GetSOC(f_p_soc, f_d_soc, f_f_soc, Orbital_Patern, fReSOC, fImSOC);
                     
                     for(int ii=0; ii<nMSpin; ii++)
                     {
@@ -3882,9 +4149,9 @@ void Sec30::AddOnSiteMatrixF(myGrid* OnSiteCtr, wxCheckTree* orbs, Aint1D Hamilt
                 int i0Ham = HamiltonianDimMap[iAtomIndex][iShell - 1];
                 
                 Adouble0D iOnSiteSK, fOnSiteSK;
-                double f_p_soc, f_d_soc;
+                double f_p_soc, f_d_soc, f_f_soc;
                 Aint0D Orbital_Patern = Aint0D();
-                GetOnSiteSKF(OnSiteCtr, OSBuffer, Label, iOnSiteSK, fOnSiteSK, f_p_soc, f_d_soc, Orbital_Patern);
+                GetOnSiteSKF(OnSiteCtr, OSBuffer, Label, iOnSiteSK, fOnSiteSK, f_p_soc, f_d_soc, f_f_soc, Orbital_Patern);
                 
                 for(int ii=0; ii<Dim1; ii++)
                 {
@@ -3906,7 +4173,7 @@ void Sec30::AddOnSiteMatrixF(myGrid* OnSiteCtr, wxCheckTree* orbs, Aint1D Hamilt
                         fImSOC[i] = new double[nMSpin];
                     }
                     
-                    GetSOC(f_p_soc, f_d_soc, Orbital_Patern, fReSOC, fImSOC);
+                    GetSOC(f_p_soc, f_d_soc, f_f_soc, Orbital_Patern, fReSOC, fImSOC);
                     
                     for(int ii=0; ii<nMSpin; ii++)
                     {
@@ -4073,6 +4340,83 @@ void Sec30::GetOnSiteSK(myGrid* GridCtrl, wxString Label, Adouble0D &iBondSK, Ad
     }
 }
 
+void Sec30::GetOnSiteSK(myGrid* GridCtrl, wxString Label, Adouble0D &iBondSK, Adouble0D &fBondSK, double &i_p_soc, double &i_d_soc, double &i_f_soc, double &f_p_soc, double &f_d_soc, double &f_f_soc, Aint0D &Orbital_Patern)
+{
+    wxString title, istr, fstr;
+    double ival, fval;
+    int nRow = GridCtrl->GetNumberRows();
+    iBondSK = std::vector<double>(40,0.0);//{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    fBondSK = std::vector<double>(40,0.0);//{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    i_p_soc=0.0;
+    f_p_soc=0.0;
+    i_d_soc=0.0;
+    f_d_soc=0.0;
+    i_f_soc=0.0;
+    f_f_soc=0.0;
+    Orbital_Patern.clear();
+    bool found = false;
+    int ind=0;
+    for (int irow=0; irow<nRow;irow++)
+    {
+        title = GridCtrl->GetCellValue(irow, 0);
+        if (!found)
+        {
+            if (title == Label) found = true;
+            ind=0;
+        }
+        else
+        {
+            //if (GridCtrl->GetCellBackgroundColour(irow, 1) != *wxWHITE) return;
+            if (GridCtrl->IsReadOnly(irow, 1)) return;
+            istr = GridCtrl->GetCellValue(irow, 1);
+            fstr = GridCtrl->GetCellValue(irow, 2);
+            bool isOki = istr.ToDouble(&ival);
+            bool isOkf = fstr.ToDouble(&fval);
+            if (title == _("p_{soc}"))
+            {
+                if (isOki)
+                    i_p_soc = ival;
+                else
+                    i_p_soc = 0.0;
+                
+                if (isOkf)
+                    f_p_soc = fval;
+                else
+                    f_p_soc = 0.0;
+            }
+            else if (title == _("d_{soc}"))
+            {
+                if (isOki)
+                    i_d_soc = ival;
+                else
+                    i_d_soc = 0.0;
+                
+                if (isOkf)
+                    f_d_soc = fval;
+                else
+                    f_d_soc = 0.0;
+            }
+            else if (title == _("f_{soc}"))
+            {
+                if (isOki)
+                    i_f_soc = ival;
+                else
+                    i_f_soc = 0.0;
+                
+                if (isOkf)
+                    f_f_soc = fval;
+                else
+                    f_f_soc = 0.0;
+            }   
+            else
+            {
+                int OrbitalIndex = SetOnSiteSKElement(ind++, title, isOki, iBondSK, ival, isOkf, fBondSK, fval);
+                Orbital_Patern.push_back(OrbitalIndex);
+            }
+        }
+    }
+}
+
 void Sec30::GetOnSiteSKF(myGrid* GridCtrl, double* GridBuffer, wxString Label, Adouble0D &iBondSK, Adouble0D &fBondSK, double &f_p_soc, double &f_d_soc, Aint0D &Orbital_Patern)
 {
     wxString title, fstr;
@@ -4115,8 +4459,54 @@ void Sec30::GetOnSiteSKF(myGrid* GridCtrl, double* GridBuffer, wxString Label, A
     }
 }
 
+void Sec30::GetOnSiteSKF(myGrid* GridCtrl, double* GridBuffer, wxString Label, Adouble0D &iBondSK, Adouble0D &fBondSK, double &f_p_soc, double &f_d_soc, double &f_f_soc, Aint0D &Orbital_Patern)
+{
+    wxString title, fstr;
+    double fval;
+    int nRow = GridCtrl->GetNumberRows();
+    iBondSK = std::vector<double>(40,0.0);//{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    fBondSK = std::vector<double>(40,0.0);//{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+    f_p_soc=0.0;
+    f_d_soc=0.0;
+    f_f_soc=0.0;
+    Orbital_Patern.clear();
+    bool found = false;
+    int ind=0;
+    for (int irow=0; irow<nRow;irow++)
+    {
+        title = GridCtrl->GetCellValue(irow, 0);
+        if (!found)
+        {
+            if (title == Label) found = true;
+            ind=0;
+        }
+        else
+        {
+            //if (GridCtrl->GetCellBackgroundColour(irow, 1) != *wxWHITE) return;
+            if (GridCtrl->IsReadOnly(irow, 1)) return;
+            //istr = GridCtrl->GetCellValue(irow, 1);
+            //fstr = GridCtrl->GetCellValue(irow, 2);
+            //bool isOki = istr.ToDouble(&ival);
+            //bool isOkf = fstr.ToDouble(&fval);
+            fval = GridBuffer[irow];
+            if (title == _("p_{soc}"))
+                f_p_soc = fval;
+            else if (title == _("d_{soc}"))
+                f_d_soc = fval;
+            else if (title == _("f_{soc}"))
+                f_f_soc = fval;
+            else
+            {
+                int OrbitalIndex = SetOnSiteSKElement(ind++, title, false, iBondSK, 0.0, true, fBondSK, fval);
+                Orbital_Patern.push_back(OrbitalIndex);
+            }
+        }
+    }
+}
+
 void Sec30::GetSOC(double p_soc, double d_soc, Aint0D Orbital_Patern, double** ReSOC, double** ImSOC)
 {
+    // s+p+d  2+6+10
     double resoc[18][18] = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 
                               0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0, 0, 0, 
                               0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
@@ -4219,6 +4609,158 @@ void Sec30::GetSOC(double p_soc, double d_soc, Aint0D Orbital_Patern, double** R
     delete [] SpinOrbital_Patern;
 }
 
+
+// extend the matrix to include f shell
+void Sec30::GetSOC(double p_soc, double d_soc, double f_soc, Aint0D Orbital_Patern, double** ReSOC, double** ImSOC)
+{
+    // s+p+d+f  2+6+10+14=32
+    double resoc[32][32] = {{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,},
+                {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,},
+                {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,},
+                {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,},
+                {0,0,0,0,0,0,0,-0.50000000,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,},
+                {0,0,0,0,0,0,0.50000000,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,},
+                {0,0,0,0,0,0.50000000,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,},
+                {0,0,0,0,-0.50000000,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,},
+                {0,0,0,0,0,0,0,0,0,0,0,0.50000000,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,},
+                {0,0,0,0,0,0,0,0,0,0,-0.50000000,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,},
+                {0,0,0,0,0,0,0,0,0,-0.50000000,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,},
+                {0,0,0,0,0,0,0,0,0.50000000,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,},
+                {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-0.86602540,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,},
+                {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.86602540,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,},
+                {0,0,0,0,0,0,0,0,0,0,0,0,0,0.86602540,0,0,0,-0.50000000,0,0,0,0,0,0,0,0,0,0,0,0,0,0,},
+                {0,0,0,0,0,0,0,0,0,0,0,0,-0.86602540,0,0,0,0.50000000,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,},
+                {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.50000000,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,},
+                {0,0,0,0,0,0,0,0,0,0,0,0,0,0,-0.50000000,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,},
+                {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1.50000000,0,},
+                {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1.50000000,},
+                {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1.00000000,0,0,0,},
+                {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1.00000000,0,0,},
+                {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1.22474487,0.50000000,0,0,0,0,0,},
+                {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1.22474487,0,0,-0.50000000,0,0,0,0,},
+                {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1.22474487,0,0,0,-1.22474487,0,0,0,0,},
+                {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1.22474487,0,0,0,1.22474487,0,0,0,0,0,},
+                {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.50000000,0,0,1.22474487,0,0,0,0,0,0,},
+                {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-0.50000000,-1.22474487,0,0,0,0,0,0,0,},
+                {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1.00000000,0,0,0,0,0,0,0,0,0,0,0,},
+                {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1.00000000,0,0,0,0,0,0,0,0,0,0,},
+                {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1.50000000,0,0,0,0,0,0,0,0,0,0,0,0,0,},
+                {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1.50000000,0,0,0,0,0,0,0,0,0,0,0,0,}};
+     
+    double imsoc[32][32] = {{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,},
+                {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,},
+                {0,0,0,0,0,0.50000000,-0.50000000,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,},
+                {0,0,0,0,0.50000000,0,0,0.50000000,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,},
+                {0,0,0,-0.50000000,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,},
+                {0,0,-0.50000000,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,},
+                {0,0,0.50000000,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,},
+                {0,0,0,-0.50000000,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,},
+                {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.50000000,-1.00000000,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,},
+                {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.50000000,0,0,1.00000000,0,0,0,0,0,0,0,0,0,0,0,0,0,0,},
+                {0,0,0,0,0,0,0,0,0,0,0,0,0,0.86602540,-0.50000000,0,0,0.50000000,0,0,0,0,0,0,0,0,0,0,0,0,0,0,},
+                {0,0,0,0,0,0,0,0,0,0,0,0,0.86602540,0,0,0.50000000,0.50000000,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,},
+                {0,0,0,0,0,0,0,0,0,0,0,-0.86602540,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,},
+                {0,0,0,0,0,0,0,0,0,0,-0.86602540,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,},
+                {0,0,0,0,0,0,0,0,0,-0.50000000,0.50000000,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,},
+                {0,0,0,0,0,0,0,0,-0.50000000,0,0,-0.50000000,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,},
+                {0,0,0,0,0,0,0,0,1.00000000,0,0,-0.50000000,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,},
+                {0,0,0,0,0,0,0,0,0,-1.00000000,-0.50000000,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,},
+                {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.61237244,0,0,0,0,0,0,0,-0.61237244,0,0,},
+                {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-0.61237244,0,0,0,0,0,0,0,-0.61237244,0,0,0,},
+                {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.61237244,0,0,0,0.79056942,0,0,0,-0.79056942,0,0,0,0.61237244,},
+                {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-0.61237244,0,0,0,-0.79056942,0,0,0,-0.79056942,0,0,0,0.61237244,0,},
+                {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.79056942,0,0,0,0,0,0,0,0.79056942,0,0,},
+                {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-0.79056942,0,0,0,0,0,0,0,0.79056942,0,0,0,},
+                {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,},
+                {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,},
+                {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.79056942,0,0,0,0,0,0,0,0.79056942,0,0,},
+                {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.79056942,0,0,0,0,0,0,0,-0.79056942,0,0,0,},
+                {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.61237244,0,0,0,-0.79056942,0,0,0,0.79056942,0,0,0,0.61237244,},
+                {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.61237244,0,0,0,-0.79056942,0,0,0,-0.79056942,0,0,0,-0.61237244,0,},
+                {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-0.61237244,0,0,0,0,0,0,0,0.61237244,0,0,},
+                {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-0.61237244,0,0,0,0,0,0,0,-0.61237244,0,0,0,}};
+    
+    const int np_real = 4;
+    const int nd_real = 12;
+    const int np_imag = 8;
+    const int nd_imag = 20;
+    const int nf_real = 20;
+    const int nf_imag = 32;
+    int p_realNonZero[np_real][2] = {{4, 7},{5, 6},{6, 5},{7, 4}};
+    int d_realNonZero[nd_real][2] = {{8, 11},{9, 10},{10, 9},{11, 8},{12, 15},{13, 14},{14, 13},{14, 17},{15, 12},{15, 16},{16, 15},{17, 14}};
+    int p_imagNonZero[np_imag][2] = {{2, 5},{2, 6},{3, 4},{3, 7},{4, 3},{5, 2},{6, 2},{7, 3}};
+    int d_imagNonZero[nd_imag][2] = {{8, 15},{8, 16},{9, 14},{9, 17},{10, 13},{10, 14},{10, 17},{11, 12},{11, 15},{11, 16},{12, 11},{13, 10},{14, 9},{14, 10},{15, 8},{15, 11},{16, 8},{16, 11},{17, 9},{17, 10}};
+    int f_realNonZero[nf_real][2] = {{18, 30},{19, 31},{20, 28},{21, 29},{22, 25},{22, 26},{23, 24},{23, 27},{24, 23},{24, 27},{25, 22},{25, 26},{26, 22},{26, 25},{27, 23},{27, 24},{28, 20},{29, 21},{30, 18},{31, 19}};
+    int f_imagNonZero[nf_imag][2] = {{18, 21},{18, 29},{19, 20},{19, 28},{20, 19},{20, 23},{20, 27},{20, 31},{21, 18},{21, 22},{21, 26},{21, 30},{22, 21},{22, 29},{23, 20},{23, 28},{26, 21},{26, 29},{27, 20},{27, 28},{28, 19},{28, 23},{28, 27},{28, 31},{29, 18},{29, 22},{29, 26},{29, 30},{30, 21},{30, 29},{31, 20},{31, 28}};
+    for(int ind=0; ind<np_real; ind++)
+    {
+        int i = p_realNonZero[ind][0];
+        int j = p_realNonZero[ind][1];
+        resoc[i][j] = p_soc*resoc[i][j];
+    }
+    
+    for(int ind=0; ind<nd_real; ind++)
+    {
+        int i = d_realNonZero[ind][0];
+        int j = d_realNonZero[ind][1];
+        resoc[i][j] = d_soc*resoc[i][j];
+    }
+
+    for(int ind=0; ind<nf_real; ind++)
+    {
+        int i = f_realNonZero[ind][0];
+        int j = f_realNonZero[ind][1];
+        resoc[i][j] = f_soc*resoc[i][j];
+    }
+    
+    for(int ind=0; ind<np_imag; ind++)
+    {
+        int i = p_imagNonZero[ind][0];
+        int j = p_imagNonZero[ind][1];
+        imsoc[i][j] = p_soc*imsoc[i][j];
+    }
+    
+    for(int ind=0; ind<nd_imag; ind++)
+    {
+        int i = d_imagNonZero[ind][0];
+        int j = d_imagNonZero[ind][1];
+        imsoc[i][j] = d_soc*imsoc[i][j];
+    }
+
+    for(int ind=0; ind<nf_imag; ind++)
+    {
+        int i = f_imagNonZero[ind][0];
+        int j = f_imagNonZero[ind][1];
+        imsoc[i][j] = f_soc*imsoc[i][j];
+    }
+    
+    int nM = Orbital_Patern.size();
+    int nM2 = 2*nM;
+    int* SpinOrbital_Patern = new int[nM2];
+    int ind0 = 0;
+    for (int i=0; i<nM; i++)
+    {
+        int i_up = 2*Orbital_Patern[i];
+        int i_dn = 2*Orbital_Patern[i] + 1;
+        SpinOrbital_Patern[ind0++] = i_up;
+        SpinOrbital_Patern[ind0++] = i_dn;
+    }
+    
+    for(int iM=0; iM<nM2; iM++)
+    {
+        int i = SpinOrbital_Patern[iM];
+        for(int jM=0; jM<nM2; jM++)
+        {
+            int j = SpinOrbital_Patern[jM];
+            ReSOC[iM][jM] = resoc[i][j];
+            ImSOC[iM][jM] = imsoc[i][j];
+        }
+    }
+    
+    delete [] SpinOrbital_Patern;
+}
+
+
 int Sec30::SetOnSiteSKElement(int ind, wxString skName, bool isOki, Adouble0D &iBondSK, double ival, bool isOkf, Adouble0D &fBondSK, double fval)
 {
     int ind0 = GetOnSiteSKInd(skName);
@@ -4247,9 +4789,25 @@ int Sec30::GetOnSiteSKInd(wxString skName)
         return 7;
     else if (skName == _("d_{x^2-y^2}"))
         return 8;
+    else if (skName == _("f_{y(3x^2-y^2)}"))
+        return 9;
+    else if (skName == _("f_{xyz}"))
+        return 10;
+    else if (skName == _("f_{y(5z^2-r^2)}"))
+        return 11;
+    else if (skName == _("f_{z(5z^2-3r^2)}"))
+        return 12;
+    else if (skName == _("f_{x(5z^2-r^2)}"))
+        return 13;
+    else if (skName == _("f_{z(x^2-y^2)}"))
+        return 14;
+    else if (skName == _("f_{x(x^2-3y^2)}"))
+        return 15;
+
     
     return -1;
 }
+
 
 void Sec30::SetBondSKElement(wxString skName, bool isOki, Adouble0D &iBondSK, double ival, bool isOkf, Adouble0D &fBondSK, double fval)
 {
@@ -4258,6 +4816,8 @@ void Sec30::SetBondSKElement(wxString skName, bool isOki, Adouble0D &iBondSK, do
     if (isOkf) fBondSK[ind] = fval;
 }
 
+
+// must agree with definition in UnitcellClass.cpp
 int Sec30::GetSKInd(wxString skName)
 {
     if (skName == _("sss"))
@@ -4280,9 +4840,31 @@ int Sec30::GetSKInd(wxString skName)
         return 8;
     else if (skName == _("ddd"))
         return 9;
+    else if (skName == _("sfs"))
+        return 10;
+    else if (skName == _("pfs"))
+        return 11;
+    else if (skName == _("pfp"))
+        return 12;
+    else if (skName == _("dfs"))
+        return 13;
+    else if (skName == _("dfp"))
+        return 14;
+    else if (skName == _("dfd"))
+        return 15;
+    else if (skName == _("ffs"))
+        return 16;
+    else if (skName == _("ffp"))
+        return 17;
+    else if (skName == _("ffd"))
+        return 18;
+    else if (skName == _("fff"))
+        return 19;
     
     return -1;
 }
+
+
 
 int Sec30::GetAtomIndexFromHamiltonianIndex(Aint1D HamiltonianDimMap, int iH)
 {

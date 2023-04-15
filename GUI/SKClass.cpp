@@ -82,6 +82,7 @@ void SKClass::Btn_Update_OnClick(wxCommandEvent& event)
 
 void SKClass::Btn_LastValues_OnClick(wxCommandEvent& event)
 {
+    //wxMessageBox(_("Here!!!"));
     sec30->CopyLastSKToInitialSK();
     sec30->SendUpdateEvent(this->GetName());
 }
