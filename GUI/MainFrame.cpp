@@ -13,7 +13,6 @@
 #include <wx/dir.h>
 #include "Embeded.h"
 #include "main.h"
-
 /*
 #ifdef __WXMAC__
 #include <GLUT/glut.h>
@@ -951,7 +950,9 @@ void MainFrame::sec30_OnUpdated(wxCommandEvent& event)
 {
     wxString info = event.GetString();
     int redraw = event.GetInt();
-    
+    //logfile->AppendText(wxString::Format(wxT("MF1022: info= %s, redraw= %d\n"),info,redraw));
+    bool isSOC; sec30->GetCheckVar(_("SOC[0]"), isSOC);
+    //logfile->AppendText(wxString::Format(wxT("isSOC= %d\n"),isSOC));
     if (info == _("SKClass"))
     {
 		int EventID = redraw;
@@ -961,7 +962,7 @@ void MainFrame::sec30_OnUpdated(wxCommandEvent& event)
 		}
 		else
 		{
-			int DoUpdateSKList = EventID;// 2 = update list
+			int DoUpdateSKList = EventID;// 2 = update list 
 			EvaluateSKPanel(DoUpdateSKList);
 		}
     }
@@ -1753,7 +1754,7 @@ bool MainFrame::ValidateSKPanel()
         if (ErrorIndex==1){isValid = false;logfile->AppendText(_("\nError list:\n"));}
         logfile->AppendText(wxString::Format(wxT("Error %d: There is not any atom in your structure!\n"),ErrorIndex));
     }
-    
+
     for (int i = 1; i<=nOnSites; i++)
     {
         wxString name = wxString::Format(wxT("AtomInd%d"),i);
@@ -1767,7 +1768,7 @@ bool MainFrame::ValidateSKPanel()
             logfile->AppendText(wxString::Format(wxT("Error %d: "),ErrorIndex) + _("The projection for the ") + comblabel->GetLabel() + _(" has not yet been set.\n"));
         }
     }
-    
+
     
     /*int b1a1, b1a2, b2a1, b2a2;
     sec30->GetVar(_("KABC_Coords"), iAtomIndex0, 0, b1a1);
@@ -1842,7 +1843,7 @@ bool MainFrame::ValidateSKPanel()
                 items.push(bond);
                 wxString sbond = bonds->GetItemText(bond);
             }
-
+            
             while (!items.empty())
             {
                 wxTreeItemId next = items.top();
@@ -1943,7 +1944,8 @@ bool MainFrame::ValidateSKPanel()
 	}
     else
         logfile->AppendText(_("\nFix the errors and try again ...\n"));
-    
+    //logfile->AppendText(wxString::Format(wxT("IsValid= %d: "),isValid) );
+    //logfile->AppendText(wxString::Format(wxT("MF:1928: isValid= %d\n "),isValid));
     return isValid;
 }
 
@@ -1959,13 +1961,18 @@ bool MainFrame::ValidateSKParametersList()
 	//int nsk = skgc->GetNumberRows();
 	int nol = olgc->GetNumberRows();
 	
+
+
 	int nHamiltonian = sec30->ArraysOf1DString[1].size();
 	bool isSOC;
 	sec30->GetCheckVar(_("SOC[0]"), isSOC);
+    //logfile->AppendText(wxString::Format(wxT("MF:1949 isSOC= %d\n"),isSOC));
 	bool isOverlap;
 	sec30->GetCheckVar(_("Overlap[0]"), isOverlap);
     
-	if ((nol < 1 && isOverlap) || (nol > 0 && !isOverlap)) AnyProblem = true;
+	if ((nol < 1 && isOverlap) || (nol > 0 && !isOverlap)) {
+        AnyProblem = true;
+    }
 	
 	if (!AnyProblem)
 	{
@@ -1973,9 +1980,11 @@ bool MainFrame::ValidateSKParametersList()
 		{
 			wxString str = osgc->GetCellValue(nos - 2, 0);
 			if ((!str.Contains(_("soc")) && isSOC) || (str.Contains(_("soc")) && !isSOC)) AnyProblem = true;
+            //logfile->AppendText(wxString::Format(wxT("AnyProblem=%d "),AnyProblem));
 		}
 		else
 			AnyProblem = true;
+            
 	}
 	
 	if (AnyProblem)
@@ -2016,6 +2025,7 @@ void MainFrame::ReArrangeSKList()
     
     bool isSOC;
     sec30->GetCheckVar(_("SOC[0]"), isSOC);
+    //logfile->AppendText(wxString::Format(wxT("isSoc= %d"),isSOC)); 
     
     bool isOverlap;
     sec30->GetCheckVar(_("Overlap[0]"), isOverlap);
@@ -2068,6 +2078,7 @@ void MainFrame::ReArrangeSKList()
                     
                     bool is_p = false;
                     bool is_d = false;
+                    bool is_f = false;
                     wxTreeItemIdValue cookie02;
                     wxTreeItemId TBOrbID = orbs->GetFirstChild(TBShellID,cookie02);
                     while (TBOrbID.IsOk())
@@ -2098,6 +2109,12 @@ void MainFrame::ReArrangeSKList()
                             {
                                 if (OnSiteLabel[0] == 'd' || OnSiteLabel[1] == 'd') is_d = true;
                             }
+
+                            if (!is_f)
+                            {
+                                if (OnSiteLabel[0] == 'f' || OnSiteLabel[1] == 'f') is_f = true;
+                            }
+
                         }
                         TBOrbID = orbs->GetNextSibling(TBOrbID);
                     }
@@ -2137,6 +2154,24 @@ void MainFrame::ReArrangeSKList()
                             IndexInfo.push_back(TotalIndex);
                             SKIndexList.push_back(IndexInfo);
                         }
+
+                        if (is_f)
+                        {
+                            TotalNumberOfParameters++;
+                            TotalIndex++;
+                            SKListAddress.push_back(TotalIndex);
+                            osgc->InsertRows(TotalIndex, 1,true);
+                            osgc->SetCellValue(TotalIndex, 0, _("f_{soc}"));
+                            osgc->SetReadOnly(TotalIndex, 0);
+                            osgc->SetCellBackgroundColour(TotalIndex, 0, c);
+                            osgc->SetCellValue(TotalIndex, 1, _("0"));
+                            
+                            Aint0D IndexInfo;
+                            IndexInfo.push_back(1);
+                            IndexInfo.push_back(TotalIndex);
+                            SKIndexList.push_back(IndexInfo);
+                        }
+
                     }
                 }
                 TBShellID = orbs->GetNextSibling(TBShellID);
@@ -2215,9 +2250,11 @@ void MainFrame::ReArrangeSKList()
             orbs2.Replace(wxString(" "), wxString(""));
     
             wxStringTokenizer SKtokenizer(AllSK, ",");
+            //logfile->AppendText(AllSK);
             while ( SKtokenizer.HasMoreTokens() )
             {
                 wxString sk = SKtokenizer.GetNextToken();
+                //logfile->AppendText(wxString::Format(wxT("sk= %s\n"),sk));
                 //to check is there such a parameter in this bond or not
                 if (IsBondContainsParameter(orbs1,orbs2,sk))
                 {
@@ -3612,6 +3649,12 @@ void MainFrame::UpdateTBBand_if()
     
     sec30->ArraysOf2DDouble[2] = iTBEigVal;
     sec30->ArraysOf2DDouble[3] = fTBEigVal;
+
+    // testing
+    //for (int i=0; i<nHamiltonianTot; i++) logfile->AppendText(wxString::Format(wxT("(%d) %f "),i,iTBEigVal[0][i]));
+    //logfile->AppendText(_('\n'));
+    //for (int i=0; i<nHamiltonianTot; i++) logfile->AppendText(wxString::Format(wxT("(%d) %f "),i,fTBEigVal[0][i]));
+
     
     //////////////////////////////Deallocate all arrays//////////////////////////////////
     for(int iECell = 0; iECell < nEssensialCells; iECell++)

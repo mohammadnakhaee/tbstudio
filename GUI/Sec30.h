@@ -191,6 +191,8 @@ public:
     void GetDirectionalCosines(double x1, double y1, double z1, double x2, double y2, double z2, double &l, double &m, double &n);
     double Hopspd(Adouble0D BondSK, double l, double m, double n, wxString o1, wxString o2);
     double Hopspd(double sss, double sps, double sds, double pps, double ppp, double pds, double pdp, double dds, double ddp, double ddd, double l, double m, double n, wxString o1, wxString o2);
+    double Hopspd(double sss, double sps, double sds, double pps, double ppp, double pds, double pdp, double dds, double ddp, double ddd, double sfs, double pfs, double pfp, double dfs, double dfp, double dfd, double l, double m, double n, wxString o1, wxString o2);
+    
     void ConstructTBHamiltonian(double a[3], double b[3], double c[3], double** XYZCoords, Adouble2D &Hi, Adouble2D &Hf, int &nEssensialCells, int &nHamiltonian, Aint1D &EssCells, bool isSOC, Adouble2D &SOC_i, Adouble2D &SOC_f);
     void ConstructTBHamiltonian(double a[3], double b[3], double c[3], double** XYZCoords, Adouble2D &Hi, Adouble2D &Hf, Adouble2D &Si, Adouble2D &Sf, int &nEssensialCells, int &nHamiltonian, Aint1D &EssCells, bool isSOC, Adouble2D &SOC_i, Adouble2D &SOC_f);
     void ConstructTBHamiltonianF(double a[3], double b[3], double c[3], double** XYZCoords, Adouble2D &Hf, int &nEssensialCells, int &nHamiltonian, Aint1D &EssCells, bool isSOC, Adouble2D &SOC_f);
@@ -208,7 +210,10 @@ public:
     void GetBondSKF(myGrid* GridCtrl, double* GridBuffer, wxString Label, Adouble0D &iBondSK, Adouble0D &fBondSK);
     void GetOnSiteSK(myGrid* GridCtrl, wxString Label, Adouble0D &iBondSK, Adouble0D &fBondSK, double &i_p_soc, double &i_d_soc, double &f_p_soc, double &f_d_soc, Aint0D &Orbital_Patern);
     void GetOnSiteSKF(myGrid* GridCtrl, double* GridBuffer, wxString Label, Adouble0D &iBondSK, Adouble0D &fBondSK, double &f_p_soc, double &f_d_soc, Aint0D &Orbital_Patern);
+    void GetOnSiteSK(myGrid* GridCtrl, wxString Label, Adouble0D &iBondSK, Adouble0D &fBondSK, double &i_p_soc, double &i_d_soc, double &i_f_soc, double &f_p_soc, double &f_d_soc, double &f_f_soc, Aint0D &Orbital_Patern);
+    void GetOnSiteSKF(myGrid* GridCtrl, double* GridBuffer, wxString Label, Adouble0D &iBondSK, Adouble0D &fBondSK, double &f_p_soc, double &f_d_soc, double &f_f_soc, Aint0D &Orbital_Patern);
     void GetSOC(double p_soc, double d_soc, Aint0D Orbital_Patern, double** ReSOC, double** ImSOC);
+    void GetSOC(double p_soc, double d_soc, double f_soc, Aint0D Orbital_Patern, double** ReSOC, double** ImSOC);
     int SetOnSiteSKElement(int ind, wxString skName, bool isOki, Adouble0D &iBondSK, double ival, bool isOkf, Adouble0D &fBondSK, double fval);
     int GetOnSiteSKInd(wxString skName);
     void SetBondSKElement(wxString skName, bool isOki, Adouble0D &iBondSK, double ival, bool isOkf, Adouble0D &fBondSK, double fval);

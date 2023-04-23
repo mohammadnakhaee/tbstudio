@@ -142,6 +142,14 @@ void OrbitalsClass::Btn_AddShell_OnClick(wxCommandEvent& event)
     treectr->tree_add(shellID,_("d_{3z^2-r^2}"),true,false);
     treectr->tree_add(shellID,_("d_{xz}"),true,false);
     treectr->tree_add(shellID,_("d_{x^2-y^2}"),true,false);
+	
+	treectr->tree_add(shellID,_("f_{y(3x^2-y^2)}"),true,false);
+    treectr->tree_add(shellID,_("f_{xyz}"),true,false);
+    treectr->tree_add(shellID,_("f_{y(5z^2-r^2)}"),true,false);
+    treectr->tree_add(shellID,_("f_{z(5z^2-3r^2)}"),true,false);
+    treectr->tree_add(shellID,_("f_{x(5z^2-r^2)}"),true,false);
+    treectr->tree_add(shellID,_("f_{z(x^2-y^2)}"),true,false);
+    treectr->tree_add(shellID,_("f_{x(x^2-3y^2)}"),true,false);
     
     treectr->Expand(rootID);
     treectr->Expand(selectedID);
