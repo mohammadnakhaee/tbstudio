@@ -36,6 +36,7 @@
     <File Name="wxcrafter_bitmaps.cpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="include">
+    <File Name="version.h"/>
     <File Name="LoginClass.h"/>
     <File Name="NomadGUI.h"/>
     <File Name="Nomad.h"/>

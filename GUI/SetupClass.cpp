@@ -198,66 +198,66 @@ void SetupClass::ReloadBand()
             int nband0 = EigVal[0].size();
             Adouble1D EigValWeights(nk0,std::vector<double>(nband0,1.0));
             
-            sec30->ArraysOf0DInt[0] = 1;
-            sec30->ArraysOf0DInt[1] = nKPoint;
-            sec30->ArraysOf0DInt[2] = maxneig;
-            sec30->ArraysOf0DInt[3] = mspin;
-            sec30->ArraysOf0DInt[6] = 0;
-            sec30->ArraysOf0DDouble[0] = ChemP;
-            sec30->ArraysOf1DDouble[0] = dkLabel;
-            sec30->ArraysOf1DString[0] = kLabel;
-            sec30->ArraysOf2DDouble[0] = KPoints;
-            sec30->ArraysOf2DDouble[1] = EigVal;
-            sec30->ArraysOf2DDouble[4] = EigValWeights;
+            sec30->isBandLoaded = true;
+            sec30->nKPoint = nKPoint;
+            sec30->maxneig = maxneig;
+            sec30->mspin = mspin;
+            sec30->isSelectMode = false;
+            sec30->ChemP = ChemP;
+            sec30->dkLabel = dkLabel;
+            sec30->kLabel = kLabel;
+            sec30->KPoints = KPoints;
+            sec30->DFTEigVal = EigVal;
+            sec30->DFTEigValWeight = EigValWeights;
     
             bool isMinOK, isMaxOK;
             IsRangeOK(maxneig, isMinOK, isMaxOK);
             if (!isMinOK)
             {
                 sec30->SetVar(_("DFTBandRange[0]"), 1, false);
-                sec30->ArraysOf0DInt[4] = 1;//int DFTnBandMin;
+                sec30->DFTnBandMin = 1;//int DFTnBandMin;
             }
             if (!isMaxOK)
             {
                 sec30->SetVar(_("DFTBandRange[1]"), maxneig, false);
-                sec30->ArraysOf0DInt[5] = maxneig;//int DFTnBandMax;
+                sec30->DFTnBandMax = maxneig;//int DFTnBandMax;
             }
             
-            if (sec30->ArraysOf0DDouble[1] == sec30->ArraysOf0DDouble[2])
+            if (sec30->DFTyMin2d0 == sec30->DFTyMax2d0)
             {
-                sec30->ArraysOf0DDouble[1] = -5;
-                sec30->ArraysOf0DDouble[2] = 5;
-                sec30->ArraysOf0DDouble[3] = -5;
-                sec30->ArraysOf0DDouble[4] = 5;
+                sec30->DFTyMin2d0 = -5;
+                sec30->DFTyMax2d0 = 5;
+                sec30->DFTyMin2d = -5;
+                sec30->DFTyMax2d = 5;
             }
             
-            int nkPoints = sec30->ArraysOf1DDouble[0].size();
-            sec30->ArraysOf0DDouble[5] = 0.0;
-            sec30->ArraysOf0DDouble[6] = sec30->ArraysOf1DDouble[0][nkPoints-1];
-            sec30->ArraysOf0DDouble[7] = 0.0;
-            sec30->ArraysOf0DDouble[8] = sec30->ArraysOf1DDouble[0][nkPoints-1];
+            int nkPoints = sec30->dkLabel.size();
+            sec30->DFTxMin2d0 = 0.0;
+            sec30->DFTxMax2d0 = sec30->dkLabel[nkPoints-1];
+            sec30->DFTxMin2d = 0.0;
+            sec30->DFTxMax2d = sec30->dkLabel[nkPoints-1];
         }
         else
         {
-            sec30->ArraysOf0DInt[0] = 0;
-            sec30->ArraysOf0DInt[1] = 0;
-            sec30->ArraysOf0DInt[2] = 0;
-            sec30->ArraysOf0DInt[3] = 0;
-            sec30->ArraysOf0DInt[6] = 0;
-            sec30->ArraysOf0DDouble[0] = 0.0;
-            sec30->ArraysOf1DDouble[0] = Adouble0D();
-            sec30->ArraysOf1DString[0] = Astring0D();
-            sec30->ArraysOf2DDouble[0] = Adouble1D();
-            sec30->ArraysOf2DDouble[1] = Adouble1D();
-            sec30->ArraysOf2DDouble[4] = Adouble1D();
-            sec30->ArraysOf0DDouble[1] = 0.0;
-            sec30->ArraysOf0DDouble[2] = 0.0;
-            sec30->ArraysOf0DDouble[3] = 0.0;
-            sec30->ArraysOf0DDouble[4] = 0.0;
-            sec30->ArraysOf0DDouble[5] = 0.0;
-            sec30->ArraysOf0DDouble[6] = 0.0;
-            sec30->ArraysOf0DDouble[7] = 0.0;
-            sec30->ArraysOf0DDouble[8] = 0.0;
+            sec30->isBandLoaded = false;
+            sec30->nKPoint = 0;
+            sec30->maxneig = 0;
+            sec30->mspin = 0;
+            sec30->isSelectMode = false;
+            sec30->ChemP = 0.0;
+            sec30->dkLabel = Adouble0D();
+            sec30->kLabel = Astring0D();
+            sec30->KPoints = Adouble1D();
+            sec30->DFTEigVal = Adouble1D();
+            sec30->DFTEigValWeight = Adouble1D();
+            sec30->DFTyMin2d0 = 0.0;
+            sec30->DFTyMax2d0 = 0.0;
+            sec30->DFTyMin2d = 0.0;
+            sec30->DFTyMax2d = 0.0;
+            sec30->DFTxMin2d0 = 0.0;
+            sec30->DFTxMax2d0 = 0.0;
+            sec30->DFTxMin2d = 0.0;
+            sec30->DFTxMax2d = 0.0;
         }
     }
     
@@ -317,12 +317,12 @@ void SetupClass::Btn_Select_OnClick(wxCommandEvent& event)
     if (btnctr->GetForegroundColour() != *wxGREEN)
     {
         btnctr->SetForegroundColour(*wxGREEN);
-        sec30->ArraysOf0DInt[6] = 1;
+        sec30->isSelectMode = true;
     }
     else
     {
         btnctr->SetForegroundColour(*wxBLACK);
-        sec30->ArraysOf0DInt[6] = 0;
+        sec30->isSelectMode = false;
     }
     
     sec30->SendUpdateEvent(this->GetName(),0);
@@ -381,7 +381,9 @@ void SetupClass::LoadOpenMXBand(wxString file, bool &isBandLoaded, int &maxneig,
             A1dvecs.push_back(rtv[i][0]);
             A1dvecs.push_back(rtv[i][1]);
             A1dvecs.push_back(rtv[i][2]);
-            sec30->ArraysOf1DDouble[i + 1] = A1dvecs;
+            if (i == 0) sec30->akDFT = A1dvecs;
+            if (i == 1) sec30->bkDFT = A1dvecs;
+            if (i == 2) sec30->ckDFT = A1dvecs;
         }
         
         int nkpath;
@@ -605,7 +607,9 @@ void SetupClass::LoadVaspXMLOutput(wxString file, bool &isBandLoaded, int &maxne
             A1dvecs.push_back(rtv[i][0]);
             A1dvecs.push_back(rtv[i][1]);
             A1dvecs.push_back(rtv[i][2]);
-            sec30->ArraysOf1DDouble[i + 1] = A1dvecs;
+            if (i == 0) sec30->akDFT = A1dvecs;
+            if (i == 1) sec30->bkDFT = A1dvecs;
+            if (i == 2) sec30->ckDFT = A1dvecs;
         }
         
         rapidxml::xml_node<>* kpoint = modeling_node->first_node("kpoints");

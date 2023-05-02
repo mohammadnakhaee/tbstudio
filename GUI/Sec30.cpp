@@ -17,80 +17,125 @@ Sec30::Sec30(wxWindow* parent)
 
 void Sec30::init()
 {
-    int nArraysOf0DDouble = 9;
-    int nArraysOf0DInt = 10;
-    int nArraysOf2DInt = 3;
-    int nArraysOf1DDouble = 4;
-    int nArraysOf1DString = 3;
-    int nArraysOf2DDouble = 5;
-    int nArraysOf3DDouble = 6;
-    ArraysOf0DDouble.clear();
-    ArraysOf0DInt.clear();
-    ArraysOf2DInt.clear();
-    ArraysOf1DDouble.clear();
-    ArraysOf1DString.clear();
-    ArraysOf2DDouble.clear();
-    ArraysOf3DDouble.clear();
-    for (int i=0; i<nArraysOf0DDouble; i++) ArraysOf0DDouble.push_back(0.0);
-    for (int i=0; i<nArraysOf0DInt; i++) ArraysOf0DInt.push_back(0);
-    for (int i=0; i<nArraysOf2DInt; i++) ArraysOf2DInt.push_back(Aint1D());
-    for (int i=0; i<nArraysOf1DDouble; i++) ArraysOf1DDouble.push_back(Adouble0D());
-    for (int i=0; i<nArraysOf1DString; i++) ArraysOf1DString.push_back(Astring0D());
-    for (int i=0; i<nArraysOf2DDouble; i++) ArraysOf2DDouble.push_back(Adouble1D());
-    for (int i=0; i<nArraysOf3DDouble; i++) ArraysOf3DDouble.push_back(Adouble2D());
+//    int nArraysOf0DDouble = 9;
+//    int nArraysOf2DInt = 3;
+//    int nArraysOf1DDouble = 4;
+//    int nArraysOf1DString = 3;
+//    int nArraysOf2DDouble = 5;
+//    int nArraysOf3DDouble = 6;
+//    ArraysOf0DDouble.clear();
+//
+//    ArraysOf2DInt.clear();
+//    ArraysOf1DDouble.clear();
+//    ArraysOf1DString.clear();
+//    ArraysOf2DDouble.clear();
+//    ArraysOf3DDouble.clear();
+//    for (int i=0; i<nArraysOf0DDouble; i++) ArraysOf0DDouble.push_back(0.0);
+//    for (int i=0; i<nArraysOf2DInt; i++) ArraysOf2DInt.push_back(Aint1D());
+//    for (int i=0; i<nArraysOf1DDouble; i++) ArraysOf1DDouble.push_back(Adouble0D());
+//    for (int i=0; i<nArraysOf1DString; i++) ArraysOf1DString.push_back(Astring0D());
+//    for (int i=0; i<nArraysOf2DDouble; i++) ArraysOf2DDouble.push_back(Adouble1D());
+//    for (int i=0; i<nArraysOf3DDouble; i++) ArraysOf3DDouble.push_back(Adouble2D());
     /////////////////////////////0D Int///////////////////////////////////////////////////////
-    ArraysOf0DInt[0] = 0;//bool isBandLoaded;
-    ArraysOf0DInt[1] = 0;//int nKPoint;
-    ArraysOf0DInt[2] = 0;//int maxneig;
-    ArraysOf0DInt[3] = 0;//int mspin;
-    ArraysOf0DInt[4] = 0;//int DFTnBandMin;
-    ArraysOf0DInt[5] = 0;//int DFTnBandMax;
-    ArraysOf0DInt[6] = 0;//bool isSelectMode;
-    ArraysOf0DInt[7] = 0;//bool isTBBand_i;
-    ArraysOf0DInt[8] = 0;//bool isTBBand_f;
-    ArraysOf0DInt[9] = 0;//bool notUsed
+//    ArraysOf0DInt[0] = 0;//bool isBandLoaded;
+//    ArraysOf0DInt[1] = 0;//int nKPoint;
+//    ArraysOf0DInt[2] = 0;//int maxneig;
+//    ArraysOf0DInt[3] = 0;//int mspin;
+//    ArraysOf0DInt[4] = 0;//int DFTnBandMin;
+//    ArraysOf0DInt[5] = 0;//int DFTnBandMax;
+//    ArraysOf0DInt[6] = 0;//bool isSelectMode;
+//    ArraysOf0DInt[7] = 0;//bool isTBBand_i;
+//    ArraysOf0DInt[8] = 0;//bool isTBBand_f;
+//    ArraysOf0DInt[9] = 0;//bool notUsed
     
     /////////////////////////////2D Int///////////////////////////////////////////////////////
-    ArraysOf2DInt[0] = Aint1D();//int** HamiltonianDimMap;
-    ArraysOf2DInt[1] = Aint1D();//int** SKListInfo;
-    ArraysOf2DInt[2] = Aint1D();//int** FitPoints;
+//    ArraysOf2DInt[0] = Aint1D();//int** HamiltonianDimMap;
+//    ArraysOf2DInt[1] = Aint1D();//int** SKListInfo;
+//    ArraysOf2DInt[2] = Aint1D();//int** FitPoints;
     
     /////////////////////////////0D Double///////////////////////////////////////////////////////
-    ArraysOf0DDouble[0] = 0.0;//double ChemP;
-    ArraysOf0DDouble[1] = 0.0;//double DFTyMin2d0;
-    ArraysOf0DDouble[2] = 0.0;//double DFTyMax2d0;
-    ArraysOf0DDouble[3] = 0.0;//double DFTyMin2d;
-    ArraysOf0DDouble[4] = 0.0;//double DFTyMax2d;
-    ArraysOf0DDouble[5] = 0.0;//double DFTxMin2d0;
-    ArraysOf0DDouble[6] = 0.0;//double DFTxMax2d0;
-    ArraysOf0DDouble[7] = 0.0;//double DFTxMin2d;
-    ArraysOf0DDouble[8] = 0.0;//double DFTxMax2d;
+//    ArraysOf0DDouble[0] = 0.0;//double ChemP;
+//    ArraysOf0DDouble[1] = 0.0;//double DFTyMin2d0;
+//    ArraysOf0DDouble[2] = 0.0;//double DFTyMax2d0;
+//    ArraysOf0DDouble[3] = 0.0;//double DFTyMin2d;
+//    ArraysOf0DDouble[4] = 0.0;//double DFTyMax2d;
+//    ArraysOf0DDouble[5] = 0.0;//double DFTxMin2d0;
+//    ArraysOf0DDouble[6] = 0.0;//double DFTxMax2d0;
+//    ArraysOf0DDouble[7] = 0.0;//double DFTxMin2d;
+//    ArraysOf0DDouble[8] = 0.0;//double DFTxMax2d;
     
     /////////////////////////////1D Double///////////////////////////////////////////////////////
-    ArraysOf1DDouble[0] = Adouble0D();//double* dkLabel;
-    ArraysOf1DDouble[1] = Adouble0D();//double akDFT[3];
-    ArraysOf1DDouble[2] = Adouble0D();//double bkDFT[3];
-    ArraysOf1DDouble[3] = Adouble0D();//double ckDFT[3];
+//    ArraysOf1DDouble[0] = Adouble0D();//double* dkLabel;
+//    ArraysOf1DDouble[1] = Adouble0D();//double akDFT[3];
+//    ArraysOf1DDouble[2] = Adouble0D();//double bkDFT[3];
+//    ArraysOf1DDouble[3] = Adouble0D();//double ckDFT[3];
     
     /////////////////////////////1D String///////////////////////////////////////////////////////
-    ArraysOf1DString[0] = Astring0D();//wxString* kLabel;
-    ArraysOf1DString[1] = Astring0D();//wxString* HamiltonianMap;
-    ArraysOf1DString[2] = Astring0D();//wxString* HamiltonianShellMap;
+//    ArraysOf1DString[0] = Astring0D();//wxString* kLabel;
+//    ArraysOf1DString[1] = Astring0D();//wxString* HamiltonianMap;
+//    ArraysOf1DString[2] = Astring0D();//wxString* HamiltonianShellMap;
     
     /////////////////////////////2D Double///////////////////////////////////////////////////////
-    ArraysOf2DDouble[0] = Adouble1D();//double** KPoints; [ka,kb,kc,kx,ky,kz,d_path]
-    ArraysOf2DDouble[1] = Adouble1D();//double** DFTEigVal;
-    ArraysOf2DDouble[2] = Adouble1D();//double** iTBEigVal;
-    ArraysOf2DDouble[3] = Adouble1D();//double** fTBEigVal;
-    ArraysOf2DDouble[4] = Adouble1D();//double** DFTEigValWeight;
+//    ArraysOf2DDouble[0] = Adouble1D();//double** KPoints; [ka,kb,kc,kx,ky,kz,d_path]
+//    ArraysOf2DDouble[1] = Adouble1D();//double** DFTEigVal;
+//    ArraysOf2DDouble[2] = Adouble1D();//double** iTBEigVal;
+//    ArraysOf2DDouble[3] = Adouble1D();//double** fTBEigVal;
+//    ArraysOf2DDouble[4] = Adouble1D();//double** DFTEigValWeight;
     
     /////////////////////////////3D Double///////////////////////////////////////////////////////
-    ArraysOf3DDouble[0] = Adouble2D();//double*** Hi; Vi_{0,0,0}, Vi_{1,0,0}, Vi_{0,1,0}, Vi_{1,1,0}, Vi_{1,-1,0}
-    ArraysOf3DDouble[1] = Adouble2D();//double*** Hf; Vf_{0,0,0}, Vf_{1,0,0}, Vf_{0,1,0}, Vf_{1,1,0}, Vf_{1,-1,0}
-    ArraysOf3DDouble[2] = Adouble2D();//double*** Si; Si_{0,0,0}, Si_{1,0,0}, Si_{0,1,0}, Si_{1,1,0}, Si_{1,-1,0}
-    ArraysOf3DDouble[3] = Adouble2D();//double*** Sf; Sf_{0,0,0}, Sf_{1,0,0}, Sf_{0,1,0}, Sf_{1,1,0}, Sf_{1,-1,0}
-    ArraysOf3DDouble[4] = Adouble2D();//double*** SOCi; SOCi_Re, SOCi_Im
-    ArraysOf3DDouble[5] = Adouble2D();//double*** SOCf; SOCf_Re, SOCf_Im
+//    ArraysOf3DDouble[0] = Adouble2D();//double*** Hi; Vi_{0,0,0}, Vi_{1,0,0}, Vi_{0,1,0}, Vi_{1,1,0}, Vi_{1,-1,0}
+//    ArraysOf3DDouble[1] = Adouble2D();//double*** Hf; Vf_{0,0,0}, Vf_{1,0,0}, Vf_{0,1,0}, Vf_{1,1,0}, Vf_{1,-1,0}
+//    ArraysOf3DDouble[2] = Adouble2D();//double*** Si; Si_{0,0,0}, Si_{1,0,0}, Si_{0,1,0}, Si_{1,1,0}, Si_{1,-1,0}
+//    ArraysOf3DDouble[3] = Adouble2D();//double*** Sf; Sf_{0,0,0}, Sf_{1,0,0}, Sf_{0,1,0}, Sf_{1,1,0}, Sf_{1,-1,0}
+//    ArraysOf3DDouble[4] = Adouble2D();//double*** SOCi; SOCi_Re, SOCi_Im
+//    ArraysOf3DDouble[5] = Adouble2D();//double*** SOCf; SOCf_Re, SOCf_Im
+
+    isBandLoaded = false;
+    nKPoint = 0;
+    maxneig = 0;
+    mspin = 0;
+    DFTnBandMin = 0;
+    DFTnBandMax = 0;
+    isSelectMode = false;
+    isTBBand_i = false;
+    isTBBand_f = false;
+    notUsed = false;
+    
+    HamiltonianDimMap = Aint1D();
+    SKListInfo = Aint1D();
+    FitPoints = Aint1D();
+    
+    ChemP = 0.0;
+    DFTyMin2d0 = 0.0;
+    DFTyMax2d0 = 0.0;
+    DFTyMin2d = 0.0;
+    DFTyMax2d = 0.0;
+    DFTxMin2d0 = 0.0;
+    DFTxMax2d0 = 0.0;
+    DFTxMin2d = 0.0;
+    DFTxMax2d = 0.0;
+    
+    dkLabel = Adouble0D();
+    akDFT = Adouble0D();
+    bkDFT = Adouble0D();
+    ckDFT = Adouble0D();
+    
+    KPoints = Adouble1D();
+    DFTEigVal = Adouble1D();
+    iTBEigVal = Adouble1D();
+    fTBEigVal = Adouble1D();
+    DFTEigValWeight = Adouble1D();
+    
+    Hi = Adouble2D();
+    Hf = Adouble2D();
+    Si = Adouble2D();
+    Sf = Adouble2D();
+    SOCi = Adouble2D();
+    SOCf = Adouble2D();
+    
+    kLabel = Astring0D();
+    HamiltonianMap = Astring0D();
+    HamiltonianShellMap = Astring0D();
 }
 
 Sec30::~Sec30()
@@ -829,6 +874,23 @@ void Sec30::SaveToFile(wxString filepath, wxString filename)
     
     if (out.is_open())
     {
+        ///////////////////////////////////////////////////////////////
+        // write the headear
+        
+        // write HeaderNumber
+        int headerNumber = HeaderNumber;
+        out.write((char *) &headerNumber, sizeof headerNumber);
+        
+        // write ApplicationFullName
+        size_t lenStr = ApplicationFullName.size();
+        out.write((char *)&lenStr, sizeof lenStr);
+        out.write(ApplicationFullName.c_str(), lenStr);
+
+        // write ReleaseVersion
+        double ver = ReleaseVersion;
+        out.write((char *)&ver, sizeof ver);
+        ///////////////////////////////////////////////////////////////
+
         int n = 0;
         std::list<wxString>::iterator is;
         wxString VariableName;
@@ -1105,211 +1167,344 @@ void Sec30::SaveToFile(wxString filepath, wxString filename)
             out.write((char *) &a, sizeof a);
         }
         ///////////////////////////////////////////////////////////////
-        n = ArraysOf0DInt.size();
+
+        out.write((char *) &isBandLoaded, sizeof isBandLoaded);
+        out.write((char *) &nKPoint, sizeof nKPoint);
+        out.write((char *) &maxneig, sizeof maxneig);
+        out.write((char *) &mspin, sizeof mspin);
+        out.write((char *) &DFTnBandMin, sizeof DFTnBandMin);
+        out.write((char *) &DFTnBandMax, sizeof DFTnBandMax);
+        out.write((char *) &isSelectMode, sizeof isSelectMode);
+        out.write((char *) &isTBBand_i, sizeof isTBBand_i);
+        out.write((char *) &isTBBand_f, sizeof isTBBand_f);
+        out.write((char *) &notUsed, sizeof notUsed);
+        
+        out.write((char *) &ChemP, sizeof ChemP);
+        out.write((char *) &DFTyMin2d0, sizeof DFTyMin2d0);
+        out.write((char *) &DFTyMax2d0, sizeof DFTyMax2d0);
+        out.write((char *) &DFTyMin2d, sizeof DFTyMin2d);
+        out.write((char *) &DFTyMax2d, sizeof DFTyMax2d);
+        out.write((char *) &DFTxMin2d0, sizeof DFTxMin2d0);
+        out.write((char *) &DFTxMax2d0, sizeof DFTxMax2d0);
+        out.write((char *) &DFTxMin2d, sizeof DFTxMin2d);
+        out.write((char *) &DFTxMax2d, sizeof DFTxMax2d);
+
+        // write HamiltonianDimMap
+        n = HamiltonianDimMap.size();
         out.write((char *) &n, sizeof n);
         
         for(int i1=0; i1!=n; i1++)
         {
-            int intvar = ArraysOf0DInt[i1];
-            out.write((char *) &intvar, sizeof intvar);
-        }
-        
-        n = ArraysOf1DInt.size();
-        out.write((char *) &n, sizeof n);
-        
-        for(int i1=0; i1!=n; i1++)
-        {
-            int n2 = ArraysOf1DInt[i1].size();
+            int n2 = HamiltonianDimMap[i1].size();
             out.write((char *) &n2, sizeof n2);
             for(int i2=0; i2!=n2; i2++)
             {
-                int intvar = ArraysOf1DInt[i1][i2];
+                int intvar = HamiltonianDimMap[i1][i2];
                 out.write((char *) &intvar, sizeof intvar);
             }
         }
         
-        n = ArraysOf2DInt.size();
+        // write SKListInfo
+        n = SKListInfo.size();
         out.write((char *) &n, sizeof n);
         
         for(int i1=0; i1!=n; i1++)
         {
-            int n2 = ArraysOf2DInt[i1].size();
+            int n2 = SKListInfo[i1].size();
             out.write((char *) &n2, sizeof n2);
             for(int i2=0; i2!=n2; i2++)
             {
-                int n3 = ArraysOf2DInt[i1][i2].size();
-                out.write((char *) &n3, sizeof n3);
-                for(int i3=0; i3!=n3; i3++)
-                {
-                    int intvar = ArraysOf2DInt[i1][i2][i3];
-                    out.write((char *) &intvar, sizeof intvar);
-                }
+                int intvar = SKListInfo[i1][i2];
+                out.write((char *) &intvar, sizeof intvar);
             }
         }
         
-        n = ArraysOf3DInt.size();
+        // write FitPoints
+        n = FitPoints.size();
         out.write((char *) &n, sizeof n);
         
         for(int i1=0; i1!=n; i1++)
         {
-            int n2 = ArraysOf3DInt[i1].size();
+            int n2 = FitPoints[i1].size();
             out.write((char *) &n2, sizeof n2);
             for(int i2=0; i2!=n2; i2++)
             {
-                int n3 = ArraysOf3DInt[i1][i2].size();
-                out.write((char *) &n3, sizeof n3);
-                for(int i3=0; i3!=n3; i3++)
-                {
-                    int n4 = ArraysOf3DInt[i1][i2][i3].size();
-                    out.write((char *) &n4, sizeof n4);
-                    for(int i4=0; i4!=n4; i4++)
-                    {
-                        int intvar = ArraysOf3DInt[i1][i2][i3][i4];
-                        out.write((char *) &intvar, sizeof intvar);
-                    }
-                }
+                int intvar = FitPoints[i1][i2];
+                out.write((char *) &intvar, sizeof intvar);
             }
         }
-        ///////////////////////////////////////////////////////////////
-        n = ArraysOf0DDouble.size();
+        
+        // write dkLabel
+        n = dkLabel.size();
         out.write((char *) &n, sizeof n);
         
         for(int i1=0; i1!=n; i1++)
         {
-            double dvar = ArraysOf0DDouble[i1];
+            double dvar = dkLabel[i1];
             out.write((char *) &dvar, sizeof dvar);
         }
         
-        n = ArraysOf1DDouble.size();
+        // write akDFT
+        n = akDFT.size();
         out.write((char *) &n, sizeof n);
         
         for(int i1=0; i1!=n; i1++)
         {
-            int n2 = ArraysOf1DDouble[i1].size();
+            double dvar = akDFT[i1];
+            out.write((char *) &dvar, sizeof dvar);
+        }
+        
+        // write bkDFT
+        n = bkDFT.size();
+        out.write((char *) &n, sizeof n);
+        
+        for(int i1=0; i1!=n; i1++)
+        {
+            double dvar = bkDFT[i1];
+            out.write((char *) &dvar, sizeof dvar);
+        }
+        
+        // write ckDFT
+        n = ckDFT.size();
+        out.write((char *) &n, sizeof n);
+        
+        for(int i1=0; i1!=n; i1++)
+        {
+            double dvar = ckDFT[i1];
+            out.write((char *) &dvar, sizeof dvar);
+        }
+        
+        // write KPoints
+        n = KPoints.size();
+        out.write((char *) &n, sizeof n);
+        
+        for(int i1=0; i1!=n; i1++)
+        {
+            int n2 = KPoints[i1].size();
             out.write((char *) &n2, sizeof n2);
             for(int i2=0; i2!=n2; i2++)
             {
-                double dvar = ArraysOf1DDouble[i1][i2];
+                double dvar = KPoints[i1][i2];
                 out.write((char *) &dvar, sizeof dvar);
             }
         }
         
-        n = ArraysOf2DDouble.size();
+        // write DFTEigVal
+        n = DFTEigVal.size();
         out.write((char *) &n, sizeof n);
         
         for(int i1=0; i1!=n; i1++)
         {
-            int n2 = ArraysOf2DDouble[i1].size();
+            int n2 = DFTEigVal[i1].size();
             out.write((char *) &n2, sizeof n2);
             for(int i2=0; i2!=n2; i2++)
             {
-                int n3 = ArraysOf2DDouble[i1][i2].size();
+                double dvar = DFTEigVal[i1][i2];
+                out.write((char *) &dvar, sizeof dvar);
+            }
+        }
+        
+        // write iTBEigVal
+        n = iTBEigVal.size();
+        out.write((char *) &n, sizeof n);
+        
+        for(int i1=0; i1!=n; i1++)
+        {
+            int n2 = iTBEigVal[i1].size();
+            out.write((char *) &n2, sizeof n2);
+            for(int i2=0; i2!=n2; i2++)
+            {
+                double dvar = iTBEigVal[i1][i2];
+                out.write((char *) &dvar, sizeof dvar);
+            }
+        }
+        
+        // write fTBEigVal
+        n = fTBEigVal.size();
+        out.write((char *) &n, sizeof n);
+        
+        for(int i1=0; i1!=n; i1++)
+        {
+            int n2 = fTBEigVal[i1].size();
+            out.write((char *) &n2, sizeof n2);
+            for(int i2=0; i2!=n2; i2++)
+            {
+                double dvar = fTBEigVal[i1][i2];
+                out.write((char *) &dvar, sizeof dvar);
+            }
+        }
+        
+        // write DFTEigValWeight
+        n = DFTEigValWeight.size();
+        out.write((char *) &n, sizeof n);
+        
+        for(int i1=0; i1!=n; i1++)
+        {
+            int n2 = DFTEigValWeight[i1].size();
+            out.write((char *) &n2, sizeof n2);
+            for(int i2=0; i2!=n2; i2++)
+            {
+                double dvar = DFTEigValWeight[i1][i2];
+                out.write((char *) &dvar, sizeof dvar);
+            }
+        }
+        
+        // write Hi
+        n = Hi.size();
+        out.write((char *) &n, sizeof n);
+        
+        for(int i1=0; i1!=n; i1++)
+        {
+            int n2 = Hi[i1].size();
+            out.write((char *) &n2, sizeof n2);
+            for(int i2=0; i2!=n2; i2++)
+            {
+                int n3 = Hi[i1][i2].size();
                 out.write((char *) &n3, sizeof n3);
                 for(int i3=0; i3!=n3; i3++)
                 {
-                    double dvar = ArraysOf2DDouble[i1][i2][i3];
+                    double dvar = Hi[i1][i2][i3];
                     out.write((char *) &dvar, sizeof dvar);
                 }
             }
         }
         
-        n = ArraysOf3DDouble.size();
+        // write Hf
+        n = Hf.size();
         out.write((char *) &n, sizeof n);
         
         for(int i1=0; i1!=n; i1++)
         {
-            int n2 = ArraysOf3DDouble[i1].size();
+            int n2 = Hf[i1].size();
             out.write((char *) &n2, sizeof n2);
             for(int i2=0; i2!=n2; i2++)
             {
-                int n3 = ArraysOf3DDouble[i1][i2].size();
+                int n3 = Hf[i1][i2].size();
                 out.write((char *) &n3, sizeof n3);
                 for(int i3=0; i3!=n3; i3++)
                 {
-                    int n4 = ArraysOf3DDouble[i1][i2][i3].size();
-                    out.write((char *) &n4, sizeof n4);
-                    for(int i4=0; i4!=n4; i4++)
-                    {
-                        double dvar = ArraysOf3DDouble[i1][i2][i3][i4];
-                        out.write((char *) &dvar, sizeof dvar);
-                    }
+                    double dvar = Hf[i1][i2][i3];
+                    out.write((char *) &dvar, sizeof dvar);
                 }
             }
         }
-        ///////////////////////////////////////////////////////////////
-        n = ArraysOf0DString.size();
+        
+        // write Si
+        n = Si.size();
         out.write((char *) &n, sizeof n);
         
         for(int i1=0; i1!=n; i1++)
         {
-            wxString var = ArraysOf0DString[i1];
+            int n2 = Si[i1].size();
+            out.write((char *) &n2, sizeof n2);
+            for(int i2=0; i2!=n2; i2++)
+            {
+                int n3 = Si[i1][i2].size();
+                out.write((char *) &n3, sizeof n3);
+                for(int i3=0; i3!=n3; i3++)
+                {
+                    double dvar = Si[i1][i2][i3];
+                    out.write((char *) &dvar, sizeof dvar);
+                }
+            }
+        }
+        
+        // write Sf
+        n = Sf.size();
+        out.write((char *) &n, sizeof n);
+        
+        for(int i1=0; i1!=n; i1++)
+        {
+            int n2 = Sf[i1].size();
+            out.write((char *) &n2, sizeof n2);
+            for(int i2=0; i2!=n2; i2++)
+            {
+                int n3 = Sf[i1][i2].size();
+                out.write((char *) &n3, sizeof n3);
+                for(int i3=0; i3!=n3; i3++)
+                {
+                    double dvar = Sf[i1][i2][i3];
+                    out.write((char *) &dvar, sizeof dvar);
+                }
+            }
+        }
+        
+        // write SOCi
+        n = SOCi.size();
+        out.write((char *) &n, sizeof n);
+        
+        for(int i1=0; i1!=n; i1++)
+        {
+            int n2 = SOCi[i1].size();
+            out.write((char *) &n2, sizeof n2);
+            for(int i2=0; i2!=n2; i2++)
+            {
+                int n3 = SOCi[i1][i2].size();
+                out.write((char *) &n3, sizeof n3);
+                for(int i3=0; i3!=n3; i3++)
+                {
+                    double dvar = SOCi[i1][i2][i3];
+                    out.write((char *) &dvar, sizeof dvar);
+                }
+            }
+        }
+        
+        // write SOCf
+        n = SOCf.size();
+        out.write((char *) &n, sizeof n);
+        
+        for(int i1=0; i1!=n; i1++)
+        {
+            int n2 = SOCf[i1].size();
+            out.write((char *) &n2, sizeof n2);
+            for(int i2=0; i2!=n2; i2++)
+            {
+                int n3 = SOCf[i1][i2].size();
+                out.write((char *) &n3, sizeof n3);
+                for(int i3=0; i3!=n3; i3++)
+                {
+                    double dvar = SOCf[i1][i2][i3];
+                    out.write((char *) &dvar, sizeof dvar);
+                }
+            }
+        }
+        
+        // write kLabel
+        n = kLabel.size();
+        out.write((char *) &n, sizeof n);
+        
+        for(int i1=0; i1!=n; i1++)
+        {
+            wxString var = kLabel[i1];
             size_t len = var.size();
             out.write((char *)&len, sizeof len);
             out.write(var.c_str(), len);
         }
         
-        n = ArraysOf1DString.size();
+        // write HamiltonianMap
+        n = HamiltonianMap.size();
         out.write((char *) &n, sizeof n);
         
         for(int i1=0; i1!=n; i1++)
         {
-            int n2 = ArraysOf1DString[i1].size();
-            out.write((char *) &n2, sizeof n2);
-            for(int i2=0; i2!=n2; i2++)
-            {
-                wxString var = ArraysOf1DString[i1][i2];
-                size_t len = var.size();
-                out.write((char *)&len, sizeof len);
-                out.write(var.c_str(), len);
-            }
+            wxString var = HamiltonianMap[i1];
+            size_t len = var.size();
+            out.write((char *)&len, sizeof len);
+            out.write(var.c_str(), len);
         }
         
-        n = ArraysOf2DString.size();
+        // write HamiltonianShellMap
+        n = HamiltonianShellMap.size();
         out.write((char *) &n, sizeof n);
         
         for(int i1=0; i1!=n; i1++)
         {
-            int n2 = ArraysOf2DString[i1].size();
-            out.write((char *) &n2, sizeof n2);
-            for(int i2=0; i2!=n2; i2++)
-            {
-                int n3 = ArraysOf2DString[i1][i2].size();
-                out.write((char *) &n3, sizeof n3);
-                for(int i3=0; i3!=n3; i3++)
-                {
-                    wxString var = ArraysOf2DString[i1][i2][i3];
-                    size_t len = var.size();
-                    out.write((char *)&len, sizeof len);
-                    out.write(var.c_str(), len);
-                }
-            }
+            wxString var = HamiltonianShellMap[i1];
+            size_t len = var.size();
+            out.write((char *)&len, sizeof len);
+            out.write(var.c_str(), len);
         }
         
-        n = ArraysOf3DString.size();
-        out.write((char *) &n, sizeof n);
-        
-        for(int i1=0; i1!=n; i1++)
-        {
-            int n2 = ArraysOf3DString[i1].size();
-            out.write((char *) &n2, sizeof n2);
-            for(int i2=0; i2!=n2; i2++)
-            {
-                int n3 = ArraysOf3DString[i1][i2].size();
-                out.write((char *) &n3, sizeof n3);
-                for(int i3=0; i3!=n3; i3++)
-                {
-                    int n4 = ArraysOf3DString[i1][i2][i3].size();
-                    out.write((char *) &n4, sizeof n4);
-                    for(int i4=0; i4!=n4; i4++)
-                    {
-                        wxString var = ArraysOf2DString[i1][i2][i3][i4];
-                        size_t len = var.size();
-                        out.write((char *)&len, sizeof len);
-                        out.write(var.c_str(), len);
-                    }
-                }
-            }
-        }
         ///////////////////////////////////////////////////////////////
         
         out.close();
@@ -1324,9 +1519,48 @@ void Sec30::LoadFromFile(wxString filepath, wxString filename)
     
     if (infile.is_open())
     {
-        int n = 0;
         ///////////////////////////////////////////////////////////////
-        infile.read(reinterpret_cast<char *>(&n), sizeof n);
+        // read the headear
+        bool withHeader = false;
+        // read HeaderNumber
+        int headerNumber;
+        infile.read(reinterpret_cast<char *>(&headerNumber), sizeof headerNumber);
+        if (headerNumber == HeaderNumber) {
+            withHeader = true;
+        }
+        
+        wxString applicationFullName;
+        double fileVersion;
+        if (withHeader) {
+            
+            // read ApplicationFullName
+            size_t ns1=0;
+            infile.read(reinterpret_cast<char *>(&ns1), sizeof ns1);
+            char* VariableNameBuf = new char[ns1];
+            for (int i = 0; i < ns1; i++)
+            {
+                char ch;
+                infile.read(&ch, sizeof ch);
+                VariableNameBuf[i] = ch;
+            }
+            wxString applicationFullName = wxString(VariableNameBuf,ns1);
+            
+            if (applicationFullName != ApplicationFullName) {
+                return;
+            }
+            
+            // read ReleaseVersion
+            infile.read(reinterpret_cast<char *>(&fileVersion), sizeof fileVersion);
+            ///////////////////////////////////////////////////////////////   
+        }
+        
+        ///////////////////////////////////////////////////////////////
+        int n = 0;
+        if (withHeader) {
+            infile.read(reinterpret_cast<char *>(&n), sizeof n);
+        } else {
+            n = headerNumber;
+        }
         
         for(int it=0; it != n; it++)
         {
@@ -1747,158 +1981,232 @@ void Sec30::LoadFromFile(wxString filepath, wxString filename)
             ctr->SetColour(c);
         }
         ///////////////////////////////////////////////////////////////
-        infile.read(reinterpret_cast<char *>(&n), sizeof n);
-        ArraysOf0DInt.clear();
         
-        for(int i1=0; i1!=n; i1++)
-        {
-            int intvar;
-            infile.read(reinterpret_cast<char *>(&intvar), sizeof intvar);
-            ArraysOf0DInt.push_back(intvar);
-        }
-        
-        infile.read(reinterpret_cast<char *>(&n), sizeof n);
-        ArraysOf1DInt.clear();
-        
-        for(int i1=0; i1!=n; i1++)
-        {
-            int n2;
-            infile.read(reinterpret_cast<char *>(&n2), sizeof n2);
-            Aint0D aint0D;
-            for(int i2=0; i2!=n2; i2++)
+        if (withHeader) {
+            infile.read(reinterpret_cast<char *>(&isBandLoaded), sizeof isBandLoaded);
+            infile.read(reinterpret_cast<char *>(&nKPoint), sizeof nKPoint);
+            infile.read(reinterpret_cast<char *>(&maxneig), sizeof maxneig);
+            infile.read(reinterpret_cast<char *>(&mspin), sizeof mspin);
+            infile.read(reinterpret_cast<char *>(&DFTnBandMin), sizeof DFTnBandMin);
+            infile.read(reinterpret_cast<char *>(&DFTnBandMax), sizeof DFTnBandMax);
+            infile.read(reinterpret_cast<char *>(&isSelectMode), sizeof isSelectMode);
+            infile.read(reinterpret_cast<char *>(&isTBBand_i), sizeof isTBBand_i);
+            infile.read(reinterpret_cast<char *>(&isTBBand_f), sizeof isTBBand_f);
+            infile.read(reinterpret_cast<char *>(&notUsed), sizeof notUsed);
+            
+            infile.read(reinterpret_cast<char *>(&ChemP), sizeof ChemP);
+            infile.read(reinterpret_cast<char *>(&DFTyMin2d0), sizeof DFTyMin2d0);
+            infile.read(reinterpret_cast<char *>(&DFTyMax2d0), sizeof DFTyMax2d0);
+            infile.read(reinterpret_cast<char *>(&DFTyMin2d), sizeof DFTyMin2d);
+            infile.read(reinterpret_cast<char *>(&DFTyMax2d), sizeof DFTyMax2d);
+            infile.read(reinterpret_cast<char *>(&DFTxMin2d0), sizeof DFTxMin2d0);
+            infile.read(reinterpret_cast<char *>(&DFTxMax2d0), sizeof DFTxMax2d0);
+            infile.read(reinterpret_cast<char *>(&DFTxMin2d), sizeof DFTxMin2d);
+            infile.read(reinterpret_cast<char *>(&DFTxMax2d), sizeof DFTxMax2d);
+            
+            // read HamiltonianDimMap
+            infile.read(reinterpret_cast<char *>(&n), sizeof n);
+            HamiltonianDimMap.clear();
+            
+            for(int i1=0; i1!=n; i1++)
             {
-                int intvar;
-                infile.read(reinterpret_cast<char *>(&intvar), sizeof intvar);
-                aint0D.push_back(intvar);
-            }
-            ArraysOf1DInt.push_back(aint0D);
-        }
-        
-        infile.read(reinterpret_cast<char *>(&n), sizeof n);
-        ArraysOf2DInt.clear();
-        
-        for(int i1=0; i1!=n; i1++)
-        {
-            int n2;
-            infile.read(reinterpret_cast<char *>(&n2), sizeof n2);
-            Aint1D aint1D;
-            for(int i2=0; i2!=n2; i2++)
-            {
-                int n3;
-                infile.read(reinterpret_cast<char *>(&n3), sizeof n3);
+                int n2;
+                infile.read(reinterpret_cast<char *>(&n2), sizeof n2);
                 Aint0D aint0D;
-                for(int i3=0; i3!=n3; i3++)
+                for(int i2=0; i2!=n2; i2++)
                 {
                     int intvar;
                     infile.read(reinterpret_cast<char *>(&intvar), sizeof intvar);
                     aint0D.push_back(intvar);
                 }
-                aint1D.push_back(aint0D);
+                HamiltonianDimMap.push_back(aint0D);
             }
-            ArraysOf2DInt.push_back(aint1D);
-        }
-        
-        infile.read(reinterpret_cast<char *>(&n), sizeof n);
-        ArraysOf3DInt.clear();
-        
-        for(int i1=0; i1!=n; i1++)
-        {
-            int n2;
-            infile.read(reinterpret_cast<char *>(&n2), sizeof n2);
-            Aint2D aint2D;
-            for(int i2=0; i2!=n2; i2++)
+            
+            // read SKListInfo
+            infile.read(reinterpret_cast<char *>(&n), sizeof n);
+            SKListInfo.clear();
+            
+            for(int i1=0; i1!=n; i1++)
             {
-                int n3;
-                infile.read(reinterpret_cast<char *>(&n3), sizeof n3);
-                Aint1D aint1D;
-                for(int i3=0; i3!=n3; i3++)
+                int n2;
+                infile.read(reinterpret_cast<char *>(&n2), sizeof n2);
+                Aint0D aint0D;
+                for(int i2=0; i2!=n2; i2++)
                 {
-                    int n4;
-                    infile.read(reinterpret_cast<char *>(&n4), sizeof n4);
-                    Aint0D aint0D;
-                    for(int i4=0; i4!=n4; i4++)
-                    {
-                        int intvar;
-                        infile.read(reinterpret_cast<char *>(&intvar), sizeof intvar);
-                        aint0D.push_back(intvar);
-                    }
-                    aint1D.push_back(aint0D);
+                    int intvar;
+                    infile.read(reinterpret_cast<char *>(&intvar), sizeof intvar);
+                    aint0D.push_back(intvar);
                 }
-                aint2D.push_back(aint1D);
+                SKListInfo.push_back(aint0D);
             }
-            ArraysOf3DInt.push_back(aint2D);
-        }
-        ///////////////////////////////////////////////////////////////
-        infile.read(reinterpret_cast<char *>(&n), sizeof n);
-        ArraysOf0DDouble.clear();
-        
-        for(int i1=0; i1!=n; i1++)
-        {
-            double dvar;
-            infile.read(reinterpret_cast<char *>(&dvar), sizeof dvar);
-            ArraysOf0DDouble.push_back(dvar);
-        }
-        
-        infile.read(reinterpret_cast<char *>(&n), sizeof n);
-        ArraysOf1DDouble.clear();
-        
-        for(int i1=0; i1!=n; i1++)
-        {
-            int n2;
-            infile.read(reinterpret_cast<char *>(&n2), sizeof n2);
-            Adouble0D adouble0D;
-            for(int i2=0; i2!=n2; i2++)
+            
+            // read FitPoints
+            infile.read(reinterpret_cast<char *>(&n), sizeof n);
+            FitPoints.clear();
+            
+            for(int i1=0; i1!=n; i1++)
+            {
+                int n2;
+                infile.read(reinterpret_cast<char *>(&n2), sizeof n2);
+                Aint0D aint0D;
+                for(int i2=0; i2!=n2; i2++)
+                {
+                    int intvar;
+                    infile.read(reinterpret_cast<char *>(&intvar), sizeof intvar);
+                    aint0D.push_back(intvar);
+                }
+                FitPoints.push_back(aint0D);
+            }
+            
+            // read dkLabel
+            infile.read(reinterpret_cast<char *>(&n), sizeof n);
+            dkLabel.clear();
+            
+            for(int i1=0; i1!=n; i1++)
             {
                 double dvar;
                 infile.read(reinterpret_cast<char *>(&dvar), sizeof dvar);
-                adouble0D.push_back(dvar);
+                dkLabel.push_back(dvar);
             }
-            ArraysOf1DDouble.push_back(adouble0D);
-        }
-        
-        infile.read(reinterpret_cast<char *>(&n), sizeof n);
-        ArraysOf2DDouble.clear();
-        
-        for(int i1=0; i1!=n; i1++)
-        {
-            int n2;
-            infile.read(reinterpret_cast<char *>(&n2), sizeof n2);
-            Adouble1D adouble1D;
-            for(int i2=0; i2!=n2; i2++)
+            
+            // read akDFT
+            infile.read(reinterpret_cast<char *>(&n), sizeof n);
+            akDFT.clear();
+            
+            for(int i1=0; i1!=n; i1++)
             {
-                int n3;
-                infile.read(reinterpret_cast<char *>(&n3), sizeof n3);
+                double dvar;
+                infile.read(reinterpret_cast<char *>(&dvar), sizeof dvar);
+                akDFT.push_back(dvar);
+            }
+            
+            // read bkDFT
+            infile.read(reinterpret_cast<char *>(&n), sizeof n);
+            bkDFT.clear();
+            
+            for(int i1=0; i1!=n; i1++)
+            {
+                double dvar;
+                infile.read(reinterpret_cast<char *>(&dvar), sizeof dvar);
+                bkDFT.push_back(dvar);
+            }
+            
+            // read ckDFT
+            infile.read(reinterpret_cast<char *>(&n), sizeof n);
+            ckDFT.clear();
+            
+            for(int i1=0; i1!=n; i1++)
+            {
+                double dvar;
+                infile.read(reinterpret_cast<char *>(&dvar), sizeof dvar);
+                ckDFT.push_back(dvar);
+            }
+            
+            // read KPoints
+            infile.read(reinterpret_cast<char *>(&n), sizeof n);
+            KPoints.clear();
+            
+            for(int i1=0; i1!=n; i1++)
+            {
+                int n2;
+                infile.read(reinterpret_cast<char *>(&n2), sizeof n2);
                 Adouble0D adouble0D;
-                for(int i3=0; i3!=n3; i3++)
+                for(int i2=0; i2!=n2; i2++)
                 {
                     double dvar;
                     infile.read(reinterpret_cast<char *>(&dvar), sizeof dvar);
                     adouble0D.push_back(dvar);
                 }
-                adouble1D.push_back(adouble0D);
+                KPoints.push_back(adouble0D);
             }
-            ArraysOf2DDouble.push_back(adouble1D);
-        }
-        
-        infile.read(reinterpret_cast<char *>(&n), sizeof n);
-        ArraysOf3DDouble.clear();
-        
-        for(int i1=0; i1!=n; i1++)
-        {
-            int n2;
-            infile.read(reinterpret_cast<char *>(&n2), sizeof n2);
-            Adouble2D adouble2D;
-            for(int i2=0; i2!=n2; i2++)
+            
+            // read DFTEigVal
+            infile.read(reinterpret_cast<char *>(&n), sizeof n);
+            DFTEigVal.clear();
+            
+            for(int i1=0; i1!=n; i1++)
             {
-                int n3;
-                infile.read(reinterpret_cast<char *>(&n3), sizeof n3);
-                Adouble1D adouble1D;
-                for(int i3=0; i3!=n3; i3++)
+                int n2;
+                infile.read(reinterpret_cast<char *>(&n2), sizeof n2);
+                Adouble0D adouble0D;
+                for(int i2=0; i2!=n2; i2++)
                 {
-                    int n4;
-                    infile.read(reinterpret_cast<char *>(&n4), sizeof n4);
+                    double dvar;
+                    infile.read(reinterpret_cast<char *>(&dvar), sizeof dvar);
+                    adouble0D.push_back(dvar);
+                }
+                DFTEigVal.push_back(adouble0D);
+            }
+            
+            // read iTBEigVal
+            infile.read(reinterpret_cast<char *>(&n), sizeof n);
+            iTBEigVal.clear();
+            
+            for(int i1=0; i1!=n; i1++)
+            {
+                int n2;
+                infile.read(reinterpret_cast<char *>(&n2), sizeof n2);
+                Adouble0D adouble0D;
+                for(int i2=0; i2!=n2; i2++)
+                {
+                    double dvar;
+                    infile.read(reinterpret_cast<char *>(&dvar), sizeof dvar);
+                    adouble0D.push_back(dvar);
+                }
+                iTBEigVal.push_back(adouble0D);
+            }
+            
+            // read fTBEigVal
+            infile.read(reinterpret_cast<char *>(&n), sizeof n);
+            fTBEigVal.clear();
+            
+            for(int i1=0; i1!=n; i1++)
+            {
+                int n2;
+                infile.read(reinterpret_cast<char *>(&n2), sizeof n2);
+                Adouble0D adouble0D;
+                for(int i2=0; i2!=n2; i2++)
+                {
+                    double dvar;
+                    infile.read(reinterpret_cast<char *>(&dvar), sizeof dvar);
+                    adouble0D.push_back(dvar);
+                }
+                fTBEigVal.push_back(adouble0D);
+            }
+            
+            // read DFTEigValWeight
+            infile.read(reinterpret_cast<char *>(&n), sizeof n);
+            DFTEigValWeight.clear();
+            
+            for(int i1=0; i1!=n; i1++)
+            {
+                int n2;
+                infile.read(reinterpret_cast<char *>(&n2), sizeof n2);
+                Adouble0D adouble0D;
+                for(int i2=0; i2!=n2; i2++)
+                {
+                    double dvar;
+                    infile.read(reinterpret_cast<char *>(&dvar), sizeof dvar);
+                    adouble0D.push_back(dvar);
+                }
+                DFTEigValWeight.push_back(adouble0D);
+            }
+
+            // read Hi
+            infile.read(reinterpret_cast<char *>(&n), sizeof n);
+            Hi.clear();
+            
+            for(int i1=0; i1!=n; i1++)
+            {
+                int n2;
+                infile.read(reinterpret_cast<char *>(&n2), sizeof n2);
+                Adouble1D adouble1D;
+                for(int i2=0; i2!=n2; i2++)
+                {
+                    int n3;
+                    infile.read(reinterpret_cast<char *>(&n3), sizeof n3);
                     Adouble0D adouble0D;
-                    for(int i4=0; i4!=n4; i4++)
+                    for(int i3=0; i3!=n3; i3++)
                     {
                         double dvar;
                         infile.read(reinterpret_cast<char *>(&dvar), sizeof dvar);
@@ -1906,38 +2214,139 @@ void Sec30::LoadFromFile(wxString filepath, wxString filename)
                     }
                     adouble1D.push_back(adouble0D);
                 }
-                adouble2D.push_back(adouble1D);
+                Hi.push_back(adouble1D);
             }
-            ArraysOf3DDouble.push_back(adouble2D);
-        }
-        ///////////////////////////////////////////////////////////////
-        infile.read(reinterpret_cast<char *>(&n), sizeof n);
-        ArraysOf0DString.clear();
-        
-        for(int i1=0; i1!=n; i1++)
-        {
-            size_t ns1=0;
-            infile.read(reinterpret_cast<char *>(&ns1), sizeof ns1);
-            char* StrBuf = new char[ns1];
-            for (int i = 0; i < ns1; i++)
+            
+            // read Hf
+            infile.read(reinterpret_cast<char *>(&n), sizeof n);
+            Hf.clear();
+            
+            for(int i1=0; i1!=n; i1++)
             {
-                char ch;
-                infile.read(&ch, sizeof ch);
-                StrBuf[i] = ch;
+                int n2;
+                infile.read(reinterpret_cast<char *>(&n2), sizeof n2);
+                Adouble1D adouble1D;
+                for(int i2=0; i2!=n2; i2++)
+                {
+                    int n3;
+                    infile.read(reinterpret_cast<char *>(&n3), sizeof n3);
+                    Adouble0D adouble0D;
+                    for(int i3=0; i3!=n3; i3++)
+                    {
+                        double dvar;
+                        infile.read(reinterpret_cast<char *>(&dvar), sizeof dvar);
+                        adouble0D.push_back(dvar);
+                    }
+                    adouble1D.push_back(adouble0D);
+                }
+                Hf.push_back(adouble1D);
             }
-            wxString var = wxString(StrBuf,ns1);
-            ArraysOf0DString.push_back(var);
-        }
-        
-        infile.read(reinterpret_cast<char *>(&n), sizeof n);
-        ArraysOf1DString.clear();
-        
-        for(int i1=0; i1!=n; i1++)
-        {
-            int n2;
-            infile.read(reinterpret_cast<char *>(&n2), sizeof n2);
-            Astring0D astring0D;
-            for(int i2=0; i2!=n2; i2++)
+            
+            // read Si
+            infile.read(reinterpret_cast<char *>(&n), sizeof n);
+            Si.clear();
+            
+            for(int i1=0; i1!=n; i1++)
+            {
+                int n2;
+                infile.read(reinterpret_cast<char *>(&n2), sizeof n2);
+                Adouble1D adouble1D;
+                for(int i2=0; i2!=n2; i2++)
+                {
+                    int n3;
+                    infile.read(reinterpret_cast<char *>(&n3), sizeof n3);
+                    Adouble0D adouble0D;
+                    for(int i3=0; i3!=n3; i3++)
+                    {
+                        double dvar;
+                        infile.read(reinterpret_cast<char *>(&dvar), sizeof dvar);
+                        adouble0D.push_back(dvar);
+                    }
+                    adouble1D.push_back(adouble0D);
+                }
+                Si.push_back(adouble1D);
+            }
+            
+            // read Sf
+            infile.read(reinterpret_cast<char *>(&n), sizeof n);
+            Sf.clear();
+            
+            for(int i1=0; i1!=n; i1++)
+            {
+                int n2;
+                infile.read(reinterpret_cast<char *>(&n2), sizeof n2);
+                Adouble1D adouble1D;
+                for(int i2=0; i2!=n2; i2++)
+                {
+                    int n3;
+                    infile.read(reinterpret_cast<char *>(&n3), sizeof n3);
+                    Adouble0D adouble0D;
+                    for(int i3=0; i3!=n3; i3++)
+                    {
+                        double dvar;
+                        infile.read(reinterpret_cast<char *>(&dvar), sizeof dvar);
+                        adouble0D.push_back(dvar);
+                    }
+                    adouble1D.push_back(adouble0D);
+                }
+                Sf.push_back(adouble1D);
+            }
+            
+            // read SOCi
+            infile.read(reinterpret_cast<char *>(&n), sizeof n);
+            SOCi.clear();
+            
+            for(int i1=0; i1!=n; i1++)
+            {
+                int n2;
+                infile.read(reinterpret_cast<char *>(&n2), sizeof n2);
+                Adouble1D adouble1D;
+                for(int i2=0; i2!=n2; i2++)
+                {
+                    int n3;
+                    infile.read(reinterpret_cast<char *>(&n3), sizeof n3);
+                    Adouble0D adouble0D;
+                    for(int i3=0; i3!=n3; i3++)
+                    {
+                        double dvar;
+                        infile.read(reinterpret_cast<char *>(&dvar), sizeof dvar);
+                        adouble0D.push_back(dvar);
+                    }
+                    adouble1D.push_back(adouble0D);
+                }
+                SOCi.push_back(adouble1D);
+            }
+            
+            // read SOCf
+            infile.read(reinterpret_cast<char *>(&n), sizeof n);
+            SOCf.clear();
+            
+            for(int i1=0; i1!=n; i1++)
+            {
+                int n2;
+                infile.read(reinterpret_cast<char *>(&n2), sizeof n2);
+                Adouble1D adouble1D;
+                for(int i2=0; i2!=n2; i2++)
+                {
+                    int n3;
+                    infile.read(reinterpret_cast<char *>(&n3), sizeof n3);
+                    Adouble0D adouble0D;
+                    for(int i3=0; i3!=n3; i3++)
+                    {
+                        double dvar;
+                        infile.read(reinterpret_cast<char *>(&dvar), sizeof dvar);
+                        adouble0D.push_back(dvar);
+                    }
+                    adouble1D.push_back(adouble0D);
+                }
+                SOCf.push_back(adouble1D);
+            }
+            
+            // read kLabel
+            infile.read(reinterpret_cast<char *>(&n), sizeof n);
+            kLabel.clear();
+            
+            for(int i1=0; i1!=n; i1++)
             {
                 size_t ns1=0;
                 infile.read(reinterpret_cast<char *>(&ns1), sizeof ns1);
@@ -1949,25 +2358,297 @@ void Sec30::LoadFromFile(wxString filepath, wxString filename)
                     StrBuf[i] = ch;
                 }
                 wxString var = wxString(StrBuf,ns1);
-                astring0D.push_back(var);
+                kLabel.push_back(var);
             }
-            ArraysOf1DString.push_back(astring0D);
-        }
-        
-        infile.read(reinterpret_cast<char *>(&n), sizeof n);
-        ArraysOf2DString.clear();
-        
-        for(int i1=0; i1!=n; i1++)
-        {
-            int n2;
-            infile.read(reinterpret_cast<char *>(&n2), sizeof n2);
-            Astring1D astring1D;
-            for(int i2=0; i2!=n2; i2++)
+            
+            // read HamiltonianMap
+            infile.read(reinterpret_cast<char *>(&n), sizeof n);
+            HamiltonianMap.clear();
+            
+            for(int i1=0; i1!=n; i1++)
             {
-                int n3;
-                infile.read(reinterpret_cast<char *>(&n3), sizeof n3);
+                size_t ns1=0;
+                infile.read(reinterpret_cast<char *>(&ns1), sizeof ns1);
+                char* StrBuf = new char[ns1];
+                for (int i = 0; i < ns1; i++)
+                {
+                    char ch;
+                    infile.read(&ch, sizeof ch);
+                    StrBuf[i] = ch;
+                }
+                wxString var = wxString(StrBuf,ns1);
+                HamiltonianMap.push_back(var);
+            }
+            
+            // read HamiltonianShellMap
+            infile.read(reinterpret_cast<char *>(&n), sizeof n);
+            HamiltonianShellMap.clear();
+            
+            for(int i1=0; i1!=n; i1++)
+            {
+                size_t ns1=0;
+                infile.read(reinterpret_cast<char *>(&ns1), sizeof ns1);
+                char* StrBuf = new char[ns1];
+                for (int i = 0; i < ns1; i++)
+                {
+                    char ch;
+                    infile.read(&ch, sizeof ch);
+                    StrBuf[i] = ch;
+                }
+                wxString var = wxString(StrBuf,ns1);
+                HamiltonianShellMap.push_back(var);
+            }
+            
+        } else {
+//////////////////////////////////// old format
+            Aint0D ArraysOf0DInt;
+            Aint1D ArraysOf1DInt;
+            Aint2D ArraysOf2DInt;
+            Aint3D ArraysOf3DInt;
+            Adouble0D ArraysOf0DDouble;
+            Adouble1D ArraysOf1DDouble;
+            Adouble2D ArraysOf2DDouble;
+            Adouble3D ArraysOf3DDouble;
+            Astring0D ArraysOf0DString;
+            Astring1D ArraysOf1DString;
+            Astring2D ArraysOf2DString;
+            Astring3D ArraysOf3DString;
+            
+            infile.read(reinterpret_cast<char *>(&n), sizeof n);
+            ArraysOf0DInt.clear();
+            
+            for(int i1=0; i1!=n; i1++)
+            {
+                int intvar;
+                infile.read(reinterpret_cast<char *>(&intvar), sizeof intvar);
+                ArraysOf0DInt.push_back(intvar);
+            }
+            
+            isBandLoaded = ArraysOf0DInt[0] != 0;
+            nKPoint = ArraysOf0DInt[1];
+            maxneig = ArraysOf0DInt[2];
+            mspin = ArraysOf0DInt[3];
+            DFTnBandMin = ArraysOf0DInt[4];
+            DFTnBandMax = ArraysOf0DInt[5];
+            isSelectMode = ArraysOf0DInt[6] != 0;
+            isTBBand_i = ArraysOf0DInt[7] != 0;
+            isTBBand_f = ArraysOf0DInt[8] != 0;
+            notUsed = ArraysOf0DInt[9] != 0;
+
+            infile.read(reinterpret_cast<char *>(&n), sizeof n);
+            ArraysOf1DInt.clear();
+            
+            for(int i1=0; i1!=n; i1++)
+            {
+                int n2;
+                infile.read(reinterpret_cast<char *>(&n2), sizeof n2);
+                Aint0D aint0D;
+                for(int i2=0; i2!=n2; i2++)
+                {
+                    int intvar;
+                    infile.read(reinterpret_cast<char *>(&intvar), sizeof intvar);
+                    aint0D.push_back(intvar);
+                }
+                ArraysOf1DInt.push_back(aint0D);
+            }
+            
+            infile.read(reinterpret_cast<char *>(&n), sizeof n);
+            ArraysOf2DInt.clear();
+            
+            for(int i1=0; i1!=n; i1++)
+            {
+                int n2;
+                infile.read(reinterpret_cast<char *>(&n2), sizeof n2);
+                Aint1D aint1D;
+                for(int i2=0; i2!=n2; i2++)
+                {
+                    int n3;
+                    infile.read(reinterpret_cast<char *>(&n3), sizeof n3);
+                    Aint0D aint0D;
+                    for(int i3=0; i3!=n3; i3++)
+                    {
+                        int intvar;
+                        infile.read(reinterpret_cast<char *>(&intvar), sizeof intvar);
+                        aint0D.push_back(intvar);
+                    }
+                    aint1D.push_back(aint0D);
+                }
+                ArraysOf2DInt.push_back(aint1D);
+            }
+            
+            HamiltonianDimMap = ArraysOf2DInt[0];
+            SKListInfo = ArraysOf2DInt[1];
+            FitPoints = ArraysOf2DInt[2];
+            
+            infile.read(reinterpret_cast<char *>(&n), sizeof n);
+            ArraysOf3DInt.clear();
+            
+            for(int i1=0; i1!=n; i1++)
+            {
+                int n2;
+                infile.read(reinterpret_cast<char *>(&n2), sizeof n2);
+                Aint2D aint2D;
+                for(int i2=0; i2!=n2; i2++)
+                {
+                    int n3;
+                    infile.read(reinterpret_cast<char *>(&n3), sizeof n3);
+                    Aint1D aint1D;
+                    for(int i3=0; i3!=n3; i3++)
+                    {
+                        int n4;
+                        infile.read(reinterpret_cast<char *>(&n4), sizeof n4);
+                        Aint0D aint0D;
+                        for(int i4=0; i4!=n4; i4++)
+                        {
+                            int intvar;
+                            infile.read(reinterpret_cast<char *>(&intvar), sizeof intvar);
+                            aint0D.push_back(intvar);
+                        }
+                        aint1D.push_back(aint0D);
+                    }
+                    aint2D.push_back(aint1D);
+                }
+                ArraysOf3DInt.push_back(aint2D);
+            }
+            ///////////////////////////////////////////////////////////////
+            infile.read(reinterpret_cast<char *>(&n), sizeof n);
+            ArraysOf0DDouble.clear();
+            
+            for(int i1=0; i1!=n; i1++)
+            {
+                double dvar;
+                infile.read(reinterpret_cast<char *>(&dvar), sizeof dvar);
+                ArraysOf0DDouble.push_back(dvar);
+            }
+            
+            ChemP = ArraysOf0DDouble[0];
+            DFTyMin2d0 = ArraysOf0DDouble[1];
+            DFTyMax2d0 = ArraysOf0DDouble[2];
+            DFTyMin2d = ArraysOf0DDouble[3];
+            DFTyMax2d = ArraysOf0DDouble[4];
+            DFTxMin2d0 = ArraysOf0DDouble[5];
+            DFTxMax2d0 = ArraysOf0DDouble[6];
+            DFTxMin2d = ArraysOf0DDouble[7];
+            DFTxMax2d = ArraysOf0DDouble[8];
+    
+            infile.read(reinterpret_cast<char *>(&n), sizeof n);
+            ArraysOf1DDouble.clear();
+            
+            for(int i1=0; i1!=n; i1++)
+            {
+                int n2;
+                infile.read(reinterpret_cast<char *>(&n2), sizeof n2);
+                Adouble0D adouble0D;
+                for(int i2=0; i2!=n2; i2++)
+                {
+                    double dvar;
+                    infile.read(reinterpret_cast<char *>(&dvar), sizeof dvar);
+                    adouble0D.push_back(dvar);
+                }
+                ArraysOf1DDouble.push_back(adouble0D);
+            }
+            
+            dkLabel = ArraysOf1DDouble[0];
+            akDFT = ArraysOf1DDouble[1];
+            bkDFT = ArraysOf1DDouble[2];
+            ckDFT = ArraysOf1DDouble[3];
+            
+            infile.read(reinterpret_cast<char *>(&n), sizeof n);
+            ArraysOf2DDouble.clear();
+            
+            for(int i1=0; i1!=n; i1++)
+            {
+                int n2;
+                infile.read(reinterpret_cast<char *>(&n2), sizeof n2);
+                Adouble1D adouble1D;
+                for(int i2=0; i2!=n2; i2++)
+                {
+                    int n3;
+                    infile.read(reinterpret_cast<char *>(&n3), sizeof n3);
+                    Adouble0D adouble0D;
+                    for(int i3=0; i3!=n3; i3++)
+                    {
+                        double dvar;
+                        infile.read(reinterpret_cast<char *>(&dvar), sizeof dvar);
+                        adouble0D.push_back(dvar);
+                    }
+                    adouble1D.push_back(adouble0D);
+                }
+                ArraysOf2DDouble.push_back(adouble1D);
+            }
+            
+            KPoints = ArraysOf2DDouble[0];
+            DFTEigVal = ArraysOf2DDouble[1];
+            iTBEigVal = ArraysOf2DDouble[2];
+            fTBEigVal = ArraysOf2DDouble[3];
+            DFTEigValWeight = ArraysOf2DDouble[4];
+            
+            infile.read(reinterpret_cast<char *>(&n), sizeof n);
+            ArraysOf3DDouble.clear();
+            
+            for(int i1=0; i1!=n; i1++)
+            {
+                int n2;
+                infile.read(reinterpret_cast<char *>(&n2), sizeof n2);
+                Adouble2D adouble2D;
+                for(int i2=0; i2!=n2; i2++)
+                {
+                    int n3;
+                    infile.read(reinterpret_cast<char *>(&n3), sizeof n3);
+                    Adouble1D adouble1D;
+                    for(int i3=0; i3!=n3; i3++)
+                    {
+                        int n4;
+                        infile.read(reinterpret_cast<char *>(&n4), sizeof n4);
+                        Adouble0D adouble0D;
+                        for(int i4=0; i4!=n4; i4++)
+                        {
+                            double dvar;
+                            infile.read(reinterpret_cast<char *>(&dvar), sizeof dvar);
+                            adouble0D.push_back(dvar);
+                        }
+                        adouble1D.push_back(adouble0D);
+                    }
+                    adouble2D.push_back(adouble1D);
+                }
+                ArraysOf3DDouble.push_back(adouble2D);
+            }
+            
+            Hi = ArraysOf3DDouble[0];
+            Hf = ArraysOf3DDouble[1];
+            Si = ArraysOf3DDouble[2];
+            Sf = ArraysOf3DDouble[3];
+            SOCi = ArraysOf3DDouble[4];
+            SOCf = ArraysOf3DDouble[5];
+            
+            ///////////////////////////////////////////////////////////////
+            infile.read(reinterpret_cast<char *>(&n), sizeof n);
+            ArraysOf0DString.clear();
+            
+            for(int i1=0; i1!=n; i1++)
+            {
+                size_t ns1=0;
+                infile.read(reinterpret_cast<char *>(&ns1), sizeof ns1);
+                char* StrBuf = new char[ns1];
+                for (int i = 0; i < ns1; i++)
+                {
+                    char ch;
+                    infile.read(&ch, sizeof ch);
+                    StrBuf[i] = ch;
+                }
+                wxString var = wxString(StrBuf,ns1);
+                ArraysOf0DString.push_back(var);
+            }
+            
+            infile.read(reinterpret_cast<char *>(&n), sizeof n);
+            ArraysOf1DString.clear();
+            
+            for(int i1=0; i1!=n; i1++)
+            {
+                int n2;
+                infile.read(reinterpret_cast<char *>(&n2), sizeof n2);
                 Astring0D astring0D;
-                for(int i3=0; i3!=n3; i3++)
+                for(int i2=0; i2!=n2; i2++)
                 {
                     size_t ns1=0;
                     infile.read(reinterpret_cast<char *>(&ns1), sizeof ns1);
@@ -1981,30 +2662,27 @@ void Sec30::LoadFromFile(wxString filepath, wxString filename)
                     wxString var = wxString(StrBuf,ns1);
                     astring0D.push_back(var);
                 }
-                astring1D.push_back(astring0D);
+                ArraysOf1DString.push_back(astring0D);
             }
-            ArraysOf2DString.push_back(astring1D);
-        }
-        
-        infile.read(reinterpret_cast<char *>(&n), sizeof n);
-        ArraysOf3DString.clear();
-        
-        for(int i1=0; i1!=n; i1++)
-        {
-            int n2;
-            infile.read(reinterpret_cast<char *>(&n2), sizeof n2);
-            Astring2D astring2D;
-            for(int i2=0; i2!=n2; i2++)
+            
+            kLabel = ArraysOf1DString[0];
+            HamiltonianMap = ArraysOf1DString[1];
+            HamiltonianShellMap = ArraysOf1DString[2];
+            
+            infile.read(reinterpret_cast<char *>(&n), sizeof n);
+            ArraysOf2DString.clear();
+            
+            for(int i1=0; i1!=n; i1++)
             {
-                int n3;
-                infile.read(reinterpret_cast<char *>(&n3), sizeof n3);
+                int n2;
+                infile.read(reinterpret_cast<char *>(&n2), sizeof n2);
                 Astring1D astring1D;
-                for(int i3=0; i3!=n3; i3++)
+                for(int i2=0; i2!=n2; i2++)
                 {
-                    int n4;
-                    infile.read(reinterpret_cast<char *>(&n4), sizeof n4);
+                    int n3;
+                    infile.read(reinterpret_cast<char *>(&n3), sizeof n3);
                     Astring0D astring0D;
-                    for(int i4=0; i4!=n4; i4++)
+                    for(int i3=0; i3!=n3; i3++)
                     {
                         size_t ns1=0;
                         infile.read(reinterpret_cast<char *>(&ns1), sizeof ns1);
@@ -2020,9 +2698,47 @@ void Sec30::LoadFromFile(wxString filepath, wxString filename)
                     }
                     astring1D.push_back(astring0D);
                 }
-                astring2D.push_back(astring1D);
+                ArraysOf2DString.push_back(astring1D);
             }
-            ArraysOf3DString.push_back(astring2D);
+            
+            infile.read(reinterpret_cast<char *>(&n), sizeof n);
+            ArraysOf3DString.clear();
+            
+            for(int i1=0; i1!=n; i1++)
+            {
+                int n2;
+                infile.read(reinterpret_cast<char *>(&n2), sizeof n2);
+                Astring2D astring2D;
+                for(int i2=0; i2!=n2; i2++)
+                {
+                    int n3;
+                    infile.read(reinterpret_cast<char *>(&n3), sizeof n3);
+                    Astring1D astring1D;
+                    for(int i3=0; i3!=n3; i3++)
+                    {
+                        int n4;
+                        infile.read(reinterpret_cast<char *>(&n4), sizeof n4);
+                        Astring0D astring0D;
+                        for(int i4=0; i4!=n4; i4++)
+                        {
+                            size_t ns1=0;
+                            infile.read(reinterpret_cast<char *>(&ns1), sizeof ns1);
+                            char* StrBuf = new char[ns1];
+                            for (int i = 0; i < ns1; i++)
+                            {
+                                char ch;
+                                infile.read(&ch, sizeof ch);
+                                StrBuf[i] = ch;
+                            }
+                            wxString var = wxString(StrBuf,ns1);
+                            astring0D.push_back(var);
+                        }
+                        astring1D.push_back(astring0D);
+                    }
+                    astring2D.push_back(astring1D);
+                }
+                ArraysOf3DString.push_back(astring2D);
+            }
         }
         ///////////////////////////////////////////////////////////////
         
@@ -3083,9 +3799,9 @@ void Sec30::ConstructTBHamiltonian(double a[3], double b[3], double c[3], double
     this->GetVar(_("nAtoms[0]"),nUnitcellAtoms);
     
     wxCheckTree* orbs = this->GetTreeObject(_("Orbitals"));
-    Astring0D HamiltonianMap = this->ArraysOf1DString[1];
+    Astring0D HamiltonianMap = this->HamiltonianMap;
     nHamiltonian = HamiltonianMap.size();
-    Aint1D HamiltonianDimMap = this->ArraysOf2DInt[0];
+    Aint1D HamiltonianDimMap = this->HamiltonianDimMap;
     wxCheckTree* bonds = this->GetTreeObject(_("Bonds"));
     wxTreeItemId rootID = bonds->GetRootItem();
     EssCells.clear();
@@ -3137,9 +3853,9 @@ void Sec30::ConstructTBHamiltonian(double a[3], double b[3], double c[3], double
     this->GetVar(_("nAtoms[0]"),nUnitcellAtoms);
     
     wxCheckTree* orbs = this->GetTreeObject(_("Orbitals"));
-    Astring0D HamiltonianMap = this->ArraysOf1DString[1];
+    Astring0D HamiltonianMap = this->HamiltonianMap;
     nHamiltonian = HamiltonianMap.size();
-    Aint1D HamiltonianDimMap = this->ArraysOf2DInt[0];
+    Aint1D HamiltonianDimMap = this->HamiltonianDimMap;
     wxCheckTree* bonds = this->GetTreeObject(_("Bonds"));
     wxTreeItemId rootID = bonds->GetRootItem();
     EssCells.clear();
@@ -3195,9 +3911,9 @@ void Sec30::ConstructTBHamiltonianF(double a[3], double b[3], double c[3], doubl
     this->GetVar(_("nAtoms[0]"),nUnitcellAtoms);
     
     wxCheckTree* orbs = this->GetTreeObject(_("Orbitals"));
-    Astring0D HamiltonianMap = this->ArraysOf1DString[1];
+    Astring0D HamiltonianMap = this->HamiltonianMap;
     nHamiltonian = HamiltonianMap.size();
-    Aint1D HamiltonianDimMap = this->ArraysOf2DInt[0];
+    Aint1D HamiltonianDimMap = this->HamiltonianDimMap;
     wxCheckTree* bonds = this->GetTreeObject(_("Bonds"));
     wxTreeItemId rootID = bonds->GetRootItem();
     EssCells.clear();
@@ -3243,9 +3959,9 @@ void Sec30::ConstructTBHamiltonianF(double a[3], double b[3], double c[3], doubl
     this->GetVar(_("nAtoms[0]"),nUnitcellAtoms);
     
     wxCheckTree* orbs = this->GetTreeObject(_("Orbitals"));
-    Astring0D HamiltonianMap = this->ArraysOf1DString[1];
+    Astring0D HamiltonianMap = this->HamiltonianMap;
     nHamiltonian = HamiltonianMap.size();
-    Aint1D HamiltonianDimMap = this->ArraysOf2DInt[0];
+    Aint1D HamiltonianDimMap = this->HamiltonianDimMap;
     wxCheckTree* bonds = this->GetTreeObject(_("Bonds"));
     wxTreeItemId rootID = bonds->GetRootItem();
     EssCells.clear();

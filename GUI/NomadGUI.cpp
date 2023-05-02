@@ -137,35 +137,35 @@ void NomadGUI::CopyToTBStudio()
 
     sec30->init();
 
-    sec30->ArraysOf0DInt[0] = remote_sec30->ArraysOf0DInt[0];
-    sec30->ArraysOf0DInt[1] = remote_sec30->ArraysOf0DInt[1];
-    sec30->ArraysOf0DInt[2] = remote_sec30->ArraysOf0DInt[2];
-    sec30->ArraysOf0DInt[3] = remote_sec30->ArraysOf0DInt[3];
-    sec30->ArraysOf0DInt[6] = remote_sec30->ArraysOf0DInt[6];
-    sec30->ArraysOf0DDouble[0] = remote_sec30->ArraysOf0DDouble[0];
+    sec30->isBandLoaded = remote_sec30->isBandLoaded;
+    sec30->nKPoint = remote_sec30->nKPoint;
+    sec30->maxneig = remote_sec30->maxneig;
+    sec30->mspin = remote_sec30->mspin;
+    sec30->isSelectMode = remote_sec30->isSelectMode;
+    sec30->ChemP = remote_sec30->ChemP;
     
-    sec30->ArraysOf1DDouble[0] = remote_sec30->ArraysOf1DDouble[0];
-    sec30->ArraysOf1DDouble[1] = remote_sec30->ArraysOf1DDouble[1];
-    sec30->ArraysOf1DDouble[2] = remote_sec30->ArraysOf1DDouble[2];
-    sec30->ArraysOf1DDouble[3] = remote_sec30->ArraysOf1DDouble[3];
+    sec30->dkLabel = remote_sec30->dkLabel;
+    sec30->akDFT = remote_sec30->akDFT;
+    sec30->bkDFT = remote_sec30->bkDFT;
+    sec30->ckDFT = remote_sec30->ckDFT;
     
-    sec30->ArraysOf1DString[0] = remote_sec30->ArraysOf1DString[0];
-    sec30->ArraysOf2DDouble[0] = remote_sec30->ArraysOf2DDouble[0];
-    sec30->ArraysOf2DDouble[1] = remote_sec30->ArraysOf2DDouble[1];
-    sec30->ArraysOf2DDouble[4] = remote_sec30->ArraysOf2DDouble[4];
+    sec30->kLabel = remote_sec30->kLabel;
+    sec30->KPoints = remote_sec30->KPoints;
+    sec30->DFTEigVal = remote_sec30->DFTEigVal;
+    sec30->DFTEigValWeight = remote_sec30->DFTEigValWeight;
     
-    sec30->ArraysOf0DInt[4] = remote_sec30->ArraysOf0DInt[4];
-    sec30->ArraysOf0DInt[5] = remote_sec30->ArraysOf0DInt[5];
+    sec30->DFTnBandMin = remote_sec30->DFTnBandMin;
+    sec30->DFTnBandMax = remote_sec30->DFTnBandMax;
     
-    sec30->ArraysOf0DDouble[1] = remote_sec30->ArraysOf0DDouble[1];
-    sec30->ArraysOf0DDouble[2] = remote_sec30->ArraysOf0DDouble[2];
-    sec30->ArraysOf0DDouble[3] = remote_sec30->ArraysOf0DDouble[3];
-    sec30->ArraysOf0DDouble[4] = remote_sec30->ArraysOf0DDouble[4];
+    sec30->DFTyMin2d0 = remote_sec30->DFTyMin2d0;
+    sec30->DFTyMax2d0 = remote_sec30->DFTyMax2d0;
+    sec30->DFTyMin2d = remote_sec30->DFTyMin2d;
+    sec30->DFTyMax2d = remote_sec30->DFTyMax2d;
     
-    sec30->ArraysOf0DDouble[5] = remote_sec30->ArraysOf0DDouble[5];
-    sec30->ArraysOf0DDouble[6] = remote_sec30->ArraysOf0DDouble[6];
-    sec30->ArraysOf0DDouble[7] = remote_sec30->ArraysOf0DDouble[7];
-    sec30->ArraysOf0DDouble[8] = remote_sec30->ArraysOf0DDouble[8];
+    sec30->DFTxMin2d0 = remote_sec30->DFTxMin2d0;
+    sec30->DFTxMax2d0 = remote_sec30->DFTxMax2d0;
+    sec30->DFTxMin2d = remote_sec30->DFTxMin2d;
+    sec30->DFTxMax2d = remote_sec30->DFTxMax2d;
     
     myGrid* kabc = sec30->GetGridObject(_("KABC_Coords"));
     
@@ -741,9 +741,9 @@ void NomadGUI::nomadEVT_On_State_Completed(wxCommandEvent& event)
                     Adouble0D akv(ak, ak + 3);
                     Adouble0D bkv(bk, bk + 3);
                     Adouble0D ckv(ck, ck + 3);
-                    remote_sec30->ArraysOf1DDouble[1] = akv;
-                    remote_sec30->ArraysOf1DDouble[2] = bkv;
-                    remote_sec30->ArraysOf1DDouble[3] = ckv;
+                    remote_sec30->akDFT = akv;
+                    remote_sec30->bkDFT = bkv;
+                    remote_sec30->ckDFT = ckv;
 
                     entryInfo->DestroyChildren();
                     wxFlexGridSizer* entryInfoGridSizer = (wxFlexGridSizer*)entryInfo->GetSizer();
@@ -869,53 +869,53 @@ void NomadGUI::nomadEVT_On_State_Completed(wxCommandEvent& event)
                     int nband0 = EigVal[0].size();
                     Adouble1D EigValWeights(nk0,std::vector<double>(nband0,1.0));
                     
-                    remote_sec30->ArraysOf0DInt[0] = 1;
-                    remote_sec30->ArraysOf0DInt[1] = nKPoint;
-                    remote_sec30->ArraysOf0DInt[2] = maxneig;
-                    remote_sec30->ArraysOf0DInt[3] = mspin;
-                    remote_sec30->ArraysOf0DInt[6] = 0;
-                    remote_sec30->ArraysOf0DDouble[0] = ChemP;
-                    remote_sec30->ArraysOf1DDouble[0] = dkLabel;
-                    remote_sec30->ArraysOf1DString[0] = kLabel;
-                    remote_sec30->ArraysOf2DDouble[0] = KPoints;
-                    remote_sec30->ArraysOf2DDouble[1] = EigVal;
-                    remote_sec30->ArraysOf2DDouble[4] = EigValWeights;
+                    remote_sec30->isBandLoaded = true;
+                    remote_sec30->nKPoint = nKPoint;
+                    remote_sec30->maxneig = maxneig;
+                    remote_sec30->mspin = mspin;
+                    remote_sec30->isSelectMode = false;
+                    remote_sec30->ChemP = ChemP;
+                    remote_sec30->dkLabel = dkLabel;
+                    remote_sec30->kLabel = kLabel;
+                    remote_sec30->KPoints = KPoints;
+                    remote_sec30->DFTEigVal = EigVal;
+                    remote_sec30->DFTEigValWeight = EigValWeights;
                     
-                    remote_sec30->ArraysOf0DInt[4] = 1;//int DFTnBandMin;
-                    remote_sec30->ArraysOf0DInt[5] = maxneig;//int DFTnBandMax;
+                    remote_sec30->DFTnBandMin = 1;//int DFTnBandMin;
+                    remote_sec30->DFTnBandMax = maxneig;//int DFTnBandMax;
                     
-                    remote_sec30->ArraysOf0DDouble[1] = -10;
-                    remote_sec30->ArraysOf0DDouble[2] = 10;
-                    remote_sec30->ArraysOf0DDouble[3] = -10;
-                    remote_sec30->ArraysOf0DDouble[4] = 10;
+                    remote_sec30->DFTyMin2d0 = -10;
+                    remote_sec30->DFTyMax2d0 = 10;
+                    remote_sec30->DFTyMin2d = -10;
+                    remote_sec30->DFTyMax2d = 10;
                     
-                    int nkPoints = remote_sec30->ArraysOf1DDouble[0].size();
-                    remote_sec30->ArraysOf0DDouble[5] = 0.0;
-                    remote_sec30->ArraysOf0DDouble[6] = remote_sec30->ArraysOf1DDouble[0][nkPoints-1];
-                    remote_sec30->ArraysOf0DDouble[7] = 0.0;
-                    remote_sec30->ArraysOf0DDouble[8] = remote_sec30->ArraysOf1DDouble[0][nkPoints-1];
+                    int nkPoints = remote_sec30->dkLabel.size();
+                    remote_sec30->DFTxMin2d0 = 0.0;
+                    remote_sec30->DFTxMax2d0 = remote_sec30->dkLabel[nkPoints-1];
+                    remote_sec30->DFTxMin2d = 0.0;
+                    remote_sec30->DFTxMax2d = remote_sec30->dkLabel[nkPoints-1];
                 }
                 else
                 {
-                    remote_sec30->ArraysOf0DInt[0] = 0;
-                    remote_sec30->ArraysOf0DInt[1] = 0;
-                    remote_sec30->ArraysOf0DInt[2] = 0;
-                    remote_sec30->ArraysOf0DInt[3] = 0;
-                    remote_sec30->ArraysOf0DInt[6] = 0;
-                    remote_sec30->ArraysOf0DDouble[0] = 0.0;
-                    remote_sec30->ArraysOf1DDouble[0] = Adouble0D();
-                    remote_sec30->ArraysOf1DString[0] = Astring0D();
-                    remote_sec30->ArraysOf2DDouble[0] = Adouble1D();
-                    remote_sec30->ArraysOf2DDouble[1] = Adouble1D();
-                    remote_sec30->ArraysOf2DDouble[4] = Adouble1D();
-                    remote_sec30->ArraysOf0DDouble[1] = 0.0;
-                    remote_sec30->ArraysOf0DDouble[2] = 0.0;
-                    remote_sec30->ArraysOf0DDouble[3] = 0.0;
-                    remote_sec30->ArraysOf0DDouble[4] = 0.0;
-                    remote_sec30->ArraysOf0DDouble[5] = 0.0;
-                    remote_sec30->ArraysOf0DDouble[6] = 0.0;
-                    remote_sec30->ArraysOf0DDouble[7] = 0.0;
-                    remote_sec30->ArraysOf0DDouble[8] = 0.0;
+                    remote_sec30->isBandLoaded = false;
+                    remote_sec30->nKPoint = 0;
+                    remote_sec30->maxneig = 0;
+                    remote_sec30->mspin = 0;
+                    remote_sec30->isSelectMode = false;
+                    remote_sec30->ChemP = 0.0;
+                    remote_sec30->dkLabel = Adouble0D();
+                    remote_sec30->kLabel = Astring0D();
+                    remote_sec30->KPoints = Adouble1D();
+                    remote_sec30->DFTEigVal = Adouble1D();
+                    remote_sec30->DFTEigValWeight = Adouble1D();
+                    remote_sec30->DFTyMin2d0 = 0.0;
+                    remote_sec30->DFTyMax2d0 = 0.0;
+                    remote_sec30->DFTyMin2d = 0.0;
+                    remote_sec30->DFTyMax2d = 0.0;
+                    remote_sec30->DFTxMin2d0 = 0.0;
+                    remote_sec30->DFTxMax2d0 = 0.0;
+                    remote_sec30->DFTxMin2d = 0.0;
+                    remote_sec30->DFTxMax2d = 0.0;
                 }
             }
 

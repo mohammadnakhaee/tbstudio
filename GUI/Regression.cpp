@@ -117,7 +117,7 @@ void Regression::Start(double* p, int np, double* t, double* y_dat, int ny, doub
 		
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//Allocate out side. Because func will be called a lot and it will be slow if we allocate and delete many times.
-		nHamiltonian = sec30->ArraysOf1DString[1].size();
+		nHamiltonian = sec30->HamiltonianMap.size();
 		
 		
 		if (isSpin)
@@ -166,8 +166,8 @@ void Regression::Start(double* p, int np, double* t, double* y_dat, int ny, doub
     
     for (int ip=0; ip<np; ip++)
     {
-        int GridInd = sec30->ArraysOf2DInt[1][ip][0];
-        int irow = sec30->ArraysOf2DInt[1][ip][1];
+        int GridInd = sec30->SKListInfo[ip][0];
+        int irow = sec30->SKListInfo[ip][1];
         double Value = p[ip];
         wxString val = wxString::Format(wxT("%.8f"), Value);
         if (GridInd == 1)
@@ -915,10 +915,9 @@ void Regression::func(double* t, int ny, double* p, int np, double* cnst, double
     bool isSpin = false;
     if (isSOC) isSpin = true;
     
-    bool isBandLoaded;
-    if (sec30->ArraysOf0DInt[0] != 0) isBandLoaded = true;
+    bool isBandLoaded = sec30->isBandLoaded;
     if (!isBandLoaded) return;
-    int nKPoint = sec30->ArraysOf0DInt[1];
+    int nKPoint = sec30->nKPoint;
     if (nKPoint < 1)  return;
     
     //myGrid* osgc = sec30->GetGridObject(_("OS"));
@@ -927,8 +926,8 @@ void Regression::func(double* t, int ny, double* p, int np, double* cnst, double
     
     for (int ip=0; ip<np; ip++)
     {
-        int GridInd = sec30->ArraysOf2DInt[1][ip][0];
-        int irow = sec30->ArraysOf2DInt[1][ip][1];
+        int GridInd = sec30->SKListInfo[ip][0];
+        int irow = sec30->SKListInfo[ip][1];
         //double Value = p[ip];
         //wxString val = wxString::Format(wxT("%.8f"), Value);
         if (GridInd == 1)
@@ -991,18 +990,18 @@ void Regression::func(double* t, int ny, double* p, int np, double* cnst, double
     else
         sec30->ConstructTBHamiltonianF(a, b, c, XYZCoords, Hf, nEssensialCells, nHamiltonian, EssCells, isSOC, SOC_f);
     
-    sec30->ArraysOf3DDouble[1] = Hf;
-    sec30->ArraysOf3DDouble[3] = Sf;
+    sec30->Hf = Hf;
+    sec30->Sf = Sf;
     if (isSOC)
-        sec30->ArraysOf3DDouble[5] = SOC_f;
+        sec30->SOCf = SOC_f;
     else
-        sec30->ArraysOf3DDouble[5] = Adouble2D();
+        sec30->SOCf = Adouble2D();
     
     for (int i=0; i<natoms; i++) delete [] XYZCoords[i];
     if (natoms>0) delete [] XYZCoords;
     
     //double** KPoints; [ka,kb,kc,kx,ky,kz,d_path]
-    Adouble1D KPoints = sec30->ArraysOf2DDouble[0];
+    Adouble1D KPoints = sec30->KPoints;
     
     //////////////////////////////Allocate all arrays//////////////////////////////////
     int** lmnEssCells = new int*[nEssensialCells];
@@ -1206,14 +1205,14 @@ void Regression::func(double* t, int ny, double* p, int np, double* cnst, double
         for(int iH=0; iH<nHamiltonianTot; iH++) fTBEigVal[ik][iH] = eigHf[iH];
     }
     
-    sec30->ArraysOf2DDouble[3] = fTBEigVal;
+    sec30->fTBEigVal = fTBEigVal;
     
     //////////////////////////////Fill the y array for fitting//////////////////////////////////
     for (int iy=0; iy<ny; iy++)
     {
-        int tbband = sec30->ArraysOf2DInt[2][iy][0]; //FitPoints[iy][0]
+        int tbband = sec30->FitPoints[iy][0]; //FitPoints[iy][0]
         //int dftband = FitPoints[iy][1]; //FitPoints[iy][1]
-        int ik = sec30->ArraysOf2DInt[2][iy][2]; //FitPoints[iy][2]
+        int ik = sec30->FitPoints[iy][2]; //FitPoints[iy][2]
         y[iy] = fTBEigVal[ik][tbband - 1];
     }
     

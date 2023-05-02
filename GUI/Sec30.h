@@ -40,6 +40,10 @@
 #include <algorithm>
 /******************************************************************************/
 
+#define HeaderNumber 101010101
+#define ApplicationFullName wxString("Tight Binding Studio")
+#define ReleaseVersion 2.0           // v1.5.0 = 1.5          v1.5.5 = 1.505        v1.5.15 = 1.515
+
 /******************************************************************************/
 #ifdef WXC_FROM_DIP
 #undef WXC_FROM_DIPclTabCtrl
@@ -96,18 +100,53 @@ public:
     std::list<wxString> choices;
     std::list<wxString> combos;
     std::list<wxString> colors;
-    Aint0D ArraysOf0DInt;
-    Aint1D ArraysOf1DInt;
-    Aint2D ArraysOf2DInt;
-    Aint3D ArraysOf3DInt;
-    Adouble0D ArraysOf0DDouble;
-    Adouble1D ArraysOf1DDouble;
-    Adouble2D ArraysOf2DDouble;
-    Adouble3D ArraysOf3DDouble;
-    Astring0D ArraysOf0DString;
-    Astring1D ArraysOf1DString;
-    Astring2D ArraysOf2DString;
-    Astring3D ArraysOf3DString;
+    
+    bool isBandLoaded;
+    int nKPoint;
+    int maxneig;
+    int mspin;
+    int DFTnBandMin;
+    int DFTnBandMax;
+    bool isSelectMode;
+    bool isTBBand_i;
+    bool isTBBand_f;
+    bool notUsed;
+
+    Aint1D HamiltonianDimMap;
+    Aint1D SKListInfo;
+    Aint1D FitPoints;
+    
+    double ChemP;
+    double DFTyMin2d0;
+    double DFTyMax2d0;
+    double DFTyMin2d;
+    double DFTyMax2d;
+    double DFTxMin2d0;
+    double DFTxMax2d0;
+    double DFTxMin2d;
+    double DFTxMax2d;
+    
+    Adouble0D dkLabel;
+    Adouble0D akDFT;  //double akDFT[3];
+    Adouble0D bkDFT;  //double bkDFT[3];
+    Adouble0D ckDFT;  //double ckDFT[3];
+    
+    Adouble1D KPoints;  // [ka,kb,kc,kx,ky,kz,d_path]
+    Adouble1D DFTEigVal;
+    Adouble1D iTBEigVal;
+    Adouble1D fTBEigVal;
+    Adouble1D DFTEigValWeight;
+    
+    Adouble2D Hi;  // Vi_{0,0,0}, Vi_{1,0,0}, Vi_{0,1,0}, Vi_{1,1,0}, Vi_{1,-1,0}
+    Adouble2D Hf;  // Vf_{0,0,0}, Vf_{1,0,0}, Vf_{0,1,0}, Vf_{1,1,0}, Vf_{1,-1,0}
+    Adouble2D Si;  // Si_{0,0,0}, Si_{1,0,0}, Si_{0,1,0}, Si_{1,1,0}, Si_{1,-1,0}
+    Adouble2D Sf;  // Sf_{0,0,0}, Sf_{1,0,0}, Sf_{0,1,0}, Sf_{1,1,0}, Sf_{1,-1,0}
+    Adouble2D SOCi;  // SOCi_Re, SOCi_Im
+    Adouble2D SOCf;  // SOCf_Re, SOCf_Im
+    
+    Astring0D kLabel;
+    Astring0D HamiltonianMap;
+    Astring0D HamiltonianShellMap;
     
     double* OSBuffer;
     double* SKBuffer;

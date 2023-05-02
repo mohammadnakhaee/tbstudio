@@ -161,18 +161,18 @@ void MyFigure2d::OnMouseWheel(wxMouseEvent& event)
     bool scrldwn = event.GetWheelRotation() < 0;
     //float delta = 0.01*0.01f*event.GetWheelDelta(); //Constant delta
 	bool isBandLoaded = false;
-	if (sec30->ArraysOf0DInt[0] != 0)
+	if (sec30->isBandLoaded)
 	{
 		double y1, y2;
 		if (ObjectID == 0)
 		{
-			y1 = sec30->ArraysOf0DDouble[1];
-			y2 = sec30->ArraysOf0DDouble[2];
+			y1 = sec30->DFTyMin2d0;
+			y2 = sec30->DFTyMax2d0;
 		}
 		else if (ObjectID == 1)
 		{
-			y1 = sec30->ArraysOf0DDouble[3];
-			y2 = sec30->ArraysOf0DDouble[4];
+			y1 = sec30->DFTyMin2d;
+			y2 = sec30->DFTyMax2d;
 		}
 		
 		double y0 = (y2 + y1) / 2.0;
@@ -186,13 +186,13 @@ void MyFigure2d::OnMouseWheel(wxMouseEvent& event)
 		
 		if (ObjectID == 0)
 		{
-			sec30->ArraysOf0DDouble[1] = y0 - r;
-			sec30->ArraysOf0DDouble[2] = y0 + r;
+			sec30->DFTyMin2d0 = y0 - r;
+			sec30->DFTyMax2d0 = y0 + r;
 		}
 		else if (ObjectID == 1)
 		{
-			sec30->ArraysOf0DDouble[3] = y0 - r;
-			sec30->ArraysOf0DDouble[4] = y0 + r;
+			sec30->DFTyMin2d = y0 - r;
+			sec30->DFTyMax2d = y0 + r;
 		}
 	}
 
@@ -217,7 +217,7 @@ void MyFigure2d::OnMouseLeftDown(wxMouseEvent& event)
     //int mouseX = pt.x - this->GetScreenPosition().x;
     //int mouseY = pt.y - this->GetScreenPosition().y;
     
-    if (sec30->ArraysOf0DInt[6] != 0) PaintMode = true;
+    if (sec30->isSelectMode) PaintMode = true;
 }
 
 void MyFigure2d::OnMouseLeftUp(wxMouseEvent& event)
@@ -226,7 +226,7 @@ void MyFigure2d::OnMouseLeftUp(wxMouseEvent& event)
     mouseX = pt.x;
     mouseY = pt.y;
     isMouseLeftDown = false;
-    if (sec30->ArraysOf0DInt[6] != 0) PaintMode = false;
+    if (sec30->isSelectMode) PaintMode = false;
 }
 
 void MyFigure2d::OnMouseMove(wxMouseEvent& event)
@@ -244,7 +244,7 @@ void MyFigure2d::OnMouseMove(wxMouseEvent& event)
         float m=0;
         float value=0;
         GetDirection(mouseX0, mouseY0, mouseX, mouseY, l, m, value);
-		if (sec30->ArraysOf0DInt[6] != 0 && PaintMode)
+		if (sec30->isSelectMode && PaintMode)
 		{
 			const wxSize ClientSize = GetClientSize();
 			int w,h;
@@ -320,17 +320,17 @@ void MyFigure2d::OnMouseMiddleDown(wxMouseEvent& event)
     isMouseLeftDown = false;
         if (ObjectID == 0)
         {
-            OldyMin = sec30->ArraysOf0DDouble[1];
-            OldyMax = sec30->ArraysOf0DDouble[2];
-            OldxMin = sec30->ArraysOf0DDouble[5];
-            OldxMax = sec30->ArraysOf0DDouble[6];
+            OldyMin = sec30->DFTyMin2d0;
+            OldyMax = sec30->DFTyMax2d0;
+            OldxMin = sec30->DFTxMin2d0;
+            OldxMax = sec30->DFTxMax2d0;
         }
         else if (ObjectID == 1)
         {
-            OldyMin = sec30->ArraysOf0DDouble[3];
-            OldyMax = sec30->ArraysOf0DDouble[4];
-            OldxMin = sec30->ArraysOf0DDouble[7];
-            OldxMax = sec30->ArraysOf0DDouble[8];
+            OldyMin = sec30->DFTyMin2d;
+            OldyMax = sec30->DFTyMax2d;
+            OldxMin = sec30->DFTxMin2d;
+            OldxMax = sec30->DFTxMax2d;
         }
 }
 
@@ -350,17 +350,17 @@ void MyFigure2d::DoMove2d(float l, float m)
     if (ObjectID == 0)
     {
         
-        sec30->ArraysOf0DDouble[1] = OldyMin + dy;
-        sec30->ArraysOf0DDouble[2] = OldyMax + dy;
-        //sec30->ArraysOf0DDouble[5] = OldxMin + dx;
-        //sec30->ArraysOf0DDouble[6] = OldxMax + dx;
+        sec30->DFTyMin2d0 = OldyMin + dy;
+        sec30->DFTyMax2d0 = OldyMax + dy;
+        //sec30->DFTxMin2d0 = OldxMin + dx;
+        //sec30->DFTxMax2d0 = OldxMax + dx;
     }
     else if (ObjectID == 1)
     {
-        sec30->ArraysOf0DDouble[3] = OldyMin + dy;
-        sec30->ArraysOf0DDouble[4] = OldyMax + dy;
-        //sec30->ArraysOf0DDouble[7] = OldxMin + dx;
-        //sec30->ArraysOf0DDouble[8] = OldxMax + dx;
+        sec30->DFTyMin2d = OldyMin + dy;
+        sec30->DFTyMax2d = OldyMax + dy;
+        //sec30->DFTxMin2d = OldxMin + dx;
+        //sec30->DFTxMax2d = OldxMax + dx;
     }
         
     myRefresh();
@@ -437,18 +437,18 @@ void MyFigure2d::SaveImageFromData(wxImage image, wxString filepath, wxString Ou
 
 void MyFigure2d::SetWeight(float x, float y, float w, float h, float coef)
 {
-    if (sec30->ArraysOf0DInt[0] == 0) return; //if (isBandLoaded = false) rturn;
-    int nX = sec30->ArraysOf0DInt[1];
-    int DFTnMin = sec30->ArraysOf0DInt[4];
-    int DFTnMax = sec30->ArraysOf0DInt[5];
+    if (!sec30->isBandLoaded) return; //if (isBandLoaded = false) rturn;
+    int nX = sec30->nKPoint;
+    int DFTnMin = sec30->DFTnBandMin;
+    int DFTnMax = sec30->DFTnBandMax;
     
-    double Xmax = sec30->ArraysOf2DDouble[0][nX-1][6];
+    double Xmax = sec30->KPoints[nX-1][6];
     double X = Xmax*x/w;
     
     int iX = 0;
     for(long ix=0; ix<nX; ix++)
     {
-        if ( sec30->ArraysOf2DDouble[0][ix][6] >= X)
+        if ( sec30->KPoints[ix][6] >= X)
         {
             iX=ix;
             break;
@@ -458,20 +458,20 @@ void MyFigure2d::SetWeight(float x, float y, float w, float h, float coef)
     double y1, y2;
     if (ObjectID == 0)
     {
-        y1 = sec30->ArraysOf0DDouble[1];
-        y2 = sec30->ArraysOf0DDouble[2];
+        y1 = sec30->DFTyMin2d0;
+        y2 = sec30->DFTyMax2d0;
     }
     else if (ObjectID == 1)
     {
-        y1 = sec30->ArraysOf0DDouble[3];
-        y2 = sec30->ArraysOf0DDouble[4];
+        y1 = sec30->DFTyMin2d;
+        y2 = sec30->DFTyMax2d;
     }
     
     double clickedY = y1 + (y2-y1)*(h - y)/h;
     double dy = (y2-y1)/60;
     for(int iband=DFTnMin; iband<=DFTnMax; iband++)
     {
-        double y = sec30->ArraysOf2DDouble[1][iX][iband-1] - sec30->ArraysOf0DDouble[0]; //EIG - ChemP
+        double y = sec30->DFTEigVal[iX][iband-1] - sec30->ChemP; //EIG - ChemP
         if(y > clickedY-dy && y < clickedY+dy)
         {
             int ix1 = iX-7;
@@ -480,9 +480,9 @@ void MyFigure2d::SetWeight(float x, float y, float w, float h, float coef)
             if (ix2 > nX-1) ix2=nX-1;
             for(long ix=ix1; ix<=ix2; ix++)
             {
-                sec30->ArraysOf2DDouble[4][ix][iband-1] += coef*0.1;
-                if (sec30->ArraysOf2DDouble[4][ix][iband-1] < 0.0) sec30->ArraysOf2DDouble[4][ix][iband-1]=0.0;
-                if (sec30->ArraysOf2DDouble[4][ix][iband-1] > 1.0) sec30->ArraysOf2DDouble[4][ix][iband-1]=1.0;
+                sec30->DFTEigValWeight[ix][iband-1] += coef*0.1;
+                if (sec30->DFTEigValWeight[ix][iband-1] < 0.0) sec30->DFTEigValWeight[ix][iband-1]=0.0;
+                if (sec30->DFTEigValWeight[ix][iband-1] > 1.0) sec30->DFTEigValWeight[ix][iband-1]=1.0;
             }
         }
     }
@@ -492,39 +492,37 @@ void MyFigure2d::SetWeight(float x, float y, float w, float h, float coef)
 
 int MyFigure2d::PlotBand(mglGraph *gr, int w, int h, Sec30* sec30, int MyID)
 {
-    bool isBandLoaded = false;
-    if (sec30->ArraysOf0DInt[0] != 0) isBandLoaded = true;
+    bool isBandLoaded = sec30->isBandLoaded;
     
     if (isBandLoaded)
     {
-        int nKPoint = sec30->ArraysOf0DInt[1];
-        int maxneig = sec30->ArraysOf0DInt[2];
-        int mspin = sec30->ArraysOf0DInt[3];
-        int DFTnMin = sec30->ArraysOf0DInt[4];
-        int DFTnMax = sec30->ArraysOf0DInt[5];
-        double ChemP = sec30->ArraysOf0DDouble[0];
-        bool SelectMode = false;
-        if (sec30->ArraysOf0DInt[6] != 0) SelectMode = true;
+        int nKPoint = sec30->nKPoint;
+        int maxneig = sec30->maxneig;
+        int mspin = sec30->mspin;
+        int DFTnMin = sec30->DFTnBandMin;
+        int DFTnMax = sec30->DFTnBandMax;
+        double ChemP = sec30->ChemP;
+        bool SelectMode = sec30->isSelectMode;
         
         mreal yMin, yMax, xMin, xMax;
         if (MyID == 0)
         {
-            yMin = (mreal)sec30->ArraysOf0DDouble[1];
-            yMax = (mreal)sec30->ArraysOf0DDouble[2];
-            xMin = (mreal)sec30->ArraysOf0DDouble[5];
-            xMax = (mreal)sec30->ArraysOf0DDouble[6];
+            yMin = (mreal)sec30->DFTyMin2d0;
+            yMax = (mreal)sec30->DFTyMax2d0;
+            xMin = (mreal)sec30->DFTxMin2d0;
+            xMax = (mreal)sec30->DFTxMax2d0;
         }
         else if (MyID == 1)
         {
-            yMin = (mreal)sec30->ArraysOf0DDouble[3];
-            yMax = (mreal)sec30->ArraysOf0DDouble[4];
-            xMin = (mreal)sec30->ArraysOf0DDouble[7];
-            xMax = (mreal)sec30->ArraysOf0DDouble[8];
+            yMin = (mreal)sec30->DFTyMin2d;
+            yMax = (mreal)sec30->DFTyMax2d;
+            xMin = (mreal)sec30->DFTxMin2d;
+            xMax = (mreal)sec30->DFTxMax2d;
         }
         
-        //sec30->ArraysOf2DDouble[0] = Adouble1D();//double** FracKPoint;
-        //sec30->ArraysOf2DDouble[1] = Adouble1D();//double** DFTEigVal;
-        //sec30->ArraysOf2DDouble[4] = Adouble1D();//double** DFTEigValWeight;
+        //sec30->KPoints = Adouble1D();//double** FracKPoint;
+        //sec30->DFTEigVal = Adouble1D();//double** DFTEigVal;
+        //sec30->DFTEigValWeight = Adouble1D();//double** DFTEigValWeight;
         
         if (DFTnMax < DFTnMin || DFTnMax<1 || DFTnMin<1 || DFTnMin>maxneig || DFTnMax>maxneig) return 1;
         
@@ -537,7 +535,7 @@ int MyFigure2d::PlotBand(mglGraph *gr, int w, int h, Sec30* sec30, int MyID)
         for(long iX=0; iX<nX; iX++)
         {
             //mreal x = iX/(nX-1.0);
-            X.a[iX] = (mreal)sec30->ArraysOf2DDouble[0][iX][6];//d_path
+            X.a[iX] = (mreal)sec30->KPoints[iX][6];//d_path
         }
             
         for(long iCurve=0; iCurve<nCurve; iCurve++)
@@ -545,7 +543,7 @@ int MyFigure2d::PlotBand(mglGraph *gr, int w, int h, Sec30* sec30, int MyID)
             for(long iX=0; iX<nX; iX++)
             {
                 //mreal x = iX/(nX-1.0);
-                Y.a[iCurve*nX + iX] = (mreal)(sec30->ArraysOf2DDouble[1][iX][iCurve + DFTnMin - 1] - ChemP);//Eigen Value - ChemP
+                Y.a[iCurve*nX + iX] = (mreal)(sec30->DFTEigVal[iX][iCurve + DFTnMin - 1] - ChemP);//Eigen Value - ChemP
             }
         }
         
@@ -556,7 +554,7 @@ int MyFigure2d::PlotBand(mglGraph *gr, int w, int h, Sec30* sec30, int MyID)
                 for(long iX=0; iX<nX; iX++)
                 {
                     //mreal x = iX/(nX-1.0);
-                    C.a[iCurve*nX + iX] = (mreal)(sec30->ArraysOf2DDouble[4][iX][iCurve + DFTnMin - 1]*2.0-1.0);//Showing fitting weight as a color. The values are between x=[0:1] but the colors are c=[-1,1], so c=2*x-1
+                    C.a[iCurve*nX + iX] = (mreal)(sec30->DFTEigValWeight[iX][iCurve + DFTnMin - 1]*2.0-1.0);//Showing fitting weight as a color. The values are between x=[0:1] but the colors are c=[-1,1], so c=2*x-1
                     /*if ( iX > (int)(0.0*nX/9.0) && iX <= (int)(1.0*nX/9.0)) C.a[iCurve*nX + iX] = -1.0;
                     if ( iX > (int)(1.0*nX/9.0) && iX <= (int)(2.0*nX/9.0)) C.a[iCurve*nX + iX] = -0.75;
                     if ( iX > (int)(2.0*nX/9.0) && iX <= (int)(3.0*nX/9.0)) C.a[iCurve*nX + iX] = -0.5;
@@ -586,18 +584,18 @@ int MyFigure2d::PlotBand(mglGraph *gr, int w, int h, Sec30* sec30, int MyID)
         //gr->Label('y', "E_k (eV)",0);   //y Title
         gr->SetRanges(X.a[0], X.a[nX-1], yMin, yMax);
         double val[]={X.a[0] + 0.00000001};
-        wxString xlabel = sec30->ArraysOf1DString[0][0];
+        wxString xlabel = sec30->kLabel[0];
         gr->SetTicksVal('x', mglData(1,val), xlabel.c_str().AsChar());
         //gr->SetTicks('x',X.a[nX-1] + 1,-1);
-        int nk = sec30->ArraysOf1DString[0].size();
+        int nk = sec30->kLabel.size();
         for (int ik=1; ik<nk-1; ik++)
         {
-            mreal xpos = (mreal)sec30->ArraysOf1DDouble[0][ik];
-            xlabel = sec30->ArraysOf1DString[0][ik];
+            mreal xpos = (mreal)sec30->dkLabel[ik];
+            xlabel = sec30->kLabel[ik];
             gr->AddTick('x', xpos, xlabel.c_str().AsChar());
         }
         mreal xpos2 = X.a[nX-1] - 0.00000001;
-        xlabel = sec30->ArraysOf1DString[0][nk-1];
+        xlabel = sec30->kLabel[nk-1];
         gr->AddTick('x', xpos2, xlabel.c_str().AsChar());
         
         //gr->SetTicks(’x’,M_PI,0,0,"\\pi");
@@ -615,17 +613,17 @@ int MyFigure2d::PlotBand(mglGraph *gr, int w, int h, Sec30* sec30, int MyID)
         
         if (MyID == 0 && !SelectMode)
         {
-            int isData = sec30->ArraysOf2DDouble[2].size();
+            int isData = sec30->iTBEigVal.size();
             if (isData != 0)
             {
-                int niTBHam = sec30->ArraysOf2DDouble[2][0].size();
+                int niTBHam = sec30->iTBEigVal[0].size();
                 mglData Y2(nX,niTBHam); //Tight-binding size
                 for(long iCurve=0; iCurve<niTBHam; iCurve++)
                 {
                     for(long iX=0; iX<nX; iX++)
                     {
                         //mreal x = iX/(nX-1.0);
-                        Y2.a[iCurve*nX + iX] = (mreal)(sec30->ArraysOf2DDouble[2][iX][iCurve]);//Eigen Value - ChemP
+                        Y2.a[iCurve*nX + iX] = (mreal)(sec30->iTBEigVal[iX][iCurve]);//Eigen Value - ChemP
                     }
                 }
                 gr->Plot(X, Y2, "{x800000}-2");      // maroon
@@ -634,17 +632,17 @@ int MyFigure2d::PlotBand(mglGraph *gr, int w, int h, Sec30* sec30, int MyID)
         
         if (MyID == 1 && !SelectMode)
         {
-            int isData = sec30->ArraysOf2DDouble[3].size();
+            int isData = sec30->fTBEigVal.size();
             if (isData != 0)
             {
-                int nfTBHam = sec30->ArraysOf2DDouble[3][0].size();
+                int nfTBHam = sec30->fTBEigVal[0].size();
                 mglData Y2(nX,nfTBHam); //Tight-binding size
                 for(long iCurve=0; iCurve<nfTBHam; iCurve++)
                 {
                     for(long iX=0; iX<nX; iX++)
                     {
                         //mreal x = iX/(nX-1.0);
-                        Y2.a[iCurve*nX + iX] = (mreal)(sec30->ArraysOf2DDouble[3][iX][iCurve]);//Eigen Value - ChemP
+                        Y2.a[iCurve*nX + iX] = (mreal)(sec30->fTBEigVal[iX][iCurve]);//Eigen Value - ChemP
                     }
                 }
                 gr->Plot(X, Y2, "{x800000}-2");      // maroon
@@ -656,7 +654,7 @@ int MyFigure2d::PlotBand(mglGraph *gr, int w, int h, Sec30* sec30, int MyID)
         
         for (int ik=1; ik<nk-1; ik++)
         {
-            mreal xpos = (mreal)sec30->ArraysOf1DDouble[0][ik];
+            mreal xpos = (mreal)sec30->dkLabel[ik];
             gr->Line(mglPoint(xpos, yMin), mglPoint(xpos, yMax), "H2");
         }
         
