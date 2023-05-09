@@ -827,7 +827,8 @@ void MainFrame::BtnOpen_OnClick(wxRibbonButtonBarEvent& event)
 	{
         wxString dgPath = OpenDialog->GetDirectory();
         wxString dgFileName = OpenDialog->GetFilename();
-        sec30->LoadFromFile(dgPath, dgFileName);
+//        sec30->LoadFromFile(dgPath, dgFileName);
+        sec30->LoadFromJSON(dgPath, dgFileName);
         UpdateGraph2Ds();
 		sec30->WorkingDIR = dgPath;
 		sec30->WorkingFile = dgFileName;
@@ -858,7 +859,8 @@ void MainFrame::BtnSave_OnClick(wxRibbonButtonBarEvent& event)
 {
     if (sec30->WorkingDIR != wxEmptyString && sec30->WorkingFile != wxEmptyString)
 	{
-		sec30->SaveToFile(sec30->WorkingDIR, sec30->WorkingFile);
+//		sec30->SaveToFile(sec30->WorkingDIR, sec30->WorkingFile);
+        sec30->SaveToJSON(sec30->WorkingDIR, sec30->WorkingFile);
 		wxMessageBox(wxT("Done!"));
 	}
 	else
@@ -897,7 +899,8 @@ void MainFrame::SaveAs()
             BaseName = dgFileName;
 		dgFileName = BaseName + _(".tbm");
 		
-        sec30->SaveToFile(dgPath, dgFileName);
+//        sec30->SaveToFile(dgPath, dgFileName);
+        sec30->SaveToJSON(dgPath, dgFileName);
 		sec30->WorkingDIR = dgPath;
 		sec30->WorkingFile = dgFileName;
 		this->SetTitle(SoftwareName + _(": ") + sec30->WorkingDIR + wxFileName::GetPathSeparator() + dgFileName);

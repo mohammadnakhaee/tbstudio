@@ -136,7 +136,8 @@ void NomadGUI::CopyToTBStudio()
     }
 
     sec30->init();
-
+    
+    sec30->DFTNomadEntryID = remote_sec30->DFTNomadEntryID;
     sec30->isBandLoaded = remote_sec30->isBandLoaded;
     sec30->nKPoint = remote_sec30->nKPoint;
     sec30->maxneig = remote_sec30->maxneig;
@@ -749,6 +750,7 @@ void NomadGUI::nomadEVT_On_State_Completed(wxCommandEvent& event)
                     wxFlexGridSizer* entryInfoGridSizer = (wxFlexGridSizer*)entryInfo->GetSizer();
                     entryInfoGridSizer->Clear(false);
                     EntryID->SetValue(entry_id);
+                    remote_sec30->DFTNomadEntryID = entry_id;
                     addInfo("Entry ID", entry_id);
                     addSpacer();
                     addSpacer();

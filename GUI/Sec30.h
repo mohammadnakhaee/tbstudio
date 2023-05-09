@@ -54,6 +54,10 @@
 #define WXC_FROM_DIP(x) x
 #endif
 /******************************************************************************/
+typedef std::vector<bool> Abool0D;
+typedef std::vector<Abool0D> Abool1D;
+typedef std::vector<Abool1D> Abool2D;
+typedef std::vector<Abool2D> Abool3D;
 typedef std::vector<int> Aint0D;
 typedef std::vector<Aint0D> Aint1D;
 typedef std::vector<Aint1D> Aint2D;
@@ -67,6 +71,10 @@ typedef std::vector<Astring0D> Astring1D;
 typedef std::vector<Astring1D> Astring2D;
 typedef std::vector<Astring2D> Astring3D;
 
+typedef std::vector<std::string> Astr0D;
+typedef std::vector<Astr0D> Astr1D;
+typedef std::vector<Astr1D> Astr2D;
+typedef std::vector<Astr2D> Astr3D;
 // It just declares MY_EVENT event type
 /******************************************************************************/
 wxDECLARE_EVENT(Sec30EVT_OnUpdated, wxCommandEvent);
@@ -89,6 +97,9 @@ public:
     bool isPlotting = false;
     //10000bool isPrinting = false;
     bool isMainThread = false;
+    
+    wxString DFTNomadEntryID = _("");
+    wxString DFTSource = _("");
     
     std::list<wxString> vars;
     std::list<wxString> grids;
@@ -208,6 +219,8 @@ public:
     
     void SaveToFile(wxString filepath, wxString filename);
     void LoadFromFile(wxString filepath, wxString filename);
+    void SaveToJSON(wxString filepath, wxString filename);
+    void LoadFromJSON(wxString filepath, wxString filename);
     void SendUpdateEvent(wxString info, int MyID = 1);
     wxString GetAtomLable(int kind);
     int GetAtomLable(wxString Lable);

@@ -1,5 +1,7 @@
 #include "Sec30.h"
+#include <configuru.hpp>
 
+using ObjIterator = configuru::Config::ConfigObjectImpl::const_iterator;
 
 // this is a definition so can't be in a header
 wxDEFINE_EVENT(Sec30EVT_OnUpdated, wxCommandEvent);
@@ -90,6 +92,9 @@ void Sec30::init()
 //    ArraysOf3DDouble[4] = Adouble2D();//double*** SOCi; SOCi_Re, SOCi_Im
 //    ArraysOf3DDouble[5] = Adouble2D();//double*** SOCf; SOCf_Re, SOCf_Im
 
+    DFTNomadEntryID = _("");
+    DFTSource = _("");
+    
     isBandLoaded = false;
     nKPoint = 0;
     maxneig = 0;
@@ -2745,6 +2750,654 @@ void Sec30::LoadFromFile(wxString filepath, wxString filename)
         infile.close();
     }
 
+}
+
+void saveRecursive(wxCheckTree* ctr, wxTreeItemId rootID, configuru::Config &JsonCurrentItem)
+{
+    wxString itemname;
+    int itemstate;
+    
+    if (rootID.IsOk())
+    {
+        itemname = ctr->GetItemText(rootID);
+        itemstate = ctr->GetItemState(rootID);
+        
+        JsonCurrentItem[itemname.ToStdString()] = configuru::Config::object();
+        JsonCurrentItem[itemname.ToStdString()]["state"] = itemstate;
+        JsonCurrentItem[itemname.ToStdString()]["children"] = configuru::Config::object();
+        
+        wxTreeItemIdValue cookie;
+        wxTreeItemId nextChild = ctr->GetFirstChild(rootID, cookie);
+        while (nextChild.IsOk())
+        {
+            configuru::Config children = JsonCurrentItem[itemname.ToStdString()]["children"];
+            saveRecursive(ctr, nextChild, children);
+
+            nextChild = ctr->GetNextSibling(nextChild);
+        }
+    }
+}
+
+void Sec30::SaveToJSON(wxString filepath, wxString filename)
+{
+    configuru::Config tbm = configuru::Config::object();
+    
+    ///////////////////////////////////////////////////////////////
+    // write app info
+    tbm["ApplicationFullName"]  = ApplicationFullName.ToStdString();
+    tbm["ReleaseVersion"]  = ReleaseVersion;
+    ///////////////////////////////////////////////////////////////
+    // write DFT Source info
+    tbm["DFTSource"] = configuru::Config::object();
+    tbm["DFTSource"]["DFTNomadEntryID"]  = DFTNomadEntryID.ToStdString();
+    tbm["DFTSource"]["DFTSource"]  = DFTSource.ToStdString();
+    ///////////////////////////////////////////////////////////////
+
+    std::list<wxString>::iterator is;
+    wxString VariableName;
+    wxString val;
+
+    ///////////////////////////////////////////////////////////////
+    tbm["vars"] = configuru::Config::object();
+    for(is=vars.begin(); is!= vars.end(); is++)
+    {
+        VariableName = *is;
+        GetVar(VariableName, val);
+        tbm["vars"][VariableName.ToStdString()]  = (std::string)val;
+    }
+    ///////////////////////////////////////////////////////////////
+    tbm["grids"] = configuru::Config::object();
+    for(is=grids.begin(); is!= grids.end(); is++)
+    {
+        VariableName = *is;
+        
+        myGrid* gc = GetGridObject(VariableName);
+        int nRow = gc->GetNumberRows();
+        int nCol = gc->GetNumberCols();
+        Astr1D vals(nRow, Astr0D(nCol, "" ) );
+        Abool1D isReadOnly(nRow, Abool0D(nCol, false ) );
+        for (int irow=0; irow<nRow;irow++)
+            for (int icol=0; icol<nCol; icol++)
+            {
+                GetVar(VariableName, irow, icol, val);
+                vals[irow][icol] = val.ToStdString();
+                isReadOnly[irow][icol] = gc->IsReadOnly(irow, icol);
+            }
+
+        tbm["grids"][VariableName.ToStdString()] = configuru::Config::object();
+        tbm["grids"][VariableName.ToStdString()]["value"] = configuru::Config::array(vals);
+        tbm["grids"][VariableName.ToStdString()]["isReadOnly"] = configuru::Config::array(isReadOnly);
+    }
+    ///////////////////////////////////////////////////////////////
+    tbm["radios"] = configuru::Config::object();
+    for(is=radios.begin(); is!= radios.end(); is++)
+    {
+        VariableName = *is;
+        bool boolval;
+        GetRadioVar(VariableName, boolval);
+        tbm["radios"][VariableName.ToStdString()]  = boolval;
+    }
+    ///////////////////////////////////////////////////////////////
+    tbm["checks"] = configuru::Config::object();
+    for(is=checks.begin(); is!= checks.end(); is++)
+    {
+        VariableName = *is;
+        bool boolval;
+        GetCheckVar(VariableName, boolval);
+        tbm["checks"][VariableName.ToStdString()]  = boolval;
+    }
+    ///////////////////////////////////////////////////////////////
+    tbm["trees"] = configuru::Config::object();
+    for(is=trees.begin(); is!= trees.end(); is++)
+    {
+        VariableName = *is;
+        tbm["trees"][VariableName.ToStdString()] = configuru::Config::object();
+
+        wxCheckTree* ctr = ((wxCheckTree*)FindWindowByName(VariableName,GetParent()));
+
+        configuru::Config JsonRootItem = tbm["trees"][VariableName.ToStdString()];
+        wxTreeItemId rootID = ctr->GetRootItem();
+        
+        saveRecursive(ctr, rootID, JsonRootItem);
+    }
+    ///////////////////////////////////////////////////////////////
+    tbm["checklists"] = configuru::Config::object();
+    for(is=checklists.begin(); is!= checklists.end(); is++)
+    {
+        VariableName = *is;
+        wxCheckListBox* ctr = ((wxCheckListBox*)FindWindowByName(VariableName,GetParent()));
+        int nItems = ctr->GetCount();
+        
+        tbm["checklists"][VariableName.ToStdString()] = configuru::Config::object();
+        for (int i=0; i<nItems; i++)
+        {
+            wxString itemname= ctr->GetString(i);
+            bool boolval = ctr->IsChecked(i);
+            tbm["checklists"][VariableName.ToStdString()][itemname.ToStdString()] = boolval;
+        }
+    }
+    ///////////////////////////////////////////////////////////////
+    tbm["lists"] = configuru::Config::object();
+    for(is=lists.begin(); is!= lists.end(); is++)
+    {
+        VariableName = *is;
+        wxListBox* ctr = ((wxListBox*)FindWindowByName(VariableName,GetParent()));
+        int nItems = ctr->GetCount();
+        Astr0D vals(nItems, "");
+        for (int i=0; i<nItems; i++)
+        {
+            wxString itemname= ctr->GetString(i);
+            vals[i] = itemname.ToStdString();
+        }
+        tbm["lists"][VariableName.ToStdString()] = configuru::Config::array(vals);
+    }
+    ///////////////////////////////////////////////////////////////
+    tbm["choices"] = configuru::Config::object();
+    for(is=choices.begin(); is!= choices.end(); is++)
+    {
+        VariableName = *is;
+        tbm["choices"][VariableName.ToStdString()] = configuru::Config::object();
+        
+        wxChoice* ctr = ((wxChoice*)FindWindowByName(VariableName,GetParent()));
+        int nItems = ctr->GetCount();
+        Astr0D vals(nItems, "");
+        for (int i=0; i<nItems; i++)
+        {
+            wxString itemname= ctr->GetString(i);
+            vals[i] = itemname.ToStdString();
+        }
+        tbm["choices"][VariableName.ToStdString()]["items"] = configuru::Config::array(vals);
+        int nselect = ctr->GetSelection();
+        tbm["choices"][VariableName.ToStdString()]["selected"] = nselect;
+    }
+    ///////////////////////////////////////////////////////////////
+    tbm["combos"] = configuru::Config::object();
+    for(is=combos.begin(); is!= combos.end(); is++)
+    {
+        VariableName = *is;
+        tbm["combos"][VariableName.ToStdString()] = configuru::Config::object();
+        
+        wxStaticText* LabelCtr = GetComboLabelObject(VariableName);
+        wxString LabelString = LabelCtr->GetLabel();
+        tbm["combos"][VariableName.ToStdString()]["label"] = LabelString.ToStdString();
+        
+        wxComboBox* ctr = ((wxComboBox*)FindWindowByName(VariableName,GetParent()));
+        int nItems = ctr->GetCount();
+        Astr0D vals(nItems, "");
+        for (int i=0; i<nItems; i++)
+        {
+            wxString itemname= ctr->GetString(i);
+            vals[i] = itemname.ToStdString();
+        }
+        tbm["combos"][VariableName.ToStdString()]["items"] = configuru::Config::array(vals);
+        int nselect = ctr->GetSelection();
+        tbm["combos"][VariableName.ToStdString()]["selected"] = nselect;
+    }
+    ///////////////////////////////////////////////////////////////
+    tbm["colors"] = configuru::Config::object();
+    for(is=colors.begin(); is!= colors.end(); is++)
+    {
+        VariableName = *is;
+        wxColourPickerCtrl* ctr = ((wxColourPickerCtrl*)FindWindowByName(VariableName,GetParent()));
+        wxColour c = ctr->GetColour();
+        Aint0D vals(4, 0);
+        int r = c.Red();
+        int g = c.Green();
+        int b = c.Blue();
+        int a = c.Alpha();
+        vals[0] = r;
+        vals[1] = g;
+        vals[2] = b;
+        vals[3] = a;
+        tbm["colors"][VariableName.ToStdString()] = configuru::Config::array(vals);
+    }
+    ///////////////////////////////////////////////////////////////
+    tbm["variables"] = configuru::Config::object();
+    
+    tbm["variables"]["isBandLoaded"] = isBandLoaded;
+    tbm["variables"]["nKPoint"] = nKPoint;
+    tbm["variables"]["maxneig"] = maxneig;
+    tbm["variables"]["mspin"] = mspin;
+    tbm["variables"]["DFTnBandMin"] = DFTnBandMin;
+    tbm["variables"]["DFTnBandMax"] = DFTnBandMax;
+    tbm["variables"]["isSelectMode"] = isSelectMode;
+    tbm["variables"]["isTBBand_i"] = isTBBand_i;
+    tbm["variables"]["isTBBand_f"] = isTBBand_f;
+    tbm["variables"]["notUsed"] = notUsed;
+    tbm["variables"]["ChemP"] = ChemP;
+    tbm["variables"]["DFTyMin2d0"] = DFTyMin2d0;
+    tbm["variables"]["DFTyMax2d0"] = DFTyMax2d0;
+    tbm["variables"]["DFTyMin2d"] = DFTyMin2d;
+    tbm["variables"]["DFTyMax2d"] = DFTyMax2d;
+    tbm["variables"]["DFTxMin2d0"] = DFTxMin2d0;
+    tbm["variables"]["DFTxMax2d0"] = DFTxMax2d0;
+    tbm["variables"]["DFTxMin2d"] = DFTxMin2d;
+    tbm["variables"]["DFTxMax2d"] = DFTxMax2d;
+    
+    tbm["variables"]["HamiltonianDimMap"] = configuru::Config::array(HamiltonianDimMap);
+    tbm["variables"]["SKListInfo"] = configuru::Config::array(SKListInfo);
+    tbm["variables"]["FitPoints"] = configuru::Config::array(FitPoints);
+    tbm["variables"]["dkLabel"] = configuru::Config::array(dkLabel);
+    tbm["variables"]["akDFT"] = configuru::Config::array(akDFT);
+    tbm["variables"]["bkDFT"] = configuru::Config::array(bkDFT);
+    tbm["variables"]["ckDFT"] = configuru::Config::array(ckDFT);
+    tbm["variables"]["KPoints"] = configuru::Config::array(KPoints);
+    tbm["variables"]["DFTEigVal"] = configuru::Config::array(DFTEigVal);
+    tbm["variables"]["iTBEigVal"] = configuru::Config::array(iTBEigVal);
+    tbm["variables"]["fTBEigVal"] = configuru::Config::array(fTBEigVal);
+    tbm["variables"]["DFTEigValWeight"] = configuru::Config::array(DFTEigValWeight);
+    tbm["variables"]["Hi"] = configuru::Config::array(Hi);
+    tbm["variables"]["Hf"] = configuru::Config::array(Hf);
+    tbm["variables"]["Si"] = configuru::Config::array(Si);
+    tbm["variables"]["Sf"] = configuru::Config::array(Sf);
+    tbm["variables"]["SOCi"] = configuru::Config::array(SOCi);
+    tbm["variables"]["SOCf"] = configuru::Config::array(SOCf);
+    
+    int n = kLabel.size();
+    Astr0D _kLabel(n, "");
+    for(int i=0; i!=n; i++) _kLabel[i] = kLabel[i].ToStdString();
+    tbm["variables"]["kLabel"] = configuru::Config::array(_kLabel);
+    
+    n = HamiltonianMap.size();
+    Astr0D _HamiltonianMap(n, "");
+    for(int i=0; i!=n; i++) _HamiltonianMap[i] = HamiltonianMap[i].ToStdString();
+    tbm["variables"]["HamiltonianMap"] = configuru::Config::array(_HamiltonianMap);
+    
+    n = HamiltonianShellMap.size();
+    Astr0D _HamiltonianShellMap(n, "");
+    for(int i=0; i!=n; i++) _HamiltonianShellMap[i] = HamiltonianShellMap[i].ToStdString();
+    tbm["variables"]["HamiltonianShellMap"] = configuru::Config::array(_HamiltonianShellMap);
+    //////////////////////////////////////////////////////////////////////////////////////////
+    
+    
+    wxString tbmFile = filepath + wxFileName::GetPathSeparator() + filename;
+    configuru::dump_file(tbmFile.ToStdString(), tbm, configuru::JSON);
+}
+
+std::vector<ObjIterator> getOrderedObject(configuru::Config config) {
+    std::vector<ObjIterator> pairs;
+    auto&& object = config.as_object()._impl;
+    for (auto it=object.begin(); it!=object.end(); ++it) pairs.push_back(it);
+    std::sort(begin(pairs), end(pairs), [](const ObjIterator& a, const ObjIterator& b) {return a->second._nr < b->second._nr;});
+    return pairs;
+}
+
+wxTreeItemId loadRecursive(wxCheckTree* ctr, wxTreeItemId parentID, wxString key, configuru::Config value, bool isRoot)
+{
+    wxString itemname = key;
+    int itemstate = (int)value["state"];
+    wxTreeItemId theNewID;
+    if (isRoot) {
+        theNewID = ctr->AddRoot(itemname);
+        ctr->SetItemState(theNewID, itemstate);
+    } else {
+        if (parentID.IsOk()) {
+            bool mystate=true;
+            bool mychecked=true;
+            if (itemstate < 0) mystate = false;
+            if (itemstate == 0) mychecked = false;
+            theNewID = ctr->tree_add(parentID, itemname, mystate, mychecked);
+        }
+    }
+    std::vector<ObjIterator> children = getOrderedObject(value["children"]);
+    for (auto&& it : children) {
+        wxString childKey = wxString((std::string)it->first);
+        configuru::Config childVal = it->second._value;
+        loadRecursive(ctr, theNewID, childKey, childVal, false);
+    }
+    
+    return theNewID;
+}
+
+void Sec30::LoadFromJSON(wxString filepath, wxString filename)
+{
+    wxString tbmFile = filepath + wxFileName::GetPathSeparator() + filename;
+    
+    configuru::Config tbm;
+    try
+	{
+        tbm = configuru::parse_file(tbmFile.ToStdString(), configuru::JSON);
+    }
+    catch(std::exception& ex)
+    {
+        LoadFromFile(filepath, filename);
+        return;
+	}
+
+    ///////////////////////////////////////////////////////////////
+    // read app info
+    std::string applicationFullName = (std::string)tbm["ApplicationFullName"];
+    double releaseVersion = (double)tbm["ReleaseVersion"];
+    ///////////////////////////////////////////////////////////////
+    // read DFT Source info
+    std::string _DFTNomadEntryID = (std::string)tbm["DFTSource"]["DFTNomadEntryID"];
+    std::string _DFTSource = (std::string)tbm["DFTSource"]["DFTSource"];
+    DFTNomadEntryID = wxString(_DFTNomadEntryID);
+    DFTSource = wxString(_DFTSource);
+    ///////////////////////////////////////////////////////////////
+    for (configuru::Config::ConfigObject::iterator p : tbm["vars"].as_object()) {
+        wxString VariableName = wxString((std::string)p.key());
+        wxString val = wxString((std::string)p.value());
+        SetVar(VariableName, val, false);
+    }
+    ///////////////////////////////////////////////////////////////
+    for (configuru::Config::ConfigObject::iterator p : tbm["grids"].as_object()) {
+        std::string _VariableName = (std::string)p.key();
+        wxString VariableName = wxString(_VariableName);
+        configuru::Config value = tbm["grids"][_VariableName]["value"];
+        configuru::Config isReadOnly = tbm["grids"][_VariableName]["isReadOnly"].as_array();
+        
+        int nRow = value.as_array().size();
+        myGrid* gc = GetGridObject(VariableName);
+        int n0 = gc->GetNumberRows();
+        if (n0>0) gc->DeleteRows(0,n0,true);
+        wxColour c; //Also it is possible to determine the color in this way: wxColour c=*wxGREEN;
+        c.Set(191,205,219,255);
+        gc->InsertRows(0, nRow,false);
+        
+        int irow = 0;
+        for (const configuru::Config& row : value.as_array()) {
+            int icol = 0;
+            for (const configuru::Config& col : row.as_array()) {
+                std::string _val = (std::string)col;
+                wxString val = wxString(_val);
+                SetVar(VariableName, irow, icol, val, false);
+                icol++;
+            }
+            irow++;
+        }
+        
+        irow = 0;
+        for (const configuru::Config& row : isReadOnly.as_array()) {
+            int icol = 0;
+            for (const configuru::Config& col : row.as_array()) {
+                bool isreadonly = (bool)col;
+                gc->SetReadOnly(irow, icol, isreadonly);
+                if (isreadonly)
+                    gc->SetCellBackgroundColour(irow, icol, c);
+                else
+                    gc->SetCellBackgroundColour(irow, icol, *wxWHITE);
+
+                icol++;
+            }
+            irow++;
+        }
+    }
+    ///////////////////////////////////////////////////////////////
+    for (configuru::Config::ConfigObject::iterator p : tbm["radios"].as_object()) {
+        wxString VariableName = wxString((std::string)p.key());
+        bool val = (bool)p.value();
+        SetRadioVar(VariableName, val, false);
+    }
+    ///////////////////////////////////////////////////////////////
+    for (configuru::Config::ConfigObject::iterator p : tbm["checks"].as_object()) {
+        wxString VariableName = wxString((std::string)p.key());
+        bool val = (bool)p.value();
+        SetCheckVar(VariableName, val, false);
+    }
+    ///////////////////////////////////////////////////////////////
+    for (configuru::Config::ConfigObject::iterator p : tbm["trees"].as_object()) {
+        std::string _VariableName = (std::string)p.key();
+        wxString VariableName = wxString(_VariableName);
+        wxCheckTree* ctr = ((wxCheckTree*)FindWindowByName(VariableName,GetParent()));
+        ctr->DeleteAllItems();
+        
+        auto&& tree = tbm["trees"][_VariableName].as_object()._impl;
+        ObjIterator root = tree.begin();
+        wxString rootKey = wxString((std::string)root->first);
+        configuru::Config rootValue = root->second._value;
+        wxTreeItemId rootID = loadRecursive(ctr, wxNullPtr, rootKey, rootValue, true);
+        ctr->Expand(rootID);
+    }
+    ///////////////////////////////////////////////////////////////
+    for (configuru::Config::ConfigObject::iterator p : tbm["checklists"].as_object()) {
+        std::string _VariableName = (std::string)p.key();
+        wxString VariableName = wxString(_VariableName);
+        wxCheckListBox* ctr = ((wxCheckListBox*)FindWindowByName(VariableName,GetParent()));
+        ctr->Clear();
+        std::vector<ObjIterator> values = getOrderedObject(tbm["checklists"][_VariableName]);
+        int ii = 0;
+        for (auto&& it : values) {
+            wxString itemname = wxString((std::string)it->first);
+            bool boolval = (bool)it->second._value;
+            ctr->Append(itemname);
+            ctr->Check(ii, boolval);
+            ii++;
+        }
+    }
+    ///////////////////////////////////////////////////////////////
+    for (configuru::Config::ConfigObject::iterator p : tbm["lists"].as_object()) {
+        std::string _VariableName = (std::string)p.key();
+        wxString VariableName = wxString(_VariableName);
+        wxCheckListBox* ctr = ((wxCheckListBox*)FindWindowByName(VariableName,GetParent()));
+        ctr->Clear();
+        for (const configuru::Config& p : tbm["lists"][_VariableName].as_array()) {
+            wxString itemname = wxString((std::string)p);
+            ctr->Append(itemname);
+        }
+    }
+    ///////////////////////////////////////////////////////////////
+    for (configuru::Config::ConfigObject::iterator p : tbm["choices"].as_object()) {
+        std::string _VariableName = (std::string)p.key();
+        wxString VariableName = wxString(_VariableName);
+        wxChoice* ctr = ((wxChoice*)FindWindowByName(VariableName,GetParent()));
+        ctr->Clear();
+        for (const configuru::Config& p : tbm["choices"][_VariableName]["items"].as_array()) {
+            wxString itemname = wxString((std::string)p);
+            ctr->Append(itemname);
+        }
+        int nselect = (int)tbm["choices"][_VariableName]["selected"];
+        ctr->Select(nselect);
+    }
+    ///////////////////////////////////////////////////////////////
+    for (configuru::Config::ConfigObject::iterator p : tbm["combos"].as_object()) {
+        std::string _VariableName = (std::string)p.key();
+        wxString VariableName = wxString(_VariableName);
+        
+        std::string label = (std::string)tbm["combos"][_VariableName]["label"];
+        wxStaticText* labelctr = GetComboLabelObject(VariableName);
+        labelctr->SetLabel(wxString(label));
+        
+        wxComboBox* ctr = ((wxComboBox*)FindWindowByName(VariableName,GetParent()));
+        ctr->Clear();
+        
+        
+        for (const configuru::Config& p : tbm["combos"][_VariableName]["items"].as_array()) {
+            wxString itemname = wxString((std::string)p);
+            ctr->Append(itemname);
+        }
+        int nselect = (int)tbm["combos"][_VariableName]["selected"];
+        ctr->Select(nselect);
+    }
+    ///////////////////////////////////////////////////////////////
+    for (configuru::Config::ConfigObject::iterator p : tbm["colors"].as_object()) {
+        std::string _VariableName = (std::string)p.key();
+        wxString VariableName = wxString(_VariableName);
+        wxColourPickerCtrl* ctr = ((wxColourPickerCtrl*)FindWindowByName(VariableName,GetParent()));
+        int r,g,b,a;
+        int ii = 0;
+        Aint0D vals(4, 0);
+        for (const configuru::Config& p : tbm["colors"][_VariableName].as_array()) {
+            int clr = (int)p;
+            vals[ii] = clr;
+            ii++;
+        }
+        r = vals[0];
+        g = vals[1];
+        b = vals[2];
+        a = vals[3];
+        wxColour c;
+        c.Set(r, g, b, a);
+        ctr->SetColour(c);
+    }
+    ///////////////////////////////////////////////////////////////
+    isBandLoaded = (bool)tbm["variables"]["isBandLoaded"];
+    nKPoint = (int)tbm["variables"]["nKPoint"];
+    maxneig = (int)tbm["variables"]["maxneig"];
+    mspin = (int)tbm["variables"]["mspin"];
+    DFTnBandMin = (int)tbm["variables"]["DFTnBandMin"];
+    DFTnBandMax = (int)tbm["variables"]["DFTnBandMax"];
+    isSelectMode = (bool)tbm["variables"]["isSelectMode"];
+    isTBBand_i = (bool)tbm["variables"]["isTBBand_i"];
+    isTBBand_f = (bool)tbm["variables"]["isTBBand_f"];
+    notUsed = (bool)tbm["variables"]["notUsed"];
+    ChemP = (double)tbm["variables"]["ChemP"];
+    DFTyMin2d0 = (double)tbm["variables"]["DFTyMin2d0"];
+    DFTyMax2d0 = (double)tbm["variables"]["DFTyMax2d0"];
+    DFTyMin2d = (double)tbm["variables"]["DFTyMin2d"];
+    DFTyMax2d = (double)tbm["variables"]["DFTyMax2d"];
+    DFTxMin2d0 = (double)tbm["variables"]["DFTxMin2d0"];
+    DFTxMax2d0 = (double)tbm["variables"]["DFTxMax2d0"];
+    DFTxMin2d = (double)tbm["variables"]["DFTxMin2d"];
+    DFTxMax2d = (double)tbm["variables"]["DFTxMax2d"];
+    
+    HamiltonianDimMap.clear();
+    for (const configuru::Config& row : tbm["variables"]["HamiltonianDimMap"].as_array()) {
+        Aint0D aint0D;
+        for (const configuru::Config& col : row.as_array()) aint0D.push_back((int)col);
+        HamiltonianDimMap.push_back(aint0D);
+    }
+    
+    SKListInfo.clear();
+    for (const configuru::Config& row : tbm["variables"]["SKListInfo"].as_array()) {
+        Aint0D aint0D;
+        for (const configuru::Config& col : row.as_array()) aint0D.push_back((int)col);
+        SKListInfo.push_back(aint0D);
+    }
+    
+    FitPoints.clear();
+    for (const configuru::Config& row : tbm["variables"]["FitPoints"].as_array()) {
+        Aint0D aint0D;
+        for (const configuru::Config& col : row.as_array()) aint0D.push_back((int)col);
+        FitPoints.push_back(aint0D);
+    }
+    
+    FitPoints.clear();
+    for (const configuru::Config& row : tbm["variables"]["FitPoints"].as_array()) {
+        Aint0D aint0D;
+        for (const configuru::Config& col : row.as_array()) aint0D.push_back((int)col);
+        FitPoints.push_back(aint0D);
+    }
+    
+    dkLabel.clear();
+    for (const configuru::Config& row : tbm["variables"]["dkLabel"].as_array()) dkLabel.push_back((double)row);
+    dkLabel.clear();
+    for (const configuru::Config& row : tbm["variables"]["dkLabel"].as_array()) dkLabel.push_back((double)row);
+    akDFT.clear();
+    for (const configuru::Config& row : tbm["variables"]["akDFT"].as_array()) akDFT.push_back((double)row);
+    bkDFT.clear();
+    for (const configuru::Config& row : tbm["variables"]["bkDFT"].as_array()) bkDFT.push_back((double)row);
+    ckDFT.clear();
+    for (const configuru::Config& row : tbm["variables"]["ckDFT"].as_array()) ckDFT.push_back((double)row);
+    
+    KPoints.clear();
+    for (const configuru::Config& row : tbm["variables"]["KPoints"].as_array()) {
+        Adouble0D adouble0D;
+        for (const configuru::Config& col : row.as_array()) adouble0D.push_back((double)col);
+        KPoints.push_back(adouble0D);
+    }
+    
+    DFTEigVal.clear();
+    for (const configuru::Config& row : tbm["variables"]["DFTEigVal"].as_array()) {
+        Adouble0D adouble0D;
+        for (const configuru::Config& col : row.as_array()) adouble0D.push_back((double)col);
+        DFTEigVal.push_back(adouble0D);
+    }
+    
+    iTBEigVal.clear();
+    for (const configuru::Config& row : tbm["variables"]["iTBEigVal"].as_array()) {
+        Adouble0D adouble0D;
+        for (const configuru::Config& col : row.as_array()) adouble0D.push_back((double)col);
+        iTBEigVal.push_back(adouble0D);
+    }
+    
+    fTBEigVal.clear();
+    for (const configuru::Config& row : tbm["variables"]["fTBEigVal"].as_array()) {
+        Adouble0D adouble0D;
+        for (const configuru::Config& col : row.as_array()) adouble0D.push_back((double)col);
+        fTBEigVal.push_back(adouble0D);
+    }
+    
+    DFTEigValWeight.clear();
+    for (const configuru::Config& row : tbm["variables"]["DFTEigValWeight"].as_array()) {
+        Adouble0D adouble0D;
+        for (const configuru::Config& col : row.as_array()) adouble0D.push_back((double)col);
+        DFTEigValWeight.push_back(adouble0D);
+    }
+    
+    Hi.clear();
+    for (const configuru::Config& row1 : tbm["variables"]["Hi"].as_array()) {
+        Adouble1D adouble1D;
+        for (const configuru::Config& row2 : row1.as_array()) {
+            Adouble0D adouble0D;
+            for (const configuru::Config& col : row2.as_array()) adouble0D.push_back((double)col);
+            adouble1D.push_back(adouble0D);
+        }
+        Hi.push_back(adouble1D);
+    }
+    
+    Hf.clear();
+    for (const configuru::Config& row1 : tbm["variables"]["Hf"].as_array()) {
+        Adouble1D adouble1D;
+        for (const configuru::Config& row2 : row1.as_array()) {
+            Adouble0D adouble0D;
+            for (const configuru::Config& col : row2.as_array()) adouble0D.push_back((double)col);
+            adouble1D.push_back(adouble0D);
+        }
+        Hf.push_back(adouble1D);
+    }
+    
+    Si.clear();
+    for (const configuru::Config& row1 : tbm["variables"]["Si"].as_array()) {
+        Adouble1D adouble1D;
+        for (const configuru::Config& row2 : row1.as_array()) {
+            Adouble0D adouble0D;
+            for (const configuru::Config& col : row2.as_array()) adouble0D.push_back((double)col);
+            adouble1D.push_back(adouble0D);
+        }
+        Si.push_back(adouble1D);
+    }
+    
+    Sf.clear();
+    for (const configuru::Config& row1 : tbm["variables"]["Sf"].as_array()) {
+        Adouble1D adouble1D;
+        for (const configuru::Config& row2 : row1.as_array()) {
+            Adouble0D adouble0D;
+            for (const configuru::Config& col : row2.as_array()) adouble0D.push_back((double)col);
+            adouble1D.push_back(adouble0D);
+        }
+        Sf.push_back(adouble1D);
+    }
+    
+    SOCi.clear();
+    for (const configuru::Config& row1 : tbm["variables"]["SOCi"].as_array()) {
+        Adouble1D adouble1D;
+        for (const configuru::Config& row2 : row1.as_array()) {
+            Adouble0D adouble0D;
+            for (const configuru::Config& col : row2.as_array()) adouble0D.push_back((double)col);
+            adouble1D.push_back(adouble0D);
+        }
+        SOCi.push_back(adouble1D);
+    }
+    
+    SOCf.clear();
+    for (const configuru::Config& row1 : tbm["variables"]["SOCf"].as_array()) {
+        Adouble1D adouble1D;
+        for (const configuru::Config& row2 : row1.as_array()) {
+            Adouble0D adouble0D;
+            for (const configuru::Config& col : row2.as_array()) adouble0D.push_back((double)col);
+            adouble1D.push_back(adouble0D);
+        }
+        SOCf.push_back(adouble1D);
+    }
+    
+    kLabel.clear();
+    for (const configuru::Config& row : tbm["variables"]["kLabel"].as_array()) kLabel.push_back(wxString((std::string)row));
+    HamiltonianMap.clear();
+    for (const configuru::Config& row : tbm["variables"]["HamiltonianMap"].as_array()) HamiltonianMap.push_back(wxString((std::string)row));
+    HamiltonianShellMap.clear();
+    for (const configuru::Config& row : tbm["variables"]["HamiltonianShellMap"].as_array()) HamiltonianShellMap.push_back(wxString((std::string)row));
+    //////////////////////////////////////////////////////////////////////////////////////////
 }
 
 wxString Sec30::GetAtomLable(int kind)
