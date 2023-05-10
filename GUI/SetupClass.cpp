@@ -169,6 +169,8 @@ void SetupClass::ReloadBand()
     sec30->GetVar(_("DFTFile[0]"), fname);
     wxString file = sec30->CreateFilePath(path,fname);
     
+    sec30->DFTNomadEntryID = _("");
+    
     wxComboBox* ctr =  sec30->GetComboObject(_("BandFileFormat"));
     int FileFormat = ctr->GetSelection();
     if (FileFormat < 0)
