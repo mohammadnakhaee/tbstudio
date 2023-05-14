@@ -120,6 +120,8 @@ void Sec30::init()
     DFTxMin2d = 0.0;
     DFTxMax2d = 0.0;
     
+    bandSections = Aint0D();
+    
     dkLabel = Adouble0D();
     akDFT = Adouble0D();
     bkDFT = Adouble0D();
@@ -2993,6 +2995,8 @@ void Sec30::SaveToJSON(wxString filepath, wxString filename)
     tbm["variables"]["SOCi"] = configuru::Config::array(SOCi);
     tbm["variables"]["SOCf"] = configuru::Config::array(SOCf);
     
+    tbm["variables"]["bandSections"] = configuru::Config::array(bandSections);
+    
     int n = kLabel.size();
     Astr0D _kLabel(n, "");
     for(int i=0; i!=n; i++) _kLabel[i] = kLabel[i].ToStdString();
@@ -3289,6 +3293,9 @@ void Sec30::LoadFromJSON(wxString filepath, wxString filename)
     for (const configuru::Config& row : tbm["variables"]["bkDFT"].as_array()) bkDFT.push_back((double)row);
     ckDFT.clear();
     for (const configuru::Config& row : tbm["variables"]["ckDFT"].as_array()) ckDFT.push_back((double)row);
+    bandSections.clear();
+    for (const configuru::Config& row : tbm["variables"]["bandSections"].as_array()) bandSections.push_back((double)row);
+    
     
     KPoints.clear();
     for (const configuru::Config& row : tbm["variables"]["KPoints"].as_array()) {

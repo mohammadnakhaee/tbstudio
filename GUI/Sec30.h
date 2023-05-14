@@ -137,6 +137,8 @@ public:
     double DFTxMin2d;
     double DFTxMax2d;
     
+    Aint0D bandSections;
+    
     Adouble0D dkLabel;
     Adouble0D akDFT;  //double akDFT[3];
     Adouble0D bkDFT;  //double bkDFT[3];

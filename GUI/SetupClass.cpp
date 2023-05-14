@@ -188,11 +188,12 @@ void SetupClass::ReloadBand()
         
         Adouble0D dkLabel;
         Astring0D kLabel;
+        Aint0D bandSections;
         
         if (FileFormat==0)
-            LoadOpenMXBand(file, isBandLoaded, maxneig, mspin, ChemP, nKPoint, KPoints, EigVal, dkLabel, kLabel);
+            LoadOpenMXBand(file, isBandLoaded, maxneig, mspin, ChemP, nKPoint, KPoints, EigVal, dkLabel, kLabel, bandSections);
         else if (FileFormat==1)
-            LoadVaspXMLOutput(file, isBandLoaded, maxneig, mspin, ChemP, nKPoint, KPoints, EigVal, dkLabel, kLabel);
+            LoadVaspXMLOutput(file, isBandLoaded, maxneig, mspin, ChemP, nKPoint, KPoints, EigVal, dkLabel, kLabel, bandSections);
         
         if (isBandLoaded)
         {
@@ -208,6 +209,7 @@ void SetupClass::ReloadBand()
             sec30->ChemP = ChemP;
             sec30->dkLabel = dkLabel;
             sec30->kLabel = kLabel;
+            sec30->bandSections = bandSections;
             sec30->KPoints = KPoints;
             sec30->DFTEigVal = EigVal;
             sec30->DFTEigValWeight = EigValWeights;
@@ -354,7 +356,7 @@ void SetupClass::Btn_Test_OnClick(wxCommandEvent& event)
     wxMessageBox(wxString::Format("%d",info),_("debug"));
 }
 
-void SetupClass::LoadOpenMXBand(wxString file, bool &isBandLoaded, int &maxneig, int &mspin, double &ChemP, int &nKp, Adouble1D &KPoints, Adouble1D &EigVal, Adouble0D &dkLabel, Astring0D &kLabel)
+void SetupClass::LoadOpenMXBand(wxString file, bool &isBandLoaded, int &maxneig, int &mspin, double &ChemP, int &nKp, Adouble1D &KPoints, Adouble1D &EigVal, Adouble0D &dkLabel, Astring0D &kLabel, Aint0D &bandSections)
 {
     double Hartree2eV = 27.2113961318;
     double BohrToAng = 1.88973;
@@ -404,11 +406,13 @@ void SetupClass::LoadOpenMXBand(wxString file, bool &isBandLoaded, int &maxneig,
         kLabel.clear();
         KPoints.clear();
         EigVal.clear();
+        bandSections.clear();
         int n1;
         double vk[3], vec[3], vk2[3], vec2[3], oldvec[3], eig;
         double d = 0.0;
         
         dkLabel.push_back(d);
+        bandSections.push_back(nKp);
         for (int i=0;i<nkpath;i++)
         {
             fscanf(fp,"%d %lf %lf %lf  %lf %lf %lf  %s %s",&n_perpath[i],&k1, &k2, &k3,&k4, &k5, &k6, c1, c2);
@@ -423,6 +427,7 @@ void SetupClass::LoadOpenMXBand(wxString file, bool &isBandLoaded, int &maxneig,
             dkLabel.push_back(d);
             if (kname1 == "G" || kname1 == "g" || kname1.Contains(_("\G")) || kname1.Contains(_("\g")) || kname1.Contains(_("gamma")) || kname1.Contains(_("Gamma"))) kname1 = _("\\Gamma");
             kLabel.push_back(kname1);
+            bandSections.push_back(nKp);
         }
         if (kname2 == "G" || kname2 == "g" || kname2.Contains(_("\G")) || kname2.Contains(_("\g")) || kname2.Contains(_("gamma")) || kname2.Contains(_("Gamma"))) kname2 = _("\\Gamma");
         kLabel.push_back(kname2);
@@ -562,7 +567,7 @@ void SetupClass::LoadOpenMXUnfoldedBand(wxString file)
     
 }
 
-void SetupClass::LoadVaspXMLOutput(wxString file, bool &isBandLoaded, int &maxneig, int &mspin, double &ChemP, int &nKp, Adouble1D &KPoints, Adouble1D &EigVal, Adouble0D &dkLabel, Astring0D &kLabel)
+void SetupClass::LoadVaspXMLOutput(wxString file, bool &isBandLoaded, int &maxneig, int &mspin, double &ChemP, int &nKp, Adouble1D &KPoints, Adouble1D &EigVal, Adouble0D &dkLabel, Astring0D &kLabel, Aint0D &bandSections)
 {
     isBandLoaded = false;
     try
@@ -652,11 +657,13 @@ void SetupClass::LoadVaspXMLOutput(wxString file, bool &isBandLoaded, int &maxne
         kLabel.clear();
         KPoints.clear();
         EigVal.clear();
+        bandSections.clear();
         int n1;
         double vk[3], vec[3], vk2[3], vec2[3], oldvec[3], eig;
         double d = 0.0;
         
         dkLabel.push_back(d);
+        bandSections.push_back(nKp);
         for (int i=0;i<nkpath;i++)
         {
             //fscanf(fp,"%d %lf %lf %lf  %lf %lf %lf  %s %s",&n_perpath[i],&k1, &k2, &k3,&k4, &k5, &k6, c1, c2);
@@ -671,6 +678,7 @@ void SetupClass::LoadVaspXMLOutput(wxString file, bool &isBandLoaded, int &maxne
             dkLabel.push_back(d);
             if (kname1 == "G" || kname1 == "g" || kname1.Contains(_("\G")) || kname1.Contains(_("\g")) || kname1.Contains(_("gamma")) || kname1.Contains(_("Gamma"))) kname1 = _("\\Gamma");
             kLabel.push_back(kname1);
+            bandSections.push_back(nKp);
         }
         if (kname2 == "G" || kname2 == "g" || kname2.Contains(_("\G")) || kname2.Contains(_("\g")) || kname2.Contains(_("gamma")) || kname2.Contains(_("Gamma"))) kname2 = _("\\Gamma");
         kLabel.push_back(kname2);

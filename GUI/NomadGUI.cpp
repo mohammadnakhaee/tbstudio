@@ -146,6 +146,7 @@ void NomadGUI::CopyToTBStudio()
     sec30->ChemP = remote_sec30->ChemP;
     
     sec30->dkLabel = remote_sec30->dkLabel;
+    sec30->bandSections = remote_sec30->bandSections;
     sec30->akDFT = remote_sec30->akDFT;
     sec30->bkDFT = remote_sec30->bkDFT;
     sec30->ckDFT = remote_sec30->ckDFT;
@@ -803,7 +804,10 @@ void NomadGUI::nomadEVT_On_State_Completed(wxCommandEvent& event)
                     wxString kname1;
                     Adouble0D dkLabel;
                     Astring0D kLabel;
+                    Aint0D bandSections;
                     dkLabel.push_back(d);
+                    int nKp = 0;
+                    bandSections.push_back(nKp);
                     if (isKLabel)
                         kname1 = nomad_kLabel.at(ThisPathInd);
                     else
@@ -835,6 +839,8 @@ void NomadGUI::nomadEVT_On_State_Completed(wxCommandEvent& event)
                             if (kname1 == "Γ" || kname1 == "G" || kname1 == "g" || kname1.Contains(_("\G")) || kname1.Contains(_("\g")) || kname1.Contains(_("gamma")) || kname1.Contains(_("Gamma"))) kname1 = _("\\Gamma");
                             if (kname1 == wxT("")) kname1 = _("?");
                             kLabel.push_back(kname1);
+                            nKp = nKp + n_perpath[ThisPathInd];
+                            bandSections.push_back(nKp);
                             deltakPath = 0.000001;
                             PathCounter = 0;
                             ThisPathInd++;
@@ -878,6 +884,7 @@ void NomadGUI::nomadEVT_On_State_Completed(wxCommandEvent& event)
                     remote_sec30->isSelectMode = false;
                     remote_sec30->ChemP = ChemP;
                     remote_sec30->dkLabel = dkLabel;
+                    remote_sec30->bandSections = bandSections;
                     remote_sec30->kLabel = kLabel;
                     remote_sec30->KPoints = KPoints;
                     remote_sec30->DFTEigVal = EigVal;
