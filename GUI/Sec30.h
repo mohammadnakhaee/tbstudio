@@ -98,8 +98,10 @@ public:
     //10000bool isPrinting = false;
     bool isMainThread = false;
     
-    wxString DFTNomadEntryID = _("");
+    wxString DFTSourceType = _("");
     wxString DFTSource = _("");
+    
+    Aint0D DFTAtomsSpecies;
     
     std::list<wxString> vars;
     std::list<wxString> grids;
@@ -137,7 +139,8 @@ public:
     double DFTxMin2d;
     double DFTxMax2d;
     
-    Aint0D bandSections;
+    Aint1D bandSectionsIndex;
+    Astring1D bandSectionsLabel;
     
     Adouble0D dkLabel;
     Adouble0D akDFT;  //double akDFT[3];

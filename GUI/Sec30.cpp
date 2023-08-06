@@ -92,7 +92,7 @@ void Sec30::init()
 //    ArraysOf3DDouble[4] = Adouble2D();//double*** SOCi; SOCi_Re, SOCi_Im
 //    ArraysOf3DDouble[5] = Adouble2D();//double*** SOCf; SOCf_Re, SOCf_Im
 
-    DFTNomadEntryID = _("");
+    DFTSourceType = _("");
     DFTSource = _("");
     
     isBandLoaded = false;
@@ -120,7 +120,8 @@ void Sec30::init()
     DFTxMin2d = 0.0;
     DFTxMax2d = 0.0;
     
-    bandSections = Aint0D();
+    bandSectionsIndex = Aint1D();
+    bandSectionsLabel = Astring1D();
     
     dkLabel = Adouble0D();
     akDFT = Adouble0D();
@@ -2791,8 +2792,8 @@ void Sec30::SaveToJSON(wxString filepath, wxString filename)
     ///////////////////////////////////////////////////////////////
     // write DFT Source info
     tbm["DFTSource"] = configuru::Config::object();
-    tbm["DFTSource"]["DFTNomadEntryID"]  = DFTNomadEntryID.ToStdString();
-    tbm["DFTSource"]["DFTSource"]  = DFTSource.ToStdString();
+    tbm["DFTSource"]["type"]  = DFTSourceType.ToStdString();
+    tbm["DFTSource"]["source"]  = DFTSource.ToStdString();
     ///////////////////////////////////////////////////////////////
 
     std::list<wxString>::iterator is;
@@ -2995,9 +2996,16 @@ void Sec30::SaveToJSON(wxString filepath, wxString filename)
     tbm["variables"]["SOCi"] = configuru::Config::array(SOCi);
     tbm["variables"]["SOCf"] = configuru::Config::array(SOCf);
     
-    tbm["variables"]["bandSections"] = configuru::Config::array(bandSections);
+    tbm["variables"]["bandSections"] = configuru::Config::object();
+    tbm["variables"]["bandSections"]["index"] = configuru::Config::array(bandSectionsIndex);
     
-    int n = kLabel.size();
+    int n = bandSectionsLabel.size();
+    Astr1D _bandSectionsLabel(n, Astr0D(2, "" ));
+    for(int i=0; i!=n; i++)
+        for(int j=0; j!=2; j++) _bandSectionsLabel[i][j] = bandSectionsLabel[i][j].ToStdString();
+    tbm["variables"]["bandSections"]["label"] = configuru::Config::array(_bandSectionsLabel);
+    
+    n = kLabel.size();
     Astr0D _kLabel(n, "");
     for(int i=0; i!=n; i++) _kLabel[i] = kLabel[i].ToStdString();
     tbm["variables"]["kLabel"] = configuru::Config::array(_kLabel);
@@ -3074,9 +3082,9 @@ void Sec30::LoadFromJSON(wxString filepath, wxString filename)
     double releaseVersion = (double)tbm["ReleaseVersion"];
     ///////////////////////////////////////////////////////////////
     // read DFT Source info
-    std::string _DFTNomadEntryID = (std::string)tbm["DFTSource"]["DFTNomadEntryID"];
-    std::string _DFTSource = (std::string)tbm["DFTSource"]["DFTSource"];
-    DFTNomadEntryID = wxString(_DFTNomadEntryID);
+    std::string _DFTSourceType = (std::string)tbm["DFTSource"]["type"];
+    std::string _DFTSource = (std::string)tbm["DFTSource"]["source"];
+    DFTSourceType = wxString(_DFTSourceType);
     DFTSource = wxString(_DFTSource);
     ///////////////////////////////////////////////////////////////
     for (configuru::Config::ConfigObject::iterator p : tbm["vars"].as_object()) {
@@ -3293,9 +3301,20 @@ void Sec30::LoadFromJSON(wxString filepath, wxString filename)
     for (const configuru::Config& row : tbm["variables"]["bkDFT"].as_array()) bkDFT.push_back((double)row);
     ckDFT.clear();
     for (const configuru::Config& row : tbm["variables"]["ckDFT"].as_array()) ckDFT.push_back((double)row);
-    bandSections.clear();
-    for (const configuru::Config& row : tbm["variables"]["bandSections"].as_array()) bandSections.push_back((double)row);
     
+    bandSectionsIndex.clear();
+    for (const configuru::Config& row : tbm["variables"]["bandSections"]["index"].as_array()) {
+        Aint0D aint0D;
+        for (const configuru::Config& col : row.as_array()) aint0D.push_back((int)col);
+        bandSectionsIndex.push_back(aint0D);
+    }
+    
+    bandSectionsLabel.clear();
+    for (const configuru::Config& row : tbm["variables"]["bandSections"]["label"].as_array()) {
+        Astring0D astring0D;
+        for (const configuru::Config& col : row.as_array()) astring0D.push_back(wxString((std::string)col));
+        bandSectionsLabel.push_back(astring0D);
+    }
     
     KPoints.clear();
     for (const configuru::Config& row : tbm["variables"]["KPoints"].as_array()) {

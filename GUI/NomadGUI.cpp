@@ -4,7 +4,7 @@
 #include <configuru.hpp>
 
 configuru::Config resolveRef(configuru::Config object, wxString path);
-void ImportFromNomad(configuru::Config data, bool &isBandLoaded, int &nAtoms, int &maxneig, int &mspin, double &ChemP, int &nKp, Adouble1D &lattice_vectors, Adouble1D &cartesian_site_positions, Aint0D &dimension_types, Astring0D &species_at_sites, Astring0D &kLabel, Adouble1D &fractional_KPoints, Adouble1D &energies_spin0, Adouble1D &energies_spin1, Aint0D &n_perpath, wxString &chemical_formula_reduced, wxString &chemical_formula_anonymous, wxString &program_name, wxString &method_name, wxString &entry_id, wxString &upload_id, wxString &parser_name, wxString &structural_type);
+void ImportFromNomad(configuru::Config data, bool &isBandLoaded, int &nAtoms, int &maxneig, int &mspin, double &ChemP, int &nKp, Adouble1D &lattice_vectors, Adouble1D &cartesian_site_positions, Aint0D &dimension_types, Astring0D &species_at_sites, Astring0D &all_start_labels, Astring0D &all_end_labels, Astring0D &kLabel, Adouble1D &fractional_KPoints, Adouble1D &energies_spin0, Adouble1D &energies_spin1, Aint0D &n_perpath, wxString &chemical_formula_reduced, wxString &chemical_formula_anonymous, wxString &program_name, wxString &method_name, wxString &entry_id, wxString &upload_id, wxString &parser_name, wxString &structural_type);
 
 bool s = true;
 NomadGUI::NomadGUI(wxWindow* parent, Sec30* main_sec30, GraphClass* _main_graph2d0, GraphClass* _main_graph2d)
@@ -137,7 +137,8 @@ void NomadGUI::CopyToTBStudio()
 
     sec30->init();
     
-    sec30->DFTNomadEntryID = remote_sec30->DFTNomadEntryID;
+    sec30->DFTSourceType = remote_sec30->DFTSourceType;
+    sec30->DFTSource = remote_sec30->DFTSource;
     sec30->isBandLoaded = remote_sec30->isBandLoaded;
     sec30->nKPoint = remote_sec30->nKPoint;
     sec30->maxneig = remote_sec30->maxneig;
@@ -146,7 +147,8 @@ void NomadGUI::CopyToTBStudio()
     sec30->ChemP = remote_sec30->ChemP;
     
     sec30->dkLabel = remote_sec30->dkLabel;
-    sec30->bandSections = remote_sec30->bandSections;
+    sec30->bandSectionsIndex = remote_sec30->bandSectionsIndex;
+    sec30->bandSectionsLabel = remote_sec30->bandSectionsLabel;
     sec30->akDFT = remote_sec30->akDFT;
     sec30->bkDFT = remote_sec30->bkDFT;
     sec30->ckDFT = remote_sec30->ckDFT;
@@ -718,12 +720,14 @@ void NomadGUI::nomadEVT_On_State_Completed(wxCommandEvent& event)
                 Adouble1D fractional_KPoints;
                 Adouble1D EigVal_spin0;
                 Adouble1D EigVal_spin1;
-
+                
+                Astring0D all_start_labels;
+                Astring0D all_end_labels;
                 Astring0D kLabel;
                 Aint0D n_perpath;
                 
                 wxString chemical_formula_reduced, chemical_formula_anonymous, program_name, method_name, entry_id, upload_id, parser_name;
-                ImportFromNomad(data, isBandLoaded, nAtoms, maxneig, mspin, ChemP, nKPoint, lattice_vectors, cartesian_site_positions, dimension_types, species_at_sites, nomad_kLabel, fractional_KPoints, EigVal_spin0, EigVal_spin1, n_perpath, chemical_formula_reduced, chemical_formula_anonymous, program_name, method_name, entry_id, upload_id, parser_name, structural_type);
+                ImportFromNomad(data, isBandLoaded, nAtoms, maxneig, mspin, ChemP, nKPoint, lattice_vectors, cartesian_site_positions, dimension_types, species_at_sites, all_start_labels, all_end_labels, nomad_kLabel, fractional_KPoints, EigVal_spin0, EigVal_spin1, n_perpath, chemical_formula_reduced, chemical_formula_anonymous, program_name, method_name, entry_id, upload_id, parser_name, structural_type);
                 
                 if (isBandLoaded)
                 {
@@ -751,7 +755,8 @@ void NomadGUI::nomadEVT_On_State_Completed(wxCommandEvent& event)
                     wxFlexGridSizer* entryInfoGridSizer = (wxFlexGridSizer*)entryInfo->GetSizer();
                     entryInfoGridSizer->Clear(false);
                     EntryID->SetValue(entry_id);
-                    remote_sec30->DFTNomadEntryID = entry_id;
+                    remote_sec30->DFTSourceType = wxT("NOMAD");
+                    remote_sec30->DFTSource = entry_id;
                     addInfo("Entry ID", entry_id);
                     addSpacer();
                     addSpacer();
@@ -799,15 +804,30 @@ void NomadGUI::nomadEVT_On_State_Completed(wxCommandEvent& event)
                     double d = 0.0;
                     int i = -1;
                     
+                    Aint1D bandSectionsIndex;
+                    Astring1D bandSectionsLabel;
+                    
+                    int n_start_labels = all_start_labels.size();
+                    int n_end_labels = all_end_labels.size();
+                    for (int ilabel=0; ilabel<n_start_labels; ilabel++) {
+                        Astring0D secLabels;
+                        secLabels.push_back(all_start_labels[ilabel]);
+                        if (ilabel < n_end_labels) {
+                            secLabels.push_back(all_end_labels[ilabel]);
+                        } else {
+                            secLabels.push_back(wxString(""));
+                        }
+                        bandSectionsLabel.push_back(secLabels);
+                    }
+                
 //                    wxString kname1 = wxString(c1, wxConvUTF8);
                     bool isKLabel = nomad_kLabel.size() > 0;
                     wxString kname1;
                     Adouble0D dkLabel;
                     Astring0D kLabel;
-                    Aint0D bandSections;
+                    
                     dkLabel.push_back(d);
                     int nKp = 0;
-                    bandSections.push_back(nKp);
                     if (isKLabel)
                         kname1 = nomad_kLabel.at(ThisPathInd);
                     else
@@ -815,6 +835,7 @@ void NomadGUI::nomadEVT_On_State_Completed(wxCommandEvent& event)
                     if (kname1 == "Γ" || kname1 == "G" || kname1 == "g" || kname1.Contains(_("\G")) || kname1.Contains(_("\g")) || kname1.Contains(_("gamma")) || kname1.Contains(_("Gamma"))) kname1 = _("\\Gamma");
                     if (kname1 == wxT("")) kname1 = _("?");
                     kLabel.push_back(kname1);
+                    int sectionIndex1 = 0;
                     for(Adouble1D::iterator it = std::begin(fractional_KPoints); it != std::end(fractional_KPoints); ++it) {
                         i++;
                         Adouble0D A1d;
@@ -840,7 +861,12 @@ void NomadGUI::nomadEVT_On_State_Completed(wxCommandEvent& event)
                             if (kname1 == wxT("")) kname1 = _("?");
                             kLabel.push_back(kname1);
                             nKp = nKp + n_perpath[ThisPathInd];
-                            bandSections.push_back(nKp);
+                            int sectionIndex2 = nKp - 1;
+                            Aint0D secIndex;
+                            secIndex.push_back(sectionIndex1);
+                            secIndex.push_back(sectionIndex2);
+                            bandSectionsIndex.push_back(secIndex);
+                            sectionIndex1 = nKp;
                             deltakPath = 0.000001;
                             PathCounter = 0;
                             ThisPathInd++;
@@ -884,7 +910,8 @@ void NomadGUI::nomadEVT_On_State_Completed(wxCommandEvent& event)
                     remote_sec30->isSelectMode = false;
                     remote_sec30->ChemP = ChemP;
                     remote_sec30->dkLabel = dkLabel;
-                    remote_sec30->bandSections = bandSections;
+                    remote_sec30->bandSectionsIndex = bandSectionsIndex;
+                    remote_sec30->bandSectionsLabel = bandSectionsLabel;
                     remote_sec30->kLabel = kLabel;
                     remote_sec30->KPoints = KPoints;
                     remote_sec30->DFTEigVal = EigVal;
@@ -1010,7 +1037,7 @@ configuru::Config resolveRef(configuru::Config object, wxString path)
     return current;
 }
 
-void ImportFromNomad(configuru::Config data, bool &isBandLoaded, int &nAtoms, int &maxneig, int &mspin, double &ChemP, int &nKp, Adouble1D &lattice_vectors, Adouble1D &cartesian_site_positions, Aint0D &dimension_types, Astring0D &species_at_sites, Astring0D &kLabel, Adouble1D &fractional_KPoints, Adouble1D &energies_spin0, Adouble1D &energies_spin1, Aint0D &n_perpath, wxString &chemical_formula_reduced, wxString &chemical_formula_anonymous, wxString &program_name, wxString &method_name, wxString &entry_id, wxString &upload_id, wxString &parser_name, wxString &structural_type)
+void ImportFromNomad(configuru::Config data, bool &isBandLoaded, int &nAtoms, int &maxneig, int &mspin, double &ChemP, int &nKp, Adouble1D &lattice_vectors, Adouble1D &cartesian_site_positions, Aint0D &dimension_types, Astring0D &species_at_sites, Astring0D &all_start_labels, Astring0D &all_end_labels, Astring0D &kLabel, Adouble1D &fractional_KPoints, Adouble1D &energies_spin0, Adouble1D &energies_spin1, Aint0D &n_perpath, wxString &chemical_formula_reduced, wxString &chemical_formula_anonymous, wxString &program_name, wxString &method_name, wxString &entry_id, wxString &upload_id, wxString &parser_name, wxString &structural_type)
 {
 //    double Hartree2eV = 27.2113961318;
     double Joule2eV = 6.241509e18;
@@ -1102,8 +1129,6 @@ void ImportFromNomad(configuru::Config data, bool &isBandLoaded, int &nAtoms, in
     int _nKp = 0;
     maxneig = 0;
     nKp = 0;
-    Astring0D all_start_labels;
-    Astring0D all_end_labels;
     configuru::Config segments = band_structure_electronic["segment"];
     if (segments.is_array()) {
         for (const configuru::Config& segment : segments.as_array()) {
